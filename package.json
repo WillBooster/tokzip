@@ -1,0 +1,38 @@
+{
+  "name": "tokzip",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WillBooster/tokzip.git"
+  },
+  "license": "UNLICENSED",
+  "author": "WillBooster Inc.",
+  "type": "module",
+  "module": "index.ts",
+  "scripts": {
+    "cleanup": "bun --bun wb lint --fix --format",
+    "format": "bun --bun wb lint --format",
+    "lint": "bun --bun wb lint",
+    "lint-fix": "bun --bun wb lint --fix",
+    "prepare": "lefthook install || true",
+    "test": "bun wb test",
+    "typecheck": "bun --bun wb typecheck",
+    "verify": "bun --bun wb verify",
+    "verify-full": "bun --bun wb verify --full"
+  },
+  "devDependencies": {
+    "@tsconfig/bun": "1.0.10",
+    "@types/bun": "latest",
+    "@willbooster/oxfmt-config": "1.2.2",
+    "@willbooster/oxlint-config": "1.4.8",
+    "@willbooster/wb": "13.25.3",
+    "lefthook": "2.1.9",
+    "oxfmt": "0.58.0",
+    "oxlint": "1.73.0",
+    "oxlint-tsgolint": "0.24.0",
+    "sort-package-json": "4.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "7.0.2"
+  }
+}
