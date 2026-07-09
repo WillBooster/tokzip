@@ -7,14 +7,20 @@
  * Usage: bun scripts/corpus/fetchOss.ts [--quick] [<language> ...]
  *   --quick  clone only the repo marked `quick` per language and cap the sample volume.
  */
-import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import nlSources from './nl-sources.json';
 import sources from './oss-sources.json';
-import { appendManifest, CORPUS_DIR, resetOrigin, sizeBucketOf, writeSample } from './shared.ts';
+import {
+  appendManifest,
+  CACHE_DIR,
+  cloneAtRef,
+  resetOrigin,
+  resolvedSha,
+  sizeBucketOf,
+  writeSample,
+} from './shared.ts';
 
-const CACHE_DIR = join(CORPUS_DIR, '.cache');
 const EXTENSIONS: Record<string, string[]> = {
   c: ['.c', '.h'],
   cpp: ['.cc', '.cpp', '.cxx', '.hpp', '.hh'],
@@ -95,11 +101,11 @@ function fetchLanguage(language: string, quick: boolean): void {
   let index = 0;
   for (const entry of selected) {
     if (total >= budget) break;
-    const checkout = cloneAt(entry);
+    const checkout = cloneAtRef(entry.repo, entry.ref);
     if (!checkout) continue;
-    const sha = resolveSha(checkout.dir);
+    const sha = resolvedSha(checkout);
     let repoBytes = 0;
-    for (const file of sampleFiles(checkout.dir, extensions)) {
+    for (const file of sampleFiles(checkout, extensions)) {
       if (total >= budget || repoBytes >= repoCap) break;
       const content = readFileSync(file.path, 'utf8');
       const name = `${String(index++).padStart(5, '0')}.txt`;
@@ -179,36 +185,6 @@ function harvestText(quick: boolean): void {
     }
   }
   console.log(`text: harvested ${total} B of docs/prose`);
-}
-
-const git = (args: string[]): boolean =>
-  spawnSync('git', args, { stdio: ['ignore', 'ignore', 'pipe'], timeout: 600_000 }).status === 0;
-
-function cloneAt(entry: SourceEntry): { dir: string } | undefined {
-  const name = entry.repo.split('/').slice(-2).join('__');
-  const dir = join(CACHE_DIR, name);
-  if (existsSync(dir)) return { dir };
-  console.log(`cloning ${entry.repo}@${entry.ref} ...`);
-  if (git(['clone', '--depth', '1', '--branch', entry.ref, '--single-branch', entry.repo, dir])) return { dir };
-  // The pinned ref is not a branch/tag name (e.g. a commit SHA): fetch it explicitly.
-  // An unresolvable ref is a hard error — silently sampling a moving default branch would
-  // break the reproducibility contract of oss-sources.json.
-  if (
-    git(['clone', '--depth', '1', entry.repo, dir]) &&
-    git(['-C', dir, 'fetch', '--depth', '1', 'origin', entry.ref]) &&
-    git(['-C', dir, 'checkout', '--detach', 'FETCH_HEAD'])
-  ) {
-    return { dir };
-  }
-  rmSync(dir, { recursive: true, force: true });
-  console.error(`error: cannot resolve ${entry.repo}@${entry.ref}; skipping repo (fix the pinned ref)`);
-  process.exitCode = 1;
-  return undefined;
-}
-
-function resolveSha(dir: string): string {
-  const result = spawnSync('git', ['-C', dir, 'rev-parse', 'HEAD'], { encoding: 'utf8' });
-  return result.stdout?.trim() ?? 'unknown';
 }
 
 interface SampledFile {

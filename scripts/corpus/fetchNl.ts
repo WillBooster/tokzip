@@ -8,7 +8,7 @@
  * Usage: bun scripts/corpus/fetchNl.ts [<locale> ...]
  */
 import sources from './nl-sources.json';
-import { appendManifest, CORPUS_DIR, resetOrigin, sizeBucketOf, writeSample } from './shared.ts';
+import { appendManifest, cloneAtRef, resetOrigin, resolvedSha, sizeBucketOf, writeSample } from './shared.ts';
 
 const CHUNK_TARGETS = [512, 2048, 8192, 24_576];
 const MAX_DOC_BYTES = 512 * 1024;
@@ -163,29 +163,13 @@ async function fetchWikipedia(locale: string, source: WikipediaSource): Promise<
 
 /** Modern technical prose from permissively licensed docs-translation repos. */
 async function fetchGitDocs(locale: string, entries: GitDocsSource[]): Promise<void> {
-  const { spawnSync } = await import('node:child_process');
-  const { existsSync, mkdirSync, readdirSync, readFileSync, statSync } = await import('node:fs');
-  const { join } = await import('node:path');
-  const cacheDir = join(CORPUS_DIR, '.cache');
-  mkdirSync(cacheDir, { recursive: true });
+  const { readdirSync, readFileSync, statSync } = await import('node:fs');
+  const { join, relative } = await import('node:path');
   for (const entry of entries) {
-    const dir = join(cacheDir, entry.repo.split('/').slice(-2).join('__'));
-    if (!existsSync(dir)) {
-      const clone = spawnSync('git', ['clone', '--depth', '1', '--branch', entry.ref, entry.repo, dir], {
-        stdio: ['ignore', 'ignore', 'pipe'],
-        timeout: 600_000,
-      });
-      if (clone.status !== 0) {
-        const fallback = spawnSync('git', ['clone', '--depth', '1', entry.repo, dir], {
-          stdio: ['ignore', 'ignore', 'pipe'],
-          timeout: 600_000,
-        });
-        if (fallback.status !== 0) {
-          console.error(`  failed to clone ${entry.repo}`);
-          continue;
-        }
-      }
-    }
+    // Pinned refs and hard failure semantics are shared with fetchOss (see cloneAtRef).
+    const dir = cloneAtRef(entry.repo, entry.ref);
+    if (!dir) continue;
+    const sha = resolvedSha(dir);
     let bytes = 0;
     const walk = (current: string): void => {
       for (const dirent of readdirSync(current, { withFileTypes: true })) {
@@ -199,7 +183,7 @@ async function fetchGitDocs(locale: string, entries: GitDocsSource[]): Promise<v
         bytes += saveChunks(
           locale,
           readFileSync(path, 'utf8'),
-          `${entry.repo}:${dirent.name}`,
+          `${entry.repo}@${sha}:${relative(dir, path)}`,
           entry.license,
           entry.trainable
         );

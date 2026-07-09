@@ -33,7 +33,9 @@ export function fromBase64(text: string): Uint8Array {
   let accBits = 0;
   let o = 0;
   for (let i = 0; i < end; i++) {
-    const value = BASE64_VALUES[text.codePointAt(i)!]!;
+    // Code points >= 128 would index past the table (undefined coerces to 0 in `|`), so guard first.
+    const code = text.codePointAt(i)!;
+    const value = code < 128 ? BASE64_VALUES[code]! : -1;
     if (value < 0) throw new RangeError('invalid base64 in module data');
     acc = (acc << 6) | value;
     accBits += 6;
