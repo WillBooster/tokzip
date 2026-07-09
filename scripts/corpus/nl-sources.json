@@ -1,0 +1,149 @@
+{
+  "$comment": "Natural-language corpus sources. Public-domain sources (Project Gutenberg, Aozora Bunko) are trainable; Wikipedia is CC-BY-SA (share-alike) and therefore benchmark-only. Wikipedia article lists are seeded and pinned for reproducibility; extracts are fetched via the MediaWiki action API.",
+  "locales": {
+    "en-US": {
+      "gutenberg": [1342, 84, 2701, 1661, 98, 74, 11, 1400, 345, 76],
+      "wikipedia": {
+        "host": "en.wikipedia.org",
+        "titles": [
+          "Data compression",
+          "Huffman coding",
+          "Lempel–Ziv–Welch",
+          "Entropy (information theory)",
+          "TypeScript",
+          "JavaScript",
+          "Compiler",
+          "Operating system",
+          "Internet",
+          "Machine learning",
+          "Photosynthesis",
+          "World War II",
+          "Solar System",
+          "DNA",
+          "Industrial Revolution",
+          "United States",
+          "William Shakespeare",
+          "Mathematics",
+          "Music",
+          "Economics"
+        ]
+      }
+    },
+    "ja-JP": {
+      "aozoraGithub": [
+        "cards/000148/files/752_14964.html",
+        "cards/000148/files/789_14547.html",
+        "cards/000035/files/1567_14913.html",
+        "cards/000035/files/301_14912.html",
+        "cards/000879/files/127_15260.html",
+        "cards/000879/files/128_15261.html",
+        "cards/001779/files/56647_58166.html",
+        "cards/000081/files/456_15050.html",
+        "cards/000081/files/43737_19215.html",
+        "cards/000129/files/695_22816.html"
+      ],
+      "gitDocs": [
+        { "repo": "https://github.com/vuejs-translations/docs-ja", "ref": "main", "license": "MIT", "trainable": true }
+      ],
+      "wikipedia": {
+        "host": "ja.wikipedia.org",
+        "titles": [
+          "データ圧縮",
+          "ハフマン符号",
+          "情報理論",
+          "コンパイラ",
+          "オペレーティングシステム",
+          "インターネット",
+          "機械学習",
+          "光合成",
+          "第二次世界大戦",
+          "太陽系",
+          "デオキシリボ核酸",
+          "産業革命",
+          "日本",
+          "夏目漱石",
+          "数学",
+          "音楽",
+          "経済学",
+          "東京都",
+          "富士山",
+          "新幹線"
+        ]
+      }
+    },
+    "zh-CN": {
+      "$comment": "Project Gutenberg zh books are traditional-script classics — wrong at the byte level for zh-CN, so training draws on permissively licensed simplified docs instead.",
+      "gitDocs": [
+        {
+          "repo": "https://github.com/vuejs-translations/docs-zh-cn",
+          "ref": "main",
+          "license": "MIT",
+          "trainable": true
+        }
+      ],
+      "wikipedia": {
+        "host": "zh.wikipedia.org",
+        "variant": "zh-cn",
+        "titles": [
+          "数据压缩",
+          "霍夫曼编码",
+          "信息论",
+          "编译器",
+          "操作系统",
+          "互联网",
+          "机器学习",
+          "光合作用",
+          "第二次世界大战",
+          "太阳系",
+          "脱氧核糖核酸",
+          "工业革命",
+          "中国",
+          "数学",
+          "音乐",
+          "经济学",
+          "北京市",
+          "长江",
+          "汉语",
+          "计算机科学"
+        ]
+      }
+    },
+    "zh-TW": {
+      "gitDocs": [
+        {
+          "repo": "https://github.com/vuejs-translations/docs-zh-tw",
+          "ref": "main",
+          "license": "MIT",
+          "trainable": true
+        }
+      ],
+      "wikipedia": {
+        "host": "zh.wikipedia.org",
+        "variant": "zh-tw",
+        "titles": [
+          "数据压缩",
+          "霍夫曼编码",
+          "信息论",
+          "编译器",
+          "操作系统",
+          "互联网",
+          "机器学习",
+          "光合作用",
+          "第二次世界大战",
+          "太阳系",
+          "脱氧核糖核酸",
+          "工业革命",
+          "臺灣",
+          "数学",
+          "音乐",
+          "经济学",
+          "臺北市",
+          "日月潭",
+          "漢語",
+          "计算机科学"
+        ]
+      },
+      "gutenberg": [23950, 23962, 24264, 7337]
+    }
+  }
+}

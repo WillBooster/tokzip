@@ -1,0 +1,262 @@
+{
+  "$comment": "Per-language OSS corpus sources. `ref` is a pinned tag/commit; the fetch script records the resolved SHA in the manifest. `trainable: false` marks copyleft/share-alike sources (benchmark split only — never dictionary training). `quick: true` marks the one repo fetched in --quick mode.",
+  "languages": {
+    "c": [
+      {
+        "repo": "https://github.com/curl/curl",
+        "ref": "curl-8_9_1",
+        "license": "MIT-like (curl)",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/madler/zlib", "ref": "v1.3.1", "license": "zlib", "trainable": true },
+      { "repo": "https://github.com/libuv/libuv", "ref": "v1.48.0", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/redis/redis", "ref": "7.2.5", "license": "RSALv2/SSPL", "trainable": false },
+      { "repo": "https://github.com/git/git", "ref": "v2.46.0", "license": "GPL-2.0", "trainable": false }
+    ],
+    "cpp": [
+      { "repo": "https://github.com/fmtlib/fmt", "ref": "11.0.2", "license": "MIT", "trainable": true, "quick": true },
+      { "repo": "https://github.com/nlohmann/json", "ref": "v3.11.3", "license": "MIT", "trainable": true },
+      {
+        "repo": "https://github.com/protocolbuffers/protobuf",
+        "ref": "v27.3",
+        "license": "BSD-3-Clause",
+        "trainable": true
+      },
+      { "repo": "https://github.com/godotengine/godot", "ref": "4.3-stable", "license": "MIT", "trainable": true }
+    ],
+    "csharp": [
+      { "repo": "https://github.com/nunit/nunit", "ref": "v4.1.0", "license": "MIT", "trainable": true, "quick": true },
+      { "repo": "https://github.com/dotnet/runtime", "ref": "v8.0.8", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/PowerShell/PowerShell", "ref": "v7.4.4", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/AvaloniaUI/Avalonia", "ref": "11.1.3", "license": "MIT", "trainable": true }
+    ],
+    "css": [
+      {
+        "repo": "https://github.com/twbs/bootstrap",
+        "ref": "v5.3.3",
+        "license": "MIT",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/jgthms/bulma", "ref": "1.0.2", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/necolas/normalize.css", "ref": "8.0.1", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/primer/css", "ref": "v21.3.5", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/argyleink/open-props", "ref": "v1.7.5", "license": "MIT", "trainable": true }
+    ],
+    "dart": [
+      {
+        "repo": "https://github.com/cfug/dio",
+        "ref": "dio_v5.5.0",
+        "license": "MIT",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/flutter/flutter", "ref": "3.24.0", "license": "BSD-3-Clause", "trainable": true },
+      {
+        "repo": "https://github.com/rrousselGit/riverpod",
+        "ref": "riverpod-v2.5.1",
+        "license": "MIT",
+        "trainable": true
+      }
+    ],
+    "haskell": [
+      {
+        "repo": "https://github.com/haskell/aeson",
+        "ref": "v2.2.3.0",
+        "license": "BSD-3-Clause",
+        "trainable": true,
+        "quick": true
+      },
+      {
+        "repo": "https://github.com/haskell/cabal",
+        "ref": "cabal-install-v3.12.1.0",
+        "license": "BSD-3-Clause",
+        "trainable": true
+      },
+      {
+        "repo": "https://github.com/haskell-servant/servant",
+        "ref": "servant-0.20.2",
+        "license": "BSD-3-Clause",
+        "trainable": true
+      },
+      { "repo": "https://github.com/jgm/pandoc", "ref": "3.3", "license": "GPL-2.0-or-later", "trainable": false },
+      { "repo": "https://github.com/xmonad/xmonad", "ref": "v0.18.0", "license": "BSD-3-Clause", "trainable": true }
+    ],
+    "html": [
+      {
+        "repo": "https://github.com/h5bp/html5-boilerplate",
+        "ref": "v9.0.1",
+        "license": "MIT",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/alphagov/govuk-frontend", "ref": "v5.5.0", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/twbs/bootstrap", "ref": "v5.3.3", "license": "MIT", "trainable": true }
+    ],
+    "java": [
+      {
+        "repo": "https://github.com/junit-team/junit5",
+        "ref": "r5.10.3",
+        "license": "EPL-2.0",
+        "trainable": true,
+        "quick": true
+      },
+      {
+        "repo": "https://github.com/google/gson",
+        "ref": "gson-parent-2.11.0",
+        "license": "Apache-2.0",
+        "trainable": true
+      },
+      { "repo": "https://github.com/google/guava", "ref": "v33.2.1", "license": "Apache-2.0", "trainable": true },
+      {
+        "repo": "https://github.com/spring-projects/spring-framework",
+        "ref": "v6.1.12",
+        "license": "Apache-2.0",
+        "trainable": true
+      },
+      { "repo": "https://github.com/apache/kafka", "ref": "3.8.0", "license": "Apache-2.0", "trainable": true }
+    ],
+    "jsp": [
+      {
+        "repo": "https://github.com/apache/jspwiki",
+        "ref": "2.12.2",
+        "license": "Apache-2.0",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/apache/roller", "ref": "roller_6.1.4", "license": "Apache-2.0", "trainable": true },
+      { "repo": "https://github.com/mybatis/jpetstore-6", "ref": "6.1.0", "license": "Apache-2.0", "trainable": true }
+    ],
+    "javascript": [
+      {
+        "repo": "https://github.com/lodash/lodash",
+        "ref": "4.17.21",
+        "license": "MIT",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/expressjs/express", "ref": "4.19.2", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/d3/d3", "ref": "v7.9.0", "license": "ISC", "trainable": true },
+      { "repo": "https://github.com/facebook/react", "ref": "v18.3.1", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/nodejs/node", "ref": "v22.6.0", "license": "MIT", "trainable": true }
+    ],
+    "php": [
+      {
+        "repo": "https://github.com/composer/composer",
+        "ref": "2.7.7",
+        "license": "MIT",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/laravel/framework", "ref": "v11.20.0", "license": "MIT", "trainable": true },
+      {
+        "repo": "https://github.com/sebastianbergmann/phpunit",
+        "ref": "11.3.1",
+        "license": "BSD-3-Clause",
+        "trainable": true
+      },
+      { "repo": "https://github.com/symfony/symfony", "ref": "v7.1.3", "license": "MIT", "trainable": true },
+      {
+        "repo": "https://github.com/WordPress/WordPress",
+        "ref": "6.6.1",
+        "license": "GPL-2.0-or-later",
+        "trainable": false
+      }
+    ],
+    "python": [
+      {
+        "repo": "https://github.com/psf/requests",
+        "ref": "v2.32.3",
+        "license": "Apache-2.0",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/pallets/flask", "ref": "3.0.3", "license": "BSD-3-Clause", "trainable": true },
+      { "repo": "https://github.com/django/django", "ref": "5.1", "license": "BSD-3-Clause", "trainable": true },
+      { "repo": "https://github.com/python/cpython", "ref": "v3.12.5", "license": "PSF-2.0", "trainable": true },
+      { "repo": "https://github.com/numpy/numpy", "ref": "v2.0.1", "license": "BSD-3-Clause", "trainable": true }
+    ],
+    "ruby": [
+      {
+        "repo": "https://github.com/sinatra/sinatra",
+        "ref": "v4.0.0",
+        "license": "MIT",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/jekyll/jekyll", "ref": "v4.3.3", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/rails/rails", "ref": "v7.2.0", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/rubocop/rubocop", "ref": "v1.65.1", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/discourse/discourse", "ref": "v3.3.1", "license": "GPL-2.0", "trainable": false }
+    ],
+    "rust": [
+      {
+        "repo": "https://github.com/clap-rs/clap",
+        "ref": "v4.5.13",
+        "license": "MIT/Apache-2.0",
+        "trainable": true,
+        "quick": true
+      },
+      {
+        "repo": "https://github.com/serde-rs/serde",
+        "ref": "v1.0.204",
+        "license": "MIT/Apache-2.0",
+        "trainable": true
+      },
+      {
+        "repo": "https://github.com/BurntSushi/ripgrep",
+        "ref": "14.1.0",
+        "license": "MIT/Unlicense",
+        "trainable": true
+      },
+      { "repo": "https://github.com/tokio-rs/tokio", "ref": "tokio-1.39.2", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/rust-lang/cargo", "ref": "0.81.0", "license": "MIT/Apache-2.0", "trainable": true }
+    ],
+    "text": [
+      {
+        "repo": "harvested",
+        "ref": "-",
+        "license": "per-repo",
+        "trainable": true,
+        "$comment": "README/CHANGELOG/docs .md/.txt files harvested from every repo cloned above; fetchOss.ts handles this pseudo-entry."
+      }
+    ],
+    "typescript": [
+      {
+        "repo": "https://github.com/colinhacks/zod",
+        "ref": "v3.23.8",
+        "license": "MIT",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/vitejs/vite", "ref": "v5.4.0", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/nestjs/nest", "ref": "v10.4.0", "license": "MIT", "trainable": true },
+      {
+        "repo": "https://github.com/microsoft/TypeScript",
+        "ref": "v5.5.4",
+        "license": "Apache-2.0",
+        "trainable": true
+      },
+      { "repo": "https://github.com/microsoft/vscode", "ref": "1.92.0", "license": "MIT", "trainable": true },
+      { "repo": "https://github.com/angular/angular", "ref": "18.1.4", "license": "MIT", "trainable": true }
+    ],
+    "zig": [
+      {
+        "repo": "https://github.com/zigtools/zls",
+        "ref": "0.13.0",
+        "license": "MIT",
+        "trainable": true,
+        "quick": true
+      },
+      { "repo": "https://github.com/ziglang/zig", "ref": "0.13.0", "license": "MIT", "trainable": true },
+      {
+        "repo": "https://github.com/tigerbeetle/tigerbeetle",
+        "ref": "0.15.4",
+        "license": "Apache-2.0",
+        "trainable": true
+      },
+      { "repo": "https://github.com/hexops/mach", "ref": "0.3.0", "license": "MIT/Apache-2.0", "trainable": true }
+    ]
+  }
+}
