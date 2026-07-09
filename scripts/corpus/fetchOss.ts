@@ -175,7 +175,7 @@ function harvestText(quick: boolean): void {
         file: `human/${name}`,
         lang: 'text',
         origin: 'human',
-        source: `${repoDir}:${file.relative}`,
+        source: `${repoDir}@${resolvedSha(dir)}:${file.relative}`,
         license: repoFlags.license,
         sizeBucket: sizeBucketOf(file.bytes),
         // Copyleft/share-alike repos stay benchmark-only even for their docs prose.
@@ -185,6 +185,13 @@ function harvestText(quick: boolean): void {
     }
   }
   console.log(`text: harvested ${total} B of docs/prose`);
+}
+
+function hashOf(text: string): number {
+  let hash = 0x81_1C_9D_C5;
+  for (let i = 0; i < text.length; i++) hash = Math.imul(hash ^ text.codePointAt(i)!, 0x01_00_01_93);
+  // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
+  return hash >>> 0;
 }
 
 interface SampledFile {
@@ -228,7 +235,9 @@ function sampleFiles(root: string, extensions: string[]): SampledFile[] {
     }
   };
   walk(root, '');
-  // Deterministic order, then spread across the tree by interleaving hash order.
-  files.sort((a, b) => (a.relative < b.relative ? -1 : 1));
+  // Deterministic pseudo-random order (stable per-path hash): when a budget cap cuts the
+  // list short, samples spread across the whole tree instead of clustering on
+  // alphabetically-first directories.
+  files.sort((a, b) => hashOf(a.relative) - hashOf(b.relative) || (a.relative < b.relative ? -1 : 1));
   return files;
 }

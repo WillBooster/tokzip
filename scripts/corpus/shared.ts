@@ -8,6 +8,11 @@ export const CACHE_DIR = join(CORPUS_DIR, '.cache');
 const git = (args: string[]): boolean =>
   spawnSync('git', args, { stdio: ['ignore', 'ignore', 'pipe'], timeout: 600_000 }).status === 0;
 
+const gitOutput = (args: string[]): string | undefined => {
+  const result = spawnSync('git', args, { encoding: 'utf8', timeout: 600_000 });
+  return result.status === 0 ? result.stdout.trim() : undefined;
+};
+
 /**
  * Shallow-clones `repo` at exactly the pinned `ref` (branch, tag, or commit SHA) into the
  * shared clone cache. An unresolvable ref is a hard error — silently sampling a moving
@@ -16,7 +21,20 @@ const git = (args: string[]): boolean =>
  */
 export function cloneAtRef(repo: string, ref: string): string | undefined {
   const dir = join(CACHE_DIR, repo.split('/').slice(-2).join('__'));
-  if (existsSync(dir)) return dir;
+  if (existsSync(dir)) {
+    // A cached checkout may predate a pin change (or be a partial clone): verify HEAD
+    // actually matches the requested ref before reusing it.
+    const head = gitOutput(['-C', dir, 'rev-parse', 'HEAD']);
+    const pinned = gitOutput(['-C', dir, 'rev-parse', `${ref}^{commit}`]);
+    if (head && (head === ref || head === pinned)) return dir;
+    if (
+      git(['-C', dir, 'fetch', '--depth', '1', 'origin', ref]) &&
+      git(['-C', dir, 'checkout', '--detach', 'FETCH_HEAD'])
+    ) {
+      return dir;
+    }
+    rmSync(dir, { recursive: true, force: true }); // Unusable cache entry: fall through to a fresh clone.
+  }
   mkdirSync(CACHE_DIR, { recursive: true });
   console.log(`cloning ${repo}@${ref} ...`);
   if (git(['clone', '--depth', '1', '--branch', ref, '--single-branch', repo, dir])) return dir;

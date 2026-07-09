@@ -89,10 +89,27 @@ function buildCells(languages: string[]): Cell[] {
   return cells;
 }
 
+// Common simplified/traditional variant pairs: enough signal to reject wrong-script output,
+// which would silently contaminate the byte-level separation the two zh dictionaries exist for.
+const SIMPLIFIED_MARKERS = new Set('这来对时说学国还为发个们经问电让书难与东车见长门马风页点体归');
+const TRADITIONAL_MARKERS = new Set('這來對時說學國還為發個們經問電讓書難與東車見長門馬風頁點體歸');
+
+function countMarkers(output: string, markers: Set<string>): number {
+  let count = 0;
+  for (const char of output) if (markers.has(char)) count++;
+  return count;
+}
+
 function plausiblyValid(output: string, cell: Cell): boolean {
   if (output.trim().length < 100) return false;
   if (cell.language === 'ja-JP' && !/[\u{3040}-\u{30FF}\u{4E00}-\u{9FFF}]/u.test(output)) return false;
-  if ((cell.language === 'zh-CN' || cell.language === 'zh-TW') && !/[\u{4E00}-\u{9FFF}]/u.test(output)) return false;
+  if (cell.language === 'zh-CN' || cell.language === 'zh-TW') {
+    if (!/[\u{4E00}-\u{9FFF}]/u.test(output)) return false;
+    const simplified = countMarkers(output, SIMPLIFIED_MARKERS);
+    const traditional = countMarkers(output, TRADITIONAL_MARKERS);
+    if (cell.language === 'zh-CN' && traditional > simplified) return false;
+    if (cell.language === 'zh-TW' && simplified > traditional) return false;
+  }
   return true;
 }
 

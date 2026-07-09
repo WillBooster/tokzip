@@ -26,6 +26,7 @@ interface GitDocsSource {
 }
 interface LocaleSources {
   gutenberg?: number[];
+  aozoraRef?: string;
   aozoraGithub?: string[];
   gitDocs?: GitDocsSource[];
   wikipedia?: WikipediaSource;
@@ -121,14 +122,15 @@ function aozoraToText(html: string): string {
     .replaceAll(/&[a-z]+;/g, ' ');
 }
 
-async function fetchAozora(locale: string, paths: string[]): Promise<void> {
+async function fetchAozora(locale: string, ref: string, paths: string[]): Promise<void> {
   for (const path of paths) {
-    const url = `https://raw.githubusercontent.com/aozorabunko/aozorabunko/master/${path}`;
+    // Pinned to a commit: fetching a moving branch would make the trainable corpus drift.
+    const url = `https://raw.githubusercontent.com/aozorabunko/aozorabunko/${ref}/${path}`;
     // Aozora Bunko HTML files are Shift_JIS-encoded.
     const html = await fetchText(url, 'shift_jis');
     if (!html) continue;
     const text = aozoraToText(html);
-    const bytes = saveChunks(locale, text, `aozora:${path}`, 'Public domain', true);
+    const bytes = saveChunks(locale, text, `aozora@${ref}:${path}`, 'Public domain', true);
     console.log(`${locale}: aozora ${path} → ${bytes} B`);
   }
 }
@@ -204,7 +206,8 @@ for (const locale of locales) {
   }
   resetOrigin(locale, 'human'); // Re-runs must not duplicate manifest rows over stale samples.
   if (localeSources.gutenberg) await fetchGutenberg(locale, localeSources.gutenberg);
-  if (localeSources.aozoraGithub) await fetchAozora(locale, localeSources.aozoraGithub);
+  if (localeSources.aozoraGithub)
+    await fetchAozora(locale, localeSources.aozoraRef ?? 'master', localeSources.aozoraGithub);
   if (localeSources.gitDocs) await fetchGitDocs(locale, localeSources.gitDocs);
   if (localeSources.wikipedia) await fetchWikipedia(locale, localeSources.wikipedia);
 }
