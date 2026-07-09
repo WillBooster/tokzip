@@ -65,6 +65,25 @@ test('slot codec round-trips every value shape', () => {
   }
 });
 
+test('sparse complete tables (unused length-0 symbols) round-trip through encoder/decoder', () => {
+  // RFC 1951-style assignment: unused symbols must not shift next_code.
+  const lengths = new Uint8Array(8);
+  lengths[0] = lengths[1] = lengths[2] = lengths[3] = 2;
+  expect(isCompleteCode(lengths)).toBe(true);
+  const { codes } = buildEncoder(lengths);
+  expect([codes[0], codes[1], codes[2], codes[3]]).toEqual([0, 1, 2, 3]);
+  const decoder = buildDecoder(lengths);
+  for (let symbol = 0; symbol < 4; symbol++) {
+    const writer = new BitWriter();
+    writer.writeBits(codes[symbol]!, 2);
+    const text = writer.toText();
+    const reader = new BitReader(decodeRadix85(text, 0, text.length));
+    const entry = decoder[reader.peekBits(12)]!;
+    expect(entry >>> 4).toBe(symbol);
+    expect(entry & 15).toBe(2);
+  }
+});
+
 test('package-merge lengths form complete canonical codes', () => {
   const freqs = new Float64Array(256).map((_, i) => (i % 7 === 0 ? 1000 : i + 1));
   const lengths = buildLengths(freqs);

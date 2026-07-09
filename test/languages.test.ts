@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { compress, decompress, LANGUAGE_IDS } from '../src/index.ts';
+import { compress, decompress, LANGUAGE_IDS, registerLanguageModule } from '../src/index.ts';
 // Importing the barrel registers every trained module, which re-runs table validation
 // (registerLanguage throws on incomplete codes) before any round-trip below.
 import '../src/languages/index.ts';
@@ -29,6 +29,21 @@ describe('every trained language module round-trips', () => {
       }
     });
   });
+});
+
+test('conflicting registrations are rejected (same id or name must not diverge)', () => {
+  const typescript = languageByName('typescript')!;
+  const base = {
+    dictionarySuffix: new Uint8Array(0),
+    top64: typescript.top64,
+    tables: typescript.tables,
+  };
+  // Same (id, name) pair: idempotent re-registration is allowed.
+  expect(() => registerLanguageModule({ ...base, id: typescript.id, name: 'typescript' })).not.toThrow();
+  // Same id under a new name, or same name under a new id: compress (by name) and
+  // decompress (by id) would silently disagree on the dictionary.
+  expect(() => registerLanguageModule({ ...base, id: typescript.id, name: 'typescript-alias' })).toThrow(RangeError);
+  expect(() => registerLanguageModule({ ...base, id: 63, name: 'typescript' })).toThrow(RangeError);
 });
 
 test('fromBase64 rejects non-ASCII instead of silently decoding it as 0', () => {

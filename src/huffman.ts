@@ -30,7 +30,8 @@ export function isCompleteCode(lengths: Uint8Array): boolean {
 /** Assigns canonical codes (increasing length, then symbol order). */
 export function buildEncoder(lengths: Uint8Array): HuffmanEncoder {
   const countPerLength = new Uint32Array(MAX_CODE_LENGTH + 1);
-  for (const length of lengths) countPerLength[length]!++;
+  // Unused symbols (length 0) must not shift next_code, or sparse complete tables mis-assign.
+  for (const length of lengths) if (length > 0) countPerLength[length]!++;
   const nextCode = new Uint32Array(MAX_CODE_LENGTH + 1);
   let code = 0;
   for (let length = 1; length <= MAX_CODE_LENGTH; length++) {

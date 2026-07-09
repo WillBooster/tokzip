@@ -52,6 +52,17 @@ export function registerLanguage(wrapperDictionary: Uint8Array, data: LanguageMo
   if (!Number.isInteger(data.id) || data.id < 0 || data.id > 63)
     throw new RangeError(`invalid language id: ${data.id}`);
   if (data.top64.length !== 64) throw new RangeError('top-64 charset must contain exactly 64 bytes');
+  // compress selects by name while decompress selects by id: a conflicting registration would
+  // let the two maps diverge and silently decode with the wrong dictionary. Re-registering the
+  // same (id, name) pair stays idempotent.
+  const existingById = byId.get(data.id);
+  if (existingById && existingById.name !== data.name) {
+    throw new RangeError(`language id ${data.id} is already registered as "${existingById.name}"`);
+  }
+  const existingByName = byName.get(data.name);
+  if (existingByName && existingByName.id !== data.id) {
+    throw new RangeError(`language "${data.name}" is already registered with id ${existingByName.id}`);
+  }
   validateTables(data.tables);
   const dictionary = new Uint8Array(wrapperDictionary.length + data.dictionarySuffix.length);
   dictionary.set(wrapperDictionary, 0);

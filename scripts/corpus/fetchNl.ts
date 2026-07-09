@@ -206,8 +206,11 @@ for (const locale of locales) {
   }
   resetOrigin(locale, 'human'); // Re-runs must not duplicate manifest rows over stale samples.
   if (localeSources.gutenberg) await fetchGutenberg(locale, localeSources.gutenberg);
-  if (localeSources.aozoraGithub)
-    await fetchAozora(locale, localeSources.aozoraRef ?? 'master', localeSources.aozoraGithub);
+  if (localeSources.aozoraGithub) {
+    // A missing pin would silently fetch the moving master branch into trainable data.
+    if (!localeSources.aozoraRef) throw new Error(`${locale}: aozoraGithub requires a pinned aozoraRef`);
+    await fetchAozora(locale, localeSources.aozoraRef, localeSources.aozoraGithub);
+  }
   if (localeSources.gitDocs) await fetchGitDocs(locale, localeSources.gitDocs);
   if (localeSources.wikipedia) await fetchWikipedia(locale, localeSources.wikipedia);
 }
