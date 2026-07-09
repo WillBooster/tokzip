@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { compress, decompress, TokzipDecodeError } from '../src/index.ts';
 import { MODE_FAST, MODE_SMALL, MODE_STORED } from '../src/format.ts';
 import { RADIX64_ALPHABET } from '../src/radix64.ts';
+import { RADIX85_ALPHABET } from '../src/radix85.ts';
 
 /** Shipped mode from a frame's flags char (header char 2). */
 function shippedMode(frame: string): number {
@@ -86,6 +87,29 @@ describe('container vectors', () => {
   test('maxOutputSize is enforced before allocation', () => {
     const frame = compress('x'.repeat(100_000));
     expect(() => decompress(frame, { maxOutputSize: 1024 })).toThrow(/maxOutputSize/);
+  });
+
+  test('NaN or negative maxOutputSize is rejected instead of disabling the cap', () => {
+    const frame = compress('x'.repeat(1000));
+    expect(() => decompress(frame, { maxOutputSize: Number.NaN })).toThrow(RangeError);
+    expect(() => decompress(frame, { maxOutputSize: -1 })).toThrow(RangeError);
+    expect(decompress(frame, { maxOutputSize: Number.POSITIVE_INFINITY })).toBe('x'.repeat(1000)); // Explicit "no cap".
+  });
+
+  test('invalid compress mode throws instead of silently using small', () => {
+    expect(() => compress('x', { mode: 'FAST' as 'fast' })).toThrow(RangeError);
+    expect(() => compress('x', { mode: '' as 'fast' })).toThrow(RangeError);
+  });
+
+  test('non-zero padding bits in a small frame are a structural error', () => {
+    const source = 'export function greet(name: string): string {\n  return name;\n}\n'.repeat(5);
+    const frame = compress(source, { mode: 'small' });
+    expect(shippedMode(frame)).toBe(MODE_SMALL);
+    // Incrementing the final radix-85 digit flips only the last word's low (padding) bits.
+    const lastIndex = RADIX85_ALPHABET.indexOf(frame.at(-1)!);
+    expect(lastIndex).toBeLessThan(84);
+    const patched = frame.slice(0, -1) + RADIX85_ALPHABET[lastIndex + 1];
+    expectDecodeError(patched, /padding|stream|truncated|invalid/);
   });
 
   test('invalid UTF-8 in a string-typed frame throws', () => {

@@ -340,5 +340,11 @@ export function decodeSmallBody(
   if (Math.ceil(Math.max(offsetCursor.bitPosition, 1) / 32) !== words.length) {
     throw new TokzipDecodeError('trailing characters after payload');
   }
+  // The padding itself must be zero (canonical frames; catches tail corruption).
+  for (let remaining = words.length * 32 - offsetCursor.bitPosition; remaining > 0;) {
+    const take = Math.min(24, remaining);
+    if (offsetCursor.readBits(take) !== 0) throw new TokzipDecodeError('non-zero padding bits');
+    remaining -= take;
+  }
   return out;
 }

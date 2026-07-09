@@ -189,8 +189,9 @@ out-of-bounds history distances and dictionary ranges.
 
 The entire body is one MSB-first bitstream emitted through the fused Z85-style writer: each
 32-bit word becomes 5 radix-85 chars (§1.2), most-significant digit first. The final partial
-word is zero-padded; a body whose character count is not a multiple of 5, or that contains
-more words than the minimal count for the used bits, is a structural error.
+word is zero-padded; a body whose character count is not a multiple of 5, that contains
+more words than the minimal count for the used bits, or whose padding bits are non-zero,
+is a structural error (frames have a single canonical encoding).
 
 ### 8.1 Bitstream layout
 

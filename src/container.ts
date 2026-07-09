@@ -46,6 +46,8 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   const language = languageByName(languageName);
   if (!language) throw new RangeError(`unregistered language: ${languageName}`);
   const mode = options?.mode ?? 'fast';
+  // Untyped callers must not silently fall through to the (expensive) small path on typos.
+  if (mode !== 'fast' && mode !== 'small') throw new RangeError(`invalid mode: ${String(mode)}`);
 
   const storedCost = packedRawLength(bytes.length);
   let shippedMode = MODE_STORED;
@@ -88,6 +90,11 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
 /** Decompresses a tokzip text frame; the return type follows the header's input-type flag. */
 export function decompress(data: string, options?: DecompressOptions): string | Uint8Array {
   const maxOutputSize = options?.maxOutputSize ?? DEFAULT_MAX_OUTPUT_SIZE;
+  // NaN would make the size guard below always pass, silently disabling the allocation cap.
+  // Infinity is allowed as an explicit "no cap".
+  if (Number.isNaN(maxOutputSize) || maxOutputSize < 0) {
+    throw new RangeError(`invalid maxOutputSize: ${maxOutputSize}`);
+  }
   const magicVersion = readRadix64(data, 0);
   if (magicVersion !== MAGIC_VERSION) {
     if (magicVersion >>> 3 === MAGIC_VERSION >>> 3) throw new TokzipDecodeError('unknown version');
