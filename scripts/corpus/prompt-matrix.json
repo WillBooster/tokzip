@@ -1,0 +1,120 @@
+{
+  "$comment": "LLM corpus generation matrix. Each sample cell = (agent, model) × language × task × size × wrapping, with a seeded topic. The roster pins explicit (agent, model) pairs — one subagent-skill invocation per pair, never --agent all — and the pair is recorded per sample in the manifest so corpus composition stays reproducible.",
+  "roster": [
+    { "agent": "claude", "model": "claude-sonnet-5" },
+    { "agent": "claude", "model": "claude-haiku-4-5-20251001" },
+    { "agent": "codex", "model": "gpt-5.1-codex" },
+    { "agent": "codex", "model": "gpt-5.1-codex-mini" },
+    { "agent": "antigravity", "model": "gemini-3-pro" },
+    { "agent": "grok", "model": "grok-code-fast-1" }
+  ],
+  "sizeTargets": [
+    { "label": "0.5k", "instruction": "about 10-15 lines (~500 characters)" },
+    { "label": "2k", "instruction": "about 50-70 lines (~2000 characters)" },
+    { "label": "8k", "instruction": "about 200-260 lines (~8000 characters)" },
+    { "label": "24k", "instruction": "about 600-750 lines (~24000 characters)" }
+  ],
+  "wrappingStyles": [
+    {
+      "label": "raw",
+      "instruction": "Return only the code itself with no surrounding explanation and no markdown fences."
+    },
+    {
+      "label": "markdown",
+      "instruction": "Explain your design briefly before the code and add usage examples after it, using markdown fenced code blocks, as you would in a chat answer."
+    },
+    {
+      "label": "chat",
+      "instruction": "Answer conversationally with multiple fenced code snippets interleaved with explanations and bullet lists, as in a chat reply."
+    }
+  ],
+  "codeTasks": [
+    { "id": "implement", "template": "Implement {topic} in {language} with a clean public API, {size}. {wrapping}" },
+    {
+      "id": "tests",
+      "template": "Write unit tests in {language} for a module that implements {topic}, {size}. {wrapping}"
+    },
+    {
+      "id": "bugfix",
+      "template": "Write a {language} module implementing {topic} that contains one subtle bug, then show the corrected version of the whole file, {size}. {wrapping}"
+    },
+    {
+      "id": "refactor",
+      "template": "Write a deliberately clumsy {language} implementation of {topic} and then refactor it into idiomatic {language}, {size}. {wrapping}"
+    },
+    {
+      "id": "explain",
+      "template": "Explain {topic} to an intermediate developer with {language} code examples, {size}. {wrapping}"
+    },
+    {
+      "id": "boilerplate",
+      "template": "Write idiomatic {language} boilerplate for {topic} (configuration, CLI scaffold, or API client as appropriate), {size}. {wrapping}"
+    },
+    {
+      "id": "review",
+      "template": "Write a short {language} snippet implementing {topic}, then code-review it and reply with concrete improvement suggestions, {size}. {wrapping}"
+    },
+    {
+      "id": "translate",
+      "template": "Write {topic} in Python, then translate it to idiomatic {language}, showing both versions, {size}. {wrapping}"
+    }
+  ],
+  "nlTasks": [
+    {
+      "id": "qa",
+      "template": "Answer this technical question in {locale}: how does {topic} work in practice? {size}."
+    },
+    {
+      "id": "summarize",
+      "template": "Write an article about {topic} in {locale} and then summarize it in three paragraphs, {size}."
+    },
+    {
+      "id": "docs",
+      "template": "You are a technical writer. Write user-facing documentation in {locale} for a {topic} feature, including an overview, a parameter table, request/response JSON examples, and caveats, {size}."
+    },
+    {
+      "id": "email",
+      "template": "Draft a professional business email in {locale} about {topic}, followed by a polite reply, {size}."
+    },
+    {
+      "id": "explain-beginner",
+      "template": "Explain {topic} in {locale} to a complete beginner with everyday analogies, {size}."
+    },
+    {
+      "id": "chat",
+      "template": "Write a plausible multi-turn (6+ turns) chat exchange in {locale} between a user and an assistant about {topic}, {size}."
+    }
+  ],
+  "codeTopics": [
+    "a token-bucket rate limiter",
+    "an LRU cache",
+    "a CSV import pipeline with date parsing",
+    "a retry wrapper with exponential backoff",
+    "a binary search tree",
+    "a JSON diff utility",
+    "a websocket chat client",
+    "a file-watching build tool",
+    "a markdown table formatter",
+    "a URL router",
+    "a job queue with priorities",
+    "a config loader with environment overrides",
+    "a simple template engine",
+    "a pagination helper for a REST API",
+    "a debounce/throttle utility",
+    "an event emitter"
+  ],
+  "nlTopics": [
+    "API pagination with cursors",
+    "database indexing",
+    "container orchestration",
+    "public-key cryptography",
+    "team onboarding processes",
+    "quarterly project planning",
+    "cache invalidation strategies",
+    "accessibility in web design",
+    "remote work communication",
+    "incident postmortems",
+    "version control workflows",
+    "technical debt management"
+  ]
+}
