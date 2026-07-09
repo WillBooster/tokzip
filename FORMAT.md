@@ -191,7 +191,10 @@ The entire body is one MSB-first bitstream emitted through the fused Z85-style w
 32-bit word becomes 5 radix-85 chars (§1.2), most-significant digit first. The final partial
 word is zero-padded; a body whose character count is not a multiple of 5, that contains
 more words than the minimal count for the used bits, or whose padding bits are non-zero,
-is a structural error (frames have a single canonical encoding).
+is a structural error (frames have a single canonical encoding). Because of §9, decoders
+also reject any non-stored body that is not strictly smaller than the stored body of the
+declared size — this additionally bounds decode-side allocations by the declared output
+size, which is validated against `maxOutputSize` first.
 
 ### 8.1 Bitstream layout
 
@@ -247,9 +250,11 @@ boundary checks of §8.1 and the minimal-padding check of §8.
 ## 9. Auto-downgrade (normative)
 
 `small` is a maximum effort, not a promise. The encoder compares complete frames — small vs
-fast vs stored — **analytically** from the single parsed token list (every token's `fast`
-char cost and the stored size are arithmetic; the `small` bit total is exact because the
-tables are static). Only the winning frame is emitted; ties choose the simpler encoding
+fast vs stored — **analytically** (every token's `fast` char cost and the stored size are
+arithmetic; the `small` bit total is exact because the tables are static). The fast
+candidate is the cheaper of the lazy-parsed token list re-priced in `fast` chars and a pure
+`fast` parse of the same input, so `small` output is never larger than `fast` output.
+Only the winning frame is emitted; ties choose the simpler encoding
 (stored ≺ fast ≺ small). If any token exceeds `fast`'s representable ranges (offset ≥ 2^18,
 dictionary start ≥ 2^18, or explicit match shorter than 4), the fast candidate is ineligible
 and the comparison is small vs stored. The header records what shipped; decoders branch only
@@ -278,5 +283,6 @@ dictionary / rep / overlap-copy matches; 12-bit vs 18-bit offset forms; single-s
 degenerate streams (raw stream modes); downgrade tie and determinism; invalid table; unknown
 id on non-stored frames; stored frame with nonzero id (decodes); unknown version; reserved
 flag bit set; truncated header / token / stream; trailing characters; non-alphabet character;
-non-canonical varint; `maxOutputSize` exceeded; invalid UTF-8 body; literal-64 vs literal-raw
+non-canonical varint; `maxOutputSize` exceeded; invalid UTF-8 body; non-stored body not
+smaller than the stored body (e.g. a size-0 `small` frame); literal-64 vs literal-raw
 runs including 1- and 2-byte raw tails; downgrade with fast-ineligible tokens.

@@ -4,8 +4,9 @@
 
 Lossless compressor specialized for **source code and natural-language text** — human-written
 or LLM-generated. Pure TypeScript (no WASM, no native deps), runs in Node/Bun/browsers, and
-emits **safe-ASCII text directly** (JSON/URL/template-literal-safe) instead of paying the 33%
-base64 tax on a binary stream.
+emits **safe-ASCII text directly** (JSON- and template-literal-safe; `fast` frames are also
+URL-safe, while `small` bodies use a radix-85 alphabet that needs percent-encoding inside
+URLs) instead of paying the 33% base64 tax on a binary stream.
 
 ```ts
 import { compress, decompress } from './src/index.ts';

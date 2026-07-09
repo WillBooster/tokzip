@@ -61,18 +61,26 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     }
   } else {
     // Auto-downgrade (normative, emission-free): compare complete frames analytically —
-    // small vs fast vs stored — smallest wins, ties choose the simpler encoding.
-    const tokens = parse(bytes, language.dictionary, dictIndexFor(language), smallPricing(bytes, language));
-    const plan = planSmallBody(tokens, bytes, language);
-    const fastCost = fastBodyCost(tokens, bytes, language);
+    // small vs fast vs stored — smallest wins, ties choose the simpler encoding. The fast
+    // candidate is the cheaper of two token lists: the small (lazy) parse re-priced in fast
+    // chars, and a pure fast parse — the lazy parse optimizes bits, so alone it could ship a
+    // fast frame larger than mode 'fast' would produce for the same input.
+    const smallTokens = parse(bytes, language.dictionary, dictIndexFor(language), smallPricing(bytes, language));
+    const plan = planSmallBody(smallTokens, bytes, language);
+    const lazyFastCost = fastBodyCost(smallTokens, bytes, language);
+    const fastTokens = parse(bytes, language.dictionary, dictIndexFor(language), fastPricing(bytes, language));
+    const pureFastCost = fastBodyCost(fastTokens, bytes, language)!;
+    const useLazyTokensForFast = lazyFastCost !== undefined && lazyFastCost < pureFastCost;
+    const fastCost = useLazyTokensForFast ? lazyFastCost : pureFastCost;
     // Pick the smallest complete frame; on ties the simpler encoding wins (stored, fast, small).
     let bestCost = storedCost;
-    if (fastCost !== undefined && fastCost < bestCost) {
+    if (fastCost < bestCost) {
       shippedMode = MODE_FAST;
       bestCost = fastCost;
     }
     if (plan.charCost < bestCost) shippedMode = MODE_SMALL;
-    if (shippedMode === MODE_FAST) body = encodeFastBody(tokens, bytes, language);
+    if (shippedMode === MODE_FAST)
+      body = encodeFastBody(useLazyTokensForFast ? smallTokens : fastTokens, bytes, language);
     else if (shippedMode === MODE_SMALL) body = emitSmallBody(plan, bytes, language);
   }
 
@@ -119,6 +127,12 @@ export function decompress(data: string, options?: DecompressOptions): string | 
     bytes = new Uint8Array(outputSize);
     readPackedRaw(data, bodyStart, bytes, 0, outputSize);
   } else if (mode === MODE_FAST || mode === MODE_SMALL) {
+    // The normative auto-downgrade means a conforming non-stored body is strictly smaller
+    // than the stored body of the same size; rejecting the rest keeps frames canonical and
+    // bounds decode-side allocations by the declared output size.
+    if (data.length - bodyStart >= packedRawLength(outputSize)) {
+      throw new TokzipDecodeError('non-canonical frame: body not smaller than stored');
+    }
     const language: RegisteredLanguage = requireLanguageById(languageId);
     bytes =
       mode === MODE_FAST

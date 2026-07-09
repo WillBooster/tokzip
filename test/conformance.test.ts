@@ -101,6 +101,19 @@ describe('container vectors', () => {
     expect(() => compress('x', { mode: '' as 'fast' })).toThrow(RangeError);
   });
 
+  test('a small frame for size 0 is non-canonical and rejected', () => {
+    // The canonical empty frame is the stored 'xAAA'; a size-0 small body can never be
+    // smaller than the (empty) stored body.
+    expectDecodeError('xACA!!!!!', /non-canonical|stored/);
+  });
+
+  test('non-stored bodies at least as large as the stored body are rejected', () => {
+    const frame = compress('abcabcabcabcabcabcabcabcabc');
+    expect(shippedMode(frame)).toBe(MODE_FAST);
+    // Pad the fast body with valid alphabet chars beyond the stored bound.
+    expectDecodeError(frame + 'A'.repeat(64), /non-canonical|stored/);
+  });
+
   test('non-zero padding bits in a small frame are a structural error', () => {
     const source = 'export function greet(name: string): string {\n  return name;\n}\n'.repeat(5);
     const frame = compress(source, { mode: 'small' });

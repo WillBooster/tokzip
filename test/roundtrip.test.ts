@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { compress, decompress } from '../src/index.ts';
 import { RADIX64_ALPHABET } from '../src/radix64.ts';
 import { RADIX85_ALPHABET } from '../src/radix85.ts';
+import '../src/languages/typescript.ts';
 
 // oxlint-disable-next-line no-misused-spread -- both alphabets are pure ASCII
 const SAFE_CHARS = new Set([...RADIX64_ALPHABET, ...RADIX85_ALPHABET]);
@@ -78,10 +79,21 @@ test('lone surrogates are replaced with U+FFFD (WHATWG TextEncoder semantics)', 
 });
 
 test('small mode is never larger than fast mode', () => {
-  for (const original of Object.values(STRING_CASES)) {
-    expect(compress(original, { mode: 'small' }).length).toBeLessThanOrEqual(
-      compress(original, { mode: 'fast' }).length
-    );
+  // Includes the counterexample that caught the lazy-tokens-only fast candidate: mixed
+  // dictionary idioms and literal runs where the greedy fast parse beats the lazy one.
+  const cases = [
+    ...Object.values(STRING_CASES),
+    'const a = 1045161295;\n' +
+      'a'.repeat(46) +
+      '```typescript\nconst x = 1;\n```\nconst e = 1913358187;\n' +
+      'a'.repeat(10),
+  ];
+  for (const language of ['none', 'typescript']) {
+    for (const original of cases) {
+      expect(compress(original, { language, mode: 'small' }).length).toBeLessThanOrEqual(
+        compress(original, { language, mode: 'fast' }).length
+      );
+    }
   }
 });
 
