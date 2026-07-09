@@ -8,7 +8,7 @@
  * Usage: bun scripts/corpus/fetchNl.ts [<locale> ...]
  */
 import sources from './nl-sources.json';
-import { appendManifest, CORPUS_DIR, sizeBucketOf, writeSample } from './shared.ts';
+import { appendManifest, CORPUS_DIR, resetOrigin, sizeBucketOf, writeSample } from './shared.ts';
 
 const CHUNK_TARGETS = [512, 2048, 8192, 24_576];
 const MAX_DOC_BYTES = 512 * 1024;
@@ -218,6 +218,7 @@ for (const locale of locales) {
     console.error(`unknown locale: ${locale}`);
     continue;
   }
+  resetOrigin(locale, 'human'); // Re-runs must not duplicate manifest rows over stale samples.
   if (localeSources.gutenberg) await fetchGutenberg(locale, localeSources.gutenberg);
   if (localeSources.aozoraGithub) await fetchAozora(locale, localeSources.aozoraGithub);
   if (localeSources.gitDocs) await fetchGitDocs(locale, localeSources.gitDocs);

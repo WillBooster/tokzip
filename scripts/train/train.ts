@@ -74,7 +74,8 @@ ${body}`
 function trainCore(): void {
   const wrapper = buildWrapperDictionary();
   // Generic id-0 tables train on the plain-text corpus when available, else on a built-in sample.
-  const docs = hasCorpus('text') ? loadTrainDocs('text') : [FALLBACK_SAMPLE];
+  const textDocs = loadTrainDocs('text');
+  const docs = textDocs.length > 0 ? textDocs : [FALLBACK_SAMPLE];
   const { top64, tables } = trainStatistics(docs, wrapper, new Uint8Array(0));
   const source = `${GENERATED_HEADER}import type { LanguageModuleData } from '../dictionary.ts';
 import { fromBase64 } from '../moduleData.ts';
@@ -233,29 +234,24 @@ function hasCorpus(name: string): boolean {
   return existsSync(join(CORPUS_DIR, name));
 }
 
-/** Train-split docs only; the manifest marks bench-split and copyleft-excluded samples. */
+/**
+ * Train-split docs only, allow-listed from the manifest: a sample trains only when it is
+ * explicitly marked `split: "train"` and trainable. Stray files without manifest rows (or a
+ * corpus that has not been through split.ts yet) contribute nothing — failing toward an empty
+ * train set is safer than silently training on unlabeled or license-restricted data.
+ */
 function loadTrainDocs(name: string): string[] {
   const dir = join(CORPUS_DIR, name);
-  if (!existsSync(dir)) return [];
-  const benchOnly = new Set<string>();
   const manifestPath = join(dir, 'manifest.jsonl');
-  if (existsSync(manifestPath)) {
-    for (const line of readFileSync(manifestPath, 'utf8').split('\n')) {
-      if (!line.trim()) continue;
-      const entry = JSON.parse(line) as { file: string; split?: string; trainable?: boolean };
-      if (entry.split !== 'train' || entry.trainable === false) benchOnly.add(entry.file);
-    }
-  }
+  if (!existsSync(manifestPath)) return [];
   const docs: string[] = [];
-  const walk = (current: string, prefix: string): void => {
-    for (const entry of readdirSync(current, { withFileTypes: true })) {
-      const path = join(current, entry.name);
-      const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
-      if (entry.isDirectory()) walk(path, relative);
-      else if (entry.name.endsWith('.txt') && !benchOnly.has(relative)) docs.push(readFileSync(path, 'utf8'));
-    }
-  };
-  walk(dir, '');
+  for (const line of readFileSync(manifestPath, 'utf8').split('\n')) {
+    if (!line.trim()) continue;
+    const entry = JSON.parse(line) as { file: string; split?: string; trainable?: boolean };
+    if (entry.split !== 'train' || entry.trainable === false) continue;
+    const path = join(dir, entry.file);
+    if (existsSync(path)) docs.push(readFileSync(path, 'utf8'));
+  }
   return docs;
 }
 

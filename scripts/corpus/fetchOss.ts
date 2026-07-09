@@ -8,10 +8,11 @@
  *   --quick  clone only the repo marked `quick` per language and cap the sample volume.
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import nlSources from './nl-sources.json';
 import sources from './oss-sources.json';
-import { appendManifest, CORPUS_DIR, sizeBucketOf, writeSample } from './shared.ts';
+import { appendManifest, CORPUS_DIR, resetOrigin, sizeBucketOf, writeSample } from './shared.ts';
 
 const CACHE_DIR = join(CORPUS_DIR, '.cache');
 const EXTENSIONS: Record<string, string[]> = {
@@ -86,6 +87,7 @@ function fetchLanguage(language: string, quick: boolean): void {
     console.error(`skip ${language}: no sources or extensions defined`);
     return;
   }
+  resetOrigin(language, 'human'); // Re-runs must not duplicate manifest rows over stale samples.
   const selected = quick ? entries.filter((e) => e.quick) : entries;
   const budget = quick ? QUICK_LANG_BUDGET_BYTES : LANG_BUDGET_BYTES;
   const repoCap = selected.length > 1 ? budget * SINGLE_REPO_SHARE : budget;
@@ -118,15 +120,46 @@ function fetchLanguage(language: string, quick: boolean): void {
   }
 }
 
+/**
+ * License/trainability by clone-cache directory name, across every source list that clones
+ * into `.corpus/.cache` (all oss-sources languages + fetchNl's gitDocs repos). Harvested text
+ * must inherit the source repo's flags, or copyleft prose could leak into shipped dictionaries.
+ */
+function repoFlagsByCacheDir(): Map<string, { license: string; trainable: boolean }> {
+  const flags = new Map<string, { license: string; trainable: boolean }>();
+  const register = (repo: string, license: string, trainable: boolean): void => {
+    flags.set(repo.split('/').slice(-2).join('__'), { license, trainable });
+  };
+  for (const entries of Object.values(sources.languages as Record<string, SourceEntry[]>)) {
+    for (const entry of entries)
+      if (entry.repo.startsWith('http')) register(entry.repo, entry.license, entry.trainable);
+  }
+  const locales = nlSources.locales as Record<
+    string,
+    { gitDocs?: { repo: string; license: string; trainable: boolean }[] }
+  >;
+  for (const locale of Object.values(locales)) {
+    for (const entry of locale.gitDocs ?? []) register(entry.repo, entry.license, entry.trainable);
+  }
+  return flags;
+}
+
 /** The `text` corpus harvests README/CHANGELOG/docs prose from every cloned repo. */
 function harvestText(quick: boolean): void {
   if (!existsSync(CACHE_DIR)) return;
+  resetOrigin('text', 'human');
+  const flags = repoFlagsByCacheDir();
   const budget = quick ? QUICK_LANG_BUDGET_BYTES : LANG_BUDGET_BYTES;
   let total = 0;
   let index = 0;
   for (const repoDir of readdirSync(CACHE_DIR)) {
     const dir = join(CACHE_DIR, repoDir);
     if (!statSync(dir).isDirectory()) continue;
+    const repoFlags = flags.get(repoDir);
+    if (!repoFlags) {
+      console.error(`text: skipping unmapped cache dir ${repoDir} (no license metadata)`);
+      continue;
+    }
     for (const file of sampleFiles(dir, EXTENSIONS.text!)) {
       if (total >= budget) return;
       const content = readFileSync(file.path, 'utf8');
@@ -137,9 +170,10 @@ function harvestText(quick: boolean): void {
         lang: 'text',
         origin: 'human',
         source: `${repoDir}:${file.relative}`,
-        license: 'per-repo (see source repo)',
+        license: repoFlags.license,
         sizeBucket: sizeBucketOf(file.bytes),
-        trainable: true,
+        // Copyleft/share-alike repos stay benchmark-only even for their docs prose.
+        trainable: repoFlags.trainable,
       });
       total += file.bytes;
     }
@@ -147,28 +181,29 @@ function harvestText(quick: boolean): void {
   console.log(`text: harvested ${total} B of docs/prose`);
 }
 
+const git = (args: string[]): boolean =>
+  spawnSync('git', args, { stdio: ['ignore', 'ignore', 'pipe'], timeout: 600_000 }).status === 0;
+
 function cloneAt(entry: SourceEntry): { dir: string } | undefined {
   const name = entry.repo.split('/').slice(-2).join('__');
   const dir = join(CACHE_DIR, name);
   if (existsSync(dir)) return { dir };
   console.log(`cloning ${entry.repo}@${entry.ref} ...`);
-  const clone = spawnSync('git', ['clone', '--depth', '1', '--branch', entry.ref, '--single-branch', entry.repo, dir], {
-    stdio: ['ignore', 'ignore', 'pipe'],
-    timeout: 600_000,
-  });
-  if (clone.status !== 0) {
-    // Fall back to the default branch when the pinned ref is not a branch/tag name.
-    const fallback = spawnSync('git', ['clone', '--depth', '1', entry.repo, dir], {
-      stdio: ['ignore', 'ignore', 'pipe'],
-      timeout: 600_000,
-    });
-    if (fallback.status !== 0) {
-      console.error(`failed to clone ${entry.repo}: ${clone.stderr?.toString().trim()}`);
-      return undefined;
-    }
-    console.error(`warning: ${entry.repo}@${entry.ref} not found; using default branch (record the resolved SHA)`);
+  if (git(['clone', '--depth', '1', '--branch', entry.ref, '--single-branch', entry.repo, dir])) return { dir };
+  // The pinned ref is not a branch/tag name (e.g. a commit SHA): fetch it explicitly.
+  // An unresolvable ref is a hard error — silently sampling a moving default branch would
+  // break the reproducibility contract of oss-sources.json.
+  if (
+    git(['clone', '--depth', '1', entry.repo, dir]) &&
+    git(['-C', dir, 'fetch', '--depth', '1', 'origin', entry.ref]) &&
+    git(['-C', dir, 'checkout', '--detach', 'FETCH_HEAD'])
+  ) {
+    return { dir };
   }
-  return { dir };
+  rmSync(dir, { recursive: true, force: true });
+  console.error(`error: cannot resolve ${entry.repo}@${entry.ref}; skipping repo (fix the pinned ref)`);
+  process.exitCode = 1;
+  return undefined;
 }
 
 function resolveSha(dir: string): string {

@@ -1,4 +1,4 @@
-import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const CORPUS_DIR = join(import.meta.dir, '../../.corpus');
@@ -32,6 +32,20 @@ export function writeSample(language: string, origin: 'human' | 'llm', name: str
 export function appendManifest(language: string, entry: ManifestEntry): void {
   mkdirSync(join(CORPUS_DIR, language), { recursive: true });
   appendFileSync(join(CORPUS_DIR, language, 'manifest.jsonl'), JSON.stringify(entry) + '\n');
+}
+
+/**
+ * Clears one origin's samples and manifest rows before a re-fetch. Without this, re-running a
+ * fetcher would overwrite sample files but keep appending manifest rows, duplicating entries.
+ */
+export function resetOrigin(language: string, origin: 'human' | 'llm'): void {
+  rmSync(join(CORPUS_DIR, language, origin), { recursive: true, force: true });
+  const manifestPath = join(CORPUS_DIR, language, 'manifest.jsonl');
+  if (!existsSync(manifestPath)) return;
+  const kept = readFileSync(manifestPath, 'utf8')
+    .split('\n')
+    .filter((line) => line.trim() && !(JSON.parse(line) as ManifestEntry).file.startsWith(`${origin}/`));
+  writeFileSync(manifestPath, kept.length > 0 ? kept.join('\n') + '\n' : '');
 }
 
 /** Deterministic seeded RNG (mulberry32) shared by split and generation sampling. */

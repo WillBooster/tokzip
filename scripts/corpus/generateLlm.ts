@@ -15,7 +15,7 @@
  */
 import { spawnSync } from 'node:child_process';
 import matrix from './prompt-matrix.json';
-import { appendManifest, seededRandom, sizeBucketOf, writeSample } from './shared.ts';
+import { appendManifest, resetOrigin, seededRandom, sizeBucketOf, writeSample } from './shared.ts';
 
 const AGENTIC_WORKFLOWS_VERSION = '3';
 const CODE_LANGUAGES = [
@@ -100,12 +100,15 @@ const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const limitIndex = args.indexOf('--limit');
 const limit = limitIndex !== -1 ? Number(args[limitIndex + 1]) : Number.POSITIVE_INFINITY;
-const requested = args.filter((a, i) => !a.startsWith('--') && i !== limitIndex + 1);
+// Only skip the value slot when --limit is actually present (limitIndex would be -1 otherwise).
+const limitValueIndex = limitIndex === -1 ? -1 : limitIndex + 1;
+const requested = args.filter((a, i) => !a.startsWith('--') && i !== limitValueIndex);
 const languages = requested.length > 0 ? requested : [...CODE_LANGUAGES, ...NL_LOCALES];
 
 const cells = buildCells(languages).slice(0, limit);
 console.log(`${cells.length} cell(s) to generate${dryRun ? ' (dry run)' : ''}`);
 
+if (!dryRun) for (const language of new Set(cells.map((cell) => cell.language))) resetOrigin(language, 'llm');
 const seen = new Set<string>();
 let index = 0;
 for (const cell of cells) {

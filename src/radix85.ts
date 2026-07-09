@@ -24,7 +24,7 @@ export class BitWriter {
   /** Total number of bits written so far. */
   bitLength = 0;
 
-  /** Writes the low `count` bits of `value` (0 ≤ count ≤ 24), MSB-first. */
+  /** Writes the low `count` bits of `value` (0 ≤ count ≤ 24), MSB-first. Callers must pass `value < 2**count`; high bits are not masked. */
   writeBits(value: number, count: number): void {
     this.bitLength += count;
     let bits = this.accBits + count;
