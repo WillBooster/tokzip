@@ -1,0 +1,48 @@
+name: Benchmark
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  # Never cancel a main run mid-publish; superseded PR runs are safe to cancel.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: write
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Cache benchmark corpus
+        uses: actions/cache@v4
+        with:
+          path: .corpus
+          key: corpus-quick-${{ hashFiles('scripts/corpus/**') }}
+      - name: Fetch corpus (cache miss only)
+        run: |
+          if [ ! -f .corpus/typescript/manifest.jsonl ]; then
+            bun scripts/corpus/fetchOss.ts --quick
+            bun scripts/corpus/fetchNl.ts
+            bun scripts/corpus/split.ts
+            rm -rf .corpus/.cache
+          fi
+      - name: Run benchmark (size + speed + round-trip verification)
+        run: bun scripts/bench/bench.ts --speed --json .tmp/bench.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-result
+          path: .tmp/bench.json
+      - name: Publish result to GitHub Pages branch
+        if: github.event_name != 'pull_request'
+        run: bash scripts/bench/publishPages.sh .tmp/bench.json

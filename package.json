@@ -10,6 +10,7 @@
   "type": "module",
   "module": "index.ts",
   "scripts": {
+    "bench": "bun scripts/bench/bench.ts",
     "cleanup": "bun --bun wb lint --fix --format",
     "format": "bun --bun wb lint --format",
     "lint": "bun --bun wb lint",
