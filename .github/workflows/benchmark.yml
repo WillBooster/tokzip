@@ -1,0 +1,58 @@
+name: Benchmark
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  # queue: max keeps every queued run instead of the default "newest pending replaces
+  # older pending", so a burst of merges to main still yields one dashboard point per
+  # commit. It cannot be combined with cancel-in-progress: true, so superseded PR runs
+  # queue too — acceptable, since runs are short once the corpus cache is warm.
+  queue: max
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TOKZIP_CORPUS_DIR: tokzip-corpus/corpus
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check out pinned benchmark corpus
+        uses: actions/checkout@v6
+        with:
+          repository: WillBooster/tokzip-corpus
+          ref: 19e2eef6cc32777d96a42e50b583475b386759d2
+          path: tokzip-corpus
+      - uses: oven-sh/setup-bun@v2
+        with:
+          # Pinned (via .tool-versions) so runtime upgrades don't masquerade as
+          # compress/decompress speed changes in the published series.
+          bun-version-file: .tool-versions
+      - run: bun install --frozen-lockfile
+      - name: Run benchmark (size + speed + round-trip verification)
+        run: bun scripts/bench/bench.ts --speed --json .tmp/bench.json
+      - uses: actions/upload-artifact@v4
+        # Upload even when the benchmark fails (e.g. a round-trip mismatch) so the
+        # structured failure report is available for debugging, not just log text.
+        if: ${{ !cancelled() }}
+        with:
+          name: benchmark-result
+          path: .tmp/bench.json
+          if-no-files-found: ignore
+      - name: Publish result to GitHub Pages branch
+        # Only mainline results reach the dashboard: this also excludes workflow_dispatch
+        # runs on feature branches, which would race main's publishes (the concurrency
+        # group is per-ref). The implicit success() gate still applies: GitHub ANDs
+        # `success()` into any `if:` expression that contains no status-check function,
+        # so a failed benchmark (e.g. a round-trip mismatch) never publishes.
+        if: github.ref == 'refs/heads/main'
+        run: bash scripts/bench/publishPages.sh .tmp/bench.json

@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>tokzip benchmarks</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --surface-1: #fcfcfb;
+        --page: #f9f9f7;
+        --text-primary: #0b0b0b;
+        --text-secondary: #52514e;
+        --text-muted: #898781;
+        --grid: #e1e0d9;
+        --border: rgba(11, 11, 11, 0.1);
+        --good: #006300;
+        --critical: #d03b3b;
+        --series-fast: #2a78d6;
+        --series-small: #1baf7a;
+        --series-brotli: #eda100;
+        --series-gzip: #008300;
+        --series-zstd: #4a3aa7;
+        --series-lz: #a63f70;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --surface-1: #1a1a19;
+          --page: #0d0d0d;
+          --text-primary: #ffffff;
+          --text-secondary: #c3c2b7;
+          --text-muted: #898781;
+          --grid: #2c2c2a;
+          --border: rgba(255, 255, 255, 0.1);
+          --good: #0ca30c;
+          --critical: #e66767;
+          --series-fast: #3987e5;
+          --series-small: #199e70;
+          --series-brotli: #c98500;
+          --series-gzip: #008300;
+          --series-zstd: #9085e9;
+          --series-lz: #e06fa6;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text-primary);
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      main {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+      }
+      .skip-link {
+        position: absolute;
+        left: 1rem;
+        top: -4rem;
+        background: var(--text-primary);
+        color: var(--page);
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        z-index: 1;
+      }
+      .skip-link:focus-visible {
+        top: 1rem;
+        outline: 0.125rem solid var(--series-fast);
+        outline-offset: 0.125rem;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 0 0 2px;
+      }
+      .subtitle {
+        color: var(--text-secondary);
+        margin: 0 0 24px;
+      }
+      .subtitle a {
+        color: inherit;
+      }
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .tile {
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 16px;
+      }
+      .tile .label {
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+      .tile .value {
+        font-size: 26px;
+        font-weight: 650;
+        margin-top: 2px;
+      }
+      .tile .note {
+        color: var(--text-muted);
+        font-size: 12px;
+        margin-top: 2px;
+      }
+      .tile .value.good {
+        color: var(--good);
+      }
+      .tile .value.bad {
+        color: var(--critical);
+      }
+      .card {
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 24px;
+      }
+      .card p.desc {
+        color: var(--text-secondary);
+        margin: 0 0 12px;
+        font-size: 13px;
+      }
+      .chart-wrap {
+        position: relative;
+        width: 100%;
+      }
+      details {
+        margin-top: 12px;
+      }
+      summary {
+        cursor: pointer;
+        color: var(--text-secondary);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 8px;
+        font-variant-numeric: tabular-nums;
+      }
+      .table-wrap {
+        overflow-x: auto;
+      }
+      th,
+      td {
+        text-align: right;
+        padding: 4px 10px;
+        border-bottom: 1px solid var(--grid);
+        font-size: 13px;
+      }
+      th:first-child,
+      td:first-child {
+        text-align: left;
+      }
+      th {
+        color: var(--text-secondary);
+        font-weight: 600;
+      }
+      #empty {
+        color: var(--text-secondary);
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to benchmark results</a>
+    <main id="main">
+      <h1>tokzip benchmarks</h1>
+      <p class="subtitle">
+        Per-commit results on the seeded <code>bench-v1</code> split of the cold-built <code>--quick</code> CI corpus
+        (one pinned OSS repo per language plus natural-language sources — smaller than the full local corpus). Output
+        size is measured on the <em>text channel</em>: binary competitors use unpadded base64url, while tokzip emits
+        URL-safe ASCII directly. Lower is better. Source:
+        <a href="https://github.com/WillBooster/tokzip">WillBooster/tokzip</a>.
+      </p>
+
+      <p id="empty" role="status" hidden>No benchmark results published yet.</p>
+      <div class="tiles" id="tiles"></div>
+
+      <div class="card">
+        <h2>Compression ratio over commits</h2>
+        <p class="desc">
+          Byte-weighted output/input ratio (%). Only runs with the latest corpus fingerprint are connected.
+        </p>
+        <div class="chart-wrap">
+          <canvas id="ratioChart" height="300" role="img" aria-label="Compression ratio by commit and method"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Throughput over commits</h2>
+        <p class="desc">
+          End-to-end per-document compress / decompress speed in MB/s (log scale), including binary-to-text framing.
+        </p>
+        <div class="chart-wrap">
+          <canvas
+            id="speedChart"
+            height="300"
+            role="img"
+            aria-label="Compression throughput by commit and method"
+          ></canvas>
+        </div>
+        <details>
+          <summary>Full throughput table (latest run)</summary>
+          <div class="table-wrap" id="speedTable"></div>
+        </details>
+      </div>
+
+      <div class="card">
+        <h2>Latest run: ratio per language</h2>
+        <p class="desc" id="languageDescription">tokzip small vs the strongest competitor on the most recent commit.</p>
+        <div class="chart-wrap">
+          <canvas id="languageChart" role="img" aria-label="Compression ratio by language"></canvas>
+        </div>
+        <details>
+          <summary>Full table (latest run, all methods)</summary>
+          <div class="table-wrap" id="languageTable"></div>
+        </details>
+      </div>
+    </main>
+
+    <script>
+      'use strict';
+
+      const RATIO_SERIES = [
+        { method: 'tokzip fast', colorVar: '--series-fast' },
+        { method: 'tokzip small', colorVar: '--series-small' },
+        { method: 'b64url(brotli q11)', colorVar: '--series-brotli' },
+        { method: 'b64url(gzip -6)', colorVar: '--series-gzip' },
+        { method: 'b64url(zstd -19)', colorVar: '--series-zstd' },
+        { method: 'lz-string URI', colorVar: '--series-lz' },
+      ];
+
+      const SPEED_SERIES = [
+        { method: 'tokzip fast', colorVar: '--series-fast' },
+        { method: 'b64url(brotli q5)', colorVar: '--series-brotli' },
+        { method: 'b64url(gzip -6)', colorVar: '--series-gzip' },
+        { method: 'b64url(zstd -3)', colorVar: '--series-zstd' },
+        { method: 'lz-string URI', colorVar: '--series-lz' },
+      ];
+
+      const charts = [];
+      let runs = [];
+
+      async function load() {
+        let text = '';
+        try {
+          const response = await fetch('results.jsonl', { cache: 'no-cache' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          text = await response.text();
+        } catch (error) {
+          const empty = document.querySelector('#empty');
+          empty.textContent = `Benchmark results could not be loaded: ${error}`;
+          empty.hidden = false;
+          return;
+        }
+        // Order by commit time, not benchmark wall-clock time: re-running the workflow
+        // for an old commit must not move that commit to the head of the series. Compare
+        // parsed instants, not strings — stored timestamps can mix UTC and local offsets.
+        const orderKey = (run) => Date.parse(run.commitTimestamp ?? run.timestamp) || 0;
+        runs = text
+          .split('\n')
+          .filter((line) => line.trim())
+          .map((line) => JSON.parse(line))
+          .sort((a, b) => orderKey(a) - orderKey(b));
+        if (runs.length === 0) {
+          document.querySelector('#empty').hidden = false;
+          return;
+        }
+        render();
+        matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+      }
+
+      function render() {
+        for (const chart of charts.splice(0)) chart.destroy();
+        const css = getComputedStyle(document.documentElement);
+        const color = (name) => css.getPropertyValue(name).trim();
+        applyChartDefaults(color);
+        renderTiles();
+        renderRatioChart(color);
+        renderSpeedChart(color);
+        renderSpeedTable();
+        renderLanguageChart(color);
+        renderLanguageTable();
+      }
+
+      function applyChartDefaults(color) {
+        Chart.defaults.color = color('--text-secondary');
+        Chart.defaults.borderColor = color('--grid');
+        Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+        Chart.defaults.plugins.legend.labels.boxWidth = 12;
+        Chart.defaults.plugins.legend.labels.boxHeight = 12;
+      }
+
+      function renderTiles() {
+        const latest = runs.at(-1);
+        const percent = (ratio) => (ratio * 100).toFixed(1) + '%';
+        const small = latest.total.ratios['tokzip small'];
+        const fast = latest.total.ratios['tokzip fast'];
+        const competitor = bestCompetitor(latest);
+        const failures = latest.roundTrip.failures.length;
+        const tiles = [
+          {
+            label: 'tokzip small (overall)',
+            value: percent(small),
+            note: `${latest.total.docs} docs, ${Object.keys(latest.languages).length} languages`,
+          },
+          { label: 'tokzip fast (overall)', value: percent(fast), note: 'speed-first mode' },
+          {
+            label: `vs ${competitor.method}`,
+            value:
+              (small <= competitor.ratio ? '−' : '+') + Math.abs((competitor.ratio - small) * 100).toFixed(1) + ' pt',
+            cls: small <= competitor.ratio ? 'good' : 'bad',
+            note: `strongest baseline: ${percent(competitor.ratio)}`,
+          },
+          {
+            label: 'Round-trip check',
+            value: failures === 0 ? '✓ lossless' : `✗ ${failures} failures`,
+            cls: failures === 0 ? 'good' : 'bad',
+            note: `${latest.roundTrip.docs} docs, ${latest.roundTrip.methods ?? 2} methods`,
+          },
+        ];
+        if (latest.speed && latest.schemaVersion === 1) {
+          tiles.push({
+            label: 'Speed (small mode)',
+            value: `${latest.speed.small.compressMBps} MB/s`,
+            note: `decompress ${latest.speed.small.decompressMBps} MB/s`,
+          });
+        }
+        if (latest.corpus) {
+          tiles.push({
+            label: 'Corpus identity',
+            value: latest.corpus.sha256.slice(0, 10),
+            note: latest.corpus.split,
+          });
+        }
+        document.querySelector('#tiles').innerHTML = tiles
+          .map(
+            (tile) =>
+              `<div class="tile"><div class="label">${tile.label}</div>` +
+              `<div class="value ${tile.cls ?? ''}">${tile.value}</div><div class="note">${tile.note}</div></div>`
+          )
+          .join('');
+      }
+
+      function commitAxis() {
+        return {
+          labels: runs.map((run) => run.commit.slice(0, 7)),
+          tooltipTitle: (items) => {
+            const run = runs[items[0].dataIndex];
+            const fingerprint = run.corpus ? ` — corpus ${run.corpus.sha256.slice(0, 10)}` : '';
+            return `${run.commit.slice(0, 12)} — ${(run.commitTimestamp ?? run.timestamp).slice(0, 10)}${fingerprint}`;
+          },
+        };
+      }
+
+      function lineDataset(label, data, lineColor, dash) {
+        return {
+          label,
+          data,
+          borderColor: lineColor,
+          backgroundColor: lineColor,
+          borderWidth: 2,
+          borderDash: dash,
+          pointRadius: runs.length > 40 ? 0 : 3,
+          pointHoverRadius: 5,
+          spanGaps: true,
+        };
+      }
+
+      function renderRatioChart(color) {
+        const axis = commitAxis();
+        charts.push(
+          new Chart(document.querySelector('#ratioChart'), {
+            type: 'line',
+            data: {
+              labels: axis.labels,
+              datasets: RATIO_SERIES.map((series) =>
+                lineDataset(
+                  series.method,
+                  runs.map((run) => {
+                    if (!isComparable(run)) return null;
+                    const ratio = run.total.ratios[series.method];
+                    // JSON has no NaN: a degenerate report serializes ratios as null,
+                    // which must render as a gap, not as 0%.
+                    return typeof ratio === 'number' ? ratio * 100 : null;
+                  }),
+                  color(series.colorVar)
+                )
+              ),
+            },
+            options: chartOptions(axis, { title: 'output / input (%)' }),
+          })
+        );
+      }
+
+      function renderSpeedChart(color) {
+        const axis = commitAxis();
+        const speedOf = (run, method, key) => {
+          if (!run.speed || !isComparable(run)) return null;
+          if (run.schemaVersion === 1 && method.startsWith('tokzip ')) return run.speed[method.slice(7)]?.[key] ?? null;
+          return run.speed[method]?.[key] ?? null;
+        };
+        const datasets = SPEED_SERIES.flatMap((series) => [
+          lineDataset(
+            `${series.method} compress`,
+            runs.map((run) => speedOf(run, series.method, 'compressMBps')),
+            color(series.colorVar)
+          ),
+          lineDataset(
+            `${series.method} decompress`,
+            runs.map((run) => speedOf(run, series.method, 'decompressMBps')),
+            color(series.colorVar),
+            [6, 4]
+          ),
+        ]);
+        charts.push(
+          new Chart(document.querySelector('#speedChart'), {
+            type: 'line',
+            data: {
+              labels: axis.labels,
+              datasets,
+            },
+            options: chartOptions(axis, { title: 'MB/s (log scale)', logarithmic: true }),
+          })
+        );
+      }
+
+      function renderLanguageChart(color) {
+        const latest = runs.at(-1);
+        const competitor = bestCompetitor(latest);
+        document.querySelector('#languageDescription').textContent =
+          `tokzip small vs ${competitor.method}, the strongest overall competitor in the most recent run. Lower is better.`;
+        const languages = Object.keys(latest.languages).sort(
+          (a, b) => latest.languages[a].total.ratios['tokzip small'] - latest.languages[b].total.ratios['tokzip small']
+        );
+        const canvas = document.querySelector('#languageChart');
+        canvas.parentElement.style.height = `${languages.length * 30 + 90}px`;
+        const barDataset = (label, colorValue, method) => ({
+          label,
+          data: languages.map((language) => latest.languages[language].total.ratios[method] * 100),
+          backgroundColor: colorValue,
+          borderRadius: 4,
+          categoryPercentage: 0.72,
+          barPercentage: 0.9,
+        });
+        charts.push(
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: languages,
+              datasets: [
+                barDataset('tokzip small', color('--series-small'), 'tokzip small'),
+                barDataset(competitor.method, color('--series-brotli'), competitor.method),
+              ],
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: { title: { display: true, text: 'output / input (%)' }, grid: { drawTicks: false } },
+                y: { grid: { display: false } },
+              },
+              plugins: {
+                legend: { position: 'top', align: 'end' },
+                tooltip: { callbacks: { label: (item) => ` ${item.dataset.label}: ${item.parsed.x.toFixed(1)}%` } },
+              },
+            },
+          })
+        );
+      }
+
+      function chartOptions(axis, { title, logarithmic = false }) {
+        return {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 12, autoSkip: true } },
+            y: {
+              type: logarithmic ? 'logarithmic' : 'linear',
+              title: { display: true, text: title },
+              grid: { drawTicks: false },
+            },
+          },
+          plugins: {
+            legend: { position: 'top', align: 'end' },
+            tooltip: {
+              callbacks: {
+                title: axis.tooltipTitle,
+                label: (item) => ` ${item.dataset.label}: ${item.parsed.y?.toFixed(1)}`,
+              },
+            },
+          },
+        };
+      }
+
+      function renderLanguageTable() {
+        const latest = runs.at(-1);
+        const methods = latest.methods;
+        const rows = Object.entries(latest.languages).map(
+          ([language, entry]) =>
+            `<tr><td>${language}</td><td>${entry.docs}</td>` +
+            methods.map((method) => `<td>${formatPercent(entry.total.ratios[method])}</td>`).join('') +
+            '</tr>'
+        );
+        document.querySelector('#languageTable').innerHTML =
+          `<table><thead><tr><th>language</th><th>docs</th>${methods.map((m) => `<th>${m}</th>`).join('')}</tr></thead>` +
+          `<tbody>${rows.join('')}</tbody></table>`;
+      }
+
+      function renderSpeedTable() {
+        const latest = runs.at(-1);
+        if (!latest.speed) return;
+        const entries =
+          latest.schemaVersion === 1
+            ? Object.entries(latest.speed).map(([mode, value]) => [`tokzip ${mode}`, value])
+            : Object.entries(latest.speed);
+        const rows = entries.map(
+          ([method, speed]) =>
+            `<tr><td>${method}</td><td>${speed.compressMBps.toFixed(1)}</td><td>${speed.decompressMBps.toFixed(1)}</td>` +
+            `<td>${speed.compressKops?.toFixed(1) ?? '—'}</td><td>${speed.decompressKops?.toFixed(1) ?? '—'}</td></tr>`
+        );
+        document.querySelector('#speedTable').innerHTML =
+          '<table><thead><tr><th>method</th><th>compress MB/s</th><th>decompress MB/s</th>' +
+          `<th>compress kdoc/s</th><th>decompress kdoc/s</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+      }
+
+      function bestCompetitor(run) {
+        return run.methods
+          .filter((method) => !method.startsWith('tokzip '))
+          .map((method) => ({ method, ratio: run.total.ratios[method] }))
+          .filter((entry) => typeof entry.ratio === 'number')
+          .sort((a, b) => a.ratio - b.ratio)[0];
+      }
+
+      function isComparable(run) {
+        const latestCorpus = runs.at(-1).corpus;
+        if (!latestCorpus) return true;
+        return run.corpus?.sha256 === latestCorpus.sha256;
+      }
+
+      function formatPercent(ratio) {
+        return typeof ratio === 'number' ? `${(ratio * 100).toFixed(1)}%` : '—';
+      }
+
+      load();
+    </script>
+  </body>
+</html>
