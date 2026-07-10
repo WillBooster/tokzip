@@ -326,7 +326,9 @@
                   series.method,
                   runs.map((run) => {
                     const ratio = run.total.ratios[series.method];
-                    return ratio === undefined ? null : ratio * 100;
+                    // JSON has no NaN: a degenerate report serializes ratios as null,
+                    // which must render as a gap, not as 0%.
+                    return typeof ratio === 'number' ? ratio * 100 : null;
                   }),
                   color(series.colorVar)
                 )

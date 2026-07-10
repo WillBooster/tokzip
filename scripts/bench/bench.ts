@@ -115,6 +115,12 @@ function main(): void {
     if (speed && report.languages[language]) benchSpeed(language, report, speedAccumulator);
   }
 
+  // A run that benchmarked nothing (typo'd language, unfetched/unsplit corpus) must not
+  // exit 0 looking like a full pass — "all 0 docs restored losslessly" proves nothing.
+  if (grandTotals.docs === 0) {
+    console.error('error: no bench documents found (fetch + split the corpus first, or check the language name)');
+    process.exit(1);
+  }
   report.total = { docs: grandTotals.docs, inputBytes: grandTotals.inputBytes, ratios: ratiosOf(grandTotals) };
   printTotals(report);
   if (speed) {
