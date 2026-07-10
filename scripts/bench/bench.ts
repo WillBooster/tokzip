@@ -62,6 +62,9 @@ interface LanguageReport {
 interface BenchReport {
   schemaVersion: 1;
   commit: string;
+  /** Committer time of `commit` (ISO 8601); the dashboard's stable series order. */
+  commitTimestamp: string;
+  /** Wall-clock time of the benchmark run itself. */
   timestamp: string;
   runtime: string;
   methods: string[];
@@ -93,6 +96,9 @@ function main(): void {
   const report: BenchReport = {
     schemaVersion: 1,
     commit: process.env['GITHUB_SHA'] ?? gitOutput(['rev-parse', 'HEAD']) ?? 'unknown',
+    // The commit's own time gives the dashboard a stable series order: re-running the
+    // benchmark for an old commit must not move it to the head of the charts.
+    commitTimestamp: gitOutput(['show', '-s', '--format=%cI', 'HEAD']) ?? new Date().toISOString(),
     timestamp: new Date().toISOString(),
     runtime: `bun ${Bun.version}`,
     methods: METHODS,
@@ -173,9 +179,17 @@ function benchDoc(
   for (const [modeIndex, mode] of MODES.entries()) {
     const packed = compress(doc.content, { language: registered ? language : 'none', mode });
     totals.outputChars[modeIndex]! += packed.length;
-    if (decompress(packed) !== doc.content) {
-      roundTrip.failures.push(`${language}/${doc.file} (${mode})`);
-      console.error(`ROUND-TRIP FAILURE: ${language}/${doc.file} (${mode})`);
+    // A decode throw must be recorded like a mismatch, not abort the run: the JSON
+    // report (and its failure list) still has to reach CI artifacts and the dashboard.
+    let failure: string | undefined;
+    try {
+      if (decompress(packed) !== doc.content) failure = `${language}/${doc.file} (${mode})`;
+    } catch (error) {
+      failure = `${language}/${doc.file} (${mode}): ${error}`;
+    }
+    if (failure !== undefined) {
+      roundTrip.failures.push(failure);
+      console.error(`ROUND-TRIP FAILURE: ${failure}`);
     }
   }
   for (const [i, competitor] of competitors.entries()) {

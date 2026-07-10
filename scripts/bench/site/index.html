@@ -210,11 +210,14 @@
       async function load() {
         const response = await fetch('results.jsonl', { cache: 'no-cache' });
         const text = response.ok ? await response.text() : '';
+        // Order by commit time, not benchmark wall-clock time: re-running the workflow
+        // for an old commit must not move that commit to the head of the series.
+        const orderKey = (run) => run.commitTimestamp ?? run.timestamp;
         runs = text
           .split('\n')
           .filter((line) => line.trim())
           .map((line) => JSON.parse(line))
-          .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+          .sort((a, b) => orderKey(a).localeCompare(orderKey(b)));
         if (runs.length === 0) {
           document.querySelector('#empty').hidden = false;
           return;
@@ -291,7 +294,7 @@
           labels: runs.map((run) => run.commit.slice(0, 7)),
           tooltipTitle: (items) => {
             const run = runs[items[0].dataIndex];
-            return `${run.commit.slice(0, 12)} — ${run.timestamp.slice(0, 10)}`;
+            return `${run.commit.slice(0, 12)} — ${(run.commitTimestamp ?? run.timestamp).slice(0, 10)}`;
           },
         };
       }
