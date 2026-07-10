@@ -81,7 +81,7 @@ function main(): void {
     console.error('error: --json requires a path');
     process.exit(1);
   }
-  const requested = args.filter((a, i) => !a.startsWith('--') && i !== jsonIndex + 1);
+  const requested = args.filter((a, i) => !a.startsWith('--') && (jsonIndex === -1 || i !== jsonIndex + 1));
   const languages =
     requested.length > 0
       ? requested

@@ -10,8 +10,10 @@ result_json="${1:?usage: publishPages.sh <bench.json>}"
 commit="$(jq -r .commit "$result_json")"
 pages_dir=.tmp/gh-pages
 
-git config user.name 'github-actions[bot]'
-git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+# Scoped to this process only (not `git config`), so local runs never mutate .git/config.
+export GIT_AUTHOR_NAME='github-actions[bot]' GIT_COMMITTER_NAME='github-actions[bot]'
+export GIT_AUTHOR_EMAIL='41898282+github-actions[bot]@users.noreply.github.com'
+export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 
 rm -rf "$pages_dir"
 git worktree prune
@@ -22,7 +24,9 @@ if git ls-remote --exit-code --heads origin gh-pages > /dev/null; then
   git fetch origin gh-pages
   git worktree add "$pages_dir" -B gh-pages FETCH_HEAD
 else
-  # First publish: create an orphan gh-pages branch inside a detached worktree.
+  # First publish: create an orphan gh-pages branch inside a detached worktree. A stale
+  # local gh-pages branch (e.g. from an aborted run) would make --orphan fail, so drop it.
+  git branch -D gh-pages 2> /dev/null || true
   git worktree add --detach "$pages_dir"
   git -C "$pages_dir" checkout --orphan gh-pages
   git -C "$pages_dir" rm -rfq . 2> /dev/null || true
