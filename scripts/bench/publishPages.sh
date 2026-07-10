@@ -16,8 +16,11 @@ git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 rm -rf "$pages_dir"
 git worktree prune
 if git ls-remote --exit-code --heads origin gh-pages > /dev/null; then
+  # Base the branch on FETCH_HEAD instead of origin/gh-pages: actions/checkout clones
+  # single-branch, so the remote-tracking ref for gh-pages is never created (and a
+  # fetch.prune=true config can even delete it mid-fetch).
   git fetch origin gh-pages
-  git worktree add "$pages_dir" -B gh-pages origin/gh-pages
+  git worktree add "$pages_dir" -B gh-pages FETCH_HEAD
 else
   # First publish: create an orphan gh-pages branch inside a detached worktree.
   git worktree add --detach "$pages_dir"
