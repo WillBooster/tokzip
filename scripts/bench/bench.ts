@@ -97,8 +97,9 @@ function main(): void {
     schemaVersion: 1,
     commit: process.env['GITHUB_SHA'] ?? gitOutput(['rev-parse', 'HEAD']) ?? 'unknown',
     // The commit's own time gives the dashboard a stable series order: re-running the
-    // benchmark for an old commit must not move it to the head of the charts.
-    commitTimestamp: gitOutput(['show', '-s', '--format=%cI', 'HEAD']) ?? new Date().toISOString(),
+    // benchmark for an old commit must not move it to the head of the charts. Normalized
+    // to UTC because git %cI emits the committer's local offset.
+    commitTimestamp: new Date(gitOutput(['show', '-s', '--format=%cI', 'HEAD']) ?? Date.now()).toISOString(),
     timestamp: new Date().toISOString(),
     runtime: `bun ${Bun.version}`,
     methods: METHODS,

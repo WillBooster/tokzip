@@ -211,13 +211,14 @@
         const response = await fetch('results.jsonl', { cache: 'no-cache' });
         const text = response.ok ? await response.text() : '';
         // Order by commit time, not benchmark wall-clock time: re-running the workflow
-        // for an old commit must not move that commit to the head of the series.
-        const orderKey = (run) => run.commitTimestamp ?? run.timestamp;
+        // for an old commit must not move that commit to the head of the series. Compare
+        // parsed instants, not strings — stored timestamps can mix UTC and local offsets.
+        const orderKey = (run) => Date.parse(run.commitTimestamp ?? run.timestamp) || 0;
         runs = text
           .split('\n')
           .filter((line) => line.trim())
           .map((line) => JSON.parse(line))
-          .sort((a, b) => orderKey(a).localeCompare(orderKey(b)));
+          .sort((a, b) => orderKey(a) - orderKey(b));
         if (runs.length === 0) {
           document.querySelector('#empty').hidden = false;
           return;
