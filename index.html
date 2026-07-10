@@ -21,6 +21,7 @@
         --series-brotli: #eda100;
         --series-gzip: #008300;
         --series-zstd: #4a3aa7;
+        --series-lz: #a63f70;
       }
       @media (prefers-color-scheme: dark) {
         :root {
@@ -38,6 +39,7 @@
           --series-brotli: #c98500;
           --series-gzip: #008300;
           --series-zstd: #9085e9;
+          --series-lz: #e06fa6;
         }
       }
       * {
@@ -52,13 +54,28 @@
           -apple-system,
           'Segoe UI',
           sans-serif;
-        font-size: 14px;
+        font-size: 16px;
         line-height: 1.5;
       }
       main {
         max-width: 1080px;
         margin: 0 auto;
         padding: 24px 16px 64px;
+      }
+      .skip-link {
+        position: absolute;
+        left: 1rem;
+        top: -4rem;
+        background: var(--text-primary);
+        color: var(--page);
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        z-index: 1;
+      }
+      .skip-link:focus-visible {
+        top: 1rem;
+        outline: 0.125rem solid var(--series-fast);
+        outline-offset: 0.125rem;
       }
       h1 {
         font-size: 22px;
@@ -136,6 +153,9 @@
         margin-top: 8px;
         font-variant-numeric: tabular-nums;
       }
+      .table-wrap {
+        overflow-x: auto;
+      }
       th,
       td {
         text-align: right;
@@ -157,40 +177,58 @@
     </style>
   </head>
   <body>
-    <main>
+    <a class="skip-link" href="#main">Skip to benchmark results</a>
+    <main id="main">
       <h1>tokzip benchmarks</h1>
       <p class="subtitle">
-        Per-commit results on the frozen <code>bench-v1</code> split of the reproducible <code>--quick</code> CI corpus
+        Per-commit results on the seeded <code>bench-v1</code> split of the cold-built <code>--quick</code> CI corpus
         (one pinned OSS repo per language plus natural-language sources — smaller than the full local corpus). Output
-        size is measured on the <em>text channel</em>: competitors pay the base64 tax on their binary output, tokzip
-        emits safe ASCII directly. Lower is better. Source:
+        size is measured on the <em>text channel</em>: binary competitors use unpadded base64url, while tokzip emits
+        URL-safe ASCII directly. Lower is better. Source:
         <a href="https://github.com/WillBooster/tokzip">WillBooster/tokzip</a>.
       </p>
 
-      <p id="empty" hidden>No benchmark results published yet.</p>
+      <p id="empty" role="status" hidden>No benchmark results published yet.</p>
       <div class="tiles" id="tiles"></div>
 
       <div class="card">
         <h2>Compression ratio over commits</h2>
-        <p class="desc">Byte-weighted output/input ratio across all languages and size buckets (%). Lower is better.</p>
-        <div class="chart-wrap"><canvas id="ratioChart" height="300"></canvas></div>
+        <p class="desc">
+          Byte-weighted output/input ratio (%). Only runs with the latest corpus fingerprint are connected.
+        </p>
+        <div class="chart-wrap">
+          <canvas id="ratioChart" height="300" role="img" aria-label="Compression ratio by commit and method"></canvas>
+        </div>
       </div>
 
       <div class="card">
         <h2>Throughput over commits</h2>
         <p class="desc">
-          tokzip compress / decompress speed in MB/s (log scale), aggregated over the whole bench corpus.
+          End-to-end per-document compress / decompress speed in MB/s (log scale), including binary-to-text framing.
         </p>
-        <div class="chart-wrap"><canvas id="speedChart" height="300"></canvas></div>
+        <div class="chart-wrap">
+          <canvas
+            id="speedChart"
+            height="300"
+            role="img"
+            aria-label="Compression throughput by commit and method"
+          ></canvas>
+        </div>
+        <details>
+          <summary>Full throughput table (latest run)</summary>
+          <div class="table-wrap" id="speedTable"></div>
+        </details>
       </div>
 
       <div class="card">
         <h2>Latest run: ratio per language</h2>
-        <p class="desc">tokzip small vs base64(brotli q11) on the most recent commit. Lower is better.</p>
-        <div class="chart-wrap"><canvas id="languageChart"></canvas></div>
+        <p class="desc" id="languageDescription">tokzip small vs the strongest competitor on the most recent commit.</p>
+        <div class="chart-wrap">
+          <canvas id="languageChart" role="img" aria-label="Compression ratio by language"></canvas>
+        </div>
         <details>
           <summary>Full table (latest run, all methods)</summary>
-          <div id="languageTable"></div>
+          <div class="table-wrap" id="languageTable"></div>
         </details>
       </div>
     </main>
@@ -201,17 +239,35 @@
       const RATIO_SERIES = [
         { method: 'tokzip fast', colorVar: '--series-fast' },
         { method: 'tokzip small', colorVar: '--series-small' },
-        { method: 'b64(brotli q11)', colorVar: '--series-brotli' },
-        { method: 'b64(gzip -6)', colorVar: '--series-gzip' },
-        { method: 'b64(zstd -19)', colorVar: '--series-zstd' },
+        { method: 'b64url(brotli q11)', colorVar: '--series-brotli' },
+        { method: 'b64url(gzip -6)', colorVar: '--series-gzip' },
+        { method: 'b64url(zstd -19)', colorVar: '--series-zstd' },
+        { method: 'lz-string URI', colorVar: '--series-lz' },
+      ];
+
+      const SPEED_SERIES = [
+        { method: 'tokzip fast', colorVar: '--series-fast' },
+        { method: 'b64url(brotli q5)', colorVar: '--series-brotli' },
+        { method: 'b64url(gzip -6)', colorVar: '--series-gzip' },
+        { method: 'b64url(zstd -3)', colorVar: '--series-zstd' },
+        { method: 'lz-string URI', colorVar: '--series-lz' },
       ];
 
       const charts = [];
       let runs = [];
 
       async function load() {
-        const response = await fetch('results.jsonl', { cache: 'no-cache' });
-        const text = response.ok ? await response.text() : '';
+        let text = '';
+        try {
+          const response = await fetch('results.jsonl', { cache: 'no-cache' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          text = await response.text();
+        } catch (error) {
+          const empty = document.querySelector('#empty');
+          empty.textContent = `Benchmark results could not be loaded: ${error}`;
+          empty.hidden = false;
+          return;
+        }
         // Order by commit time, not benchmark wall-clock time: re-running the workflow
         // for an old commit must not move that commit to the head of the series. Compare
         // parsed instants, not strings — stored timestamps can mix UTC and local offsets.
@@ -237,6 +293,7 @@
         renderTiles();
         renderRatioChart(color);
         renderSpeedChart(color);
+        renderSpeedTable();
         renderLanguageChart(color);
         renderLanguageTable();
       }
@@ -254,7 +311,7 @@
         const percent = (ratio) => (ratio * 100).toFixed(1) + '%';
         const small = latest.total.ratios['tokzip small'];
         const fast = latest.total.ratios['tokzip fast'];
-        const brotli = latest.total.ratios['b64(brotli q11)'];
+        const competitor = bestCompetitor(latest);
         const failures = latest.roundTrip.failures.length;
         const tiles = [
           {
@@ -264,23 +321,31 @@
           },
           { label: 'tokzip fast (overall)', value: percent(fast), note: 'speed-first mode' },
           {
-            label: 'vs base64(brotli q11)',
-            value: (small <= brotli ? '−' : '+') + Math.abs((brotli - small) * 100).toFixed(1) + ' pt',
-            cls: small <= brotli ? 'good' : 'bad',
-            note: `brotli baseline: ${percent(brotli)}`,
+            label: `vs ${competitor.method}`,
+            value:
+              (small <= competitor.ratio ? '−' : '+') + Math.abs((competitor.ratio - small) * 100).toFixed(1) + ' pt',
+            cls: small <= competitor.ratio ? 'good' : 'bad',
+            note: `strongest baseline: ${percent(competitor.ratio)}`,
           },
           {
             label: 'Round-trip check',
             value: failures === 0 ? '✓ lossless' : `✗ ${failures} failures`,
             cls: failures === 0 ? 'good' : 'bad',
-            note: `${latest.roundTrip.docs} docs, both modes`,
+            note: `${latest.roundTrip.docs} docs, ${latest.roundTrip.methods ?? 2} methods`,
           },
         ];
-        if (latest.speed) {
+        if (latest.speed && latest.schemaVersion === 1) {
           tiles.push({
             label: 'Speed (small mode)',
             value: `${latest.speed.small.compressMBps} MB/s`,
             note: `decompress ${latest.speed.small.decompressMBps} MB/s`,
+          });
+        }
+        if (latest.corpus) {
+          tiles.push({
+            label: 'Corpus identity',
+            value: latest.corpus.sha256.slice(0, 10),
+            note: latest.corpus.split,
           });
         }
         document.querySelector('#tiles').innerHTML = tiles
@@ -297,7 +362,8 @@
           labels: runs.map((run) => run.commit.slice(0, 7)),
           tooltipTitle: (items) => {
             const run = runs[items[0].dataIndex];
-            return `${run.commit.slice(0, 12)} — ${(run.commitTimestamp ?? run.timestamp).slice(0, 10)}`;
+            const fingerprint = run.corpus ? ` — corpus ${run.corpus.sha256.slice(0, 10)}` : '';
+            return `${run.commit.slice(0, 12)} — ${(run.commitTimestamp ?? run.timestamp).slice(0, 10)}${fingerprint}`;
           },
         };
       }
@@ -327,6 +393,7 @@
                 lineDataset(
                   series.method,
                   runs.map((run) => {
+                    if (!isComparable(run)) return null;
                     const ratio = run.total.ratios[series.method];
                     // JSON has no NaN: a degenerate report serializes ratios as null,
                     // which must render as a gap, not as 0%.
@@ -343,36 +410,30 @@
 
       function renderSpeedChart(color) {
         const axis = commitAxis();
-        const speedOf = (run, mode, key) => (run.speed ? run.speed[mode][key] : null);
+        const speedOf = (run, method, key) => {
+          if (!run.speed || !isComparable(run)) return null;
+          if (run.schemaVersion === 1 && method.startsWith('tokzip ')) return run.speed[method.slice(7)]?.[key] ?? null;
+          return run.speed[method]?.[key] ?? null;
+        };
+        const datasets = SPEED_SERIES.flatMap((series) => [
+          lineDataset(
+            `${series.method} compress`,
+            runs.map((run) => speedOf(run, series.method, 'compressMBps')),
+            color(series.colorVar)
+          ),
+          lineDataset(
+            `${series.method} decompress`,
+            runs.map((run) => speedOf(run, series.method, 'decompressMBps')),
+            color(series.colorVar),
+            [6, 4]
+          ),
+        ]);
         charts.push(
           new Chart(document.querySelector('#speedChart'), {
             type: 'line',
             data: {
               labels: axis.labels,
-              datasets: [
-                lineDataset(
-                  'fast compress',
-                  runs.map((r) => speedOf(r, 'fast', 'compressMBps')),
-                  color('--series-fast')
-                ),
-                lineDataset(
-                  'fast decompress',
-                  runs.map((r) => speedOf(r, 'fast', 'decompressMBps')),
-                  color('--series-fast'),
-                  [6, 4]
-                ),
-                lineDataset(
-                  'small compress',
-                  runs.map((r) => speedOf(r, 'small', 'compressMBps')),
-                  color('--series-small')
-                ),
-                lineDataset(
-                  'small decompress',
-                  runs.map((r) => speedOf(r, 'small', 'decompressMBps')),
-                  color('--series-small'),
-                  [6, 4]
-                ),
-              ],
+              datasets,
             },
             options: chartOptions(axis, { title: 'MB/s (log scale)', logarithmic: true }),
           })
@@ -381,6 +442,9 @@
 
       function renderLanguageChart(color) {
         const latest = runs.at(-1);
+        const competitor = bestCompetitor(latest);
+        document.querySelector('#languageDescription').textContent =
+          `tokzip small vs ${competitor.method}, the strongest overall competitor in the most recent run. Lower is better.`;
         const languages = Object.keys(latest.languages).sort(
           (a, b) => latest.languages[a].total.ratios['tokzip small'] - latest.languages[b].total.ratios['tokzip small']
         );
@@ -401,7 +465,7 @@
               labels: languages,
               datasets: [
                 barDataset('tokzip small', color('--series-small'), 'tokzip small'),
-                barDataset('b64(brotli q11)', color('--series-brotli'), 'b64(brotli q11)'),
+                barDataset(competitor.method, color('--series-brotli'), competitor.method),
               ],
             },
             options: {
@@ -452,12 +516,47 @@
         const rows = Object.entries(latest.languages).map(
           ([language, entry]) =>
             `<tr><td>${language}</td><td>${entry.docs}</td>` +
-            methods.map((method) => `<td>${(entry.total.ratios[method] * 100).toFixed(1)}%</td>`).join('') +
+            methods.map((method) => `<td>${formatPercent(entry.total.ratios[method])}</td>`).join('') +
             '</tr>'
         );
         document.querySelector('#languageTable').innerHTML =
           `<table><thead><tr><th>language</th><th>docs</th>${methods.map((m) => `<th>${m}</th>`).join('')}</tr></thead>` +
           `<tbody>${rows.join('')}</tbody></table>`;
+      }
+
+      function renderSpeedTable() {
+        const latest = runs.at(-1);
+        if (!latest.speed) return;
+        const entries =
+          latest.schemaVersion === 1
+            ? Object.entries(latest.speed).map(([mode, value]) => [`tokzip ${mode}`, value])
+            : Object.entries(latest.speed);
+        const rows = entries.map(
+          ([method, speed]) =>
+            `<tr><td>${method}</td><td>${speed.compressMBps.toFixed(1)}</td><td>${speed.decompressMBps.toFixed(1)}</td>` +
+            `<td>${speed.compressKops?.toFixed(1) ?? '—'}</td><td>${speed.decompressKops?.toFixed(1) ?? '—'}</td></tr>`
+        );
+        document.querySelector('#speedTable').innerHTML =
+          '<table><thead><tr><th>method</th><th>compress MB/s</th><th>decompress MB/s</th>' +
+          `<th>compress kdoc/s</th><th>decompress kdoc/s</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+      }
+
+      function bestCompetitor(run) {
+        return run.methods
+          .filter((method) => !method.startsWith('tokzip '))
+          .map((method) => ({ method, ratio: run.total.ratios[method] }))
+          .filter((entry) => typeof entry.ratio === 'number')
+          .sort((a, b) => a.ratio - b.ratio)[0];
+      }
+
+      function isComparable(run) {
+        const latestCorpus = runs.at(-1).corpus;
+        if (!latestCorpus) return true;
+        return run.corpus?.sha256 === latestCorpus.sha256;
+      }
+
+      function formatPercent(ratio) {
+        return typeof ratio === 'number' ? `${(ratio * 100).toFixed(1)}%` : '—';
       }
 
       load();
