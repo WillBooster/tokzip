@@ -160,9 +160,11 @@
     <main>
       <h1>tokzip benchmarks</h1>
       <p class="subtitle">
-        Per-commit results on the frozen <code>bench-v1</code> corpus split. Output size is measured on the
-        <em>text channel</em>: competitors pay the base64 tax on their binary output, tokzip emits safe ASCII directly.
-        Lower is better. Source: <a href="https://github.com/WillBooster/tokzip">WillBooster/tokzip</a>.
+        Per-commit results on the frozen <code>bench-v1</code> split of the reproducible <code>--quick</code> CI corpus
+        (one pinned OSS repo per language plus natural-language sources — smaller than the full local corpus). Output
+        size is measured on the <em>text channel</em>: competitors pay the base64 tax on their binary output, tokzip
+        emits safe ASCII directly. Lower is better. Source:
+        <a href="https://github.com/WillBooster/tokzip">WillBooster/tokzip</a>.
       </p>
 
       <p id="empty" hidden>No benchmark results published yet.</p>

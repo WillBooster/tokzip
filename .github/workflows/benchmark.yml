@@ -22,21 +22,34 @@ jobs:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          # Pinned (via .tool-versions) so runtime upgrades don't masquerade as
+          # compress/decompress speed changes in the published series.
+          bun-version-file: .tool-versions
       - run: bun install --frozen-lockfile
       - name: Cache benchmark corpus
         uses: actions/cache@v4
         with:
           path: .corpus
           key: corpus-quick-${{ hashFiles('scripts/corpus/**') }}
-      - name: Fetch corpus (cache miss only)
+      - name: Fetch corpus (cache miss or incomplete)
+        # The NL fetchers soft-continue on HTTP failures, so "fetch exited 0" does not
+        # imply a complete corpus. Validate every expected manifest and fail the step on
+        # an incomplete result — that also blocks the cache save (post-if: success()),
+        # so the next run re-fetches instead of freezing a partial corpus into CI.
         run: |
-          if [ ! -f .corpus/typescript/manifest.jsonl ]; then
+          languages='c cpp csharp css dart haskell html java javascript jsp php python ruby rust text typescript zig en-US ja-JP zh-CN zh-TW'
+          complete() {
+            for language in $languages; do
+              [ -s ".corpus/$language/manifest.jsonl" ] || { echo "corpus incomplete: $language"; return 1; }
+            done
+          }
+          if ! complete; then
             bun scripts/corpus/fetchOss.ts --quick
             bun scripts/corpus/fetchNl.ts
             bun scripts/corpus/split.ts
             rm -rf .corpus/.cache
           fi
+          complete
       - name: Run benchmark (size + speed + round-trip verification)
         run: bun scripts/bench/bench.ts --speed --json .tmp/bench.json
       - uses: actions/upload-artifact@v4
