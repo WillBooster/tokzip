@@ -40,12 +40,18 @@ jobs:
       - name: Run benchmark (size + speed + round-trip verification)
         run: bun scripts/bench/bench.ts --speed --json .tmp/bench.json
       - uses: actions/upload-artifact@v4
+        # Upload even when the benchmark fails (e.g. a round-trip mismatch) so the
+        # structured failure report is available for debugging, not just log text.
+        if: ${{ !cancelled() }}
         with:
           name: benchmark-result
           path: .tmp/bench.json
+          if-no-files-found: ignore
       - name: Publish result to GitHub Pages branch
-        # The implicit success() gate still applies: GitHub ANDs `success()` into any
-        # `if:` expression that contains no status-check function, so a failed benchmark
-        # (e.g. a round-trip mismatch) never publishes to the dashboard.
-        if: github.event_name != 'pull_request'
+        # Only mainline results reach the dashboard: this also excludes workflow_dispatch
+        # runs on feature branches, which would race main's publishes (the concurrency
+        # group is per-ref). The implicit success() gate still applies: GitHub ANDs
+        # `success()` into any `if:` expression that contains no status-check function,
+        # so a failed benchmark (e.g. a round-trip mismatch) never publishes.
+        if: github.ref == 'refs/heads/main'
         run: bash scripts/bench/publishPages.sh .tmp/bench.json

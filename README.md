@@ -33,13 +33,15 @@ The wire format is specified in [FORMAT.md](FORMAT.md); the design rationale liv
 **Live dashboard (per-commit charts): <https://willbooster.github.io/tokzip/>**
 
 Every push to `main` runs the [Benchmark workflow](.github/workflows/benchmark.yml) on the
-frozen `bench-v1` corpus split (1,848 documents, ~12 MB, sampled from pinned OSS repos and
-natural-language sources across 21 languages/locales). The run measures output size on the
-_text channel_ (competitors pay the base64 tax on their binary output; tokzip emits safe
-ASCII directly), compress/decompress throughput, and **verifies every document round-trips
-losslessly in both modes** — a mismatch fails the run.
+frozen `bench-v1` split of the reproducible `--quick` corpus (~1,600 documents sampled from
+one pinned OSS repo per language plus natural-language sources; under `--quick`, a language
+can end up with no bench-split documents — currently `html`). The run measures output size
+on the _text channel_ (competitors pay the base64 tax on their binary output; tokzip emits
+safe ASCII directly), compress/decompress throughput, and **verifies every document
+round-trips losslessly in both modes** — a mismatch fails the run.
 
-Representative results (output/input, lower is better; Apple Silicon, Bun 1.3):
+Representative results from a fuller local corpus (`bench-v1` split: 1,848 documents,
+~12 MB, 21 languages/locales; output/input, lower is better; Apple Silicon, Bun 1.3):
 
 | corpus       | docs | tokzip fast | tokzip small | b64(brotli q11) | b64(gzip -6) | b64(zstd -19) |
 | ------------ | ---: | ----------: | -----------: | --------------: | -----------: | ------------: |
