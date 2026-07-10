@@ -8,8 +8,12 @@ on:
 
 concurrency:
   group: benchmark-${{ github.ref }}
-  # Never cancel a main run mid-publish; superseded PR runs are safe to cancel.
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  # queue: max keeps every queued run instead of the default "newest pending replaces
+  # older pending", so a burst of merges to main still yields one dashboard point per
+  # commit. It cannot be combined with cancel-in-progress: true, so superseded PR runs
+  # queue too — acceptable, since runs are short once the corpus cache is warm.
+  queue: max
+  cancel-in-progress: false
 
 permissions:
   contents: write
