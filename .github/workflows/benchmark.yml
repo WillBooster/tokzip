@@ -44,5 +44,8 @@ jobs:
           name: benchmark-result
           path: .tmp/bench.json
       - name: Publish result to GitHub Pages branch
+        # The implicit success() gate still applies: GitHub ANDs `success()` into any
+        # `if:` expression that contains no status-check function, so a failed benchmark
+        # (e.g. a round-trip mismatch) never publishes to the dashboard.
         if: github.event_name != 'pull_request'
         run: bash scripts/bench/publishPages.sh .tmp/bench.json
