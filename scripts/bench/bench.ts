@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { languageByName } from '../../src/dictionary.ts';
 import { compress, decompress } from '../../src/index.ts';
 import '../../src/languages/index.ts';
-import { CORPUS_DIRS, type ManifestEntry } from '../corpus.ts';
+import { corpusDirs, type ManifestEntry } from '../corpus.ts';
 import { competitors } from './competitors.ts';
 
 const BUCKETS = ['0.5k', '2k', '8k', '24k'] as const;
@@ -134,11 +134,13 @@ function parseArgs(args: string[]): { speed: boolean; jsonPath?: string; languag
       ? requested
       : [
           ...new Set(
-            CORPUS_DIRS.filter((corpusDir) => existsSync(corpusDir)).flatMap((corpusDir) =>
-              readdirSync(corpusDir, { withFileTypes: true })
-                .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
-                .map((entry) => entry.name)
-            )
+            corpusDirs()
+              .filter((corpusDir) => existsSync(corpusDir))
+              .flatMap((corpusDir) =>
+                readdirSync(corpusDir, { withFileTypes: true })
+                  .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
+                  .map((entry) => entry.name)
+              )
           ),
         ].toSorted();
   return { speed, jsonPath, languages };
@@ -261,7 +263,7 @@ function sampleTimes(operation: () => number): number[] {
 }
 
 function loadBenchDocs(language: string): BenchDoc[] {
-  return CORPUS_DIRS.flatMap((corpusDir) => {
+  return corpusDirs().flatMap((corpusDir) => {
     const dir = join(corpusDir, language);
     const manifestPath = join(dir, 'manifest.jsonl');
     if (!existsSync(manifestPath)) return [];
