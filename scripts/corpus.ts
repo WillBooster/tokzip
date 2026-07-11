@@ -53,10 +53,14 @@ function detectCorpusDirs(): string[] {
     console.error(`private corpus: ${privateCorpusDir} (pulled)`);
   } else {
     // spawnSync reports a failed launch (missing git, timeout) via `error` with null stderr.
-    const reason = pull.error?.message ?? pull.stderr ?? 'unknown error';
-    console.error(
-      `private corpus: ${privateCorpusDir} (git pull failed, using existing checkout: ${reason.trim().split('\n')[0]})`
-    );
+    // git itself buries the reason under fetch progress lines, so prefer the fatal: line.
+    const stderrLines = (pull.stderr ?? '').split('\n').filter((line) => line.trim());
+    const reason =
+      pull.error?.message ??
+      stderrLines.findLast((line) => line.startsWith('fatal:')) ??
+      stderrLines.at(-1) ??
+      'unknown error';
+    console.error(`private corpus: ${privateCorpusDir} (git pull failed, using existing checkout: ${reason.trim()})`);
   }
   return [CORPUS_DIR, privateCorpusDir];
 }
