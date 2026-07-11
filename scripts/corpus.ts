@@ -19,11 +19,15 @@ const defaultCorpusDir = resolve(import.meta.dir, '../../tokzip-corpus/corpus');
 export const CORPUS_DIR = resolve(process.env['TOKZIP_CORPUS_DIR'] ?? defaultCorpusDir);
 
 /**
- * Every corpus root, in a stable order: the public corpus plus the sibling
+ * Every corpus root benchmarks read, in a stable order: the public corpus plus the sibling
  * `tokzip-corpus-private` checkout when one exists. Detection is automatic and freshens the
- * private checkout with `git pull` so local training and benchmarks always see its latest
- * committed samples. An explicit `TOKZIP_CORPUS_DIR` means "use exactly this corpus", so it
- * disables the detection; CI without the private checkout is unaffected either way.
+ * private checkout with `git pull` so local benchmarks always see its latest committed
+ * samples. An explicit `TOKZIP_CORPUS_DIR` means "use exactly this corpus", so it disables
+ * the detection; CI without the private checkout is unaffected either way.
+ *
+ * Training intentionally stays on `CORPUS_DIR` only: generated dictionaries embed literal
+ * fragments of their training documents and are committed to this public repository, so
+ * private production content must never flow into them.
  */
 export const CORPUS_DIRS = detectCorpusDirs();
 
@@ -41,8 +45,10 @@ function detectCorpusDirs(): string[] {
   if (pull.status === 0) {
     console.error(`private corpus: ${privateCorpusDir} (pulled)`);
   } else {
+    // spawnSync reports a failed launch (missing git, timeout) via `error` with null stderr.
+    const reason = pull.error?.message ?? pull.stderr ?? 'unknown error';
     console.error(
-      `private corpus: ${privateCorpusDir} (git pull failed, using existing checkout: ${(pull.stderr || 'timeout').trim().split('\n')[0]})`
+      `private corpus: ${privateCorpusDir} (git pull failed, using existing checkout: ${reason.trim().split('\n')[0]})`
     );
   }
   return [CORPUS_DIR, privateCorpusDir];

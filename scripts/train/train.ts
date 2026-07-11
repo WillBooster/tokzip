@@ -26,7 +26,7 @@ import { dictIndexFor, parse } from '../../src/lz.ts';
 import { toBase64 } from '../../src/moduleData.ts';
 import { smallPricing } from '../../src/smallMode.ts';
 import { LENGTH_SLOT_COUNT, OFFSET_SLOT_COUNT, slotOf } from '../../src/slots.ts';
-import { CORPUS_DIRS } from '../corpus.ts';
+import { CORPUS_DIR } from '../corpus.ts';
 import { trainDictionary } from './trainDictionary.ts';
 import { buildWrapperDictionary } from './wrapperContent.ts';
 
@@ -99,7 +99,7 @@ function trainLanguageModule(name: string): void {
   const id = LANGUAGE_IDS[name];
   if (id === undefined || id === 0) throw new Error(`unknown language: ${name}`);
   const docs = loadTrainDocs(name);
-  if (docs.length === 0) throw new Error(`no train-split corpus for ${name} under ${CORPUS_DIRS.join(', ')}`);
+  if (docs.length === 0) throw new Error(`no train-split corpus for ${name} under ${CORPUS_DIR}/${name}`);
   const wrapper = buildWrapperDictionary();
   const wrapperText = new TextDecoder().decode(wrapper);
   const suffix = trainDictionary(docs, DICTIONARY_BUDGET_BYTES, wrapperText);
@@ -232,7 +232,7 @@ function identifierFor(name: string): string {
 }
 
 function hasCorpus(name: string): boolean {
-  return CORPUS_DIRS.some((corpusDir) => existsSync(join(corpusDir, name)));
+  return existsSync(join(CORPUS_DIR, name));
 }
 
 /**
@@ -242,18 +242,19 @@ function hasCorpus(name: string): boolean {
  * train set is safer than silently training on unlabeled or license-restricted data.
  */
 function loadTrainDocs(name: string): string[] {
+  // Training reads only the public corpus, never CORPUS_DIRS: generated dictionaries embed
+  // literal fragments of their training documents and are committed to this public
+  // repository, so the auto-detected private corpus must stay benchmark-only.
+  const dir = join(CORPUS_DIR, name);
+  const manifestPath = join(dir, 'manifest.jsonl');
+  if (!existsSync(manifestPath)) return [];
   const docs: string[] = [];
-  for (const corpusDir of CORPUS_DIRS) {
-    const dir = join(corpusDir, name);
-    const manifestPath = join(dir, 'manifest.jsonl');
-    if (!existsSync(manifestPath)) continue;
-    for (const line of readFileSync(manifestPath, 'utf8').split('\n')) {
-      if (!line.trim()) continue;
-      const entry = JSON.parse(line) as { file: string; split?: string; trainable?: boolean };
-      if (entry.split !== 'train' || entry.trainable === false) continue;
-      const path = join(dir, entry.file);
-      if (existsSync(path)) docs.push(readFileSync(path, 'utf8'));
-    }
+  for (const line of readFileSync(manifestPath, 'utf8').split('\n')) {
+    if (!line.trim()) continue;
+    const entry = JSON.parse(line) as { file: string; split?: string; trainable?: boolean };
+    if (entry.split !== 'train' || entry.trainable === false) continue;
+    const path = join(dir, entry.file);
+    if (existsSync(path)) docs.push(readFileSync(path, 'utf8'));
   }
   return docs;
 }
