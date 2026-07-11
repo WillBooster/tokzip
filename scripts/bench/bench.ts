@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { languageByName } from '../../src/dictionary.ts';
 import { compress, decompress } from '../../src/index.ts';
 import '../../src/languages/index.ts';
-import { CORPUS_DIR, type ManifestEntry } from '../corpus.ts';
+import { CORPUS_DIRS, type ManifestEntry } from '../corpus.ts';
 import { competitors } from './competitors.ts';
 
 const BUCKETS = ['0.5k', '2k', '8k', '24k'] as const;
@@ -132,10 +132,15 @@ function parseArgs(args: string[]): { speed: boolean; jsonPath?: string; languag
   const languages =
     requested.length > 0
       ? requested
-      : readdirSync(CORPUS_DIR, { withFileTypes: true })
-          .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
-          .map((entry) => entry.name)
-          .toSorted();
+      : [
+          ...new Set(
+            CORPUS_DIRS.filter((corpusDir) => existsSync(corpusDir)).flatMap((corpusDir) =>
+              readdirSync(corpusDir, { withFileTypes: true })
+                .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
+                .map((entry) => entry.name)
+            )
+          ),
+        ].toSorted();
   return { speed, jsonPath, languages };
 }
 
@@ -256,19 +261,21 @@ function sampleTimes(operation: () => number): number[] {
 }
 
 function loadBenchDocs(language: string): BenchDoc[] {
-  const dir = join(CORPUS_DIR, language);
-  const manifestPath = join(dir, 'manifest.jsonl');
-  if (!existsSync(manifestPath)) return [];
-  return readFileSync(manifestPath, 'utf8')
-    .split('\n')
-    .filter((line) => line.trim())
-    .map((line) => JSON.parse(line) as ManifestEntry)
-    .filter((entry) => entry.split === 'bench')
-    .map((entry) => ({
-      file: entry.file,
-      content: readFileSync(join(dir, entry.file), 'utf8'),
-      bucket: entry.sizeBucket,
-    }));
+  return CORPUS_DIRS.flatMap((corpusDir) => {
+    const dir = join(corpusDir, language);
+    const manifestPath = join(dir, 'manifest.jsonl');
+    if (!existsSync(manifestPath)) return [];
+    return readFileSync(manifestPath, 'utf8')
+      .split('\n')
+      .filter((line) => line.trim())
+      .map((line) => JSON.parse(line) as ManifestEntry)
+      .filter((entry) => entry.split === 'bench')
+      .map((entry) => ({
+        file: entry.file,
+        content: readFileSync(join(dir, entry.file), 'utf8'),
+        bucket: entry.sizeBucket,
+      }));
+  });
 }
 
 function tokzipMethod(mode: 'fast' | 'small'): BenchMethod {

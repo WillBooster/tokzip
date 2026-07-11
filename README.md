@@ -79,7 +79,9 @@ bun scripts/train/train.ts --all            # train dictionaries + tables → sr
 bun scripts/bench/bench.ts                  # size vs base64url(brotli/zstd/gzip), lz-string + round-trip; --speed, --json
 ```
 
-By default, training and benchmarks read `../tokzip-corpus/corpus`. Set
-`TOKZIP_CORPUS_DIR` to use another public or private corpus checkout. Corpus acquisition,
+By default, training and benchmarks read `../tokzip-corpus/corpus`, and a sibling
+`../tokzip-corpus-private` checkout is detected automatically (freshened with `git pull`)
+and merged in. Set `TOKZIP_CORPUS_DIR` to use exactly one corpus checkout instead — it
+disables the private-corpus detection. Corpus acquisition,
 generation, provenance, validation, and splitting live in the dedicated corpus repository;
 this repository commits only trained modules and the codec that consumes them.
