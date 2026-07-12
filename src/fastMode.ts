@@ -52,7 +52,7 @@ export function fastPricing(bytes: Uint8Array, language: RegisteredLanguage): Pa
     repCost: (_r, len) => matchCharCost('rep', 0, len),
     historyCost: (dist, len) => matchCharCost('history', dist - 1, len),
     dictCost: (start, len) => matchCharCost('dict', start, len),
-    lazy: true,
+    lazy: false,
     window: FAST_WINDOW,
     maxDictStart: FAST_WINDOW,
   };

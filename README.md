@@ -17,12 +17,13 @@ const packed = compress(source, { language: 'typescript', mode: 'small' });
 const restored = decompress(packed); // === source
 ```
 
-- Exactly **two modes**: `fast` (speed-first, char-aligned radix-64 stream) and `small`
-  (size-first: static entropy coding through a fused radix-85 writer, with normative
-  auto-downgrade so output never expands beyond a stored frame).
+- Exactly **two modes**: `fast` (speed-first: greedy-lazy parse into a char-aligned radix-64
+  stream) and `small` (size-first: an exact-bit-price optimal parse feeding static entropy
+  coding through a fused radix-85 writer, with normative auto-downgrade so output never
+  expands beyond a stored frame).
 - **Per-language preset dictionaries** (17 programming languages + 4 locales, tree-shakeable
-  modules) plus a shared wrapper dictionary in core — decisive on short inputs where
-  general-purpose compressors have nothing to work with.
+  modules of ~250 KB dictionary each) plus a shared wrapper dictionary in core — decisive on
+  short inputs where general-purpose compressors have nothing to work with.
 - Never fails on malformed/partial input; corrupt payloads throw a typed `TokzipDecodeError`.
 
 The wire format is specified in [FORMAT.md](FORMAT.md); the design rationale lives in
@@ -50,15 +51,15 @@ Latest local run (`bench-v2`, fingerprint `e2a3f1fc5b8f`, 1,931 documents, ~9.4 
 
 | corpus       | docs | tokzip fast | tokzip small | b64url(brotli q11) | b64url(gzip -6) | b64url(zstd -19) |
 | ------------ | ---: | ----------: | -----------: | -----------------: | --------------: | ---------------: |
-| typescript   |  146 |       32.1% |        23.9% |              22.8% |           26.6% |            25.6% |
-| javascript   |   62 |       51.5% |        38.7% |              38.4% |           45.3% |            44.3% |
-| python       |   70 |       38.9% |        29.1% |              28.0% |           32.3% |            31.4% |
-| java         |   90 |       36.3% |        27.4% |              32.3% |           40.0% |            39.7% |
-| csharp       |  231 |       31.3% |        23.5% |              25.1% |           29.7% |            29.3% |
-| rust         |   75 |       34.5% |        26.4% |              26.8% |           30.5% |            29.6% |
-| en-US        |   94 |       58.5% |        45.2% |              40.8% |           52.0% |            51.3% |
-| ja-JP        |   89 |       60.1% |        47.3% |              48.6% |           58.4% |            57.6% |
-| **all (21)** | 1931 |   **42.4%** |    **32.4%** |          **31.3%** |       **37.7%** |        **36.7%** |
+| typescript   |  146 |       27.6% |        20.6% |              22.8% |           26.6% |            25.6% |
+| javascript   |   62 |       43.7% |        33.0% |              38.4% |           45.3% |            44.3% |
+| python       |   70 |       33.4% |        25.0% |              28.0% |           32.3% |            31.4% |
+| java         |   90 |       26.7% |        20.1% |              32.3% |           40.0% |            39.7% |
+| csharp       |  231 |       25.4% |        19.0% |              25.1% |           29.7% |            29.2% |
+| rust         |   75 |       28.1% |        21.4% |              26.8% |           30.5% |            29.6% |
+| en-US        |   94 |       47.7% |        36.5% |              40.8% |           52.0% |            51.3% |
+| ja-JP        |   89 |       44.0% |        33.9% |              48.6% |           58.4% |            57.6% |
+| **all (21)** | 1931 |   **35.1%** |    **26.8%** |          **31.3%** |       **37.7%** |        **36.7%** |
 
 On this per-document workload, tokzip `fast` compresses/decompresses at 24.6/183.8 MB/s
 (5.3/39.5 thousand documents/s), and `small` at 8.2/82.5 MB/s. Brotli q11 reaches the
