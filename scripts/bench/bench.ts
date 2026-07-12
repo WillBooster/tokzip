@@ -1,5 +1,5 @@
 /**
- * Text-channel compression benchmark on the seeded `bench-v1` corpus split.
+ * Text-channel compression benchmark on the seeded `bench-v2` corpus split.
  *
  * Size, lossless round-trip, and (with --speed) end-to-end per-document throughput are
  * measured for tokzip and every competitor. Binary codecs include base64url encode/decode
@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { languageByName } from '../../src/dictionary.ts';
 import { compress, decompress } from '../../src/index.ts';
 import '../../src/languages/index.ts';
-import { CORPUS_DIR, type ManifestEntry } from '../corpus.ts';
+import { corpusDirs, type ManifestEntry } from '../corpus.ts';
 import { competitors } from './competitors.ts';
 
 const BUCKETS = ['0.5k', '2k', '8k', '24k'] as const;
@@ -68,7 +68,7 @@ interface BenchReport {
   timestamp: string;
   runtime: string;
   methods: string[];
-  corpus: { split: 'bench-v1'; sha256: string };
+  corpus: { split: 'bench-v2'; sha256: string };
   roundTrip: { docs: number; methods: number; checks: number; failures: string[] };
   languages: Record<string, LanguageReport>;
   total: { docs: number; inputBytes: number; ratios: Record<string, number> };
@@ -95,7 +95,7 @@ function main(): void {
     timestamp: new Date().toISOString(),
     runtime: `bun ${Bun.version}`,
     methods: METHOD_NAMES,
-    corpus: { split: 'bench-v1', sha256: '' },
+    corpus: { split: 'bench-v2', sha256: '' },
     roundTrip: { docs: 0, methods: METHODS.length, checks: 0, failures: [] },
     languages: {},
     total: { docs: 0, inputBytes: 0, ratios: {} },
@@ -132,10 +132,17 @@ function parseArgs(args: string[]): { speed: boolean; jsonPath?: string; languag
   const languages =
     requested.length > 0
       ? requested
-      : readdirSync(CORPUS_DIR, { withFileTypes: true })
-          .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
-          .map((entry) => entry.name)
-          .toSorted();
+      : [
+          ...new Set(
+            corpusDirs()
+              .filter((corpusDir) => existsSync(corpusDir))
+              .flatMap((corpusDir) =>
+                readdirSync(corpusDir, { withFileTypes: true })
+                  .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
+                  .map((entry) => entry.name)
+              )
+          ),
+        ].toSorted();
   return { speed, jsonPath, languages };
 }
 
@@ -256,19 +263,21 @@ function sampleTimes(operation: () => number): number[] {
 }
 
 function loadBenchDocs(language: string): BenchDoc[] {
-  const dir = join(CORPUS_DIR, language);
-  const manifestPath = join(dir, 'manifest.jsonl');
-  if (!existsSync(manifestPath)) return [];
-  return readFileSync(manifestPath, 'utf8')
-    .split('\n')
-    .filter((line) => line.trim())
-    .map((line) => JSON.parse(line) as ManifestEntry)
-    .filter((entry) => entry.split === 'bench')
-    .map((entry) => ({
-      file: entry.file,
-      content: readFileSync(join(dir, entry.file), 'utf8'),
-      bucket: entry.sizeBucket,
-    }));
+  return corpusDirs().flatMap((corpusDir) => {
+    const dir = join(corpusDir, language);
+    const manifestPath = join(dir, 'manifest.jsonl');
+    if (!existsSync(manifestPath)) return [];
+    return readFileSync(manifestPath, 'utf8')
+      .split('\n')
+      .filter((line) => line.trim())
+      .map((line) => JSON.parse(line) as ManifestEntry)
+      .filter((entry) => entry.split === 'bench')
+      .map((entry) => ({
+        file: entry.file,
+        content: readFileSync(join(dir, entry.file), 'utf8'),
+        bucket: entry.sizeBucket,
+      }));
+  });
 }
 
 function tokzipMethod(mode: 'fast' | 'small'): BenchMethod {

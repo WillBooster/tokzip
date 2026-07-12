@@ -33,11 +33,10 @@ The wire format is specified in [FORMAT.md](FORMAT.md); the design rationale liv
 **Live dashboard (per-commit charts): <https://willbooster.github.io/tokzip/>**
 
 Every push to `main` runs the [Benchmark workflow](.github/workflows/benchmark.yml) on the
-seeded `bench-v1` split from a pinned
-[`tokzip-corpus`](https://github.com/WillBooster/tokzip-corpus) commit (~980 documents
-sampled from one pinned, permissively licensed OSS repo per language plus MIT-licensed
-natural-language documentation; a language
-can end up with no bench-split documents — currently `html`). Every report includes a SHA-256
+seeded `bench-v2` split from a pinned
+[`tokzip-corpus`](https://github.com/WillBooster/tokzip-corpus) commit (~2,000 documents
+sampled from pinned, permissively licensed OSS repositories plus permissively licensed
+natural-language documentation). Every report includes a SHA-256
 fingerprint of the exact corpus bytes so results from changed upstream natural-language
 content are not mistaken for like-for-like codec changes.
 
@@ -46,25 +45,25 @@ tokzip and the `lz-string` URI mode already emit text. It also measures median e
 per-document throughput, including binary-to-text framing, and **verifies every method on
 every document round-trips losslessly** — any mismatch fails the run.
 
-Latest local run (`bench-v1`, fingerprint `5c435549ab34`, 980 documents, ~5.0 MB,
-20 languages/locales; output/input, lower is better; Apple Silicon, Bun 1.3):
+Latest local run (`bench-v2`, fingerprint `bcd46da4b82d`, 1,953 documents, ~9.6 MB,
+21 languages/locales; output/input, lower is better; Apple Silicon, Bun 1.3):
 
 | corpus       | docs | tokzip fast | tokzip small | b64url(brotli q11) | b64url(gzip -6) | b64url(zstd -19) |
 | ------------ | ---: | ----------: | -----------: | -----------------: | --------------: | ---------------: |
-| typescript   |   29 |       35.8% |        26.8% |              28.9% |           32.8% |            32.1% |
-| javascript   |    4 |       45.9% |        34.1% |              31.5% |           36.5% |            34.9% |
-| python       |    7 |       43.1% |        32.0% |              29.8% |           34.7% |            33.3% |
-| java         |   39 |       39.7% |        29.8% |              31.6% |           38.6% |            37.7% |
-| csharp       |  141 |       27.2% |        20.3% |              21.9% |           26.0% |            25.6% |
-| rust         |   53 |       31.8% |        24.2% |              23.9% |           27.4% |            26.6% |
-| en-US        |   56 |       63.1% |        48.6% |              46.3% |           58.4% |            57.8% |
-| ja-JP        |   53 |       61.0% |        48.2% |              48.3% |           57.6% |            56.1% |
-| **all (20)** |  980 |   **43.5%** |    **33.4%** |          **33.2%** |       **40.1%** |        **38.9%** |
+| typescript   |  146 |       32.1% |        23.9% |              22.8% |           26.6% |            25.6% |
+| javascript   |   62 |       51.5% |        38.7% |              38.4% |           45.3% |            44.3% |
+| python       |   70 |       38.9% |        29.1% |              28.0% |           32.3% |            31.4% |
+| java         |   90 |       36.3% |        27.4% |              32.3% |           40.0% |            39.7% |
+| csharp       |  231 |       31.3% |        23.5% |              25.1% |           29.7% |            29.3% |
+| rust         |   75 |       34.5% |        26.4% |              26.8% |           30.5% |            29.6% |
+| en-US        |   98 |       59.5% |        45.7% |              41.1% |           52.4% |            51.7% |
+| ja-JP        |   78 |       62.2% |        48.8% |              50.3% |           60.4% |            59.7% |
+| **all (21)** | 1953 |   **42.6%** |    **32.8%** |          **31.4%** |       **37.9%** |        **36.8%** |
 
-On this per-document workload, tokzip `fast` compresses/decompresses at 26.0/192.5 MB/s
-(5.4/39.9 thousand documents/s), and `small` at 7.7/28.0 MB/s. Brotli q11 reaches the
-smallest overall output but compresses at 0.6 MB/s; zstd -3 reaches 108.4 MB/s but emits
-42.3% of the input size after base64url framing.
+On this per-document workload, tokzip `fast` compresses/decompresses at 23.6/180.7 MB/s
+(5.1/38.7 thousand documents/s), and `small` at 8.0/81.9 MB/s. Brotli q11 reaches the
+smallest overall output but compresses at 1.1 MB/s; zstd -3 reaches 243.8 MB/s but emits
+40.0% of the input size after base64url framing.
 
 ```bash
 bun scripts/bench/bench.ts                      # size table + round-trip verification
@@ -79,7 +78,11 @@ bun scripts/train/train.ts --all            # train dictionaries + tables → sr
 bun scripts/bench/bench.ts                  # size vs base64url(brotli/zstd/gzip), lz-string + round-trip; --speed, --json
 ```
 
-By default, training and benchmarks read `../tokzip-corpus/corpus`. Set
-`TOKZIP_CORPUS_DIR` to use another public or private corpus checkout. Corpus acquisition,
+By default, training and benchmarks read `../tokzip-corpus/corpus`, and benchmarks also
+detect a sibling `../tokzip-corpus-private` checkout automatically (freshened with
+`git pull`) and merge its bench split in. Training never reads the private corpus:
+generated dictionaries embed literal training fragments and are committed to this public
+repository. Set `TOKZIP_CORPUS_DIR` to use exactly one corpus checkout instead — it
+disables the private-corpus detection. Corpus acquisition,
 generation, provenance, validation, and splitting live in the dedicated corpus repository;
 this repository commits only trained modules and the codec that consumes them.

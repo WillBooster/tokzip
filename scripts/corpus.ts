@@ -1,4 +1,6 @@
-import { resolve } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 export interface ManifestEntry {
   file: string;
@@ -15,3 +17,72 @@ const defaultCorpusDir = resolve(import.meta.dir, '../../tokzip-corpus/corpus');
 
 /** Corpus checkout used by offline training and benchmarks. */
 export const CORPUS_DIR = resolve(process.env['TOKZIP_CORPUS_DIR'] ?? defaultCorpusDir);
+
+let detectedCorpusDirs: string[] | undefined;
+
+/**
+ * Every corpus root benchmarks read, in a stable order: the public corpus plus the sibling
+ * `tokzip-corpus-private` checkout when one exists. Detection is automatic and freshens the
+ * private checkout with `git pull` so local benchmarks always see its latest committed
+ * samples. An explicit `TOKZIP_CORPUS_DIR` means "use exactly this corpus", so it disables
+ * the detection; CI without the private checkout is unaffected either way.
+ *
+ * Detection (and its `git pull` side effect) runs lazily on first call, so importing
+ * `CORPUS_DIR` alone — as training does — never touches the private checkout. Training
+ * intentionally stays on `CORPUS_DIR` only: generated dictionaries embed literal fragments
+ * of their training documents and are committed to this public repository, so private
+ * production content must never flow into them.
+ */
+export function corpusDirs(): string[] {
+  detectedCorpusDirs ??= detectCorpusDirs();
+  return detectedCorpusDirs;
+}
+
+function detectCorpusDirs(): string[] {
+  if (process.env['TOKZIP_CORPUS_DIR']) return [CORPUS_DIR];
+  const privateRepoDir = resolve(import.meta.dir, '../../tokzip-corpus-private');
+  const privateCorpusDir = join(privateRepoDir, 'corpus');
+  if (!existsSync(privateCorpusDir)) return [CORPUS_DIR];
+  // `git -C` walks up parents to find a repository, so pulling a non-repo copy (an extracted
+  // artifact, a plain `cp -r`) would mutate whatever ancestor repo encloses it. Use such a
+  // copy as-is instead of freshening it.
+  if (!existsSync(join(privateRepoDir, '.git'))) return [CORPUS_DIR, privateCorpusDir];
+  // A stale private corpus would silently skew benchmark fingerprints; a failed pull
+  // (offline, diverged branch) only degrades to the existing checkout. Credential prompts
+  // must fail fast too: git asks on /dev/tty even with piped stdio, which would otherwise
+  // block the benchmark until the timeout. BatchMode is appended to the effective SSH
+  // command (GIT_SSH_COMMAND over core.sshCommand over GIT_SSH, mirroring git's own
+  // precedence) rather than replacing it, so deploy keys and other custom SSH setups keep
+  // working. GIT_SSH is a bare program path, so it is shell-quoted before being promoted
+  // into the shell-interpreted GIT_SSH_COMMAND.
+  const gitSshProgram = process.env['GIT_SSH'] && `'${process.env['GIT_SSH'].replaceAll("'", String.raw`'\''`)}'`;
+  const configuredSsh =
+    process.env['GIT_SSH_COMMAND'] ??
+    (spawnSync('git', ['-C', privateRepoDir, 'config', '--get', 'core.sshCommand'], {
+      encoding: 'utf8',
+    }).stdout?.trim() ||
+      gitSshProgram);
+  const pull = spawnSync('git', ['-C', privateRepoDir, 'pull', '--ff-only'], {
+    encoding: 'utf8',
+    timeout: 60_000,
+    env: {
+      ...process.env,
+      GIT_TERMINAL_PROMPT: '0',
+      GIT_SSH_COMMAND: `${configuredSsh || 'ssh'} -o BatchMode=yes`,
+    },
+  });
+  if (pull.status === 0) {
+    console.error(`private corpus: ${privateCorpusDir} (pulled)`);
+  } else {
+    // spawnSync reports a failed launch (missing git, timeout) via `error` with null stderr.
+    // git itself buries the reason under fetch progress lines, so prefer the fatal: line.
+    const stderrLines = (pull.stderr ?? '').split('\n').filter((line) => line.trim());
+    const reason =
+      pull.error?.message ??
+      stderrLines.findLast((line) => line.startsWith('fatal:')) ??
+      stderrLines.at(-1) ??
+      'unknown error';
+    console.error(`private corpus: ${privateCorpusDir} (git pull failed, using existing checkout: ${reason.trim()})`);
+  }
+  return [CORPUS_DIR, privateCorpusDir];
+}
