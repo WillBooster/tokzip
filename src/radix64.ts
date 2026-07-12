@@ -163,7 +163,11 @@ export function readPackedRaw(
     const c1 = asciiCodeAt(data, pos + 1);
     const c2 = asciiCodeAt(data, pos + 2);
     const c3 = asciiCodeAt(data, pos + 3);
-    const v0 = (c0 | c1 | c2 | c3) < 128 ? values[c0]! : -1;
+    // Reject non-ASCII before the table lookups so no index can run past the 128-entry table.
+    if ((c0 | c1 | c2 | c3) >= 128) {
+      throw new TokzipDecodeError(`non-alphabet character at position ${pos}`);
+    }
+    const v0 = values[c0]!;
     const v1 = values[c1]!;
     const v2 = values[c2]!;
     const v3 = values[c3]!;
