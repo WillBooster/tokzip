@@ -60,17 +60,25 @@ export function trainDictionary(docs: string[], budgetBytes: number, alreadyCove
   candidates.sort((a, b) => b.score - a.score);
 
   const encoder = new TextEncoder();
-  const parts: string[] = [];
-  let size = 0;
+  let packed = '';
   let coveredProbe = alreadyCovered;
   for (const { segment } of candidates.slice(0, MAX_SELECTED_CANDIDATES)) {
-    const byteLength = encoder.encode(segment).length;
-    if (size + byteLength > budgetBytes) continue;
     if (coveredProbe.includes(segment)) continue;
-    parts.push(segment);
-    coveredProbe += segment;
-    size += byteLength;
-    if (size >= budgetBytes - 4) break;
+    // Suffix–prefix packing: reuse the longest dictionary tail that prefixes the segment,
+    // so the budget buys strictly more coverage than plain concatenation.
+    const appended = appendWithOverlap(packed, segment);
+    if (encoder.encode(appended).length > budgetBytes) continue;
+    packed = appended;
+    coveredProbe = alreadyCovered + packed;
+    if (encoder.encode(packed).length >= budgetBytes - 4) break;
   }
-  return encoder.encode(parts.join(''));
+  return encoder.encode(packed);
+}
+
+function appendWithOverlap(packed: string, segment: string): string {
+  const max = Math.min(packed.length, segment.length - 1);
+  for (let overlap = max; overlap > 0; overlap--) {
+    if (packed.endsWith(segment.slice(0, overlap))) return packed + segment.slice(overlap);
+  }
+  return packed + segment;
 }

@@ -64,11 +64,11 @@ const OPTIMAL_MAX_INPUT = 1 << 19;
 /** Match-finder search depths (chain links walked per position). */
 const GREEDY_DEPTH = 16;
 const GREEDY_DICT_DEPTH = 12;
-const OPTIMAL_DEPTH = 48;
-const OPTIMAL_DICT_DEPTH = 32;
+const OPTIMAL_DEPTH = 96;
+const OPTIMAL_DICT_DEPTH = 64;
 
 /** The DP evaluates every match length up to this bound, then only slot-boundary lengths. */
-const DENSE_LEN_BOUND = 34;
+const DENSE_LEN_BOUND = 66;
 
 /**
  * Matches at least this long are taken whole and the DP jumps past them (zstd-style immediate
