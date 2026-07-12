@@ -33,9 +33,9 @@ import { buildWrapperDictionary } from './wrapperContent.ts';
 const ROOT = join(import.meta.dir, '../..');
 const GENERATED_DIR = join(ROOT, 'src/generated');
 const LANGUAGES_DIR = join(ROOT, 'src/languages');
-const DICTIONARY_BUDGET_BYTES = 20 * 1024;
+const DICTIONARY_BUDGET_BYTES = 254 * 1024;
 /** Bound on per-language statistics input; keeps a full training run tractable. */
-const MAX_STATS_BYTES = 8 * 1024 * 1024;
+const MAX_STATS_BYTES = 16 * 1024 * 1024;
 
 const textEncoder = new TextEncoder();
 
@@ -130,7 +130,7 @@ export { ${exportName} };
 
 /**
  * Runs the real parser over the corpus with bootstrap tables, tallies per-stream symbol
- * frequencies, and rebuilds the tables from them; a second round re-parses with the trained
+ * frequencies, and rebuilds the tables from them; later rounds re-parse with the trained
  * tables so prices and statistics converge.
  */
 function trainStatistics(
@@ -145,7 +145,7 @@ function trainStatistics(
   let top64 = rankTop64(byteFrequencies(docs));
   let tables = flatTables();
   let dictIndexHolder: RegisteredLanguage | undefined;
-  for (let round = 0; round < 2; round++) {
+  for (let round = 0; round < 3; round++) {
     const language = makeLanguage(dictionary, top64, tables);
     if (dictIndexHolder) language.dictIndex = dictIndexHolder.dictIndex;
     dictIndexHolder = language;

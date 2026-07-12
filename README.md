@@ -17,12 +17,13 @@ const packed = compress(source, { language: 'typescript', mode: 'small' });
 const restored = decompress(packed); // === source
 ```
 
-- Exactly **two modes**: `fast` (speed-first, char-aligned radix-64 stream) and `small`
-  (size-first: static entropy coding through a fused radix-85 writer, with normative
-  auto-downgrade so output never expands beyond a stored frame).
+- Exactly **two modes**: `fast` (speed-first: greedy parse into a char-aligned radix-64
+  stream) and `small` (size-first: an exact-bit-price optimal parse feeding static entropy
+  coding through a fused radix-85 writer, with normative auto-downgrade so output never
+  expands beyond a stored frame).
 - **Per-language preset dictionaries** (17 programming languages + 4 locales, tree-shakeable
-  modules) plus a shared wrapper dictionary in core — decisive on short inputs where
-  general-purpose compressors have nothing to work with.
+  modules of ~250 KB dictionary each) plus a shared wrapper dictionary in core — decisive on
+  short inputs where general-purpose compressors have nothing to work with.
 - Never fails on malformed/partial input; corrupt payloads throw a typed `TokzipDecodeError`.
 
 The wire format is specified in [FORMAT.md](FORMAT.md); the design rationale lives in
@@ -50,20 +51,21 @@ Latest local run (`bench-v2`, fingerprint `e2a3f1fc5b8f`, 1,931 documents, ~9.4 
 
 | corpus       | docs | tokzip fast | tokzip small | b64url(brotli q11) | b64url(gzip -6) | b64url(zstd -19) |
 | ------------ | ---: | ----------: | -----------: | -----------------: | --------------: | ---------------: |
-| typescript   |  146 |       32.1% |        23.9% |              22.8% |           26.6% |            25.6% |
-| javascript   |   62 |       51.5% |        38.7% |              38.4% |           45.3% |            44.3% |
-| python       |   70 |       38.9% |        29.1% |              28.0% |           32.3% |            31.4% |
-| java         |   90 |       36.3% |        27.4% |              32.3% |           40.0% |            39.7% |
-| csharp       |  231 |       31.3% |        23.5% |              25.1% |           29.7% |            29.3% |
-| rust         |   75 |       34.5% |        26.4% |              26.8% |           30.5% |            29.6% |
-| en-US        |   94 |       58.5% |        45.2% |              40.8% |           52.0% |            51.3% |
-| ja-JP        |   89 |       60.1% |        47.3% |              48.6% |           58.4% |            57.6% |
-| **all (21)** | 1931 |   **42.4%** |    **32.4%** |          **31.3%** |       **37.7%** |        **36.7%** |
+| typescript   |  146 |       28.2% |        20.5% |              22.8% |           26.6% |            25.6% |
+| javascript   |   62 |       44.4% |        32.8% |              38.4% |           45.3% |            44.3% |
+| python       |   70 |       34.1% |        24.9% |              28.0% |           32.3% |            31.4% |
+| java         |   90 |       27.2% |        20.0% |              32.3% |           40.0% |            39.7% |
+| csharp       |  231 |       25.9% |        18.9% |              25.1% |           29.7% |            29.2% |
+| rust         |   75 |       28.6% |        21.4% |              26.8% |           30.5% |            29.6% |
+| en-US        |   94 |       48.3% |        36.4% |              40.8% |           52.0% |            51.3% |
+| ja-JP        |   89 |       44.6% |        33.7% |              48.6% |           58.4% |            57.6% |
+| **all (21)** | 1931 |   **35.7%** |    **26.7%** |          **31.3%** |       **37.7%** |        **36.7%** |
 
-On this per-document workload, tokzip `fast` compresses/decompresses at 24.6/183.8 MB/s
-(5.3/39.5 thousand documents/s), and `small` at 8.2/82.5 MB/s. Brotli q11 reaches the
-smallest overall output but compresses at 1.1 MB/s; zstd -3 reaches 237.1 MB/s but emits
-39.9% of the input size after base64url framing.
+On this per-document workload, tokzip `fast` compresses/decompresses at 39.3/245.1 MB/s
+(8.4/52.7 thousand documents/s), and `small` at 3.5/175.7 MB/s. `small` produces the
+smallest output of every measured method — 4.5 points below brotli q11, which compresses
+at 1.2 MB/s; `fast` beats zstd -19's ratio at roughly six times its compression speed,
+and zstd -3 reaches 278.8 MB/s but emits 39.9% of the input size after base64url framing.
 
 ```bash
 bun scripts/bench/bench.ts                      # size table + round-trip verification
