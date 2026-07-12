@@ -41,14 +41,16 @@ for (let i = 0; i < docs.length; i++) {
 }
 
 const iterations = Math.max(1, Math.ceil(8_000_000 / inputBytes));
+const SAMPLES = 7;
 const timeIt = (op: () => void): number => {
   const samples: number[] = [];
-  for (let s = 0; s < 3; s++) {
+  for (let s = 0; s < SAMPLES; s++) {
     const t0 = performance.now();
     for (let it = 0; it < iterations; it++) op();
     samples.push(performance.now() - t0);
   }
-  return (inputBytes * iterations) / 1_048_576 / (samples.toSorted((a, b) => a - b)[1]! / 1000);
+  const median = samples.toSorted((a, b) => a - b)[Math.floor(SAMPLES / 2)]!;
+  return (inputBytes * iterations) / 1_048_576 / (median / 1000);
 };
 const cMBps = timeIt(() => {
   for (const d of docs) compress(d.content, { language: d.language, mode });

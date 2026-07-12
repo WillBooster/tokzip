@@ -83,6 +83,9 @@ const CUT_LEN = 128;
 /** Chain walks stop once a match this long is found (zstd-style sufficient length). */
 const SUFFICIENT_LEN = 64;
 
+/** The greedy-lazy parser only probes a deferral when the current match is shorter than this. */
+const LAZY_PROBE_MAX = 32;
+
 /** Internal DP arrival kinds (3 + r encodes rep r). */
 const DP_LIT = 0;
 const DP_HISTORY = 1;
@@ -789,9 +792,10 @@ function parseGreedy(
       pos++;
       continue;
     }
-    if (lazy && pos + 1 < n) {
+    if (lazy && pos + 1 < n && bestLen < LAZY_PROBE_MAX) {
       // Bounded price-aware lazy step: prefer deferring when a literal plus the next match
-      // covers bytes at a strictly better price density.
+      // covers bytes at a strictly better price density. Long matches are taken immediately —
+      // deferring rarely beats them and the probe would double the search work.
       const curCost = bestCost;
       const curLen = bestLen;
       const curKind = bestKind;
