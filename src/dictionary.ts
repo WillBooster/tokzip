@@ -37,8 +37,10 @@ export interface RegisteredLanguage {
 
 export interface DictIndex {
   hashShift: number;
-  /** Bucketed positions (4 slots per bucket), -1 for empty. */
-  table: Int32Array;
+  /** Hash-chain heads: latest dictionary position per bucket, -1 for empty. */
+  head: Int32Array;
+  /** Previous position with the same hash, per dictionary position. */
+  prev: Int32Array;
 }
 
 const byId = new Map<number, RegisteredLanguage>();

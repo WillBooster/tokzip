@@ -1,6 +1,6 @@
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
-import { decodeFastBody, encodeFastBody, fastBodyCost, fastPricing } from './fastMode.ts';
+import { decodeFastBody, emitFastBody, fastBodyCost, fastPricing } from './fastMode.ts';
 import {
   DEFAULT_MAX_OUTPUT_SIZE,
   FLAG_BYTES,
@@ -10,15 +10,16 @@ import {
   MODE_STORED,
   RESERVED_FLAG_MASK,
 } from './format.ts';
-import { dictIndexFor, parse } from './lz.ts';
+import { dictIndexFor, parse, type Token } from './lz.ts';
 import {
   packedRawLength,
   pushPackedRaw,
   pushVarint64,
-  RADIX64_CHARS,
+  RADIX64_CODES,
   readPackedRaw,
   readRadix64,
   readVarint64,
+  TextSink,
 } from './radix64.ts';
 import { decodeSmallBody, emitSmallBody, planSmallBody, smallPricing } from './smallMode.ts';
 
@@ -53,19 +54,20 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
 
   const storedCost = packedRawLength(bytes.length);
   let shippedMode = MODE_STORED;
-  let body = '';
+  let fastTokensToShip: Token[] | undefined;
+  let smallBody = '';
   if (mode === 'fast') {
     const tokens = parse(bytes, language.dictionary, dictIndexFor(language), fastPricing(bytes, language));
     const fastCost = fastBodyCost(tokens, bytes, language)!;
     if (fastCost < storedCost) {
       shippedMode = MODE_FAST;
-      body = encodeFastBody(tokens, bytes, language);
+      fastTokensToShip = tokens;
     }
   } else {
     // Auto-downgrade (normative, emission-free): compare complete frames analytically —
     // small vs fast vs stored — smallest wins, ties choose the simpler encoding. The fast
-    // candidate is the cheaper of two token lists: the small (lazy) parse re-priced in fast
-    // chars, and a pure fast parse — the lazy parse optimizes bits, so alone it could ship a
+    // candidate is the cheaper of two token lists: the small (optimal) parse re-priced in fast
+    // chars, and a pure fast parse — the optimal parse minimizes bits, so alone it could ship a
     // fast frame larger than mode 'fast' would produce for the same input.
     const smallTokens = parse(bytes, language.dictionary, dictIndexFor(language), smallPricing(bytes, language));
     const plan = planSmallBody(smallTokens, bytes, language);
@@ -81,20 +83,19 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
       bestCost = fastCost;
     }
     if (plan.charCost < bestCost) shippedMode = MODE_SMALL;
-    if (shippedMode === MODE_FAST)
-      body = encodeFastBody(useLazyTokensForFast ? smallTokens : fastTokens, bytes, language);
-    else if (shippedMode === MODE_SMALL) body = emitSmallBody(plan, bytes, language);
+    if (shippedMode === MODE_FAST) fastTokensToShip = useLazyTokensForFast ? smallTokens : fastTokens;
+    else if (shippedMode === MODE_SMALL) smallBody = emitSmallBody(plan, bytes, language);
   }
 
-  const out: string[] = [
-    RADIX64_CHARS[MAGIC_VERSION]!,
-    // Stored frames always carry language id 0 (decoders ignore it).
-    RADIX64_CHARS[shippedMode === MODE_STORED ? 0 : language.id]!,
-    RADIX64_CHARS[shippedMode | (isString ? 0 : FLAG_BYTES)]!,
-  ];
+  const out = new TextSink(shippedMode === MODE_SMALL ? 16 : packedRawLength(bytes.length) + 16);
+  out.push(RADIX64_CODES[MAGIC_VERSION]!);
+  // Stored frames always carry language id 0 (decoders ignore it).
+  out.push(RADIX64_CODES[shippedMode === MODE_STORED ? 0 : language.id]!);
+  out.push(RADIX64_CODES[shippedMode | (isString ? 0 : FLAG_BYTES)]!);
   pushVarint64(out, bytes.length);
   if (shippedMode === MODE_STORED) pushPackedRaw(out, bytes, 0, bytes.length);
-  return out.join('') + body;
+  else if (fastTokensToShip) emitFastBody(out, fastTokensToShip, bytes, language);
+  return out.toString() + smallBody;
 }
 
 /** Decompresses a tokzip text frame; the return type follows the header's input-type flag. */

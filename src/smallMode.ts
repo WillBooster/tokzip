@@ -13,8 +13,8 @@ import {
   TOKEN_KIND_LITRUN,
   TOKEN_KIND_REP0,
 } from './format.ts';
-import { buildDecoder, buildEncoder, MAX_CODE_LENGTH } from './huffman.ts';
-import type { ParsePricing, Token } from './lz.ts';
+import { buildDecoder, buildEncoder, type HuffmanEncoder, MAX_CODE_LENGTH } from './huffman.ts';
+import type { ParsePricing, SlotPricing, Token } from './lz.ts';
 import { BitReader, BitWriter, decodeRadix85 } from './radix85.ts';
 import {
   extraBitsOf,
@@ -26,47 +26,62 @@ import {
   valueOfSlot,
 } from './slots.ts';
 
-function tokenSymbol(kind: number, lenSlot: number): number {
-  return kind * LENGTH_SLOT_COUNT + lenSlot;
-}
-
 function bitVarintLength(value: number): number {
   let length = 8;
   for (let rest = Math.floor(value / 128); rest > 0; rest = Math.floor(rest / 128)) length += 8;
   return length;
 }
 
+/** Exact-bit-price slot tables derived from a language's static tables, cached per language. */
+const slotPricingCache = new WeakMap<EntropyTables, SlotPricing>();
+
+function slotPricingFor(tables: EntropyTables): SlotPricing {
+  let pricing = slotPricingCache.get(tables);
+  if (pricing) return pricing;
+  const { literal, token, offset } = tables;
+  const litBits = new Float64Array(256);
+  for (let b = 0; b < 256; b++) litBits[b] = literal[b]! || RAW_LITERAL_BITS;
+  const tokenBits = (symbol: number): number => token[symbol]! || RAW_TOKEN_BITS;
+  const histSlotBits = new Float64Array(LENGTH_SLOT_COUNT);
+  const dictSlotBits = new Float64Array(LENGTH_SLOT_COUNT);
+  const repSlotBits = new Float64Array(4 * LENGTH_SLOT_COUNT);
+  for (let s = 0; s < LENGTH_SLOT_COUNT; s++) {
+    const extra = extraBitsOf(s);
+    histSlotBits[s] = tokenBits(TOKEN_KIND_HISTORY * LENGTH_SLOT_COUNT + s) + extra;
+    dictSlotBits[s] = tokenBits(TOKEN_KIND_DICT * LENGTH_SLOT_COUNT + s) + extra;
+    for (let r = 0; r < 4; r++) {
+      repSlotBits[r * LENGTH_SLOT_COUNT + s] = tokenBits((TOKEN_KIND_REP0 + r) * LENGTH_SLOT_COUNT + s) + extra;
+    }
+  }
+  const offsetSlotBits = new Float64Array(OFFSET_SLOT_COUNT);
+  for (let s = 0; s < OFFSET_SLOT_COUNT; s++) {
+    offsetSlotBits[s] = (offset[s]! || RAW_OFFSET_SLOT_BITS) + extraBitsOf(s);
+  }
+  pricing = { litBits, histSlotBits, dictSlotBits, repSlotBits, offsetSlotBits };
+  slotPricingCache.set(tables, pricing);
+  return pricing;
+}
+
 /**
  * Builds the `small`-mode pricing model: exact output-bit prices from the static per-language
- * tables (this is what lets the bounded lazy parser make true cost-based decisions).
+ * tables. The attached slot tables let the parser run its exact-price optimal parse.
  */
 export function smallPricing(bytes: Uint8Array, language: RegisteredLanguage): ParsePricing {
-  const { literal, token, offset } = language.tables;
-  const litBits = (byte: number): number => literal[byte]! || RAW_LITERAL_BITS;
-  const tokenBits = (symbol: number): number => token[symbol]! || RAW_TOKEN_BITS;
-  const offsetBits = (slot: number): number => offset[slot]! || RAW_OFFSET_SLOT_BITS;
+  const optimal = slotPricingFor(language.tables);
+  const { litBits, histSlotBits, dictSlotBits, repSlotBits, offsetSlotBits } = optimal;
 
   const litCostPrefix = new Float64Array(bytes.length + 1);
-  for (let i = 0; i < bytes.length; i++) litCostPrefix[i + 1] = litCostPrefix[i]! + litBits(bytes[i]!);
+  for (let i = 0; i < bytes.length; i++) litCostPrefix[i + 1] = litCostPrefix[i]! + litBits[bytes[i]!]!;
 
-  const matchTokenBits = (kind: number, len: number): number => {
-    const slot = slotOf(len - MIN_LEN_REP);
-    return tokenBits(tokenSymbol(kind, slot)) + extraBitsOf(slot);
-  };
   return {
     litCostPrefix,
-    repCost: (repIndex, len) => matchTokenBits(TOKEN_KIND_REP0 + repIndex, len),
-    historyCost: (dist, len) => {
-      const offSlot = slotOf(dist - 1);
-      return matchTokenBits(TOKEN_KIND_HISTORY, len) + offsetBits(offSlot) + extraBitsOf(offSlot);
-    },
-    dictCost: (start, len) => {
-      const offSlot = slotOf(start);
-      return matchTokenBits(TOKEN_KIND_DICT, len) + offsetBits(offSlot) + extraBitsOf(offSlot);
-    },
+    repCost: (repIndex, len) => repSlotBits[repIndex * LENGTH_SLOT_COUNT + slotOf(len - MIN_LEN_REP)]!,
+    historyCost: (dist, len) => histSlotBits[slotOf(len - MIN_LEN_REP)]! + offsetSlotBits[slotOf(dist - 1)]!,
+    dictCost: (start, len) => dictSlotBits[slotOf(len - MIN_LEN_REP)]! + offsetSlotBits[slotOf(start)]!,
     lazy: true,
     window: SMALL_WINDOW,
     maxDictStart: SMALL_WINDOW,
+    optimal,
   };
 }
 
@@ -77,7 +92,6 @@ interface StreamPlan {
 
 /** A fully priced `small` body: sizes are exact, so the frame comparison never needs emission. */
 export interface SmallPlan {
-  tokens: Token[];
   literals: StreamPlan;
   tokenStream: StreamPlan;
   offsets: StreamPlan;
@@ -85,6 +99,7 @@ export interface SmallPlan {
   totalBits: number;
   /** Exact char count of the emitted radix-85 body. */
   charCost: number;
+  collected: CollectedStreams;
 }
 
 interface CollectedStreams {
@@ -109,7 +124,7 @@ function collectStreams(tokens: Token[], bytes: Uint8Array): CollectedStreams {
   };
   const pushToken = (kind: number, lenValue: number): void => {
     const slot = slotOf(lenValue);
-    collected.tokenSyms.push(tokenSymbol(kind, slot));
+    collected.tokenSyms.push(kind * LENGTH_SLOT_COUNT + slot);
     collected.tokenExtraBits.push(extraBitsOf(slot));
     collected.tokenExtraValues.push(extraValueOf(lenValue, slot));
   };
@@ -183,13 +198,43 @@ export function planSmallBody(tokens: Token[], bytes: Uint8Array, language: Regi
     literals.bitLength +
     tokenStream.bitLength +
     offsets.bitLength;
-  return { tokens, literals, tokenStream, offsets, tokenCount, totalBits, charCost: Math.ceil(totalBits / 32) * 5 };
+  return {
+    literals,
+    tokenStream,
+    offsets,
+    tokenCount,
+    totalBits,
+    charCost: Math.ceil(totalBits / 32) * 5,
+    collected,
+  };
+}
+
+const encoderCache = new WeakMap<
+  EntropyTables,
+  { literal: HuffmanEncoder; token: HuffmanEncoder; offset: HuffmanEncoder }
+>();
+
+function encodersFor(tables: EntropyTables): {
+  literal: HuffmanEncoder;
+  token: HuffmanEncoder;
+  offset: HuffmanEncoder;
+} {
+  let encoders = encoderCache.get(tables);
+  if (!encoders) {
+    encoders = {
+      literal: buildEncoder(tables.literal),
+      token: buildEncoder(tables.token),
+      offset: buildEncoder(tables.offset),
+    };
+    encoderCache.set(tables, encoders);
+  }
+  return encoders;
 }
 
 /** Serializes a planned `small` body through the fused radix-85 writer (single pass). */
-export function emitSmallBody(plan: SmallPlan, bytes: Uint8Array, language: RegisteredLanguage): string {
-  const collected = collectStreams(plan.tokens, bytes);
-  const tables = language.tables;
+export function emitSmallBody(plan: SmallPlan, _bytes: Uint8Array, language: RegisteredLanguage): string {
+  const collected = plan.collected;
+  const encoders = encodersFor(language.tables);
   const writer = new BitWriter();
   writer.writeBits(
     (plan.literals.huffman ? 4 : 0) | (plan.tokenStream.huffman ? 2 : 0) | (plan.offsets.huffman ? 1 : 0),
@@ -199,26 +244,39 @@ export function emitSmallBody(plan: SmallPlan, bytes: Uint8Array, language: Regi
   writer.writeVarint(plan.literals.bitLength);
   writer.writeVarint(plan.tokenStream.bitLength);
 
-  const litEncoder = plan.literals.huffman ? buildEncoder(tables.literal) : undefined;
-  for (const byte of collected.literalBytes) {
-    if (litEncoder) writer.writeBits(litEncoder.codes[byte]!, litEncoder.lengths[byte]!);
-    else writer.writeBits(byte, RAW_LITERAL_BITS);
+  const literalBytes = collected.literalBytes;
+  if (plan.literals.huffman) {
+    const { codes, lengths } = encoders.literal;
+    for (let i = 0; i < literalBytes.length; i++) {
+      const byte = literalBytes[i]!;
+      writer.writeBits(codes[byte]!, lengths[byte]!);
+    }
+  } else {
+    for (let i = 0; i < literalBytes.length; i++) writer.writeBits(literalBytes[i]!, RAW_LITERAL_BITS);
   }
-  const tokenEncoder = plan.tokenStream.huffman ? buildEncoder(tables.token) : undefined;
-  for (let i = 0; i < collected.tokenSyms.length; i++) {
-    const symbol = collected.tokenSyms[i]!;
-    if (tokenEncoder) writer.writeBits(tokenEncoder.codes[symbol]!, tokenEncoder.lengths[symbol]!);
-    else writer.writeBits(symbol, RAW_TOKEN_BITS);
-    if (collected.tokenExtraBits[i]! > 0)
-      writer.writeBits(collected.tokenExtraValues[i]!, collected.tokenExtraBits[i]!);
+  {
+    const { codes, lengths } = encoders.token;
+    const huffman = plan.tokenStream.huffman;
+    const syms = collected.tokenSyms;
+    for (let i = 0; i < syms.length; i++) {
+      const symbol = syms[i]!;
+      if (huffman) writer.writeBits(codes[symbol]!, lengths[symbol]!);
+      else writer.writeBits(symbol, RAW_TOKEN_BITS);
+      const extra = collected.tokenExtraBits[i]!;
+      if (extra > 0) writer.writeBits(collected.tokenExtraValues[i]!, extra);
+    }
   }
-  const offsetEncoder = plan.offsets.huffman ? buildEncoder(tables.offset) : undefined;
-  for (let i = 0; i < collected.offsetSlots.length; i++) {
-    const slot = collected.offsetSlots[i]!;
-    if (offsetEncoder) writer.writeBits(offsetEncoder.codes[slot]!, offsetEncoder.lengths[slot]!);
-    else writer.writeBits(slot, RAW_OFFSET_SLOT_BITS);
-    if (collected.offsetExtraBits[i]! > 0)
-      writer.writeBits(collected.offsetExtraValues[i]!, collected.offsetExtraBits[i]!);
+  {
+    const { codes, lengths } = encoders.offset;
+    const huffman = plan.offsets.huffman;
+    const slots = collected.offsetSlots;
+    for (let i = 0; i < slots.length; i++) {
+      const slot = slots[i]!;
+      if (huffman) writer.writeBits(codes[slot]!, lengths[slot]!);
+      else writer.writeBits(slot, RAW_OFFSET_SLOT_BITS);
+      const extra = collected.offsetExtraBits[i]!;
+      if (extra > 0) writer.writeBits(collected.offsetExtraValues[i]!, extra);
+    }
   }
   return writer.toText();
 }
@@ -274,13 +332,6 @@ export function decodeSmallBody(
   const tokenHuffman = (modes & 2) !== 0;
   const offsetHuffman = (modes & 1) !== 0;
 
-  const readLiteral = (): number =>
-    litHuffman ? readSymbol(litCursor, decoders.literal) : litCursor.readBits(RAW_LITERAL_BITS);
-  const readToken = (): number => {
-    const symbol = tokenHuffman ? readSymbol(tokenCursor, decoders.token) : tokenCursor.readBits(RAW_TOKEN_BITS);
-    if (symbol >= TOKEN_ALPHABET_SIZE) throw new TokzipDecodeError('invalid symbol');
-    return symbol;
-  };
   const readOffsetValue = (): number => {
     const slot = offsetHuffman
       ? readSymbol(offsetCursor, decoders.offset)
@@ -292,11 +343,17 @@ export function decodeSmallBody(
 
   const out = new Uint8Array(outputSize);
   const { dictionary } = language;
-  const reps = [...INITIAL_REPS];
+  const litTable = decoders.literal;
+  const tokenTable = decoders.token;
+  let rep0 = INITIAL_REPS[0]!;
+  let rep1 = INITIAL_REPS[1]!;
+  let rep2 = INITIAL_REPS[2]!;
+  let rep3 = INITIAL_REPS[3]!;
   let produced = 0;
   for (let t = 0; t < tokenCount; t++) {
-    const symbol = readToken();
-    const kind = Math.floor(symbol / LENGTH_SLOT_COUNT);
+    const symbol = tokenHuffman ? readSymbol(tokenCursor, tokenTable) : tokenCursor.readBits(RAW_TOKEN_BITS);
+    if (symbol >= TOKEN_ALPHABET_SIZE) throw new TokzipDecodeError('invalid symbol');
+    const kind = Math.trunc(symbol / LENGTH_SLOT_COUNT);
     const slot = symbol % LENGTH_SLOT_COUNT;
     const extraBits = extraBitsOf(slot);
     const slotValue = valueOfSlot(slot, extraBits > 0 ? tokenCursor.readBits(extraBits) : 0);
@@ -304,8 +361,13 @@ export function decodeSmallBody(
     if (kind === TOKEN_KIND_LITRUN) {
       const length = slotValue + 1;
       if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
-      for (let i = 0; i < length; i++) out[produced + i] = readLiteral();
-      produced += length;
+      const runEnd = produced + length;
+      if (litHuffman) {
+        for (let i = produced; i < runEnd; i++) out[i] = readSymbol(litCursor, litTable);
+      } else {
+        for (let i = produced; i < runEnd; i++) out[i] = litCursor.readBits(RAW_LITERAL_BITS);
+      }
+      produced = runEnd;
       continue;
     }
     const length = slotValue + MIN_LEN_REP;
@@ -318,17 +380,38 @@ export function decodeSmallBody(
       let dist: number;
       if (kind === TOKEN_KIND_HISTORY) {
         dist = readOffsetValue() + 1;
-        reps.pop();
-        reps.unshift(dist);
+        rep3 = rep2;
+        rep2 = rep1;
+        rep1 = rep0;
+        rep0 = dist;
       } else {
         const repIndex = kind - TOKEN_KIND_REP0;
-        if (repIndex < 0 || repIndex > 3) throw new TokzipDecodeError('invalid symbol');
-        dist = reps[repIndex]!;
-        reps.splice(repIndex, 1);
-        reps.unshift(dist);
+        if (repIndex === 0) dist = rep0;
+        else if (repIndex === 1) {
+          dist = rep1;
+          rep1 = rep0;
+          rep0 = dist;
+        } else if (repIndex === 2) {
+          dist = rep2;
+          rep2 = rep1;
+          rep1 = rep0;
+          rep0 = dist;
+        } else {
+          dist = rep3;
+          rep3 = rep2;
+          rep2 = rep1;
+          rep1 = rep0;
+          rep0 = dist;
+        }
       }
       if (dist < 1 || dist > produced) throw new TokzipDecodeError('history match out of bounds');
-      for (let i = 0; i < length; i++) out[produced + i] = out[produced - dist + i]!;
+      if (dist >= length) {
+        // Non-overlapping: block copy.
+        out.copyWithin(produced, produced - dist, produced - dist + length);
+      } else {
+        const from = produced - dist;
+        for (let i = 0; i < length; i++) out[produced + i] = out[from + i]!;
+      }
     }
     produced += length;
   }

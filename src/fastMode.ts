@@ -14,13 +14,16 @@ import {
 } from './format.ts';
 import type { ParsePricing, Token } from './lz.ts';
 import {
-  RADIX64_CHARS,
+  asciiCodeAt,
   packedRawLength,
   pushPackedRaw,
   pushVarint64,
+  RADIX64_CODES,
+  RADIX64_VALUES,
   readPackedRaw,
   readRadix64,
   readVarint64,
+  TextSink,
   varint64Length,
 } from './radix64.ts';
 
@@ -129,30 +132,37 @@ export function fastBodyCost(tokens: Token[], bytes: Uint8Array, language: Regis
   return cost;
 }
 
-function pushTag(out: string[], kind: number, payload: number): void {
-  out.push(RADIX64_CHARS[(kind << 3) | payload]!);
+function pushTag(out: TextSink, kind: number, payload: number): void {
+  out.push(RADIX64_CODES[(kind << 3) | payload]!);
 }
 
-function pushOffset(out: string[], value: number): void {
+function pushOffset(out: TextSink, value: number): void {
   if (value < SHORT_OFFSET_LIMIT) {
-    out.push(RADIX64_CHARS[(value >>> 6) & 63]!, RADIX64_CHARS[value & 63]!);
+    out.push(RADIX64_CODES[(value >>> 6) & 63]!);
+    out.push(RADIX64_CODES[value & 63]!);
   } else {
-    out.push(RADIX64_CHARS[(value >>> 12) & 63]!, RADIX64_CHARS[(value >>> 6) & 63]!, RADIX64_CHARS[value & 63]!);
+    out.push(RADIX64_CODES[(value >>> 12) & 63]!);
+    out.push(RADIX64_CODES[(value >>> 6) & 63]!);
+    out.push(RADIX64_CODES[value & 63]!);
   }
 }
 
-function pushLiteralSegment(out: string[], bytes: Uint8Array, segment: LiteralSegment, top64Index: Int8Array): void {
+function pushLiteralSegment(out: TextSink, bytes: Uint8Array, segment: LiteralSegment, top64Index: Int8Array): void {
   const length = segment.end - segment.start;
   pushTag(out, segment.raw ? KIND_LITRAW : KIND_LIT64, Math.min(length - 1, 7));
   // The length varint precedes the body so decoding stays single-pass (body size depends on it).
   if (length >= LIT_EXT_LEN) pushVarint64(out, length - LIT_EXT_LEN);
   if (segment.raw) pushPackedRaw(out, bytes, segment.start, segment.end);
-  else for (let i = segment.start; i < segment.end; i++) out.push(RADIX64_CHARS[top64Index[bytes[i]!]!]!);
+  else {
+    const buffer = out.reserve(length);
+    let at = out.length;
+    for (let i = segment.start; i < segment.end; i++) buffer[at++] = RADIX64_CODES[top64Index[bytes[i]!]!]!;
+    out.length = at;
+  }
 }
 
-/** Serializes the token list as the `fast`-mode radix-64 stream (tag, offset field, length varint). */
-export function encodeFastBody(tokens: Token[], bytes: Uint8Array, language: RegisteredLanguage): string {
-  const out: string[] = [];
+/** Serializes the token list into `out` as the `fast`-mode radix-64 stream (tag, offset field, length varint). */
+export function emitFastBody(out: TextSink, tokens: Token[], bytes: Uint8Array, language: RegisteredLanguage): void {
   for (const token of tokens) {
     if (token.type === 'lit') {
       for (const segment of segmentLiterals(bytes, token.start, token.end, language.top64Index)) {
@@ -173,7 +183,13 @@ export function encodeFastBody(tokens: Token[], bytes: Uint8Array, language: Reg
       if (token.len >= EXPLICIT_EXT_LEN) pushVarint64(out, token.len - EXPLICIT_EXT_LEN);
     }
   }
-  return out.join('');
+}
+
+/** Serializes the token list as the `fast`-mode radix-64 stream (string form; see {@link emitFastBody}). */
+export function encodeFastBody(tokens: Token[], bytes: Uint8Array, language: RegisteredLanguage): string {
+  const out = new TextSink(bytes.length + 64);
+  emitFastBody(out, tokens, bytes, language);
+  return out.toString();
 }
 
 /**
@@ -189,7 +205,10 @@ export function decodeFastBody(
 ): Uint8Array {
   const out = new Uint8Array(outputSize);
   const { dictionary, top64 } = language;
-  const reps = [...INITIAL_REPS];
+  let rep0 = INITIAL_REPS[0]!;
+  let rep1 = INITIAL_REPS[1]!;
+  let rep2 = INITIAL_REPS[2]!;
+  let rep3 = INITIAL_REPS[3]!;
   let produced = 0;
 
   const readOffset = (width: number): number => {
@@ -219,7 +238,13 @@ export function decodeFastBody(
       if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
       if (kind === KIND_LIT64) {
         if (bodyPos + length > end) throw new TokzipDecodeError('truncated literal run');
-        for (let i = 0; i < length; i++) out[produced + i] = top64[readRadix64(data, bodyPos + i)]!;
+        const values = RADIX64_VALUES;
+        for (let i = 0; i < length; i++) {
+          const code = asciiCodeAt(data, bodyPos + i);
+          const value = code < 128 ? values[code]! : -1;
+          if (value < 0) throw new TokzipDecodeError(`non-alphabet character at position ${bodyPos + i}`);
+          out[produced + i] = top64[value]!;
+        }
         pos = bodyPos + length;
       } else {
         if (bodyPos + packedRawLength(length) > end) throw new TokzipDecodeError('truncated literal run');
@@ -245,8 +270,10 @@ export function decodeFastBody(
       }
       if (kind === KIND_HISTORY) {
         dist = value + 1;
-        reps.pop();
-        reps.unshift(dist);
+        rep3 = rep2;
+        rep2 = rep1;
+        rep1 = rep0;
+        rep0 = dist;
       } else {
         sourceIsDict = true;
         dictStart = value;
@@ -259,9 +286,23 @@ export function decodeFastBody(
         length = REP_EXT_LEN + result.value;
         pos = result.pos;
       }
-      dist = reps[repIndex]!;
-      reps.splice(repIndex, 1);
-      reps.unshift(dist);
+      if (repIndex === 0) dist = rep0;
+      else if (repIndex === 1) {
+        dist = rep1;
+        rep1 = rep0;
+        rep0 = dist;
+      } else if (repIndex === 2) {
+        dist = rep2;
+        rep2 = rep1;
+        rep1 = rep0;
+        rep0 = dist;
+      } else {
+        dist = rep3;
+        rep3 = rep2;
+        rep2 = rep1;
+        rep1 = rep0;
+        rep0 = dist;
+      }
     }
 
     if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
@@ -270,8 +311,13 @@ export function decodeFastBody(
       out.set(dictionary.subarray(dictStart, dictStart + length), produced);
     } else {
       if (dist < 1 || dist > produced) throw new TokzipDecodeError('history match out of bounds');
-      // Byte-by-byte copy: history matches may overlap-copy.
-      for (let i = 0; i < length; i++) out[produced + i] = out[produced - dist + i]!;
+      if (dist >= length) {
+        out.copyWithin(produced, produced - dist, produced - dist + length);
+      } else {
+        // Overlap-copy: history matches may copy bytes produced by the same match.
+        const from = produced - dist;
+        for (let i = 0; i < length; i++) out[produced + i] = out[from + i]!;
+      }
     }
     produced += length;
   }
