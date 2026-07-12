@@ -130,7 +130,7 @@ export { ${exportName} };
 
 /**
  * Runs the real parser over the corpus with bootstrap tables, tallies per-stream symbol
- * frequencies, and rebuilds the tables from them; a second round re-parses with the trained
+ * frequencies, and rebuilds the tables from them; later rounds re-parse with the trained
  * tables so prices and statistics converge.
  */
 function trainStatistics(

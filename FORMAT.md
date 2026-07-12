@@ -136,9 +136,9 @@ matches, and rep matches.
   NOT emit a frame larger than the stored frame of the same input (see §8); the reference
   encoder only accepts matches whose exact output cost beats the literal encoding of the same
   bytes (in `fast`: rep matches become profitable at 2–3 bytes, explicit matches at 4–5
-  depending on offset width, chosen by a greedy parse with a bounded price-aware lazy step;
-  in `small`: exact static-table bit prices drive a shortest-path optimal parse with
-  path-carried rep state, falling back to the lazy parse beyond the encoder's input bound).
+  depending on offset width, chosen by a greedy parse; in `small`: exact static-table bit
+  prices drive a shortest-path optimal parse with path-carried rep state, falling back to a
+  bounded price-aware lazy parse beyond the encoder's input bound).
 
 ## 7. `fast` body: char-aligned radix-64 token stream
 

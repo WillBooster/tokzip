@@ -17,7 +17,7 @@ const packed = compress(source, { language: 'typescript', mode: 'small' });
 const restored = decompress(packed); // === source
 ```
 
-- Exactly **two modes**: `fast` (speed-first: greedy-lazy parse into a char-aligned radix-64
+- Exactly **two modes**: `fast` (speed-first: greedy parse into a char-aligned radix-64
   stream) and `small` (size-first: an exact-bit-price optimal parse feeding static entropy
   coding through a fused radix-85 writer, with normative auto-downgrade so output never
   expands beyond a stored frame).
