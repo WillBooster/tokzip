@@ -1,5 +1,5 @@
 /**
- * Text-channel compression benchmark on the seeded `bench-v1` corpus split.
+ * Text-channel compression benchmark on the seeded `bench-v2` corpus split.
  *
  * Size, lossless round-trip, and (with --speed) end-to-end per-document throughput are
  * measured for tokzip and every competitor. Binary codecs include base64url encode/decode
@@ -68,7 +68,7 @@ interface BenchReport {
   timestamp: string;
   runtime: string;
   methods: string[];
-  corpus: { split: 'bench-v1'; sha256: string };
+  corpus: { split: 'bench-v2'; sha256: string };
   roundTrip: { docs: number; methods: number; checks: number; failures: string[] };
   languages: Record<string, LanguageReport>;
   total: { docs: number; inputBytes: number; ratios: Record<string, number> };
@@ -95,7 +95,7 @@ function main(): void {
     timestamp: new Date().toISOString(),
     runtime: `bun ${Bun.version}`,
     methods: METHOD_NAMES,
-    corpus: { split: 'bench-v1', sha256: '' },
+    corpus: { split: 'bench-v2', sha256: '' },
     roundTrip: { docs: 0, methods: METHODS.length, checks: 0, failures: [] },
     languages: {},
     total: { docs: 0, inputBytes: 0, ratios: {} },
