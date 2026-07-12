@@ -51,13 +51,17 @@ function detectCorpusDirs(): string[] {
   // (offline, diverged branch) only degrades to the existing checkout. Credential prompts
   // must fail fast too: git asks on /dev/tty even with piped stdio, which would otherwise
   // block the benchmark until the timeout. BatchMode is appended to the effective SSH
-  // command (env var over core.sshCommand, mirroring git's own precedence) rather than
-  // replacing it, so deploy keys and other custom SSH setups keep working.
+  // command (GIT_SSH_COMMAND over core.sshCommand over GIT_SSH, mirroring git's own
+  // precedence) rather than replacing it, so deploy keys and other custom SSH setups keep
+  // working. GIT_SSH is a bare program path, so it is shell-quoted before being promoted
+  // into the shell-interpreted GIT_SSH_COMMAND.
+  const gitSshProgram = process.env['GIT_SSH'] && `'${process.env['GIT_SSH'].replaceAll("'", String.raw`'\''`)}'`;
   const configuredSsh =
     process.env['GIT_SSH_COMMAND'] ??
-    spawnSync('git', ['-C', privateRepoDir, 'config', '--get', 'core.sshCommand'], {
+    (spawnSync('git', ['-C', privateRepoDir, 'config', '--get', 'core.sshCommand'], {
       encoding: 'utf8',
-    }).stdout?.trim();
+    }).stdout?.trim() ||
+      gitSshProgram);
   const pull = spawnSync('git', ['-C', privateRepoDir, 'pull', '--ff-only'], {
     encoding: 'utf8',
     timeout: 60_000,
