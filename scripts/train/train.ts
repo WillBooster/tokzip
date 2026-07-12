@@ -33,7 +33,7 @@ import { buildWrapperDictionary } from './wrapperContent.ts';
 const ROOT = join(import.meta.dir, '../..');
 const GENERATED_DIR = join(ROOT, 'src/generated');
 const LANGUAGES_DIR = join(ROOT, 'src/languages');
-const DICTIONARY_BUDGET_BYTES = 20 * 1024;
+const DICTIONARY_BUDGET_BYTES = 192 * 1024;
 /** Bound on per-language statistics input; keeps a full training run tractable. */
 const MAX_STATS_BYTES = 8 * 1024 * 1024;
 
