@@ -46,11 +46,22 @@ function detectCorpusDirs(): string[] {
   // A stale private corpus would silently skew benchmark fingerprints; a failed pull
   // (offline, diverged branch) only degrades to the existing checkout. Credential prompts
   // must fail fast too: git asks on /dev/tty even with piped stdio, which would otherwise
-  // block the benchmark until the timeout.
+  // block the benchmark until the timeout. BatchMode is appended to the effective SSH
+  // command (env var over core.sshCommand, mirroring git's own precedence) rather than
+  // replacing it, so deploy keys and other custom SSH setups keep working.
+  const configuredSsh =
+    process.env['GIT_SSH_COMMAND'] ??
+    spawnSync('git', ['-C', privateRepoDir, 'config', '--get', 'core.sshCommand'], {
+      encoding: 'utf8',
+    }).stdout?.trim();
   const pull = spawnSync('git', ['-C', privateRepoDir, 'pull', '--ff-only'], {
     encoding: 'utf8',
     timeout: 60_000,
-    env: { ...process.env, GIT_TERMINAL_PROMPT: '0', GIT_SSH_COMMAND: 'ssh -o BatchMode=yes' },
+    env: {
+      ...process.env,
+      GIT_TERMINAL_PROMPT: '0',
+      GIT_SSH_COMMAND: `${configuredSsh || 'ssh'} -o BatchMode=yes`,
+    },
   });
   if (pull.status === 0) {
     console.error(`private corpus: ${privateCorpusDir} (pulled)`);
