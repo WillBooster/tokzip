@@ -274,6 +274,14 @@ lazily on first compress per language and cached per process (idempotent, re-ent
 Compressing with an explicitly requested unregistered language throws; decoding a non-stored
 frame with an unregistered id is a structural error.
 
+**Module data is part of the codec identity.** Non-stored frames reference the registered
+module's dictionary bytes, top-64 charset, and code lengths implicitly — the frame carries
+only the language id. A non-stored frame therefore decodes correctly only with the exact
+trained module data its encoder used; retraining dictionaries or tables is a breaking change
+for persisted non-stored frames even though the wire format version is unchanged (stored
+frames are unaffected). Deployments that persist frames across library upgrades must pin the
+library version or re-encode; see the tracking issue on versioned module assets.
+
 ## 11. Conformance vectors
 
 Executable vectors live in `test/conformance.test.ts` and `test/roundtrip.test.ts`; the
