@@ -65,10 +65,10 @@ const OPTIMAL_MAX_INPUT = 1 << 19;
 const GREEDY_DEPTH = 16;
 const GREEDY_DICT_DEPTH = 12;
 /** Shallow 4-byte-hash walks (short matches) + deep selective 6-byte-hash walks (long matches). */
-const OPTIMAL_DEPTH_SHORT = 12;
-const OPTIMAL_DEPTH = 96;
-const OPTIMAL_DICT_DEPTH_SHORT = 8;
-const OPTIMAL_DICT_DEPTH = 64;
+const OPTIMAL_DEPTH_SHORT = 8;
+const OPTIMAL_DEPTH = 48;
+const OPTIMAL_DICT_DEPTH_SHORT = 6;
+const OPTIMAL_DICT_DEPTH = 32;
 
 /** The DP evaluates every match length up to this bound, then only slot-boundary lengths. */
 const DENSE_LEN_BOUND = 48;
@@ -81,7 +81,7 @@ const DENSE_LEN_BOUND = 48;
 const CUT_LEN = 128;
 
 /** Chain walks stop once a match this long is found (zstd-style sufficient length). */
-const SUFFICIENT_LEN = 64;
+const SUFFICIENT_LEN = 48;
 
 /** The greedy-lazy parser only probes a deferral when the current match is shorter than this. */
 const LAZY_PROBE_MAX = 32;
