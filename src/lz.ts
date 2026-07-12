@@ -63,12 +63,13 @@ const OPTIMAL_MAX_INPUT = 1 << 19;
 
 /** Match-finder search depths (chain links walked per position). */
 const GREEDY_DEPTH = 16;
-const GREEDY_DICT_DEPTH = 12;
+const GREEDY_DICT_DEPTH_SHORT = 6;
+const GREEDY_DICT_DEPTH = 16;
 /** Shallow 4-byte-hash walks (short matches) + deep selective 6-byte-hash walks (long matches). */
 const OPTIMAL_DEPTH_SHORT = 8;
 const OPTIMAL_DEPTH = 48;
 const OPTIMAL_DICT_DEPTH_SHORT = 6;
-const OPTIMAL_DICT_DEPTH = 32;
+const OPTIMAL_DICT_DEPTH = 48;
 
 /** The DP evaluates every match length up to this bound, then only slot-boundary lengths. */
 const DENSE_LEN_BOUND = 48;
@@ -735,15 +736,17 @@ function parseGreedy(
               bestDist = d;
               bestRep = r;
             }
-            if (len === cap) break;
+            if (len === cap || len >= SUFFICIENT_LEN) break;
           }
         }
         cand = prev[cand]!;
       }
       if (dictIndex) {
-        let dcand = dictIndex.head[hash4(bytes, pos, dictIndex.hashShift)]!;
-        let depthD = GREEDY_DICT_DEPTH;
+        // Two-tier dictionary search (see the optimal parser): shallow 4-byte-hash walk for
+        // short matches, then the selective 6-byte-hash chain for long ones.
         let bestMD = MIN_LEN_EXPLICIT - 1;
+        let dcand = dictIndex.head[hash4(bytes, pos, dictIndex.hashShift)]!;
+        let depthD = GREEDY_DICT_DEPTH_SHORT;
         while (dcand >= 0 && depthD-- > 0) {
           if (dcand < maxDictStart && dictionary[dcand + bestMD] === bytes[pos + bestMD]) {
             const dcap = dictionary.length - dcand < cap ? dictionary.length - dcand : cap;
@@ -759,10 +762,34 @@ function parseGreedy(
                 bestKind = 2;
                 bestStart = dcand;
               }
-              if (len === cap) break;
+              if (len === cap || len >= SUFFICIENT_LEN) break;
             }
           }
           dcand = dictIndex.prev[dcand]!;
+        }
+        if (bestMD < cap && bestMD < SUFFICIENT_LEN && pos + 6 <= n) {
+          let dcand6 = dictIndex.head6[hash6(bytes, pos, dictIndex.hashShift)]!;
+          let depth6 = GREEDY_DICT_DEPTH;
+          while (dcand6 >= 0 && depth6-- > 0) {
+            if (dcand6 < maxDictStart && dictionary[dcand6 + bestMD] === bytes[pos + bestMD]) {
+              const dcap = dictionary.length - dcand6 < cap ? dictionary.length - dcand6 : cap;
+              const len = matchLength(bytes, pos, dictionary, dcand6, dcap);
+              if (len > bestMD) {
+                bestMD = len;
+                const cost = pricing.dictCost(dcand6, len);
+                const savings = litCostPrefix[pos + len]! - litBase - cost;
+                if (savings > 0 && savings > bestSavings) {
+                  bestSavings = savings;
+                  bestCost = cost;
+                  bestLen = len;
+                  bestKind = 2;
+                  bestStart = dcand6;
+                }
+                if (len === cap || len >= SUFFICIENT_LEN) break;
+              }
+            }
+            dcand6 = dictIndex.prev6[dcand6]!;
+          }
         }
       }
     }
