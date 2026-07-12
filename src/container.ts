@@ -36,7 +36,9 @@ export interface DecompressOptions {
 
 const textEncoder = new TextEncoder();
 // Fatal decoding: invalid UTF-8 in a string-typed frame throws, never U+FFFD insertion.
-const fatalDecoder = new TextDecoder('utf-8', { fatal: true });
+// ignoreBOM keeps a leading U+FEFF as a character instead of eating it, so round-tripping a
+// BOM-prefixed string returns it intact — decoding is lossless or it throws, never silently lossy.
+const fatalDecoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 
 /** Compresses a string (UTF-8) or raw bytes into a safe-ASCII text frame. */
 export function compress(input: string | Uint8Array, options?: CompressOptions): string {

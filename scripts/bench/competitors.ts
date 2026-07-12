@@ -21,7 +21,9 @@ const zstdCompressSync = zstdModule.zstdCompressSync as
 const zstdDecompressSync = zstdModule.zstdDecompressSync as ((data: Uint8Array) => Uint8Array) | undefined;
 
 const encoder = new TextEncoder();
-const decoder = new TextDecoder('utf-8', { fatal: true });
+// ignoreBOM so the baselines are measured on the same lossless contract as tokzip: without it a
+// leading U+FEFF is swallowed on decode and every codec "fails" the round-trip check.
+const decoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 
 export const competitors: Competitor[] = [
   binaryCompetitor('b64url(brotli q11)', {
