@@ -37,10 +37,16 @@ export interface RegisteredLanguage {
 
 export interface DictIndex {
   hashShift: number;
-  /** Hash-chain heads: latest dictionary position per bucket, -1 for empty. */
+  /** 4-byte-hash chain heads: latest dictionary position per bucket, -1 for empty. */
   head: Int32Array;
-  /** Previous position with the same hash, per dictionary position. */
+  /** Previous position with the same 4-byte hash, per dictionary position. */
   prev: Int32Array;
+  /**
+   * 6-byte-hash chains: far more selective on the large repetitive preset dictionaries, so
+   * the optimal parse can search deep for long matches without walking useless candidates.
+   */
+  head6: Int32Array;
+  prev6: Int32Array;
 }
 
 const byId = new Map<number, RegisteredLanguage>();
