@@ -45,7 +45,7 @@ tokzip and the `lz-string` URI mode already emit text. It also measures median e
 per-document throughput, including binary-to-text framing, and **verifies every method on
 every document round-trips losslessly** — any mismatch fails the run.
 
-Latest local run (`bench-v2`, fingerprint `bcd46da4b82d`, 1,953 documents, ~9.6 MB,
+Latest local run (`bench-v2`, fingerprint `e2a3f1fc5b8f`, 1,931 documents, ~9.4 MB,
 21 languages/locales; output/input, lower is better; Apple Silicon, Bun 1.3):
 
 | corpus       | docs | tokzip fast | tokzip small | b64url(brotli q11) | b64url(gzip -6) | b64url(zstd -19) |
@@ -56,14 +56,14 @@ Latest local run (`bench-v2`, fingerprint `bcd46da4b82d`, 1,953 documents, ~9.6 
 | java         |   90 |       36.3% |        27.4% |              32.3% |           40.0% |            39.7% |
 | csharp       |  231 |       31.3% |        23.5% |              25.1% |           29.7% |            29.3% |
 | rust         |   75 |       34.5% |        26.4% |              26.8% |           30.5% |            29.6% |
-| en-US        |   98 |       59.5% |        45.7% |              41.1% |           52.4% |            51.7% |
-| ja-JP        |   78 |       62.2% |        48.8% |              50.3% |           60.4% |            59.7% |
-| **all (21)** | 1953 |   **42.6%** |    **32.8%** |          **31.4%** |       **37.9%** |        **36.8%** |
+| en-US        |   94 |       58.5% |        45.2% |              40.8% |           52.0% |            51.3% |
+| ja-JP        |   89 |       60.1% |        47.3% |              48.6% |           58.4% |            57.6% |
+| **all (21)** | 1931 |   **42.4%** |    **32.4%** |          **31.3%** |       **37.7%** |        **36.7%** |
 
-On this per-document workload, tokzip `fast` compresses/decompresses at 23.6/180.7 MB/s
-(5.1/38.7 thousand documents/s), and `small` at 8.0/81.9 MB/s. Brotli q11 reaches the
-smallest overall output but compresses at 1.1 MB/s; zstd -3 reaches 243.8 MB/s but emits
-40.0% of the input size after base64url framing.
+On this per-document workload, tokzip `fast` compresses/decompresses at 24.6/183.8 MB/s
+(5.3/39.5 thousand documents/s), and `small` at 8.2/82.5 MB/s. Brotli q11 reaches the
+smallest overall output but compresses at 1.1 MB/s; zstd -3 reaches 237.1 MB/s but emits
+39.9% of the input size after base64url framing.
 
 ```bash
 bun scripts/bench/bench.ts                      # size table + round-trip verification
