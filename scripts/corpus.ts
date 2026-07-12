@@ -44,10 +44,13 @@ function detectCorpusDirs(): string[] {
   const privateCorpusDir = join(privateRepoDir, 'corpus');
   if (!existsSync(privateCorpusDir)) return [CORPUS_DIR];
   // A stale private corpus would silently skew benchmark fingerprints; a failed pull
-  // (offline, diverged branch) only degrades to the existing checkout.
+  // (offline, diverged branch) only degrades to the existing checkout. Credential prompts
+  // must fail fast too: git asks on /dev/tty even with piped stdio, which would otherwise
+  // block the benchmark until the timeout.
   const pull = spawnSync('git', ['-C', privateRepoDir, 'pull', '--ff-only'], {
     encoding: 'utf8',
     timeout: 60_000,
+    env: { ...process.env, GIT_TERMINAL_PROMPT: '0', GIT_SSH_COMMAND: 'ssh -o BatchMode=yes' },
   });
   if (pull.status === 0) {
     console.error(`private corpus: ${privateCorpusDir} (pulled)`);
