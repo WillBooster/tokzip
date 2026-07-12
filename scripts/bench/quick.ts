@@ -29,6 +29,10 @@ for (const corpusDir of corpusDirs()) {
 }
 
 const inputBytes = docs.reduce((a, d) => a + d.bytes, 0);
+if (inputBytes === 0) {
+  console.error('error: no bench documents found (fetch + split the corpus first)');
+  process.exit(1);
+}
 let outChars = 0;
 const encoded: string[] = [];
 for (const d of docs) {
