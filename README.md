@@ -51,20 +51,21 @@ Latest local run (`bench-v2`, fingerprint `e2a3f1fc5b8f`, 1,931 documents, ~9.4 
 
 | corpus       | docs | tokzip fast | tokzip small | b64url(brotli q11) | b64url(gzip -6) | b64url(zstd -19) |
 | ------------ | ---: | ----------: | -----------: | -----------------: | --------------: | ---------------: |
-| typescript   |  146 |       27.6% |        20.6% |              22.8% |           26.6% |            25.6% |
-| javascript   |   62 |       43.7% |        33.0% |              38.4% |           45.3% |            44.3% |
-| python       |   70 |       33.4% |        25.0% |              28.0% |           32.3% |            31.4% |
-| java         |   90 |       26.7% |        20.1% |              32.3% |           40.0% |            39.7% |
-| csharp       |  231 |       25.4% |        19.0% |              25.1% |           29.7% |            29.2% |
-| rust         |   75 |       28.1% |        21.4% |              26.8% |           30.5% |            29.6% |
-| en-US        |   94 |       47.7% |        36.5% |              40.8% |           52.0% |            51.3% |
-| ja-JP        |   89 |       44.0% |        33.9% |              48.6% |           58.4% |            57.6% |
-| **all (21)** | 1931 |   **35.1%** |    **26.8%** |          **31.3%** |       **37.7%** |        **36.7%** |
+| typescript   |  146 |       28.2% |        20.6% |              22.8% |           26.6% |            25.6% |
+| javascript   |   62 |       44.4% |        33.0% |              38.4% |           45.3% |            44.3% |
+| python       |   70 |       34.1% |        25.0% |              28.0% |           32.3% |            31.4% |
+| java         |   90 |       27.2% |        20.1% |              32.3% |           40.0% |            39.7% |
+| csharp       |  231 |       25.9% |        19.0% |              25.1% |           29.7% |            29.2% |
+| rust         |   75 |       28.6% |        21.4% |              26.8% |           30.5% |            29.6% |
+| en-US        |   94 |       48.3% |        36.5% |              40.8% |           52.0% |            51.3% |
+| ja-JP        |   89 |       44.6% |        33.9% |              48.6% |           58.4% |            57.6% |
+| **all (21)** | 1931 |   **35.7%** |    **26.8%** |          **31.3%** |       **37.7%** |        **36.7%** |
 
-On this per-document workload, tokzip `fast` compresses/decompresses at 24.6/183.8 MB/s
-(5.3/39.5 thousand documents/s), and `small` at 8.2/82.5 MB/s. Brotli q11 reaches the
-smallest overall output but compresses at 1.1 MB/s; zstd -3 reaches 237.1 MB/s but emits
-39.9% of the input size after base64url framing.
+On this per-document workload, tokzip `fast` compresses/decompresses at 39.3/245.1 MB/s
+(8.4/52.7 thousand documents/s), and `small` at 3.5/175.7 MB/s. `small` produces the
+smallest output of every measured method — 4.5 points below brotli q11, which compresses
+at 1.2 MB/s; `fast` beats zstd -19's ratio at roughly six times its compression speed,
+and zstd -3 reaches 278.8 MB/s but emits 39.9% of the input size after base64url framing.
 
 ```bash
 bun scripts/bench/bench.ts                      # size table + round-trip verification
