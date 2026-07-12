@@ -6,9 +6,6 @@ import { TokzipDecodeError } from './errors.ts';
  */
 export const RADIX64_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
-// oxlint-disable-next-line no-misused-spread -- the alphabet is pure ASCII
-export const RADIX64_CHARS: string[] = [...RADIX64_ALPHABET];
-
 /** Char code of each radix-64 value — emission writes bytes, not strings. */
 export const RADIX64_CODES = new Uint8Array(64);
 for (let i = 0; i < 64; i++) RADIX64_CODES[i] = RADIX64_ALPHABET.codePointAt(i)!;

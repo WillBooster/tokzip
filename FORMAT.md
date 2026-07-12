@@ -136,8 +136,9 @@ matches, and rep matches.
   NOT emit a frame larger than the stored frame of the same input (see §8); the reference
   encoder only accepts matches whose exact output cost beats the literal encoding of the same
   bytes (in `fast`: rep matches become profitable at 2–3 bytes, explicit matches at 4–5
-  depending on offset width; in `small`: exact static-table bit prices drive a bounded
-  (1-step) price-aware lazy parse).
+  depending on offset width, chosen by a greedy parse with a bounded price-aware lazy step;
+  in `small`: exact static-table bit prices drive a shortest-path optimal parse with
+  path-carried rep state, falling back to the lazy parse beyond the encoder's input bound).
 
 ## 7. `fast` body: char-aligned radix-64 token stream
 
@@ -252,7 +253,7 @@ boundary checks of §8.1 and the minimal-padding check of §8.
 `small` is a maximum effort, not a promise. The encoder compares complete frames — small vs
 fast vs stored — **analytically** (every token's `fast` char cost and the stored size are
 arithmetic; the `small` bit total is exact because the tables are static). The fast
-candidate is the cheaper of the lazy-parsed token list re-priced in `fast` chars and a pure
+candidate is the cheaper of the small-parsed token list re-priced in `fast` chars and a pure
 `fast` parse of the same input, so `small` output is never larger than `fast` output.
 Only the winning frame is emitted; ties choose the simpler encoding
 (stored ≺ fast ≺ small). If any token exceeds `fast`'s representable ranges (offset ≥ 2^18,

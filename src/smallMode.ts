@@ -232,7 +232,7 @@ function encodersFor(tables: EntropyTables): {
 }
 
 /** Serializes a planned `small` body through the fused radix-85 writer (single pass). */
-export function emitSmallBody(plan: SmallPlan, _bytes: Uint8Array, language: RegisteredLanguage): string {
+export function emitSmallBody(plan: SmallPlan, language: RegisteredLanguage): string {
   const collected = plan.collected;
   const encoders = encodersFor(language.tables);
   const writer = new BitWriter();

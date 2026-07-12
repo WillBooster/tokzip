@@ -84,7 +84,7 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     }
     if (plan.charCost < bestCost) shippedMode = MODE_SMALL;
     if (shippedMode === MODE_FAST) fastTokensToShip = useLazyTokensForFast ? smallTokens : fastTokens;
-    else if (shippedMode === MODE_SMALL) smallBody = emitSmallBody(plan, bytes, language);
+    else if (shippedMode === MODE_SMALL) smallBody = emitSmallBody(plan, language);
   }
 
   const out = new TextSink(shippedMode === MODE_SMALL ? 16 : packedRawLength(bytes.length) + 16);
