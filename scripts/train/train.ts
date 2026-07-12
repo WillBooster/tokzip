@@ -242,7 +242,7 @@ function hasCorpus(name: string): boolean {
  * train set is safer than silently training on unlabeled or license-restricted data.
  */
 function loadTrainDocs(name: string): string[] {
-  // Training reads only the public corpus, never CORPUS_DIRS: generated dictionaries embed
+  // Training reads only the public corpus, never corpusDirs(): generated dictionaries embed
   // literal fragments of their training documents and are committed to this public
   // repository, so the auto-detected private corpus must stay benchmark-only.
   const dir = join(CORPUS_DIR, name);

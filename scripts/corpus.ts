@@ -43,6 +43,10 @@ function detectCorpusDirs(): string[] {
   const privateRepoDir = resolve(import.meta.dir, '../../tokzip-corpus-private');
   const privateCorpusDir = join(privateRepoDir, 'corpus');
   if (!existsSync(privateCorpusDir)) return [CORPUS_DIR];
+  // `git -C` walks up parents to find a repository, so pulling a non-repo copy (an extracted
+  // artifact, a plain `cp -r`) would mutate whatever ancestor repo encloses it. Use such a
+  // copy as-is instead of freshening it.
+  if (!existsSync(join(privateRepoDir, '.git'))) return [CORPUS_DIR, privateCorpusDir];
   // A stale private corpus would silently skew benchmark fingerprints; a failed pull
   // (offline, diverged branch) only degrades to the existing checkout. Credential prompts
   // must fail fast too: git asks on /dev/tty even with piped stdio, which would otherwise
