@@ -70,7 +70,13 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     // chars, and a pure fast parse — the optimal parse minimizes bits, so alone it could ship a
     // fast frame larger than mode 'fast' would produce for the same input.
     const smallTokens = parse(bytes, language.dictionary, dictIndexFor(language), smallPricing(bytes, language));
-    const plan = planSmallBody(smallTokens, bytes, language);
+    let plan = planSmallBody(smallTokens, bytes, language);
+    if (bytes.length > 0) {
+      // The DP charges literal runs only a slot-0 floor, so on rare short inputs a match-bearing
+      // parse can lose to plain literals; the all-literal plan is O(n) to price, so compare it.
+      const allLiteralPlan = planSmallBody([{ type: 'lit', start: 0, end: bytes.length }], bytes, language);
+      if (allLiteralPlan.charCost < plan.charCost) plan = allLiteralPlan;
+    }
     const lazyFastCost = fastBodyCost(smallTokens, bytes, language);
     const fastTokens = parse(bytes, language.dictionary, dictIndexFor(language), fastPricing(bytes, language));
     const pureFastCost = fastBodyCost(fastTokens, bytes, language)!;

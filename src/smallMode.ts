@@ -57,7 +57,8 @@ function slotPricingFor(tables: EntropyTables): SlotPricing {
   for (let s = 0; s < OFFSET_SLOT_COUNT; s++) {
     offsetSlotBits[s] = (offset[s]! || RAW_OFFSET_SLOT_BITS) + extraBitsOf(s);
   }
-  pricing = { litBits, histSlotBits, dictSlotBits, repSlotBits, offsetSlotBits };
+  const litRunStartBits = tokenBits(TOKEN_KIND_LITRUN * LENGTH_SLOT_COUNT);
+  pricing = { litBits, litRunStartBits, histSlotBits, dictSlotBits, repSlotBits, offsetSlotBits };
   slotPricingCache.set(tables, pricing);
   return pricing;
 }

@@ -30,6 +30,12 @@ export type Token = LiteralToken | HistoryToken | DictToken;
 export interface SlotPricing {
   /** Exact literal bit price per byte value (raw-mode fallback substituted for codeless bytes). */
   litBits: Float64Array;
+  /**
+   * Bits of the shortest literal-run token (slot 0), charged by the DP when a literal opens a
+   * new run. Longer runs cost more via length extra bits, but charging the slot-0 floor stops
+   * marginal matches from fragmenting literal runs "for free".
+   */
+  litRunStartBits: number;
   /** History token bits per length slot (token symbol + length extra bits). */
   histSlotBits: Float64Array;
   /** Dictionary token bits per length slot. */
@@ -274,9 +280,11 @@ function parseOptimal(
     const rep2 = reps[ri + 2]!;
     const rep3 = reps[ri + 3]!;
 
-    // Literal step (always available; keeps every position reachable).
+    // Literal step (always available; keeps every position reachable). Opening a new run
+    // (position 0, or arriving via a match) pays the run-token floor; extending one is free.
     {
-      const c = base + litBits[bytes[i]!]!;
+      const runStart = i === 0 || kind[i]! !== DP_LIT ? prices.litRunStartBits : 0;
+      const c = base + litBits[bytes[i]!]! + runStart;
       if (c < cost[i + 1]!) {
         cost[i + 1] = c;
         src[i + 1] = i;
