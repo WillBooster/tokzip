@@ -1,8 +1,9 @@
 import type { RegisteredLanguage } from './dictionary.ts';
-import { TokzipDecodeError } from './errors.ts';
+import { allocateDecodeBuffer, TokzipDecodeError } from './errors.ts';
 import {
   FAST_WINDOW,
   INITIAL_REPS,
+  MATCH_LEN_CAP,
   KIND_DICT,
   KIND_HISTORY,
   KIND_LIT64,
@@ -213,7 +214,14 @@ export function decodeFastBody(
   outputSize: number,
   language: RegisteredLanguage
 ): Uint8Array {
-  const out = new Uint8Array(outputSize);
+  // Structural output bound, checked before allocating: every token consumes at least one
+  // char and produces at most MATCH_LEN_CAP bytes, so a declared size beyond that cannot be
+  // produced by this body (this also stops forged huge-size frames from forcing enormous
+  // allocations under `maxOutputSize: Infinity`).
+  if (outputSize > (end - pos) * MATCH_LEN_CAP) {
+    throw new TokzipDecodeError('declared size exceeds body capacity');
+  }
+  const out = allocateDecodeBuffer(outputSize);
   const { dictionary, top64 } = language;
   let rep0 = INITIAL_REPS[0]!;
   let rep1 = INITIAL_REPS[1]!;

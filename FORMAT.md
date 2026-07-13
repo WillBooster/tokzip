@@ -184,7 +184,11 @@ tag.
 
 Tokens are decoded until exactly the declared size has been produced; producing beyond it,
 running out of characters, or leftover characters afterwards are structural errors, as are
-out-of-bounds history distances and dictionary ranges.
+out-of-bounds history distances and dictionary ranges. A declared size exceeding
+`bodyChars × 262145` (each token consumes at least one char and produces at most one
+maximum-length match) is structurally unproducible and MUST be rejected **before** any
+output allocation; allocation failures for accepted sizes MUST still surface as decode
+errors, not engine exceptions.
 
 ## 8. `small` body: separated streams, static entropy coding, radix-85
 
@@ -257,7 +261,10 @@ low bits of `v`), written MSB-first immediately after the symbol in the same str
 `tokenCount` tokens are read from the token stream. Literal-run tokens then read `runLength`
 symbols from the literal stream; history/dictionary tokens read one slot (+extras) from the
 offset stream; rep tokens read nothing further. Bounds rules match §7.4, plus the two cursor
-boundary checks of §8.1 and the minimal-padding check of §8.
+boundary checks of §8.1 and the minimal-padding check of §8. Because every token consumes at
+least one token-stream bit and produces at most 262145 bytes, `tokenCount` exceeding the
+token-stream bit length, or a declared size exceeding `tokenCount × 262145`, is a structural
+error and MUST be rejected **before** any output allocation.
 
 ## 9. Auto-downgrade (normative)
 
@@ -304,6 +311,8 @@ dictionary / rep / overlap-copy matches; 12-bit vs 18-bit offset forms; single-s
 degenerate streams (raw stream modes); downgrade tie and determinism; invalid table; unknown
 id on non-stored frames; stored frame with nonzero id (decodes); unknown version; reserved
 flag bit set; truncated header / token / stream; trailing characters; non-alphabet character;
-non-canonical varint; `maxOutputSize` exceeded; invalid UTF-8 body; non-stored body not
-smaller than the stored body (e.g. a size-0 `small` frame); literal-64 vs literal-raw
-runs including 1- and 2-byte raw tails; downgrade with fast-ineligible tokens.
+non-canonical varint; `maxOutputSize` exceeded; declared size beyond the body's structural
+output capacity (rejected before allocation, even with `maxOutputSize: Infinity`); invalid
+UTF-8 body; non-stored body not smaller than the stored body (e.g. a size-0 `small` frame);
+literal-64 vs literal-raw runs including 1- and 2-byte raw tails; downgrade with
+fast-ineligible tokens.

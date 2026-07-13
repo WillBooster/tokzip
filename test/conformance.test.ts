@@ -89,6 +89,16 @@ describe('container vectors', () => {
     expect(() => decompress(frame, { maxOutputSize: 1024 })).toThrow(/maxOutputSize/);
   });
 
+  test('a declared size beyond the body capacity is rejected before allocation', () => {
+    // A small frame declaring 2^34 - 1 bytes with a near-empty body: structurally
+    // unproducible, and must throw a typed error (not an engine out-of-memory RangeError)
+    // even under the explicit "no cap" setting.
+    expect(() => decompress('yAC______P!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(TokzipDecodeError);
+    expect(() => decompress('yAC______P!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(
+      /body capacity|allocatable/
+    );
+  });
+
   test('NaN or negative maxOutputSize is rejected instead of disabling the cap', () => {
     const frame = compress('x'.repeat(1000));
     expect(() => decompress(frame, { maxOutputSize: Number.NaN })).toThrow(RangeError);

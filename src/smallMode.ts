@@ -1,7 +1,8 @@
 import type { EntropyTables, RegisteredLanguage } from './dictionary.ts';
-import { TokzipDecodeError } from './errors.ts';
+import { allocateDecodeBuffer, TokzipDecodeError } from './errors.ts';
 import {
   INITIAL_REPS,
+  MATCH_LEN_CAP,
   MIN_LEN_REP,
   OFFSET_CONTEXT_COUNT,
   OFFSET_CONTEXT_DICT,
@@ -507,6 +508,13 @@ export function decodeSmallBody(
   const tokenStart = litStart + litBitLength;
   const offsetStart = tokenStart + tokenBitLength;
   if (offsetStart > words.length * 32) throw new TokzipDecodeError('stream lengths exceed payload');
+  // Structural output bound, checked before allocating: every token consumes at least one
+  // token-stream bit and produces at most MATCH_LEN_CAP bytes, so a declared size beyond
+  // that cannot be produced by this body (this also stops forged huge-size frames from
+  // forcing enormous allocations under `maxOutputSize: Infinity`).
+  if (tokenCount > tokenBitLength || outputSize > tokenCount * MATCH_LEN_CAP) {
+    throw new TokzipDecodeError('declared size exceeds body capacity');
+  }
   const litCursor = new BitReader(words, litStart);
   const tokenCursor = new BitReader(words, tokenStart);
   const offsetCursor = new BitReader(words, offsetStart);
@@ -525,7 +533,7 @@ export function decodeSmallBody(
     return valueOfSlot(slot, extraBits > 0 ? offsetCursor.readBits(extraBits) : 0);
   };
 
-  const out = new Uint8Array(outputSize);
+  const out = allocateDecodeBuffer(outputSize);
   const { dictionary } = language;
   const { litContext } = language.tables;
   let rep0 = INITIAL_REPS[0]!;
