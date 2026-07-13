@@ -131,7 +131,9 @@ matches, and rep matches.
 - **Windows (normative per mode):** `fast` 256 KiB (2^18), `small` 1 MiB (2^20).
 - Encoders MUST split matches longer than 262145 bytes (= `small` length-slot bound + 2);
   `fast` length varints could represent more, but the cap is format-wide for cross-mode
-  token-list compatibility.
+  token-list compatibility, and decoders MUST reject a match length beyond it as a
+  structural error (the `small` slot alphabet cannot express one; literal runs are bounded
+  by the slot alphabet in `small` and unbounded in `fast`).
 - **Cost-based acceptance** is normative as a guarantee, not an algorithm: an encoder MUST
   NOT emit a frame larger than the stored frame of the same input (see §8); the reference
   encoder only accepts matches whose exact output cost beats the literal encoding of the same

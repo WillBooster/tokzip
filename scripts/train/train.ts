@@ -29,7 +29,7 @@ import { buildLengths } from '../../src/huffman.ts';
 import { LANGUAGE_IDS } from '../../src/languageIds.ts';
 import { dictIndexFor, parse } from '../../src/lz.ts';
 import { toBase64 } from '../../src/moduleData.ts';
-import { smallPricing } from '../../src/smallMode.ts';
+import { MAX_RUN_LENGTH, smallPricing } from '../../src/smallMode.ts';
 import { LENGTH_SLOT_COUNT, OFFSET_SLOT_COUNT, slotOf } from '../../src/slots.ts';
 import { CORPUS_DIR } from '../corpus.ts';
 import { trainDictionary } from './trainDictionary.ts';
@@ -201,7 +201,11 @@ function collectStatistics(docs: string[], dictionary: Uint8Array, language: Reg
     };
     for (const token of tokens) {
       if (token.type === 'lit') {
-        pushToken(TOKEN_KIND_LITRUN, Math.min(token.end - token.start - 1, 262_143));
+        // Mirror serialization exactly: runs beyond the slot alphabet split into consecutive
+        // litrun tokens (including the extra litrun→litrun context transitions).
+        for (let start = token.start; start < token.end; start += MAX_RUN_LENGTH) {
+          pushToken(TOKEN_KIND_LITRUN, Math.min(start + MAX_RUN_LENGTH, token.end) - start - 1);
+        }
         for (let i = token.start; i < token.end; i++) {
           literalFold[(i > 0 ? bytes[i - 1]! : 0) * 256 + bytes[i]!]!++;
         }

@@ -323,6 +323,9 @@ export function decodeFastBody(
       }
     }
 
+    // Encoders MUST split longer matches (format-wide cap for cross-mode token compatibility;
+    // the pre-allocation capacity bound also relies on it), so a longer one is structural.
+    if (length > MATCH_LEN_CAP) throw new TokzipDecodeError('match length exceeds cap');
     if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
     if (sourceIsDict) {
       if (dictStart + length > dictionary.length) throw new TokzipDecodeError('dictionary match out of bounds');

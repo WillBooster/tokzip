@@ -32,7 +32,7 @@ import {
 } from './slots.ts';
 
 /** Longest literal run one litrun token can carry (runs beyond this split). */
-const MAX_RUN_LENGTH = maxSlotValue(LENGTH_SLOT_COUNT) + 1;
+export const MAX_RUN_LENGTH = maxSlotValue(LENGTH_SLOT_COUNT) + 1;
 
 /** Decode-side lookups replacing a division/modulo per token symbol. */
 const SYMBOL_KIND = new Uint8Array(TOKEN_ALPHABET_SIZE);
