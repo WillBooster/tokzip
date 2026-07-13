@@ -81,7 +81,7 @@ bun scripts/bench/bench.ts --speed --json out.json  # + MB/s and a machine-reada
 ```bash
 bun test                                    # round-trip + conformance vectors
 bun scripts/train/train.ts --all            # train dictionaries + tables → src/generated/
-bun scripts/bench/bench.ts                  # size vs base64url(brotli/zstd/gzip), lz-string + round-trip; --speed, --json
+bun scripts/bench/bench.ts                  # size vs base64url(brotli/zstd/gzip/xz), lz-string + round-trip; --speed, --json
 ```
 
 By default, training and benchmarks read `../tokzip-corpus/corpus`, and benchmarks also
