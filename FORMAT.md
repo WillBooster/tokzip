@@ -1,4 +1,4 @@
-# tokzip text frame format (version 1)
+# tokzip text frame format (version 2)
 
 This document is the normative wire-format specification for tokzip payloads. It is
 self-contained so the format can be ported to other implementation languages. The reference
@@ -8,7 +8,7 @@ A tokzip payload is a single **text frame**: a safe-ASCII string generated in on
 no binary intermediate and no base64 stage. Trailing characters after the frame are a
 structural error. All structural errors MUST be reported as a typed decode error
 (`TokzipDecodeError` in the reference implementation); valid-looking corruption MAY decode to
-wrong output without throwing (there is no integrity checksum in v1; a flag bit is reserved).
+wrong output without throwing (there is no integrity checksum in v2; a flag bit is reserved).
 
 ## 1. Alphabets
 
@@ -59,7 +59,7 @@ zero on encode and ignored on decode.
 ## 3. Frame layout
 
 ```
-[0] magic|version   radix-64 char; value 0b110_001 (0x31, char 'x') for v1.
+[0] magic|version   radix-64 char; value 0b110_010 (50, char 'y') for v2.
 [1] language id     radix-64 char; 0–63.
 [2] flags           radix-64 char:
                       bits 1:0  shipped mode: 0 stored, 1 fast, 2 small; 3 is invalid
@@ -79,7 +79,7 @@ zero on encode and ignored on decode.
   callers use the bytes path.)
 - Frames are single: any character after the body is a structural error.
 
-## 4. Language ids (v1 allocation)
+## 4. Language ids (v2 allocation, unchanged from v1)
 
 | id  | language            |     | id  | language   |
 | --- | ------------------- | --- | --- | ---------- |
@@ -213,21 +213,32 @@ size, which is validated against `maxOutputSize` first.
 The three streams are decoded with independent cursors; after decoding, the literal and token
 cursors MUST land exactly on their recorded boundaries.
 
-### 8.2 Static entropy coding
+### 8.2 Static context-modeled entropy coding
 
-Each language module ships **static canonical Huffman code lengths** for three alphabets:
+Each language module ships **static canonical Huffman code lengths** for three alphabets,
+**one table per context** (all contexts are decoder-derivable state, so frames carry nothing
+extra):
 
-- **literal** stream: byte values, 256 symbols;
+- **literal** stream: byte values, 256 symbols. Context = the module's trained **literal
+  context class** of the previous decoded output byte (byte value 0 when no byte has been
+  produced yet — including at the start of a run after nothing but position 0). The module
+  ships a 256-entry class map (`litContext`) and `litClassCount` tables (1–64 classes).
 - **token** stream: `kind × 36 + lengthSlot`, 252 symbols, kinds:
-  0 literal-run, 1 history, 2 dictionary, 3–6 rep0–rep3;
-- **offset** stream: offset slots, 40 symbols.
+  0 literal-run, 1 history, 2 dictionary, 3–6 rep0–rep3. Context = the **previous token's
+  kind** (7 contexts; the first token of a frame uses kind 0, literal-run).
+- **offset** stream: offset slots, 40 symbols. Context = the match kind consuming the offset:
+  0 history, 1 dictionary (2 contexts).
 
-Code lengths are ≤ 12 and MUST form a complete code (Kraft sum exactly 1) over the used
-alphabet, validated at registration; decoders use a 4096-entry single-lookup table. Canonical
-assignment: codes ordered by (length, symbol index). A per-frame **raw mode** per stream
-(mode bit 0) encodes symbols as fixed-width integers instead: literals 8 bits, token symbols
-8 bits, offset slots 6 bits — this covers degenerate/empty streams and inputs whose symbols
-lack codes in the shipped table.
+Every context's code lengths are ≤ 12 and MUST form a complete code (Kraft sum exactly 1)
+over the used alphabet, validated at registration; decoders use a 4096-entry single-lookup
+table per context. Canonical assignment: codes ordered by (length, symbol index). A per-frame
+**raw mode** per stream (mode bit 0) encodes symbols as fixed-width integers instead,
+ignoring contexts: literals 8 bits, token symbols 8 bits, offset slots 6 bits — this covers
+degenerate/empty streams and inputs whose symbols lack codes in the shipped tables.
+
+The literal context is the previous **output** byte, which for a conforming encoder is
+simply the previous input byte — literal pricing is therefore tokenization-independent and
+exact even inside an optimal parse.
 
 ### 8.3 Slot coding (lengths and offsets)
 
@@ -268,15 +279,16 @@ conforming implementations given the same token list.
 ## 10. Language modules
 
 A module ships: language id + name, dictionary suffix bytes, the 64-byte top-64 literal
-charset, and the three code-length arrays of §8.2. Tables are validated at registration
+charset, the literal context class map + class count, and the three per-context code-length
+arrays of §8.2. Tables are validated at registration
 (complete code, alphabet sizes, charset length 64); the dictionary match index is built
 lazily on first compress per language and cached per process (idempotent, re-entrant).
 Compressing with an explicitly requested unregistered language throws; decoding a non-stored
 frame with an unregistered id is a structural error.
 
 **Module data is part of the codec identity.** Non-stored frames reference the registered
-module's dictionary bytes, top-64 charset, and code lengths implicitly — the frame carries
-only the language id. A non-stored frame therefore decodes correctly only with the exact
+module's dictionary bytes, top-64 charset, context map, and code lengths implicitly — the
+frame carries only the language id. A non-stored frame therefore decodes correctly only with the exact
 trained module data its encoder used; retraining dictionaries or tables is a breaking change
 for persisted non-stored frames even though the wire format version is unchanged (stored
 frames are unaffected). Deployments that persist frames across library upgrades must pin the
@@ -287,7 +299,7 @@ library version or re-encode; see the tracking issue on versioned module assets.
 Executable vectors live in `test/conformance.test.ts` and `test/roundtrip.test.ts`; the
 normative list mirrors the design issue:
 
-empty input (exact frame `xAAA`); tiny stored frame (exact overhead bound); history /
+empty input (exact frame `yAAA`); tiny stored frame (exact overhead bound); history /
 dictionary / rep / overlap-copy matches; 12-bit vs 18-bit offset forms; single-symbol and
 degenerate streams (raw stream modes); downgrade tie and determinism; invalid table; unknown
 id on non-stored frames; stored frame with nonzero id (decodes); unknown version; reserved

@@ -9,8 +9,8 @@ const SEGMENT_LENGTHS = [128, 96, 64, 48, 32, 24, 16, 12, 8, 6, 4] as const;
 /** Approximate fast-mode cost of a dictionary reference (tag + 2–3 offset chars). */
 const MATCH_OVERHEAD_CHARS = 3.5;
 /** Bound on dictionary-training input (chars) so n-gram counting stays tractable. */
-const MAX_TRAINING_CHARS = 10_000_000;
-const MAX_SELECTED_CANDIDATES = 150_000;
+const MAX_TRAINING_CHARS = 24_000_000;
+const MAX_SELECTED_CANDIDATES = 400_000;
 
 interface Candidate {
   segment: string;
@@ -50,9 +50,9 @@ export function trainDictionary(docs: string[], budgetBytes: number, alreadyCove
 
   const candidates: Candidate[] = [];
   for (const length of SEGMENT_LENGTHS) {
-    const cap = length >= 16 ? 400_000 : 800_000;
+    const cap = length >= 16 ? 800_000 : 1_600_000;
     for (const [segment, freq] of countNgrams(bounded, length, cap)) {
-      if (freq < 4) continue;
+      if (freq < 3) continue;
       const savedPerOccurrence = length - MATCH_OVERHEAD_CHARS;
       if (savedPerOccurrence <= 0) continue;
       // Density: chars saved across occurrences per dictionary byte spent.

@@ -155,12 +155,21 @@ export class BitReader {
     return first + (this.words[(pos >>> 5) + 1]! >>> (32 - spill));
   }
 
-  /** Peeks `count` bits (0 ≤ count ≤ 24) without consuming, zero-padded beyond capacity. */
+  /** Peeks `count` bits (1 ≤ count ≤ 24) without consuming, zero-padded beyond capacity. */
   peekBits(count: number): number {
-    const saved = this.pos;
-    const available = Math.min(count, this.bitCapacity - this.pos);
-    const value = available > 0 ? this.readBits(available) : 0;
-    this.pos = saved;
+    const pos = this.pos;
+    if (pos + count <= this.bitCapacity) {
+      // Hot path: a plain in-bounds read with no cursor mutation.
+      const offset = pos & 31;
+      const spill = offset + count - 32;
+      const first = (this.words[pos >>> 5]! << offset) >>> (32 - count);
+      if (spill <= 0) return first;
+      return first + (this.words[(pos >>> 5) + 1]! >>> (32 - spill));
+    }
+    const available = this.bitCapacity - pos;
+    if (available <= 0) return 0;
+    const value = this.readBits(available);
+    this.pos = pos;
     return value * 2 ** (count - available);
   }
 

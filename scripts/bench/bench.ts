@@ -37,6 +37,8 @@ interface BenchMethod {
   name: string;
   compress(doc: LoadedDoc): string;
   decompress(encoded: string): string;
+  /** Excluded from the speed benchmark (see {@link Competitor.speedExempt}). */
+  speedExempt?: boolean;
 }
 
 interface SizeTotals {
@@ -82,6 +84,7 @@ const METHODS: BenchMethod[] = [
     name: competitor.name,
     compress: (doc: LoadedDoc) => competitor.compress(doc.content),
     decompress: (encoded: string) => competitor.decompress(encoded),
+    speedExempt: competitor.speedExempt,
   })),
 ];
 const METHOD_NAMES = METHODS.map((method) => method.name);
@@ -215,6 +218,7 @@ function benchSpeed(docs: LoadedDoc[]): Record<string, SpeedResult> {
   const result: Record<string, SpeedResult> = {};
 
   for (const method of METHODS) {
+    if (method.speedExempt) continue;
     const encoded = docs.map((doc) => method.compress(doc));
     // Warm both code paths without adding another expensive full q11 corpus pass.
     for (let index = 0; index < Math.min(32, docs.length); index++) method.decompress(encoded[index]!);

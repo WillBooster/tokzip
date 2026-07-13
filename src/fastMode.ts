@@ -39,13 +39,23 @@ function matchCharCost(kind: 'history' | 'dict' | 'rep', value: number, len: num
   return 1 + offsetChars + (len >= EXPLICIT_EXT_LEN ? varint64Length(len - EXPLICIT_EXT_LEN) : 0);
 }
 
+// Scratch prefix buffer reused across calls (compress is synchronous; each pricing's prefix
+// is only read while its own parse runs, and smallMode keeps a separate scratch).
+let fastPrefixScratch = new Float64Array(0);
+
 /** Builds the `fast`-mode pricing model for the shared LZ parser. */
 export function fastPricing(bytes: Uint8Array, language: RegisteredLanguage): ParsePricing {
   const { top64Index } = language;
-  const litCostPrefix = new Float64Array(bytes.length + 1);
+  if (fastPrefixScratch.length < bytes.length + 1) {
+    fastPrefixScratch = new Float64Array(Math.max(bytes.length + 1, fastPrefixScratch.length * 2, 4096));
+  }
+  const litCostPrefix = fastPrefixScratch;
+  // In-charset literals cost exactly 1 char; others amortize raw bit-packing (3 bytes → 4 chars).
+  // The running sum stays in a local so the loop carries no load-after-store dependency.
+  let acc = 0;
   for (let i = 0; i < bytes.length; i++) {
-    // In-charset literals cost exactly 1 char; others amortize raw bit-packing (3 bytes → 4 chars).
-    litCostPrefix[i + 1] = litCostPrefix[i]! + (top64Index[bytes[i]!]! >= 0 ? 1 : 4 / 3);
+    acc += top64Index[bytes[i]!]! >= 0 ? 1 : 4 / 3;
+    litCostPrefix[i + 1] = acc;
   }
   return {
     litCostPrefix,
