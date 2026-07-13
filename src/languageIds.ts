@@ -1,5 +1,5 @@
 /**
- * Stable v1 language-id allocation (normative; see FORMAT.md). Id 0 is the dictionary-less
+ * Stable language-id allocation (normative; see FORMAT.md; unchanged since v1). Id 0 is the dictionary-less
  * wrapper-only path; XML is deferred but its id is reserved.
  */
 export const LANGUAGE_IDS: Readonly<Record<string, number>> = {

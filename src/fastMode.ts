@@ -1,8 +1,9 @@
 import type { RegisteredLanguage } from './dictionary.ts';
-import { TokzipDecodeError } from './errors.ts';
+import { allocateDecodeBuffer, TokzipDecodeError } from './errors.ts';
 import {
   FAST_WINDOW,
   INITIAL_REPS,
+  MATCH_LEN_CAP,
   KIND_DICT,
   KIND_HISTORY,
   KIND_LIT64,
@@ -39,13 +40,23 @@ function matchCharCost(kind: 'history' | 'dict' | 'rep', value: number, len: num
   return 1 + offsetChars + (len >= EXPLICIT_EXT_LEN ? varint64Length(len - EXPLICIT_EXT_LEN) : 0);
 }
 
+// Scratch prefix buffer reused across calls (compress is synchronous; each pricing's prefix
+// is only read while its own parse runs, and smallMode keeps a separate scratch).
+let fastPrefixScratch = new Float64Array(0);
+
 /** Builds the `fast`-mode pricing model for the shared LZ parser. */
 export function fastPricing(bytes: Uint8Array, language: RegisteredLanguage): ParsePricing {
   const { top64Index } = language;
-  const litCostPrefix = new Float64Array(bytes.length + 1);
+  if (fastPrefixScratch.length < bytes.length + 1) {
+    fastPrefixScratch = new Float64Array(Math.max(bytes.length + 1, fastPrefixScratch.length * 2, 4096));
+  }
+  const litCostPrefix = fastPrefixScratch;
+  // In-charset literals cost exactly 1 char; others amortize raw bit-packing (3 bytes → 4 chars).
+  // The running sum stays in a local so the loop carries no load-after-store dependency.
+  let acc = 0;
   for (let i = 0; i < bytes.length; i++) {
-    // In-charset literals cost exactly 1 char; others amortize raw bit-packing (3 bytes → 4 chars).
-    litCostPrefix[i + 1] = litCostPrefix[i]! + (top64Index[bytes[i]!]! >= 0 ? 1 : 4 / 3);
+    acc += top64Index[bytes[i]!]! >= 0 ? 1 : 4 / 3;
+    litCostPrefix[i + 1] = acc;
   }
   return {
     litCostPrefix,
@@ -203,7 +214,14 @@ export function decodeFastBody(
   outputSize: number,
   language: RegisteredLanguage
 ): Uint8Array {
-  const out = new Uint8Array(outputSize);
+  // Structural output bound, checked before allocating: every token consumes at least one
+  // char and produces at most MATCH_LEN_CAP bytes, so a declared size beyond that cannot be
+  // produced by this body (this also stops forged huge-size frames from forcing enormous
+  // allocations under `maxOutputSize: Infinity`).
+  if (outputSize > (end - pos) * MATCH_LEN_CAP) {
+    throw new TokzipDecodeError('declared size exceeds body capacity');
+  }
+  const out = allocateDecodeBuffer(outputSize);
   const { dictionary, top64 } = language;
   let rep0 = INITIAL_REPS[0]!;
   let rep1 = INITIAL_REPS[1]!;
@@ -305,6 +323,9 @@ export function decodeFastBody(
       }
     }
 
+    // Encoders MUST split longer matches (format-wide cap for cross-mode token compatibility;
+    // the pre-allocation capacity bound also relies on it), so a longer one is structural.
+    if (length > MATCH_LEN_CAP) throw new TokzipDecodeError('match length exceeds cap');
     if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
     if (sourceIsDict) {
       if (dictStart + length > dictionary.length) throw new TokzipDecodeError('dictionary match out of bounds');

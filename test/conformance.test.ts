@@ -17,7 +17,7 @@ function expectDecodeError(frame: string, message: string | RegExp): void {
 describe('container vectors', () => {
   test('empty input is the exact 4-char stored frame', () => {
     const frame = compress('');
-    expect(frame).toBe('xAAA');
+    expect(frame).toBe('yAAA');
     expect(decompress(frame)).toBe('');
   });
 
@@ -51,7 +51,7 @@ describe('container vectors', () => {
   test('bad magic and unknown version', () => {
     const frame = compress('hello');
     expectDecodeError('A' + frame.slice(1), /bad magic/);
-    expectDecodeError('y' + frame.slice(1), /unknown version/); // Same magic, version 2.
+    expectDecodeError('x' + frame.slice(1), /unknown version/); // Same magic, version 1.
   });
 
   test('invalid mode and reserved flag bits', () => {
@@ -62,11 +62,11 @@ describe('container vectors', () => {
 
   test('non-canonical size varint', () => {
     // Varint 'gA' encodes value 0 with a redundant continuation group.
-    expectDecodeError('xAAgA', /non-canonical varint/);
+    expectDecodeError('yAAgA', /non-canonical varint/);
   });
 
   test('non-alphabet character', () => {
-    expectDecodeError('x"AA', /non-alphabet character/);
+    expectDecodeError('y"AA', /non-alphabet character/);
   });
 
   test('truncated header and truncated payload', () => {
@@ -89,6 +89,16 @@ describe('container vectors', () => {
     expect(() => decompress(frame, { maxOutputSize: 1024 })).toThrow(/maxOutputSize/);
   });
 
+  test('a declared size beyond the body capacity is rejected before allocation', () => {
+    // A small frame declaring 2^34 - 1 bytes with a near-empty body: structurally
+    // unproducible, and must throw a typed error (not an engine out-of-memory RangeError)
+    // even under the explicit "no cap" setting.
+    expect(() => decompress('yAC______P!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(TokzipDecodeError);
+    expect(() => decompress('yAC______P!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(
+      /body capacity|allocatable/
+    );
+  });
+
   test('NaN or negative maxOutputSize is rejected instead of disabling the cap', () => {
     const frame = compress('x'.repeat(1000));
     expect(() => decompress(frame, { maxOutputSize: Number.NaN })).toThrow(RangeError);
@@ -102,9 +112,9 @@ describe('container vectors', () => {
   });
 
   test('a small frame for size 0 is non-canonical and rejected', () => {
-    // The canonical empty frame is the stored 'xAAA'; a size-0 small body can never be
+    // The canonical empty frame is the stored 'yAAA'; a size-0 small body can never be
     // smaller than the (empty) stored body.
-    expectDecodeError('xACA!!!!!', /non-canonical|stored/);
+    expectDecodeError('yACA!!!!!', /non-canonical|stored/);
   });
 
   test('non-stored bodies at least as large as the stored body are rejected', () => {

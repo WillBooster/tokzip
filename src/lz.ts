@@ -28,22 +28,22 @@ export type Token = LiteralToken | HistoryToken | DictToken;
  * every price is a plain array lookup, so the DP inner loop stays allocation- and call-free.
  */
 export interface SlotPricing {
-  /** Exact literal bit price per byte value (raw-mode fallback substituted for codeless bytes). */
-  litBits: Float64Array;
   /**
-   * Bits of the shortest literal-run token (slot 0), charged by the DP when a literal opens a
-   * new run. Longer runs cost more via length extra bits, but charging the slot-0 floor stops
-   * marginal matches from fragmenting literal runs "for free".
+   * Bits of the shortest literal-run token (slot 0) per token context, charged by the DP when
+   * a literal opens a new run. Longer runs cost more via length extra bits, but charging the
+   * slot-0 floor stops marginal matches from fragmenting literal runs "for free".
    */
-  litRunStartBits: number;
-  /** History token bits per length slot (token symbol + length extra bits). */
+  litRunStartBits: Float64Array;
+  /** History token bits, indexed `tokenContext * LENGTH_SLOT_COUNT + lengthSlot`. */
   histSlotBits: Float64Array;
-  /** Dictionary token bits per length slot. */
+  /** Dictionary token bits, indexed `tokenContext * LENGTH_SLOT_COUNT + lengthSlot`. */
   dictSlotBits: Float64Array;
-  /** Rep token bits, indexed `repIndex * LENGTH_SLOT_COUNT + lengthSlot`. */
+  /** Rep token bits, indexed `(tokenContext * 4 + repIndex) * LENGTH_SLOT_COUNT + lengthSlot`. */
   repSlotBits: Float64Array;
-  /** Offset bits per offset slot (symbol + offset extra bits). */
-  offsetSlotBits: Float64Array;
+  /** History offset bits per offset slot (symbol + offset extra bits). */
+  histOffsetSlotBits: Float64Array;
+  /** Dictionary offset bits per offset slot (symbol + offset extra bits). */
+  dictOffsetSlotBits: Float64Array;
 }
 
 /** Mode-specific pricing and limits driving the shared parser. */
@@ -73,9 +73,9 @@ const GREEDY_DICT_DEPTH_SHORT = 6;
 const GREEDY_DICT_DEPTH = 16;
 /** Shallow 4-byte-hash walks (short matches) + deep selective 6-byte-hash walks (long matches). */
 const OPTIMAL_DEPTH_SHORT = 8;
-const OPTIMAL_DEPTH = 48;
+const OPTIMAL_DEPTH = 64;
 const OPTIMAL_DICT_DEPTH_SHORT = 6;
-const OPTIMAL_DICT_DEPTH = 48;
+const OPTIMAL_DICT_DEPTH = 64;
 
 /** The DP evaluates every match length up to this bound, then only slot-boundary lengths. */
 const DENSE_LEN_BOUND = 48;
@@ -123,6 +123,8 @@ function hashBitsFor(length: number): number {
 /**
  * Builds (or returns the cached) hash-chain index over a language's assembled dictionary.
  * Built lazily on first compress() per language, cached per process; idempotent.
+ * Positions are inserted in descending order so every chain is walked lowest-offset-first:
+ * low offsets cost the fewest bits/chars, and walks can stop at `maxDictStart`.
  */
 export function dictIndexFor(language: RegisteredLanguage): DictIndex | undefined {
   const dict = language.dictionary;
@@ -132,14 +134,14 @@ export function dictIndexFor(language: RegisteredLanguage): DictIndex | undefine
   const shift = 32 - bits;
   const head = new Int32Array(1 << bits).fill(-1);
   const prev = new Int32Array(dict.length);
-  for (let i = 0; i + 4 <= dict.length; i++) {
+  for (let i = dict.length - 4; i >= 0; i--) {
     const bucket = hash4(dict, i, shift);
     prev[i] = head[bucket]!;
     head[bucket] = i;
   }
   const head6 = new Int32Array(1 << bits).fill(-1);
   const prev6 = new Int32Array(dict.length);
-  for (let i = 0; i + 6 <= dict.length; i++) {
+  for (let i = dict.length - 6; i >= 0; i--) {
     const bucket = hash6(dict, i, shift);
     prev6[i] = head6[bucket]!;
     head6[bucket] = i;
@@ -189,7 +191,15 @@ export function parse(
 ): Token[] {
   if (bytes.length === 0) return [];
   if (pricing.optimal && bytes.length <= OPTIMAL_MAX_INPUT) {
-    return parseOptimal(bytes, dictionary, dictIndex, pricing.window, pricing.maxDictStart, pricing.optimal);
+    return parseOptimal(
+      bytes,
+      dictionary,
+      dictIndex,
+      pricing.window,
+      pricing.maxDictStart,
+      pricing.optimal,
+      pricing.litCostPrefix
+    );
   }
   return parseGreedy(bytes, dictionary, dictIndex, pricing);
 }
@@ -240,10 +250,11 @@ function parseOptimal(
   dictIndex: DictIndex | undefined,
   window: number,
   maxDictStart: number,
-  prices: SlotPricing
+  prices: SlotPricing,
+  litCostPrefix: Float64Array
 ): Token[] {
   const n = bytes.length;
-  const { litBits, histSlotBits, dictSlotBits, repSlotBits, offsetSlotBits } = prices;
+  const { histSlotBits, dictSlotBits, repSlotBits, histOffsetSlotBits, dictOffsetSlotBits } = prices;
 
   const bits = hashBitsFor(n);
   const shift = 32 - bits;
@@ -279,12 +290,17 @@ function parseOptimal(
     const rep1 = reps[ri + 1]!;
     const rep2 = reps[ri + 2]!;
     const rep3 = reps[ri + 3]!;
+    // Token context: the previous token's kind. DP arrival kinds coincide with the token-kind
+    // numbering (litrun 0, history 1, dict 2, rep0–rep3 3–6); position 0 starts at litrun.
+    const ctx = i === 0 ? 0 : kind[i]!;
+    const ctxLen = ctx * LENGTH_SLOT_COUNT;
+    const ctxRep = ctx * 4 * LENGTH_SLOT_COUNT;
 
     // Literal step (always available; keeps every position reachable). Opening a new run
     // (position 0, or arriving via a match) pays the run-token floor; extending one is free.
     {
-      const runStart = i === 0 || kind[i]! !== DP_LIT ? prices.litRunStartBits : 0;
-      const c = base + litBits[bytes[i]!]! + runStart;
+      const runStart = i === 0 || kind[i]! !== DP_LIT ? prices.litRunStartBits[ctx]! : 0;
+      const c = base + (litCostPrefix[i + 1]! - litCostPrefix[i]!) + runStart;
       if (c < cost[i + 1]!) {
         cost[i + 1] = c;
         src[i + 1] = i;
@@ -302,11 +318,18 @@ function parseOptimal(
       // Rep matches (min length 2): a single joint pass over lengths. For each length only the
       // cheapest rep covering it can win, so the per-length work is one cost compare; the
       // arg-min rep is recomputed only when the slot advances or a rep's match length runs out.
-      const m0 = rep0 <= i ? matchLength(bytes, i, bytes, i - rep0, cap) : 0;
-      const m1 = rep1 <= i && rep1 !== rep0 ? matchLength(bytes, i, bytes, i - rep1, cap) : 0;
-      const m2 = rep2 <= i && rep2 !== rep1 && rep2 !== rep0 ? matchLength(bytes, i, bytes, i - rep2, cap) : 0;
+      // First-byte guards skip the call for the common all-miss case.
+      const b0 = bytes[i]!;
+      const m0 = rep0 <= i && bytes[i - rep0] === b0 ? matchLength(bytes, i, bytes, i - rep0, cap) : 0;
+      const m1 = rep1 <= i && rep1 !== rep0 && bytes[i - rep1] === b0 ? matchLength(bytes, i, bytes, i - rep1, cap) : 0;
+      const m2 =
+        rep2 <= i && rep2 !== rep1 && rep2 !== rep0 && bytes[i - rep2] === b0
+          ? matchLength(bytes, i, bytes, i - rep2, cap)
+          : 0;
       const m3 =
-        rep3 <= i && rep3 !== rep2 && rep3 !== rep1 && rep3 !== rep0 ? matchLength(bytes, i, bytes, i - rep3, cap) : 0;
+        rep3 <= i && rep3 !== rep2 && rep3 !== rep1 && rep3 !== rep0 && bytes[i - rep3] === b0
+          ? matchLength(bytes, i, bytes, i - rep3, cap)
+          : 0;
       let maxM = m0 > m1 ? m0 : m1;
       if (m2 > maxM) maxM = m2;
       if (m3 > maxM) maxM = m3;
@@ -314,7 +337,7 @@ function parseOptimal(
         // Immediate encoding: take the longest rep whole and jump past it.
         const r = maxM === m0 ? 0 : maxM === m1 ? 1 : maxM === m2 ? 2 : 3;
         const d = r === 0 ? rep0 : r === 1 ? rep1 : r === 2 ? rep2 : rep3;
-        const c = base + repSlotBits[r * LENGTH_SLOT_COUNT + slotOf(maxM - MIN_LEN_REP)]!;
+        const c = base + repSlotBits[ctxRep + r * LENGTH_SLOT_COUNT + slotOf(maxM - MIN_LEN_REP)]!;
         const j = i + maxM;
         if (c < cost[j]!) updateRep(cost, src, kind, dist, reps, i, j, c, r, d, rep0, rep1, rep2, rep3);
         insertChains(bytes, i, n, shift, head, prev, head6, prev6);
@@ -337,21 +360,21 @@ function parseOptimal(
             stale = false;
             bestR = -1;
             bestBits = Number.POSITIVE_INFINITY;
-            if (m0 >= len && repSlotBits[s]! < bestBits) {
+            if (m0 >= len && repSlotBits[ctxRep + s]! < bestBits) {
               bestR = 0;
-              bestBits = repSlotBits[s]!;
+              bestBits = repSlotBits[ctxRep + s]!;
             }
-            if (m1 >= len && repSlotBits[LENGTH_SLOT_COUNT + s]! < bestBits) {
+            if (m1 >= len && repSlotBits[ctxRep + LENGTH_SLOT_COUNT + s]! < bestBits) {
               bestR = 1;
-              bestBits = repSlotBits[LENGTH_SLOT_COUNT + s]!;
+              bestBits = repSlotBits[ctxRep + LENGTH_SLOT_COUNT + s]!;
             }
-            if (m2 >= len && repSlotBits[2 * LENGTH_SLOT_COUNT + s]! < bestBits) {
+            if (m2 >= len && repSlotBits[ctxRep + 2 * LENGTH_SLOT_COUNT + s]! < bestBits) {
               bestR = 2;
-              bestBits = repSlotBits[2 * LENGTH_SLOT_COUNT + s]!;
+              bestBits = repSlotBits[ctxRep + 2 * LENGTH_SLOT_COUNT + s]!;
             }
-            if (m3 >= len && repSlotBits[3 * LENGTH_SLOT_COUNT + s]! < bestBits) {
+            if (m3 >= len && repSlotBits[ctxRep + 3 * LENGTH_SLOT_COUNT + s]! < bestBits) {
               bestR = 3;
-              bestBits = repSlotBits[3 * LENGTH_SLOT_COUNT + s]!;
+              bestBits = repSlotBits[ctxRep + 3 * LENGTH_SLOT_COUNT + s]!;
             }
           }
           const c = base + bestBits;
@@ -368,21 +391,21 @@ function parseOptimal(
             const slot = slotOf(len - MIN_LEN_REP);
             let bestR2 = -1;
             let bestBits2 = Number.POSITIVE_INFINITY;
-            if (m0 >= len && repSlotBits[slot]! < bestBits2) {
+            if (m0 >= len && repSlotBits[ctxRep + slot]! < bestBits2) {
               bestR2 = 0;
-              bestBits2 = repSlotBits[slot]!;
+              bestBits2 = repSlotBits[ctxRep + slot]!;
             }
-            if (m1 >= len && repSlotBits[LENGTH_SLOT_COUNT + slot]! < bestBits2) {
+            if (m1 >= len && repSlotBits[ctxRep + LENGTH_SLOT_COUNT + slot]! < bestBits2) {
               bestR2 = 1;
-              bestBits2 = repSlotBits[LENGTH_SLOT_COUNT + slot]!;
+              bestBits2 = repSlotBits[ctxRep + LENGTH_SLOT_COUNT + slot]!;
             }
-            if (m2 >= len && repSlotBits[2 * LENGTH_SLOT_COUNT + slot]! < bestBits2) {
+            if (m2 >= len && repSlotBits[ctxRep + 2 * LENGTH_SLOT_COUNT + slot]! < bestBits2) {
               bestR2 = 2;
-              bestBits2 = repSlotBits[2 * LENGTH_SLOT_COUNT + slot]!;
+              bestBits2 = repSlotBits[ctxRep + 2 * LENGTH_SLOT_COUNT + slot]!;
             }
-            if (m3 >= len && repSlotBits[3 * LENGTH_SLOT_COUNT + slot]! < bestBits2) {
+            if (m3 >= len && repSlotBits[ctxRep + 3 * LENGTH_SLOT_COUNT + slot]! < bestBits2) {
               bestR2 = 3;
-              bestBits2 = repSlotBits[3 * LENGTH_SLOT_COUNT + slot]!;
+              bestBits2 = repSlotBits[ctxRep + 3 * LENGTH_SLOT_COUNT + slot]!;
             }
             const c = base + bestBits2;
             const j = i + len;
@@ -399,29 +422,34 @@ function parseOptimal(
         // Explicit history matches: walk the chains collecting the Pareto set (nearer candidates
         // first, so a farther candidate is kept only when it extends the match length). The
         // shallow 4-byte-hash walk covers short matches; the selective 6-byte-hash chain is
-        // then walked deep for long matches.
+        // then walked deep for long matches. A sufficient rep match floors the search: an
+        // explicit match of the same length pays an offset on top of the same length bits, so
+        // only strictly longer ones are collected (the deep walk still finds those).
         let candCount = 0;
+        let bestExplicit = MIN_LEN_EXPLICIT - 1;
         {
-          let bestM = MIN_LEN_EXPLICIT - 1;
+          let bestM = maxM >= SUFFICIENT_LEN ? maxM : MIN_LEN_EXPLICIT - 1;
           const minPos = i - window;
-          let cand = head[hash4(bytes, i, shift)]!;
-          let depth = OPTIMAL_DEPTH_SHORT;
-          while (cand >= 0 && cand >= minPos && depth-- > 0) {
-            if (bytes[cand + bestM] === bytes[i + bestM]) {
-              const m = matchLength(bytes, i, bytes, cand, cap);
-              if (m > bestM) {
-                const d = i - cand;
-                // Distances already in the rep cache were priced above at every length.
-                if (d !== rep0 && d !== rep1 && d !== rep2 && d !== rep3) {
-                  candDist[candCount] = d;
-                  candLen[candCount] = m;
-                  candCount++;
+          if (bestM < SUFFICIENT_LEN) {
+            let cand = head[hash4(bytes, i, shift)]!;
+            let depth = OPTIMAL_DEPTH_SHORT;
+            while (cand >= 0 && cand >= minPos && depth-- > 0) {
+              if (bytes[cand + bestM] === bytes[i + bestM]) {
+                const m = matchLength(bytes, i, bytes, cand, cap);
+                if (m > bestM) {
+                  const d = i - cand;
+                  // Distances already in the rep cache were priced above at every length.
+                  if (d !== rep0 && d !== rep1 && d !== rep2 && d !== rep3) {
+                    candDist[candCount] = d;
+                    candLen[candCount] = m;
+                    candCount++;
+                  }
+                  bestM = m;
+                  if (m === cap || m >= SUFFICIENT_LEN) break;
                 }
-                bestM = m;
-                if (m === cap || m >= SUFFICIENT_LEN) break;
               }
+              cand = prev[cand]!;
             }
-            cand = prev[cand]!;
           }
           if (bestM < cap && i + 6 <= n) {
             let cand6 = head6[hash6(bytes, i, shift)]!;
@@ -443,12 +471,13 @@ function parseOptimal(
               cand6 = prev6[cand6]!;
             }
           }
+          bestExplicit = bestM;
         }
         if (candCount > 0 && candLen[candCount - 1]! >= CUT_LEN) {
           // Immediate encoding: take the longest match whole and jump past it.
           const d = candDist[candCount - 1]!;
           const m = candLen[candCount - 1]!;
-          const c = base + histSlotBits[slotOf(m - MIN_LEN_REP)]! + offsetSlotBits[slotOf(d - 1)]!;
+          const c = base + histSlotBits[ctxLen + slotOf(m - MIN_LEN_REP)]! + histOffsetSlotBits[slotOf(d - 1)]!;
           const j = i + m;
           if (c < cost[j]!) updateHistory(cost, src, kind, dist, reps, i, j, c, d, rep0, rep1, rep2);
           insertChains(bytes, i, n, shift, head, prev, head6, prev6);
@@ -459,10 +488,10 @@ function parseOptimal(
         for (let c0 = 0; c0 < candCount; c0++) {
           const d = candDist[c0]!;
           const m = candLen[c0]!;
-          const offBits = offsetSlotBits[slotOf(d - 1)]!;
+          const offBits = histOffsetSlotBits[slotOf(d - 1)]!;
           const denseEnd = m < DENSE_LEN_BOUND ? m : DENSE_LEN_BOUND;
           for (let len = lo; len <= denseEnd; len++) {
-            const c = base + histSlotBits[slotOf(len - MIN_LEN_REP)]! + offBits;
+            const c = base + histSlotBits[ctxLen + slotOf(len - MIN_LEN_REP)]! + offBits;
             const j = i + len;
             if (c < cost[j]!) updateHistory(cost, src, kind, dist, reps, i, j, c, d, rep0, rep1, rep2);
           }
@@ -470,7 +499,7 @@ function parseOptimal(
             for (let s = slotOf(Math.max(lo, DENSE_LEN_BOUND) - MIN_LEN_REP); s < LENGTH_SLOT_COUNT; s++) {
               const len = Math.min(m, SLOT_MAX_VALUE[s]! + MIN_LEN_REP);
               if (len <= DENSE_LEN_BOUND || len < lo) continue;
-              const c = base + histSlotBits[slotOf(len - MIN_LEN_REP)]! + offBits;
+              const c = base + histSlotBits[ctxLen + slotOf(len - MIN_LEN_REP)]! + offBits;
               const j = i + len;
               if (c < cost[j]!) updateHistory(cost, src, kind, dist, reps, i, j, c, d, rep0, rep1, rep2);
               if (len === m) break;
@@ -481,32 +510,39 @@ function parseOptimal(
 
         // Dictionary matches (no rep-cache interaction). Two-tier search: a shallow 4-byte-hash
         // walk covers short matches, then the selective 6-byte-hash chain is walked deep for
-        // long matches without paying for the dictionary's dense 4-gram collisions.
-        if (dictIndex) {
+        // long matches without paying for the dictionary's dense 4-gram collisions. A found
+        // rep/history match floors the search at one byte less than its length: shorter
+        // dictionary matches essentially never win, but an equal-length one can (dictionary
+        // tokens/offsets use their own context tables), and a strictly longer one often does.
+        const dictFloor = bestExplicit > maxM ? bestExplicit : maxM;
+        if (dictIndex && dictFloor <= cap) {
           let candCountD = 0;
           {
-            let cand = dictIndex.head[hash4(bytes, i, dictIndex.hashShift)]!;
-            let bestM = MIN_LEN_EXPLICIT - 1;
-            let depth = OPTIMAL_DICT_DEPTH_SHORT;
-            while (cand >= 0 && depth-- > 0) {
-              if (cand < maxDictStart && dictionary[cand + bestM] === bytes[i + bestM]) {
-                const dcap = dictionary.length - cand < cap ? dictionary.length - cand : cap;
-                const m = matchLength(bytes, i, dictionary, cand, dcap);
-                if (m > bestM) {
-                  candDist[candCountD] = cand;
-                  candLen[candCountD] = m;
-                  candCountD++;
-                  bestM = m;
-                  if (m === cap || m >= SUFFICIENT_LEN) break;
+            let bestM = dictFloor >= SUFFICIENT_LEN ? dictFloor - 1 : MIN_LEN_EXPLICIT - 1;
+            if (dictFloor < SUFFICIENT_LEN) {
+              let cand = dictIndex.head[hash4(bytes, i, dictIndex.hashShift)]!;
+              let depth = OPTIMAL_DICT_DEPTH_SHORT;
+              // Chains ascend by offset, so the first out-of-range candidate ends the walk.
+              while (cand >= 0 && cand < maxDictStart && depth-- > 0) {
+                if (dictionary[cand + bestM] === bytes[i + bestM]) {
+                  const dcap = dictionary.length - cand < cap ? dictionary.length - cand : cap;
+                  const m = matchLength(bytes, i, dictionary, cand, dcap);
+                  if (m > bestM) {
+                    candDist[candCountD] = cand;
+                    candLen[candCountD] = m;
+                    candCountD++;
+                    bestM = m;
+                    if (m === cap || m >= SUFFICIENT_LEN) break;
+                  }
                 }
+                cand = dictIndex.prev[cand]!;
               }
-              cand = dictIndex.prev[cand]!;
             }
             if (bestM < cap && i + 6 <= n) {
               let cand6 = dictIndex.head6[hash6(bytes, i, dictIndex.hashShift)]!;
               let depth6 = OPTIMAL_DICT_DEPTH;
-              while (cand6 >= 0 && depth6-- > 0) {
-                if (cand6 < maxDictStart && dictionary[cand6 + bestM] === bytes[i + bestM]) {
+              while (cand6 >= 0 && cand6 < maxDictStart && depth6-- > 0) {
+                if (dictionary[cand6 + bestM] === bytes[i + bestM]) {
                   const dcap = dictionary.length - cand6 < cap ? dictionary.length - cand6 : cap;
                   const m = matchLength(bytes, i, dictionary, cand6, dcap);
                   if (m > bestM) {
@@ -524,7 +560,7 @@ function parseOptimal(
           if (candCountD > 0 && candLen[candCountD - 1]! >= CUT_LEN) {
             const start = candDist[candCountD - 1]!;
             const m = candLen[candCountD - 1]!;
-            const c = base + dictSlotBits[slotOf(m - MIN_LEN_REP)]! + offsetSlotBits[slotOf(start)]!;
+            const c = base + dictSlotBits[ctxLen + slotOf(m - MIN_LEN_REP)]! + dictOffsetSlotBits[slotOf(start)]!;
             const j = i + m;
             if (c < cost[j]!) updateDict(cost, src, kind, dist, reps, i, j, c, start, rep0, rep1, rep2, rep3);
             insertChains(bytes, i, n, shift, head, prev, head6, prev6);
@@ -535,10 +571,10 @@ function parseOptimal(
           for (let c0 = 0; c0 < candCountD; c0++) {
             const start = candDist[c0]!;
             const m = candLen[c0]!;
-            const offBits = offsetSlotBits[slotOf(start)]!;
+            const offBits = dictOffsetSlotBits[slotOf(start)]!;
             const denseEnd = m < DENSE_LEN_BOUND ? m : DENSE_LEN_BOUND;
             for (let len = dlo; len <= denseEnd; len++) {
-              const c = base + dictSlotBits[slotOf(len - MIN_LEN_REP)]! + offBits;
+              const c = base + dictSlotBits[ctxLen + slotOf(len - MIN_LEN_REP)]! + offBits;
               const j = i + len;
               if (c < cost[j]!) updateDict(cost, src, kind, dist, reps, i, j, c, start, rep0, rep1, rep2, rep3);
             }
@@ -546,7 +582,7 @@ function parseOptimal(
               for (let s = slotOf(Math.max(dlo, DENSE_LEN_BOUND) - MIN_LEN_REP); s < LENGTH_SLOT_COUNT; s++) {
                 const len = Math.min(m, SLOT_MAX_VALUE[s]! + MIN_LEN_REP);
                 if (len <= DENSE_LEN_BOUND || len < dlo) continue;
-                const c = base + dictSlotBits[slotOf(len - MIN_LEN_REP)]! + offBits;
+                const c = base + dictSlotBits[ctxLen + slotOf(len - MIN_LEN_REP)]! + offBits;
                 const j = i + len;
                 if (c < cost[j]!) updateDict(cost, src, kind, dist, reps, i, j, c, start, rep0, rep1, rep2, rep3);
                 if (len === m) break;
@@ -751,35 +787,42 @@ function parseGreedy(
       }
       if (dictIndex) {
         // Two-tier dictionary search (see the optimal parser): shallow 4-byte-hash walk for
-        // short matches, then the selective 6-byte-hash chain for long ones.
-        let bestMD = MIN_LEN_EXPLICIT - 1;
-        let dcand = dictIndex.head[hash4(bytes, pos, dictIndex.hashShift)]!;
-        let depthD = GREEDY_DICT_DEPTH_SHORT;
-        while (dcand >= 0 && depthD-- > 0) {
-          if (dcand < maxDictStart && dictionary[dcand + bestMD] === bytes[pos + bestMD]) {
-            const dcap = dictionary.length - dcand < cap ? dictionary.length - dcand : cap;
-            const len = matchLength(bytes, pos, dictionary, dcand, dcap);
-            if (len > bestMD) {
-              bestMD = len;
-              const cost = pricing.dictCost(dcand, len);
-              const savings = litCostPrefix[pos + len]! - litBase - cost;
-              if (savings > 0 && savings > bestSavings) {
-                bestSavings = savings;
-                bestCost = cost;
-                bestLen = len;
-                bestKind = 2;
-                bestStart = dcand;
+        // short matches, then the selective 6-byte-hash chain for long ones. A found
+        // rep/history match floors the search at one byte less than its length — shorter
+        // dictionary matches essentially never win, but an equal-length one can (cheaper
+        // cost wins the savings comparison), and a strictly longer one often does.
+        const sufficient = bestKind !== 0 && bestLen >= SUFFICIENT_LEN;
+        let bestMD = sufficient ? bestLen - 1 : MIN_LEN_EXPLICIT - 1;
+        if (!sufficient) {
+          let dcand = dictIndex.head[hash4(bytes, pos, dictIndex.hashShift)]!;
+          let depthD = GREEDY_DICT_DEPTH_SHORT;
+          // Chains ascend by offset, so the first out-of-range candidate ends the walk.
+          while (dcand >= 0 && dcand < maxDictStart && depthD-- > 0) {
+            if (dictionary[dcand + bestMD] === bytes[pos + bestMD]) {
+              const dcap = dictionary.length - dcand < cap ? dictionary.length - dcand : cap;
+              const len = matchLength(bytes, pos, dictionary, dcand, dcap);
+              if (len > bestMD) {
+                bestMD = len;
+                const cost = pricing.dictCost(dcand, len);
+                const savings = litCostPrefix[pos + len]! - litBase - cost;
+                if (savings > 0 && savings > bestSavings) {
+                  bestSavings = savings;
+                  bestCost = cost;
+                  bestLen = len;
+                  bestKind = 2;
+                  bestStart = dcand;
+                }
+                if (len === cap || len >= SUFFICIENT_LEN) break;
               }
-              if (len === cap || len >= SUFFICIENT_LEN) break;
             }
+            dcand = dictIndex.prev[dcand]!;
           }
-          dcand = dictIndex.prev[dcand]!;
         }
-        if (bestMD < cap && bestMD < SUFFICIENT_LEN && pos + 6 <= n) {
+        if (bestMD < cap && (sufficient || bestMD < SUFFICIENT_LEN) && pos + 6 <= n) {
           let dcand6 = dictIndex.head6[hash6(bytes, pos, dictIndex.hashShift)]!;
           let depth6 = GREEDY_DICT_DEPTH;
-          while (dcand6 >= 0 && depth6-- > 0) {
-            if (dcand6 < maxDictStart && dictionary[dcand6 + bestMD] === bytes[pos + bestMD]) {
+          while (dcand6 >= 0 && dcand6 < maxDictStart && depth6-- > 0) {
+            if (dictionary[dcand6 + bestMD] === bytes[pos + bestMD]) {
               const dcap = dictionary.length - dcand6 < cap ? dictionary.length - dcand6 : cap;
               const len = matchLength(bytes, pos, dictionary, dcand6, dcap);
               if (len > bestMD) {

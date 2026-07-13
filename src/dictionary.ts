@@ -1,13 +1,21 @@
 import { OFFSET_SLOT_COUNT } from './slots.ts';
-import { TOKEN_ALPHABET_SIZE } from './format.ts';
+import { LIT_CLASS_MAX, OFFSET_CONTEXT_COUNT, TOKEN_ALPHABET_SIZE, TOKEN_CONTEXT_COUNT } from './format.ts';
 import { isCompleteCode } from './huffman.ts';
 import { TokzipDecodeError } from './errors.ts';
 
-/** Static `small`-mode canonical Huffman code lengths for the three separated streams. */
+/**
+ * Static `small`-mode canonical Huffman code lengths for the three separated streams,
+ * one table per context (see format.ts): literals keyed by the trained class of the
+ * previous byte, token symbols by the previous token kind, offsets by the match kind.
+ */
 export interface EntropyTables {
-  literal: Uint8Array; // 256 symbols
-  token: Uint8Array; // TOKEN_ALPHABET_SIZE symbols
-  offset: Uint8Array; // OFFSET_SLOT_COUNT symbols
+  /** Trained literal context class per previous-byte value (256 entries, values < litClassCount). */
+  litContext: Uint8Array;
+  /** Number of trained literal context classes (1–{@link LIT_CLASS_MAX}). */
+  litClassCount: number;
+  literal: Uint8Array; // litClassCount × 256 symbols
+  token: Uint8Array; // TOKEN_CONTEXT_COUNT × TOKEN_ALPHABET_SIZE symbols
+  offset: Uint8Array; // OFFSET_CONTEXT_COUNT × OFFSET_SLOT_COUNT symbols
 }
 
 /** Data shipped by a language module (or by core for id 0). */
@@ -37,9 +45,9 @@ export interface RegisteredLanguage {
 
 export interface DictIndex {
   hashShift: number;
-  /** 4-byte-hash chain heads: latest dictionary position per bucket, -1 for empty. */
+  /** 4-byte-hash chain heads: lowest dictionary position per bucket (chains ascend), -1 for empty. */
   head: Int32Array;
-  /** Previous position with the same 4-byte hash, per dictionary position. */
+  /** Next higher position with the same 4-byte hash, per dictionary position. */
   prev: Int32Array;
   /**
    * 6-byte-hash chains: far more selective on the large repetitive preset dictionaries, so
@@ -109,18 +117,30 @@ export function requireLanguageById(id: number): RegisteredLanguage {
 }
 
 function validateTables(tables: EntropyTables): void {
+  const { litClassCount } = tables;
+  if (!Number.isInteger(litClassCount) || litClassCount < 1 || litClassCount > LIT_CLASS_MAX) {
+    throw new RangeError(`invalid literal class count: ${litClassCount}`);
+  }
+  if (tables.litContext.length !== 256) throw new RangeError('literal context map must have 256 entries');
+  for (const cls of tables.litContext) {
+    if (cls >= litClassCount) throw new RangeError('literal context class out of range');
+  }
   if (
-    tables.literal.length !== 256 ||
-    tables.token.length !== TOKEN_ALPHABET_SIZE ||
-    tables.offset.length !== OFFSET_SLOT_COUNT
+    tables.literal.length !== litClassCount * 256 ||
+    tables.token.length !== TOKEN_CONTEXT_COUNT * TOKEN_ALPHABET_SIZE ||
+    tables.offset.length !== OFFSET_CONTEXT_COUNT * OFFSET_SLOT_COUNT
   ) {
     throw new RangeError('entropy table has wrong alphabet size');
   }
-  for (const [name, lengths] of [
-    ['literal', tables.literal],
-    ['token', tables.token],
-    ['offset', tables.offset],
+  for (const [name, lengths, alphabetSize] of [
+    ['literal', tables.literal, 256],
+    ['token', tables.token, TOKEN_ALPHABET_SIZE],
+    ['offset', tables.offset, OFFSET_SLOT_COUNT],
   ] as const) {
-    if (!isCompleteCode(lengths)) throw new RangeError(`entropy table "${name}" is not a complete code`);
+    for (let base = 0; base < lengths.length; base += alphabetSize) {
+      if (!isCompleteCode(lengths.subarray(base, base + alphabetSize))) {
+        throw new RangeError(`entropy table "${name}" context ${base / alphabetSize} is not a complete code`);
+      }
+    }
   }
 }

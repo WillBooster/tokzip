@@ -13,8 +13,13 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { join } from 'node:path';
 import type { EntropyTables, RegisteredLanguage } from '../../src/dictionary.ts';
 import {
+  LIT_CLASS_MAX,
   MIN_LEN_REP,
+  OFFSET_CONTEXT_COUNT,
+  OFFSET_CONTEXT_DICT,
+  OFFSET_CONTEXT_HISTORY,
   TOKEN_ALPHABET_SIZE,
+  TOKEN_CONTEXT_COUNT,
   TOKEN_KIND_DICT,
   TOKEN_KIND_HISTORY,
   TOKEN_KIND_LITRUN,
@@ -24,7 +29,7 @@ import { buildLengths } from '../../src/huffman.ts';
 import { LANGUAGE_IDS } from '../../src/languageIds.ts';
 import { dictIndexFor, parse } from '../../src/lz.ts';
 import { toBase64 } from '../../src/moduleData.ts';
-import { smallPricing } from '../../src/smallMode.ts';
+import { MAX_RUN_LENGTH, smallPricing } from '../../src/smallMode.ts';
 import { LENGTH_SLOT_COUNT, OFFSET_SLOT_COUNT, slotOf } from '../../src/slots.ts';
 import { CORPUS_DIR } from '../corpus.ts';
 import { trainDictionary } from './trainDictionary.ts';
@@ -33,9 +38,9 @@ import { buildWrapperDictionary } from './wrapperContent.ts';
 const ROOT = join(import.meta.dir, '../..');
 const GENERATED_DIR = join(ROOT, 'src/generated');
 const LANGUAGES_DIR = join(ROOT, 'src/languages');
-const DICTIONARY_BUDGET_BYTES = 254 * 1024;
+const DICTIONARY_BUDGET_BYTES = 512 * 1024;
 /** Bound on per-language statistics input; keeps a full training run tractable. */
-const MAX_STATS_BYTES = 16 * 1024 * 1024;
+const MAX_STATS_BYTES = 32 * 1024 * 1024;
 
 const textEncoder = new TextEncoder();
 
@@ -128,10 +133,21 @@ export { ${exportName} };
   console.log(`${name}: dictionary ${suffix.length} B, trained on ${docs.length} doc(s)`);
 }
 
+/** Joint symbol frequencies collected from one parse pass, split into two folds for validation. */
+interface StreamStatistics {
+  /** Literal frequencies by previous-byte context, per fold: `[fold][ctx * 256 + byte]`. */
+  literal: [Float64Array, Float64Array];
+  /** Token-symbol frequencies by previous-token-kind context: `[ctx * TOKEN_ALPHABET_SIZE + symbol]`. */
+  token: Float64Array;
+  /** Offset-slot frequencies by match-kind context: `[ctx * OFFSET_SLOT_COUNT + slot]`. */
+  offset: Float64Array;
+}
+
 /**
  * Runs the real parser over the corpus with bootstrap tables, tallies per-stream symbol
- * frequencies, and rebuilds the tables from them; later rounds re-parse with the trained
- * tables so prices and statistics converge.
+ * frequencies per context, and rebuilds the tables from them; later rounds re-parse with the
+ * trained tables so prices and statistics converge. Literal contexts (the previous byte) are
+ * greedily merged into classes; the class count is chosen by two-fold cross-validation.
  */
 function trainStatistics(
   docs: string[],
@@ -149,41 +165,207 @@ function trainStatistics(
     const language = makeLanguage(dictionary, top64, tables);
     if (dictIndexHolder) language.dictIndex = dictIndexHolder.dictIndex;
     dictIndexHolder = language;
-    const literalFreqs = new Float64Array(256);
-    const tokenFreqs = new Float64Array(TOKEN_ALPHABET_SIZE);
-    const offsetFreqs = new Float64Array(OFFSET_SLOT_COUNT);
-    let statsBytes = 0;
-    for (const doc of docs) {
-      if (statsBytes >= MAX_STATS_BYTES) break;
-      const bytes = textEncoder.encode(doc);
-      statsBytes += bytes.length;
-      const tokens = parse(bytes, dictionary, dictIndexFor(language), smallPricing(bytes, language));
-      for (const token of tokens) {
-        if (token.type === 'lit') {
-          const runValue = Math.min(token.end - token.start - 1, 262_143);
-          tokenFreqs[TOKEN_KIND_LITRUN * LENGTH_SLOT_COUNT + slotOf(runValue)]!++;
-          for (let i = token.start; i < token.end; i++) literalFreqs[bytes[i]!]!++;
-        } else if (token.type === 'history') {
-          const lenSlot = slotOf(token.len - MIN_LEN_REP);
-          if (token.rep >= 0) tokenFreqs[(TOKEN_KIND_REP0 + token.rep) * LENGTH_SLOT_COUNT + lenSlot]!++;
-          else {
-            tokenFreqs[TOKEN_KIND_HISTORY * LENGTH_SLOT_COUNT + lenSlot]!++;
-            offsetFreqs[slotOf(token.dist - 1)]!++;
-          }
-        } else {
-          tokenFreqs[TOKEN_KIND_DICT * LENGTH_SLOT_COUNT + slotOf(token.len - MIN_LEN_REP)]!++;
-          offsetFreqs[slotOf(token.start)]!++;
-        }
-      }
-    }
-    top64 = rankTop64(literalFreqs);
+    const stats = collectStatistics(docs, dictionary, language);
+    const literalFull = new Float64Array(256 * 256);
+    for (let i = 0; i < literalFull.length; i++) literalFull[i] = stats.literal[0][i]! + stats.literal[1][i]!;
+    top64 = rankTop64(marginalLiteralFreqs(literalFull));
+    const { litContext, litClassCount } = chooseLiteralClasses(stats.literal);
     tables = {
-      literal: buildLengths(smoothed(literalFreqs)),
-      token: buildLengths(smoothed(tokenFreqs)),
-      offset: buildLengths(smoothed(offsetFreqs)),
+      litContext,
+      litClassCount,
+      literal: buildContextLengths(mergeByClass(literalFull, litContext, litClassCount, 256), 256),
+      token: buildContextLengths(stats.token, TOKEN_ALPHABET_SIZE),
+      offset: buildContextLengths(stats.offset, OFFSET_SLOT_COUNT),
     };
   }
   return { top64, tables };
+}
+
+function collectStatistics(docs: string[], dictionary: Uint8Array, language: RegisteredLanguage): StreamStatistics {
+  const stats: StreamStatistics = {
+    literal: [new Float64Array(256 * 256), new Float64Array(256 * 256)],
+    token: new Float64Array(TOKEN_CONTEXT_COUNT * TOKEN_ALPHABET_SIZE),
+    offset: new Float64Array(OFFSET_CONTEXT_COUNT * OFFSET_SLOT_COUNT),
+  };
+  let statsBytes = 0;
+  for (const [docIndex, doc] of docs.entries()) {
+    if (statsBytes >= MAX_STATS_BYTES) break;
+    const bytes = textEncoder.encode(doc);
+    statsBytes += bytes.length;
+    const literalFold = stats.literal[docIndex % 2]!;
+    const tokens = parse(bytes, dictionary, dictIndexFor(language), smallPricing(bytes, language));
+    let prevKind = TOKEN_KIND_LITRUN;
+    const pushToken = (kind: number, lenValue: number): void => {
+      stats.token[prevKind * TOKEN_ALPHABET_SIZE + kind * LENGTH_SLOT_COUNT + slotOf(lenValue)]!++;
+      prevKind = kind;
+    };
+    for (const token of tokens) {
+      if (token.type === 'lit') {
+        // Mirror serialization exactly: runs beyond the slot alphabet split into consecutive
+        // litrun tokens (including the extra litrun→litrun context transitions).
+        for (let start = token.start; start < token.end; start += MAX_RUN_LENGTH) {
+          pushToken(TOKEN_KIND_LITRUN, Math.min(start + MAX_RUN_LENGTH, token.end) - start - 1);
+        }
+        for (let i = token.start; i < token.end; i++) {
+          literalFold[(i > 0 ? bytes[i - 1]! : 0) * 256 + bytes[i]!]!++;
+        }
+      } else if (token.type === 'history') {
+        if (token.rep >= 0) pushToken(TOKEN_KIND_REP0 + token.rep, token.len - MIN_LEN_REP);
+        else {
+          pushToken(TOKEN_KIND_HISTORY, token.len - MIN_LEN_REP);
+          stats.offset[OFFSET_CONTEXT_HISTORY * OFFSET_SLOT_COUNT + slotOf(token.dist - 1)]!++;
+        }
+      } else {
+        pushToken(TOKEN_KIND_DICT, token.len - MIN_LEN_REP);
+        stats.offset[OFFSET_CONTEXT_DICT * OFFSET_SLOT_COUNT + slotOf(token.start)]!++;
+      }
+    }
+  }
+  return stats;
+}
+
+/** Sums per-context literal frequencies down to plain byte frequencies (for the top-64 charset). */
+function marginalLiteralFreqs(literalFull: Float64Array): Float64Array {
+  const freqs = new Float64Array(256);
+  for (let ctx = 0; ctx < 256; ctx++) {
+    for (let byte = 0; byte < 256; byte++) freqs[byte]! += literalFull[ctx * 256 + byte]!;
+  }
+  return freqs;
+}
+
+/** Sums joint `[ctx][symbol]` frequencies into `[classOf(ctx)][symbol]` frequencies. */
+function mergeByClass(
+  joint: Float64Array,
+  classOf: Uint8Array,
+  classCount: number,
+  alphabetSize: number
+): Float64Array {
+  const merged = new Float64Array(classCount * alphabetSize);
+  const contextCount = joint.length / alphabetSize;
+  for (let ctx = 0; ctx < contextCount; ctx++) {
+    const target = classOf[ctx]! * alphabetSize;
+    for (let symbol = 0; symbol < alphabetSize; symbol++) {
+      merged[target + symbol]! += joint[ctx * alphabetSize + symbol]!;
+    }
+  }
+  return merged;
+}
+
+/** Builds smoothed package-merge code lengths independently for each context slice. */
+function buildContextLengths(freqs: Float64Array, alphabetSize: number): Uint8Array {
+  const lengths = new Uint8Array(freqs.length);
+  for (let base = 0; base < freqs.length; base += alphabetSize) {
+    lengths.set(buildLengths(smoothed(freqs.subarray(base, base + alphabetSize))), base);
+  }
+  return lengths;
+}
+
+/** Total bits (frequency-weighted self-information) of one conditional distribution. */
+function entropyBits(freq: Float64Array): number {
+  let sum = 0;
+  for (const x of freq) sum += x;
+  if (sum === 0) return 0;
+  let bits = 0;
+  for (const x of freq) if (x > 0) bits -= x * Math.log2(x / sum);
+  return bits;
+}
+
+/** Cluster of merged literal contexts (see {@link chooseLiteralClasses}). */
+interface Cluster {
+  freq: Float64Array;
+  members: number[];
+  entropyBits: number;
+}
+
+/**
+ * Greedy agglomerative context merging: contexts (previous-byte values) whose conditional
+ * literal distributions are closest (smallest joint-entropy increase) merge first. Candidate
+ * class counts are scored by two-fold cross-validation (fold-0-trained code lengths applied
+ * to fold-1 frequencies and vice versa), so extra classes must pay for their own overfit.
+ */
+function chooseLiteralClasses(folds: [Float64Array, Float64Array]): {
+  litContext: Uint8Array;
+  litClassCount: number;
+} {
+  const full = new Float64Array(256 * 256);
+  for (let i = 0; i < full.length; i++) full[i] = folds[0][i]! + folds[1][i]!;
+  let total = 0;
+  for (const x of full) total += x;
+
+  // Active clusters: frequent contexts start alone; rare ones share one bucket.
+  const clusters: Cluster[] = [];
+  const rare: number[] = [];
+  for (let ctx = 0; ctx < 256; ctx++) {
+    const freq = full.subarray(ctx * 256, ctx * 256 + 256);
+    let count = 0;
+    for (const x of freq) count += x;
+    if (count >= total * 0.0005) {
+      clusters.push({ freq: Float64Array.from(freq), members: [ctx], entropyBits: entropyBits(freq) });
+    } else rare.push(ctx);
+  }
+  if (rare.length > 0 || clusters.length === 0) {
+    const freq = new Float64Array(256);
+    for (const ctx of rare) {
+      for (let byte = 0; byte < 256; byte++) freq[byte]! += full[ctx * 256 + byte]!;
+    }
+    clusters.push({ freq, members: rare, entropyBits: entropyBits(freq) });
+  }
+
+  // Merge down to LIT_CLASS_MAX, snapshotting each candidate class count on the way.
+  const candidates = new Map<number, Uint8Array>();
+  const snapshot = (): Uint8Array => {
+    const classOf = new Uint8Array(256);
+    for (const [cls, cluster] of clusters.entries()) for (const ctx of cluster.members) classOf[ctx] = cls;
+    return classOf;
+  };
+  const candidateCounts = new Set([LIT_CLASS_MAX, 32, 16, 8, 4, 1]);
+  const merged = new Float64Array(256);
+  while (clusters.length > 1) {
+    if (candidateCounts.has(clusters.length)) candidates.set(clusters.length, snapshot());
+    let bestI = 0;
+    let bestJ = 1;
+    let bestDelta = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < clusters.length; i++) {
+      for (let j = i + 1; j < clusters.length; j++) {
+        for (let byte = 0; byte < 256; byte++) merged[byte] = clusters[i]!.freq[byte]! + clusters[j]!.freq[byte]!;
+        const delta = entropyBits(merged) - clusters[i]!.entropyBits - clusters[j]!.entropyBits;
+        if (delta < bestDelta) {
+          bestDelta = delta;
+          bestI = i;
+          bestJ = j;
+        }
+      }
+    }
+    const a = clusters[bestI]!;
+    const b = clusters[bestJ]!;
+    for (let byte = 0; byte < 256; byte++) a.freq[byte]! += b.freq[byte]!;
+    a.members.push(...b.members);
+    a.entropyBits = entropyBits(a.freq);
+    clusters.splice(bestJ, 1);
+  }
+  candidates.set(1, snapshot());
+
+  // Cross-validated cost of each candidate: code lengths from one fold, symbol counts from the other.
+  let bestCount = 1;
+  let bestBits = Number.POSITIVE_INFINITY;
+  for (const [count, classOf] of candidates) {
+    let bits = 0;
+    for (const [foldIndex, trainFold] of folds.entries()) {
+      const evalFold = folds[1 - foldIndex]!;
+      const lengths = buildContextLengths(mergeByClass(trainFold, classOf, count, 256), 256);
+      for (let ctx = 0; ctx < 256; ctx++) {
+        const base = classOf[ctx]! * 256;
+        for (let byte = 0; byte < 256; byte++) {
+          bits += evalFold[ctx * 256 + byte]! * lengths[base + byte]!;
+        }
+      }
+    }
+    if (bits < bestBits) {
+      bestBits = bits;
+      bestCount = count;
+    }
+  }
+  return { litContext: candidates.get(bestCount)!, litClassCount: bestCount };
 }
 
 function makeLanguage(dictionary: Uint8Array, top64: Uint8Array, tables: EntropyTables): RegisteredLanguage {
@@ -210,15 +392,22 @@ function smoothed(freqs: Float64Array): Float64Array {
 
 function flatTables(): EntropyTables {
   return {
+    litContext: new Uint8Array(256),
+    litClassCount: 1,
     literal: buildLengths(new Float64Array(256).fill(1)),
-    token: buildLengths(new Float64Array(TOKEN_ALPHABET_SIZE).fill(1)),
-    offset: buildLengths(new Float64Array(OFFSET_SLOT_COUNT).fill(1)),
+    token: buildContextLengths(
+      new Float64Array(TOKEN_CONTEXT_COUNT * TOKEN_ALPHABET_SIZE).fill(1),
+      TOKEN_ALPHABET_SIZE
+    ),
+    offset: buildContextLengths(new Float64Array(OFFSET_CONTEXT_COUNT * OFFSET_SLOT_COUNT).fill(1), OFFSET_SLOT_COUNT),
   };
 }
 
 function moduleDataFields(top64: Uint8Array, tables: EntropyTables): string {
   return `  top64: fromBase64('${toBase64(top64)}'),
   tables: {
+    litContext: fromBase64('${toBase64(tables.litContext)}'),
+    litClassCount: ${tables.litClassCount},
     literal: fromBase64('${toBase64(tables.literal)}'),
     token: fromBase64('${toBase64(tables.token)}'),
     offset: fromBase64('${toBase64(tables.offset)}'),
