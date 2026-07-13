@@ -511,15 +511,15 @@ function parseOptimal(
         // Dictionary matches (no rep-cache interaction). Two-tier search: a shallow 4-byte-hash
         // walk covers short matches, then the selective 6-byte-hash chain is walked deep for
         // long matches without paying for the dictionary's dense 4-gram collisions. A found
-        // rep/history match floors the search: a same-length dictionary match pays a full
-        // absolute offset, so it essentially never beats one — but a strictly longer one can,
-        // so the deep walk still runs with that length as its floor.
+        // rep/history match floors the search at one byte less than its length: shorter
+        // dictionary matches essentially never win, but an equal-length one can (dictionary
+        // tokens/offsets use their own context tables), and a strictly longer one often does.
         const dictFloor = bestExplicit > maxM ? bestExplicit : maxM;
-        if (dictIndex && dictFloor < cap) {
+        if (dictIndex && dictFloor <= cap) {
           let candCountD = 0;
           {
-            let bestM = dictFloor >= SUFFICIENT_LEN ? dictFloor : MIN_LEN_EXPLICIT - 1;
-            if (bestM < SUFFICIENT_LEN) {
+            let bestM = dictFloor >= SUFFICIENT_LEN ? dictFloor - 1 : MIN_LEN_EXPLICIT - 1;
+            if (dictFloor < SUFFICIENT_LEN) {
               let cand = dictIndex.head[hash4(bytes, i, dictIndex.hashShift)]!;
               let depth = OPTIMAL_DICT_DEPTH_SHORT;
               // Chains ascend by offset, so the first out-of-range candidate ends the walk.
@@ -788,11 +788,12 @@ function parseGreedy(
       if (dictIndex) {
         // Two-tier dictionary search (see the optimal parser): shallow 4-byte-hash walk for
         // short matches, then the selective 6-byte-hash chain for long ones. A found
-        // rep/history match floors the search — a same-length dictionary match pays a full
-        // absolute offset, so it essentially never beats one, but a strictly longer one can.
-        const dictFloor = bestKind !== 0 && bestLen >= SUFFICIENT_LEN ? bestLen : MIN_LEN_EXPLICIT - 1;
-        let bestMD = dictFloor;
-        if (bestMD < SUFFICIENT_LEN) {
+        // rep/history match floors the search at one byte less than its length — shorter
+        // dictionary matches essentially never win, but an equal-length one can (cheaper
+        // cost wins the savings comparison), and a strictly longer one often does.
+        const sufficient = bestKind !== 0 && bestLen >= SUFFICIENT_LEN;
+        let bestMD = sufficient ? bestLen - 1 : MIN_LEN_EXPLICIT - 1;
+        if (!sufficient) {
           let dcand = dictIndex.head[hash4(bytes, pos, dictIndex.hashShift)]!;
           let depthD = GREEDY_DICT_DEPTH_SHORT;
           // Chains ascend by offset, so the first out-of-range candidate ends the walk.
@@ -817,7 +818,7 @@ function parseGreedy(
             dcand = dictIndex.prev[dcand]!;
           }
         }
-        if (bestMD < cap && (bestMD === dictFloor || bestMD < SUFFICIENT_LEN) && pos + 6 <= n) {
+        if (bestMD < cap && (sufficient || bestMD < SUFFICIENT_LEN) && pos + 6 <= n) {
           let dcand6 = dictIndex.head6[hash6(bytes, pos, dictIndex.hashShift)]!;
           let depth6 = GREEDY_DICT_DEPTH;
           while (dcand6 >= 0 && dcand6 < maxDictStart && depth6-- > 0) {
