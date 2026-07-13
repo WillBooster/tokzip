@@ -418,35 +418,38 @@ function parseOptimal(
         }
       }
 
-      if (cap >= MIN_LEN_EXPLICIT && i + 4 <= n && maxM < SUFFICIENT_LEN) {
+      if (cap >= MIN_LEN_EXPLICIT && i + 4 <= n) {
         // Explicit history matches: walk the chains collecting the Pareto set (nearer candidates
         // first, so a farther candidate is kept only when it extends the match length). The
         // shallow 4-byte-hash walk covers short matches; the selective 6-byte-hash chain is
-        // then walked deep for long matches. Skipped when a rep match is already sufficient —
-        // an explicit match of similar length pays an offset on top of the same length bits.
+        // then walked deep for long matches. A sufficient rep match floors the search: an
+        // explicit match of the same length pays an offset on top of the same length bits, so
+        // only strictly longer ones are collected (the deep walk still finds those).
         let candCount = 0;
         let bestExplicit = MIN_LEN_EXPLICIT - 1;
         {
-          let bestM = MIN_LEN_EXPLICIT - 1;
+          let bestM = maxM >= SUFFICIENT_LEN ? maxM : MIN_LEN_EXPLICIT - 1;
           const minPos = i - window;
-          let cand = head[hash4(bytes, i, shift)]!;
-          let depth = OPTIMAL_DEPTH_SHORT;
-          while (cand >= 0 && cand >= minPos && depth-- > 0) {
-            if (bytes[cand + bestM] === bytes[i + bestM]) {
-              const m = matchLength(bytes, i, bytes, cand, cap);
-              if (m > bestM) {
-                const d = i - cand;
-                // Distances already in the rep cache were priced above at every length.
-                if (d !== rep0 && d !== rep1 && d !== rep2 && d !== rep3) {
-                  candDist[candCount] = d;
-                  candLen[candCount] = m;
-                  candCount++;
+          if (bestM < SUFFICIENT_LEN) {
+            let cand = head[hash4(bytes, i, shift)]!;
+            let depth = OPTIMAL_DEPTH_SHORT;
+            while (cand >= 0 && cand >= minPos && depth-- > 0) {
+              if (bytes[cand + bestM] === bytes[i + bestM]) {
+                const m = matchLength(bytes, i, bytes, cand, cap);
+                if (m > bestM) {
+                  const d = i - cand;
+                  // Distances already in the rep cache were priced above at every length.
+                  if (d !== rep0 && d !== rep1 && d !== rep2 && d !== rep3) {
+                    candDist[candCount] = d;
+                    candLen[candCount] = m;
+                    candCount++;
+                  }
+                  bestM = m;
+                  if (m === cap || m >= SUFFICIENT_LEN) break;
                 }
-                bestM = m;
-                if (m === cap || m >= SUFFICIENT_LEN) break;
               }
+              cand = prev[cand]!;
             }
-            cand = prev[cand]!;
           }
           if (bestM < cap && i + 6 <= n) {
             let cand6 = head6[hash6(bytes, i, shift)]!;
@@ -507,29 +510,33 @@ function parseOptimal(
 
         // Dictionary matches (no rep-cache interaction). Two-tier search: a shallow 4-byte-hash
         // walk covers short matches, then the selective 6-byte-hash chain is walked deep for
-        // long matches without paying for the dictionary's dense 4-gram collisions. Skipped
-        // when a rep or history match is already sufficient: a same-length dictionary match
-        // pays a full absolute offset, so it essentially never beats one.
-        if (dictIndex && bestExplicit < SUFFICIENT_LEN && maxM < SUFFICIENT_LEN) {
+        // long matches without paying for the dictionary's dense 4-gram collisions. A found
+        // rep/history match floors the search: a same-length dictionary match pays a full
+        // absolute offset, so it essentially never beats one — but a strictly longer one can,
+        // so the deep walk still runs with that length as its floor.
+        const dictFloor = bestExplicit > maxM ? bestExplicit : maxM;
+        if (dictIndex && dictFloor < cap) {
           let candCountD = 0;
           {
-            let cand = dictIndex.head[hash4(bytes, i, dictIndex.hashShift)]!;
-            let bestM = MIN_LEN_EXPLICIT - 1;
-            let depth = OPTIMAL_DICT_DEPTH_SHORT;
-            // Chains ascend by offset, so the first out-of-range candidate ends the walk.
-            while (cand >= 0 && cand < maxDictStart && depth-- > 0) {
-              if (dictionary[cand + bestM] === bytes[i + bestM]) {
-                const dcap = dictionary.length - cand < cap ? dictionary.length - cand : cap;
-                const m = matchLength(bytes, i, dictionary, cand, dcap);
-                if (m > bestM) {
-                  candDist[candCountD] = cand;
-                  candLen[candCountD] = m;
-                  candCountD++;
-                  bestM = m;
-                  if (m === cap || m >= SUFFICIENT_LEN) break;
+            let bestM = dictFloor >= SUFFICIENT_LEN ? dictFloor : MIN_LEN_EXPLICIT - 1;
+            if (bestM < SUFFICIENT_LEN) {
+              let cand = dictIndex.head[hash4(bytes, i, dictIndex.hashShift)]!;
+              let depth = OPTIMAL_DICT_DEPTH_SHORT;
+              // Chains ascend by offset, so the first out-of-range candidate ends the walk.
+              while (cand >= 0 && cand < maxDictStart && depth-- > 0) {
+                if (dictionary[cand + bestM] === bytes[i + bestM]) {
+                  const dcap = dictionary.length - cand < cap ? dictionary.length - cand : cap;
+                  const m = matchLength(bytes, i, dictionary, cand, dcap);
+                  if (m > bestM) {
+                    candDist[candCountD] = cand;
+                    candLen[candCountD] = m;
+                    candCountD++;
+                    bestM = m;
+                    if (m === cap || m >= SUFFICIENT_LEN) break;
+                  }
                 }
+                cand = dictIndex.prev[cand]!;
               }
-              cand = dictIndex.prev[cand]!;
             }
             if (bestM < cap && i + 6 <= n) {
               let cand6 = dictIndex.head6[hash6(bytes, i, dictIndex.hashShift)]!;
@@ -778,36 +785,39 @@ function parseGreedy(
         }
         cand = prev[cand]!;
       }
-      if (dictIndex && (bestKind === 0 || bestLen < SUFFICIENT_LEN)) {
+      if (dictIndex) {
         // Two-tier dictionary search (see the optimal parser): shallow 4-byte-hash walk for
-        // short matches, then the selective 6-byte-hash chain for long ones. Skipped when a
-        // rep/history match is already sufficient — a same-length dictionary match pays a
-        // full absolute offset, so it essentially never beats one.
-        let bestMD = MIN_LEN_EXPLICIT - 1;
-        let dcand = dictIndex.head[hash4(bytes, pos, dictIndex.hashShift)]!;
-        let depthD = GREEDY_DICT_DEPTH_SHORT;
-        // Chains ascend by offset, so the first out-of-range candidate ends the walk.
-        while (dcand >= 0 && dcand < maxDictStart && depthD-- > 0) {
-          if (dictionary[dcand + bestMD] === bytes[pos + bestMD]) {
-            const dcap = dictionary.length - dcand < cap ? dictionary.length - dcand : cap;
-            const len = matchLength(bytes, pos, dictionary, dcand, dcap);
-            if (len > bestMD) {
-              bestMD = len;
-              const cost = pricing.dictCost(dcand, len);
-              const savings = litCostPrefix[pos + len]! - litBase - cost;
-              if (savings > 0 && savings > bestSavings) {
-                bestSavings = savings;
-                bestCost = cost;
-                bestLen = len;
-                bestKind = 2;
-                bestStart = dcand;
+        // short matches, then the selective 6-byte-hash chain for long ones. A found
+        // rep/history match floors the search — a same-length dictionary match pays a full
+        // absolute offset, so it essentially never beats one, but a strictly longer one can.
+        const dictFloor = bestKind !== 0 && bestLen >= SUFFICIENT_LEN ? bestLen : MIN_LEN_EXPLICIT - 1;
+        let bestMD = dictFloor;
+        if (bestMD < SUFFICIENT_LEN) {
+          let dcand = dictIndex.head[hash4(bytes, pos, dictIndex.hashShift)]!;
+          let depthD = GREEDY_DICT_DEPTH_SHORT;
+          // Chains ascend by offset, so the first out-of-range candidate ends the walk.
+          while (dcand >= 0 && dcand < maxDictStart && depthD-- > 0) {
+            if (dictionary[dcand + bestMD] === bytes[pos + bestMD]) {
+              const dcap = dictionary.length - dcand < cap ? dictionary.length - dcand : cap;
+              const len = matchLength(bytes, pos, dictionary, dcand, dcap);
+              if (len > bestMD) {
+                bestMD = len;
+                const cost = pricing.dictCost(dcand, len);
+                const savings = litCostPrefix[pos + len]! - litBase - cost;
+                if (savings > 0 && savings > bestSavings) {
+                  bestSavings = savings;
+                  bestCost = cost;
+                  bestLen = len;
+                  bestKind = 2;
+                  bestStart = dcand;
+                }
+                if (len === cap || len >= SUFFICIENT_LEN) break;
               }
-              if (len === cap || len >= SUFFICIENT_LEN) break;
             }
+            dcand = dictIndex.prev[dcand]!;
           }
-          dcand = dictIndex.prev[dcand]!;
         }
-        if (bestMD < cap && bestMD < SUFFICIENT_LEN && pos + 6 <= n) {
+        if (bestMD < cap && (bestMD === dictFloor || bestMD < SUFFICIENT_LEN) && pos + 6 <= n) {
           let dcand6 = dictIndex.head6[hash6(bytes, pos, dictIndex.hashShift)]!;
           let depth6 = GREEDY_DICT_DEPTH;
           while (dcand6 >= 0 && dcand6 < maxDictStart && depth6-- > 0) {
