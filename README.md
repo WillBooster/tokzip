@@ -48,10 +48,10 @@ tokzip and the `lz-string` URI mode already emit text. It also measures median e
 per-document throughput, including binary-to-text framing, and **verifies every method on
 every document round-trips losslessly** — any mismatch fails the run.
 
-Latest `main` run (`bench-v2`, fingerprint `5a25e65df399`, 2,493 documents, ~11.1 MB,
-21 languages/locales). Ratio is text-channel output/input (lower is better; identical
-across machines); speed is median end-to-end per-document throughput on a standard
-GitHub Actions runner with the pinned Bun:
+Reference run, pinned at corpus fingerprint `5a25e65df399` (`bench-v2`, 2,493 documents,
+~11.1 MB, 21 languages/locales). Ratio is text-channel output/input (lower is better;
+identical across machines for a given corpus); speed is median end-to-end per-document
+throughput on a standard GitHub Actions runner with the pinned Bun:
 
 | method             | output / input |   compress | decompress |
 | ------------------ | -------------: | ---------: | ---------: |
@@ -71,16 +71,17 @@ it, and 15 points below xz -9e. `fast` beats zstd -19's ratio at four times its
 compression speed while staying URL-safe. (The xz -9e reference runs through the system
 CLI, so it is measured for size and round-trip only.)
 
-The figures below are regenerated from the newest `main` benchmark run on every push:
+The figures below are regenerated from the newest `main` benchmark run on every push, so
+they can be newer than the pinned table above:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://willbooster.github.io/tokzip/charts/ratio-speed-dark.svg" />
-  <img alt="Scatter chart of compression speed versus output size: tokzip small has the smallest output of all measured methods, and tokzip fast beats zstd -19's ratio at four times its speed" src="https://willbooster.github.io/tokzip/charts/ratio-speed-light.svg" />
+  <img alt="Scatter chart of compression speed versus output size for tokzip fast, tokzip small, and the baseline codecs on the newest main run" src="https://willbooster.github.io/tokzip/charts/ratio-speed-light.svg" />
 </picture>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://willbooster.github.io/tokzip/charts/languages-dark.svg" />
-  <img alt="Dot plot of per-language compression ratios: tokzip small produces the smallest output on every language and locale, ahead of tokzip fast, brotli q11, and zstd -19" src="https://willbooster.github.io/tokzip/charts/languages-light.svg" />
+  <img alt="Dot plot of per-language compression ratios for tokzip small, tokzip fast, brotli q11, and zstd -19 on the newest main run" src="https://willbooster.github.io/tokzip/charts/languages-light.svg" />
 </picture>
 
 ```bash
