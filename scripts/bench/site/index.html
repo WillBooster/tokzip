@@ -18,10 +18,13 @@
         --critical: #d03b3b;
         --series-fast: #2a78d6;
         --series-small: #1baf7a;
-        --series-brotli: #eda100;
+        --series-brotli-q11: #eda100;
+        --series-brotli-q5: #eb6834;
         --series-gzip: #008300;
-        --series-zstd: #4a3aa7;
+        --series-zstd-19: #4a3aa7;
+        --series-zstd-3: #e34948;
         --series-lz: #a63f70;
+        --series-xz: #898781;
       }
       @media (prefers-color-scheme: dark) {
         :root {
@@ -36,10 +39,13 @@
           --critical: #e66767;
           --series-fast: #3987e5;
           --series-small: #199e70;
-          --series-brotli: #c98500;
+          --series-brotli-q11: #c98500;
+          --series-brotli-q5: #d95926;
           --series-gzip: #008300;
-          --series-zstd: #9085e9;
+          --series-zstd-19: #9085e9;
+          --series-zstd-3: #e66767;
           --series-lz: #e06fa6;
+          --series-xz: #898781;
         }
       }
       * {
@@ -184,7 +190,7 @@
         Per-commit results on the seeded <code>bench-v2</code> split of the committed corpus, checked out at a pinned
         commit (samples from many pinned, permissively licensed OSS repositories plus natural-language sources). Output
         size is measured on the <em>text channel</em>: binary competitors use unpadded base64url, while tokzip emits
-        URL-safe ASCII directly. Lower is better. Source:
+        URL-safe ASCII directly. Lower is better. Click legend entries to show or hide methods. Source:
         <a href="https://github.com/WillBooster/tokzip">WillBooster/tokzip</a>.
       </p>
 
@@ -204,7 +210,8 @@
       <div class="card">
         <h2>Throughput over commits</h2>
         <p class="desc">
-          End-to-end per-document compress / decompress speed in MB/s (log scale), including binary-to-text framing.
+          End-to-end per-document compress (solid) / decompress (dashed) speed in MB/s (log scale), including
+          binary-to-text framing.
         </p>
         <div class="chart-wrap">
           <canvas
@@ -214,21 +221,54 @@
             aria-label="Compression throughput by commit and method"
           ></canvas>
         </div>
+      </div>
+
+      <div class="card" id="paretoCard" hidden>
+        <h2>Latest run: ratio vs speed</h2>
+        <p class="desc">
+          Compression speed against output size on the most recent commit — closer to the bottom-right is better. The xz
+          reference runs through the system CLI, so it is measured for size only and does not appear here.
+        </p>
+        <div class="chart-wrap" style="height: 360px">
+          <canvas
+            id="paretoChart"
+            role="img"
+            aria-label="Compression ratio versus compression speed by method"
+          ></canvas>
+        </div>
         <details>
-          <summary>Full throughput table (latest run)</summary>
-          <div class="table-wrap" id="speedTable"></div>
+          <summary>Full table (latest run: ratio and speed per method)</summary>
+          <div class="table-wrap" id="summaryTable"></div>
         </details>
       </div>
 
       <div class="card">
         <h2>Latest run: ratio per language</h2>
-        <p class="desc" id="languageDescription">tokzip small vs the strongest competitor on the most recent commit.</p>
+        <p class="desc" id="languageDescription">
+          Output/input ratio per language on the most recent commit. Lower is better; the strongest general-purpose
+          baselines are shown by default and the rest can be enabled from the legend.
+        </p>
         <div class="chart-wrap">
-          <canvas id="languageChart" role="img" aria-label="Compression ratio by language"></canvas>
+          <canvas id="languageChart" role="img" aria-label="Compression ratio by language and method"></canvas>
         </div>
         <details>
           <summary>Full table (latest run, all methods)</summary>
           <div class="table-wrap" id="languageTable"></div>
+        </details>
+      </div>
+
+      <div class="card" id="bucketCard" hidden>
+        <h2>Latest run: ratio by input size</h2>
+        <p class="desc">
+          Byte-weighted output/input ratio per input-size bucket on the most recent commit. Preset dictionaries matter
+          most on short inputs, where general-purpose compressors have no history to work with.
+        </p>
+        <div class="chart-wrap" style="height: 320px">
+          <canvas id="bucketChart" role="img" aria-label="Compression ratio by input size bucket and method"></canvas>
+        </div>
+        <details>
+          <summary>Full table (latest run, all methods)</summary>
+          <div class="table-wrap" id="bucketTable"></div>
         </details>
       </div>
     </main>
@@ -236,22 +276,51 @@
     <script>
       'use strict';
 
+      // Fixed per-method colors: a method keeps its hue in every chart on this page.
+      const SERIES_COLOR_VARS = {
+        'tokzip fast': '--series-fast',
+        'tokzip small': '--series-small',
+        'b64url(brotli q11)': '--series-brotli-q11',
+        'b64url(brotli q5)': '--series-brotli-q5',
+        'b64url(gzip -6)': '--series-gzip',
+        'b64url(zstd -19)': '--series-zstd-19',
+        'b64url(zstd -3)': '--series-zstd-3',
+        'lz-string URI': '--series-lz',
+        'b64url(xz -9e)': '--series-xz',
+      };
+
       const RATIO_SERIES = [
-        { method: 'tokzip fast', colorVar: '--series-fast' },
-        { method: 'tokzip small', colorVar: '--series-small' },
-        { method: 'b64url(brotli q11)', colorVar: '--series-brotli' },
-        { method: 'b64url(gzip -6)', colorVar: '--series-gzip' },
-        { method: 'b64url(zstd -19)', colorVar: '--series-zstd' },
-        { method: 'lz-string URI', colorVar: '--series-lz' },
+        'tokzip fast',
+        'tokzip small',
+        'b64url(brotli q11)',
+        'b64url(gzip -6)',
+        'b64url(zstd -19)',
+        'lz-string URI',
       ];
 
       const SPEED_SERIES = [
-        { method: 'tokzip fast', colorVar: '--series-fast' },
-        { method: 'b64url(brotli q5)', colorVar: '--series-brotli' },
-        { method: 'b64url(gzip -6)', colorVar: '--series-gzip' },
-        { method: 'b64url(zstd -3)', colorVar: '--series-zstd' },
-        { method: 'lz-string URI', colorVar: '--series-lz' },
+        'tokzip fast',
+        'tokzip small',
+        'b64url(brotli q5)',
+        'b64url(gzip -6)',
+        'b64url(zstd -3)',
+        'lz-string URI',
       ];
+
+      // Ratio-ordered method list for the latest-run charts; the first four are visible
+      // by default, the rest start hidden behind their legend entries.
+      const SNAPSHOT_SERIES = [
+        'tokzip small',
+        'tokzip fast',
+        'b64url(brotli q11)',
+        'b64url(zstd -19)',
+        'b64url(brotli q5)',
+        'b64url(gzip -6)',
+        'b64url(zstd -3)',
+        'b64url(xz -9e)',
+        'lz-string URI',
+      ];
+      const SNAPSHOT_VISIBLE_COUNT = 4;
 
       const charts = [];
       let runs = [];
@@ -293,9 +362,12 @@
         renderTiles();
         renderRatioChart(color);
         renderSpeedChart(color);
-        renderSpeedTable();
+        renderParetoChart(color);
+        renderSummaryTable();
         renderLanguageChart(color);
         renderLanguageTable();
+        renderBucketChart(color);
+        renderBucketTable();
       }
 
       function applyChartDefaults(color) {
@@ -334,12 +406,15 @@
             note: `${latest.roundTrip.docs} docs, ${latest.roundTrip.methods ?? 2} methods`,
           },
         ];
-        if (latest.speed && latest.schemaVersion === 1) {
-          tiles.push({
-            label: 'Speed (small mode)',
-            value: `${latest.speed.small.compressMBps} MB/s`,
-            note: `decompress ${latest.speed.small.decompressMBps} MB/s`,
-          });
+        for (const mode of ['small', 'fast']) {
+          const speed = speedOfLatest(latest, `tokzip ${mode}`);
+          if (speed) {
+            tiles.push({
+              label: `tokzip ${mode} speed`,
+              value: `${speed.compressMBps} MB/s`,
+              note: `decompress ${speed.decompressMBps} MB/s`,
+            });
+          }
         }
         if (latest.corpus) {
           tiles.push({
@@ -389,17 +464,17 @@
             type: 'line',
             data: {
               labels: axis.labels,
-              datasets: RATIO_SERIES.map((series) =>
+              datasets: RATIO_SERIES.map((method) =>
                 lineDataset(
-                  series.method,
+                  method,
                   runs.map((run) => {
                     if (!isComparable(run)) return null;
-                    const ratio = run.total.ratios[series.method];
+                    const ratio = run.total.ratios[method];
                     // JSON has no NaN: a degenerate report serializes ratios as null,
                     // which must render as a gap, not as 0%.
                     return typeof ratio === 'number' ? ratio * 100 : null;
                   }),
-                  color(series.colorVar)
+                  seriesColor(method, color)
                 )
               ),
             },
@@ -415,16 +490,16 @@
           if (run.schemaVersion === 1 && method.startsWith('tokzip ')) return run.speed[method.slice(7)]?.[key] ?? null;
           return run.speed[method]?.[key] ?? null;
         };
-        const datasets = SPEED_SERIES.flatMap((series) => [
+        const datasets = SPEED_SERIES.flatMap((method) => [
           lineDataset(
-            `${series.method} compress`,
-            runs.map((run) => speedOf(run, series.method, 'compressMBps')),
-            color(series.colorVar)
+            `${method} compress`,
+            runs.map((run) => speedOf(run, method, 'compressMBps')),
+            seriesColor(method, color)
           ),
           lineDataset(
-            `${series.method} decompress`,
-            runs.map((run) => speedOf(run, series.method, 'decompressMBps')),
-            color(series.colorVar),
+            `${method} decompress`,
+            runs.map((run) => speedOf(run, method, 'decompressMBps')),
+            seriesColor(method, color),
             [6, 4]
           ),
         ]);
@@ -440,33 +515,90 @@
         );
       }
 
+      function renderParetoChart(color) {
+        const latest = runs.at(-1);
+        const points = snapshotMethods(latest)
+          .map((method) => ({
+            method,
+            speed: speedOfLatest(latest, method)?.compressMBps,
+            ratio: latest.total.ratios[method],
+          }))
+          .filter((point) => typeof point.speed === 'number' && typeof point.ratio === 'number');
+        document.querySelector('#paretoCard').hidden = points.length === 0;
+        if (points.length === 0) return;
+        const speeds = points.map((point) => point.speed);
+        charts.push(
+          new Chart(document.querySelector('#paretoChart'), {
+            type: 'scatter',
+            data: {
+              datasets: points.map((point) => ({
+                label: point.method,
+                data: [{ x: point.speed, y: point.ratio * 100 }],
+                backgroundColor: seriesColor(point.method, color),
+                borderColor: color('--surface-1'),
+                borderWidth: 2,
+                pointRadius: point.method.startsWith('tokzip ') ? 8 : 6,
+                pointHoverRadius: 10,
+              })),
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: {
+                  type: 'logarithmic',
+                  // Padded bounds keep the extreme points' markers clear of the plot edges.
+                  min: Math.min(...speeds) / 1.6,
+                  max: Math.max(...speeds) * 1.4,
+                  title: { display: true, text: 'compression speed (MB/s, log scale) →' },
+                  grid: { drawTicks: false },
+                  ticks: { callback: logTickLabel },
+                },
+                y: {
+                  title: { display: true, text: '← output / input (%)' },
+                  grid: { drawTicks: false },
+                },
+              },
+              plugins: {
+                legend: { position: 'top', align: 'end', labels: { usePointStyle: true } },
+                tooltip: {
+                  callbacks: {
+                    label: (item) => ` ${item.dataset.label}: ${item.parsed.x} MB/s, ${item.parsed.y.toFixed(1)}%`,
+                  },
+                },
+              },
+            },
+          })
+        );
+      }
+
       function renderLanguageChart(color) {
         const latest = runs.at(-1);
-        const competitor = bestCompetitor(latest);
-        document.querySelector('#languageDescription').textContent =
-          `tokzip small vs ${competitor.method}, the strongest overall competitor in the most recent run. Lower is better.`;
+        const methods = snapshotMethods(latest);
         const languages = Object.keys(latest.languages).sort(
-          (a, b) => latest.languages[a].total.ratios['tokzip small'] - latest.languages[b].total.ratios['tokzip small']
+          (a, b) =>
+            (latest.languages[a].total.ratios['tokzip small'] ?? 1) -
+            (latest.languages[b].total.ratios['tokzip small'] ?? 1)
         );
         const canvas = document.querySelector('#languageChart');
-        canvas.parentElement.style.height = `${languages.length * 30 + 90}px`;
-        const barDataset = (label, colorValue, method) => ({
-          label,
-          data: languages.map((language) => latest.languages[language].total.ratios[method] * 100),
-          backgroundColor: colorValue,
-          borderRadius: 4,
-          categoryPercentage: 0.72,
-          barPercentage: 0.9,
-        });
+        canvas.parentElement.style.height = `${languages.length * 44 + 110}px`;
         charts.push(
           new Chart(canvas, {
             type: 'bar',
             data: {
               labels: languages,
-              datasets: [
-                barDataset('tokzip small', color('--series-small'), 'tokzip small'),
-                barDataset(competitor.method, color('--series-brotli'), competitor.method),
-              ],
+              datasets: methods.map((method, index) => ({
+                label: method,
+                data: languages.map((language) => {
+                  const ratio = latest.languages[language].total.ratios[method];
+                  return typeof ratio === 'number' ? ratio * 100 : null;
+                }),
+                backgroundColor: seriesColor(method, color),
+                borderRadius: 3,
+                categoryPercentage: 0.8,
+                barPercentage: 0.95,
+                hidden: index >= SNAPSHOT_VISIBLE_COUNT,
+              })),
             },
             options: {
               indexAxis: 'y',
@@ -485,6 +617,68 @@
         );
       }
 
+      function renderBucketChart(color) {
+        const latest = runs.at(-1);
+        const buckets = bucketTotals(latest);
+        document.querySelector('#bucketCard').hidden = buckets.length === 0;
+        if (buckets.length === 0) return;
+        charts.push(
+          new Chart(document.querySelector('#bucketChart'), {
+            type: 'bar',
+            data: {
+              labels: buckets.map((bucket) => `${bucket.name} (${bucket.docs} docs)`),
+              datasets: snapshotMethods(latest).map((method, index) => ({
+                label: method,
+                data: buckets.map((bucket) => bucket.ratios[method] ?? null),
+                backgroundColor: seriesColor(method, color),
+                borderRadius: 3,
+                categoryPercentage: 0.8,
+                barPercentage: 0.95,
+                hidden: index >= SNAPSHOT_VISIBLE_COUNT,
+              })),
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: { title: { display: true, text: 'input size bucket' }, grid: { display: false } },
+                y: { title: { display: true, text: 'output / input (%)' }, grid: { drawTicks: false } },
+              },
+              plugins: {
+                legend: { position: 'top', align: 'end' },
+                tooltip: { callbacks: { label: (item) => ` ${item.dataset.label}: ${item.parsed.y.toFixed(1)}%` } },
+              },
+            },
+          })
+        );
+      }
+
+      /** Byte-weighted per-bucket ratios aggregated across languages (schema v2 only). */
+      function bucketTotals(run) {
+        const totals = new Map();
+        for (const language of Object.values(run.languages)) {
+          for (const [name, bucket] of Object.entries(language.buckets ?? {})) {
+            const entry = totals.get(name) ?? { name, docs: 0, inputBytes: 0, outputChars: {} };
+            entry.docs += bucket.docs;
+            entry.inputBytes += bucket.inputBytes;
+            for (const [method, ratio] of Object.entries(bucket.ratios)) {
+              if (typeof ratio !== 'number') continue;
+              entry.outputChars[method] = (entry.outputChars[method] ?? 0) + ratio * bucket.inputBytes;
+            }
+            totals.set(name, entry);
+          }
+        }
+        return [...totals.values()]
+          .sort((a, b) => parseFloat(a.name) - parseFloat(b.name))
+          .map((entry) => ({
+            name: entry.name,
+            docs: entry.docs,
+            ratios: Object.fromEntries(
+              Object.entries(entry.outputChars).map(([method, chars]) => [method, (chars / entry.inputBytes) * 100])
+            ),
+          }));
+      }
+
       function chartOptions(axis, { title, logarithmic = false }) {
         return {
           responsive: true,
@@ -496,6 +690,7 @@
               type: logarithmic ? 'logarithmic' : 'linear',
               title: { display: true, text: title },
               grid: { drawTicks: false },
+              ticks: logarithmic ? { callback: logTickLabel } : undefined,
             },
           },
           plugins: {
@@ -524,21 +719,62 @@
           `<tbody>${rows.join('')}</tbody></table>`;
       }
 
-      function renderSpeedTable() {
+      function renderBucketTable() {
         const latest = runs.at(-1);
-        if (!latest.speed) return;
-        const entries =
-          latest.schemaVersion === 1
-            ? Object.entries(latest.speed).map(([mode, value]) => [`tokzip ${mode}`, value])
-            : Object.entries(latest.speed);
-        const rows = entries.map(
-          ([method, speed]) =>
-            `<tr><td>${method}</td><td>${speed.compressMBps.toFixed(1)}</td><td>${speed.decompressMBps.toFixed(1)}</td>` +
-            `<td>${speed.compressKops?.toFixed(1) ?? '—'}</td><td>${speed.decompressKops?.toFixed(1) ?? '—'}</td></tr>`
+        const buckets = bucketTotals(latest);
+        if (buckets.length === 0) return;
+        const methods = latest.methods;
+        const rows = buckets.map(
+          (bucket) =>
+            `<tr><td>${bucket.name}</td><td>${bucket.docs}</td>` +
+            methods
+              .map(
+                (method) =>
+                  `<td>${bucket.ratios[method] === undefined ? '—' : bucket.ratios[method].toFixed(1) + '%'}</td>`
+              )
+              .join('') +
+            '</tr>'
         );
-        document.querySelector('#speedTable').innerHTML =
-          '<table><thead><tr><th>method</th><th>compress MB/s</th><th>decompress MB/s</th>' +
+        document.querySelector('#bucketTable').innerHTML =
+          `<table><thead><tr><th>bucket</th><th>docs</th>${methods.map((m) => `<th>${m}</th>`).join('')}</tr></thead>` +
+          `<tbody>${rows.join('')}</tbody></table>`;
+      }
+
+      function renderSummaryTable() {
+        const latest = runs.at(-1);
+        const rows = snapshotMethods(latest).map((method) => {
+          const speed = speedOfLatest(latest, method);
+          return (
+            `<tr><td>${method}</td><td>${formatPercent(latest.total.ratios[method])}</td>` +
+            `<td>${speed ? speed.compressMBps.toFixed(1) : '—'}</td><td>${speed ? speed.decompressMBps.toFixed(1) : '—'}</td>` +
+            `<td>${speed?.compressKops?.toFixed(1) ?? '—'}</td><td>${speed?.decompressKops?.toFixed(1) ?? '—'}</td></tr>`
+          );
+        });
+        document.querySelector('#summaryTable').innerHTML =
+          '<table><thead><tr><th>method</th><th>output / input</th><th>compress MB/s</th><th>decompress MB/s</th>' +
           `<th>compress kdoc/s</th><th>decompress kdoc/s</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+      }
+
+      /** Methods of the latest run in ratio-informed display order (unknown ones last). */
+      function snapshotMethods(run) {
+        const known = SNAPSHOT_SERIES.filter((method) => run.methods.includes(method));
+        return [...known, ...run.methods.filter((method) => !known.includes(method))];
+      }
+
+      function speedOfLatest(run, method) {
+        if (!run.speed) return undefined;
+        if (run.schemaVersion === 1) return method.startsWith('tokzip ') ? run.speed[method.slice(7)] : undefined;
+        return run.speed[method];
+      }
+
+      function seriesColor(method, color) {
+        return color(SERIES_COLOR_VARS[method] ?? '--text-muted');
+      }
+
+      /** Keeps log axes readable: label only the 1/2/5 mantissa steps. */
+      function logTickLabel(value) {
+        const mantissa = Number((value / 10 ** Math.floor(Math.log10(value))).toPrecision(2));
+        return [1, 2, 5].includes(mantissa) ? value : '';
       }
 
       function bestCompetitor(run) {

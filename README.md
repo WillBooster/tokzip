@@ -32,7 +32,8 @@ The wire format is specified in [FORMAT.md](FORMAT.md); the design rationale liv
 
 ## Benchmarks
 
-**Live dashboard (per-commit charts): <https://willbooster.github.io/tokzip/>**
+**Live dashboard (per-commit charts, per-language and per-size tables):
+<https://willbooster.github.io/tokzip/>**
 
 Every push to `main` runs the [Benchmark workflow](.github/workflows/benchmark.yml) on the
 seeded `bench-v2` split from a pinned
@@ -47,29 +48,40 @@ tokzip and the `lz-string` URI mode already emit text. It also measures median e
 per-document throughput, including binary-to-text framing, and **verifies every method on
 every document round-trips losslessly** — any mismatch fails the run.
 
-Latest local run (`bench-v2`, fingerprint `5a25e65df399`, 2,493 documents, ~11.1 MB,
-21 languages/locales; output/input, lower is better; Apple Silicon, Bun 1.3):
+Latest `main` run (`bench-v2`, fingerprint `5a25e65df399`, 2,493 documents, ~11.1 MB,
+21 languages/locales). Ratio is text-channel output/input (lower is better; identical
+across machines); speed is median end-to-end per-document throughput on a standard
+GitHub Actions runner with the pinned Bun:
 
-| corpus       | docs | tokzip fast | tokzip small | b64url(brotli q11) | b64url(gzip -6) | b64url(zstd -19) | b64url(xz -9e) |
-| ------------ | ---: | ----------: | -----------: | -----------------: | --------------: | ---------------: | -------------: |
-| typescript   |  146 |       28.2% |        18.9% |              22.8% |           26.6% |            25.6% |          27.1% |
-| javascript   |   62 |       44.0% |        30.3% |              38.4% |           45.3% |            44.3% |          48.1% |
-| python       |   70 |       33.9% |        23.0% |              28.0% |           32.3% |            31.4% |          32.9% |
-| java         |   90 |       26.7% |        17.8% |              32.3% |           40.0% |            39.7% |          42.2% |
-| csharp       |  231 |       25.7% |        17.3% |              25.1% |           29.7% |            29.3% |          31.9% |
-| rust         |   75 |       28.6% |        19.4% |              26.8% |           30.5% |            29.6% |          32.1% |
-| en-US        |  347 |       51.8% |        36.2% |              43.7% |           54.9% |            54.1% |          58.2% |
-| ja-JP        |  139 |       50.4% |        33.3% |              46.7% |           57.1% |            55.9% |          55.5% |
-| **all (21)** | 2493 |   **40.1%** |    **27.1%** |          **34.4%** |       **41.9%** |        **40.7%** |      **42.3%** |
+| method             | output / input |   compress | decompress |
+| ------------------ | -------------: | ---------: | ---------: |
+| **tokzip small**   |      **27.1%** |   1.9 MB/s |  95.1 MB/s |
+| b64url(brotli q11) |          34.4% |   0.9 MB/s | 152.6 MB/s |
+| b64url(brotli q5)  |          38.7% |  41.6 MB/s | 166.0 MB/s |
+| **tokzip fast**    |      **40.1%** |  19.2 MB/s | 127.1 MB/s |
+| b64url(zstd -19)   |          40.7% |   4.9 MB/s | 256.4 MB/s |
+| b64url(gzip -6)    |          41.9% |  75.8 MB/s | 204.9 MB/s |
+| b64url(xz -9e)     |          42.3% |          — |          — |
+| b64url(zstd -3)    |          44.1% | 149.8 MB/s | 247.8 MB/s |
+| lz-string URI      |          61.6% |   4.7 MB/s |  15.9 MB/s |
 
-On this per-document workload, tokzip `fast` compresses/decompresses at 37.0/221.0 MB/s
-(8.3/49.6 thousand documents/s), and `small` at 3.2/158.4 MB/s. `small` produces the
-smallest output of every measured method on **every language and locale** — 7.3 points
-below brotli q11 overall while compressing ~2.7× faster than it (brotli q11: 1.2 MB/s),
-and 15 points below xz -9e. `fast` beats zstd -19's ratio at five times its compression
-speed, and zstd -3 reaches 267.9 MB/s but emits 40.7% of the input size after base64url
-framing. (The xz -9e reference runs through the system CLI, so it is measured for size
-and round-trip only.)
+`small` produces the smallest output of every measured method on **every language and
+locale** — 7.3 points below brotli q11 overall while compressing about twice as fast as
+it, and 15 points below xz -9e. `fast` beats zstd -19's ratio at four times its
+compression speed while staying URL-safe. (The xz -9e reference runs through the system
+CLI, so it is measured for size and round-trip only.)
+
+The figures below are regenerated from the newest `main` benchmark run on every push:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://willbooster.github.io/tokzip/charts/ratio-speed-dark.svg" />
+  <img alt="Scatter chart of compression speed versus output size: tokzip small has the smallest output of all measured methods, and tokzip fast beats zstd -19's ratio at four times its speed" src="https://willbooster.github.io/tokzip/charts/ratio-speed-light.svg" />
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://willbooster.github.io/tokzip/charts/languages-dark.svg" />
+  <img alt="Dot plot of per-language compression ratios: tokzip small produces the smallest output on every language and locale, ahead of tokzip fast, brotli q11, and zstd -19" src="https://willbooster.github.io/tokzip/charts/languages-light.svg" />
+</picture>
 
 ```bash
 bun scripts/bench/bench.ts                      # size table + round-trip verification

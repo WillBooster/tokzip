@@ -33,12 +33,14 @@ else
 fi
 
 cp scripts/bench/site/index.html "$pages_dir/index.html"
+# Static SVG figures for the README, regenerated from this run so they track main.
+bun scripts/bench/renderCharts.ts "$result_json" "$pages_dir/charts"
 touch "$pages_dir/.nojekyll" "$pages_dir/results.jsonl"
 grep -v "\"commit\":\"$commit\"" "$pages_dir/results.jsonl" > "$pages_dir/results.jsonl.tmp" || true
 jq -c . "$result_json" >> "$pages_dir/results.jsonl.tmp"
 mv "$pages_dir/results.jsonl.tmp" "$pages_dir/results.jsonl"
 
-git -C "$pages_dir" add .nojekyll index.html results.jsonl
+git -C "$pages_dir" add .nojekyll index.html results.jsonl charts
 if git -C "$pages_dir" diff --cached --quiet; then
   echo 'no changes to publish'
 else
