@@ -34,6 +34,9 @@ fi
 
 cp scripts/bench/site/index.html "$pages_dir/index.html"
 # Static SVG figures for the README, regenerated from this run so they track main.
+# Clear the directory first: a chart the renderer no longer emits (renamed, or skipped
+# for a report without speed data) must not keep shipping as if it belonged to this run.
+rm -rf "$pages_dir/charts"
 bun scripts/bench/renderCharts.ts "$result_json" "$pages_dir/charts"
 touch "$pages_dir/.nojekyll" "$pages_dir/results.jsonl"
 grep -v "\"commit\":\"$commit\"" "$pages_dir/results.jsonl" > "$pages_dir/results.jsonl.tmp" || true

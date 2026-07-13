@@ -178,6 +178,9 @@ function renderLanguageChart(report: ChartReport, theme: Theme): string {
     { method: 'tokzip fast', color: theme.seriesFast, shape: 'triangle' as const },
     { method: 'b64url(brotli q11)', color: theme.seriesBrotli, shape: 'square' as const },
     { method: 'b64url(zstd -19)', color: theme.seriesZstd, shape: 'diamond' as const },
+    // The filter only guards the optional competitors: bench.ts unconditionally measures
+    // both tokzip modes, so `series` (and the Math.max spread below) is never empty for
+    // any report the benchmark actually produces.
   ].filter((entry) => Object.values(report.languages).some((language) => language.total.ratios[entry.method]));
   const languages = Object.keys(report.languages).toSorted(
     (left, right) =>
