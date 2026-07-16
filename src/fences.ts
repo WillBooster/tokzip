@@ -115,10 +115,19 @@ function resolveLabel(bytes: Uint8Array, start: number, end: number): number {
 
 /**
  * Encoder policy (not normative): a block language must cover at least this many input
- * bytes before its extension index is built. Building and process-caching a hash index over
- * a ~512 KB dictionary costs milliseconds and megabytes, which tiny blocks cannot repay.
+ * bytes — fence lines excluded — before its extension index is built. Building and
+ * process-caching a hash index over a ~512 KB dictionary costs milliseconds and megabytes;
+ * tiny blocks cannot repay that, while for real blocks (median ~122 bytes in the bench
+ * corpora) the cache amortizes across the process like the frame-language index does.
  */
 const MIN_EXTENSION_CONTENT = 64;
+
+/**
+ * Encoder policy (not normative): at most this many distinct block languages extend one
+ * document (the largest by content win; ties break by language id for determinism). This
+ * bounds worst-case index memory for pathological many-language documents.
+ */
+const MAX_EXTENSION_LANGUAGES = 4;
 
 /**
  * Encoder pre-scan: splits the input into dictionary segments at fence transitions.
@@ -141,12 +150,16 @@ export function computeDictSegments(bytes: Uint8Array, language: RegisteredLangu
   let lineStart = 0;
   for (let i = 0; i < bytes.length; i++) {
     if (bytes[i] !== LF) continue;
+    const thisLineStart = lineStart;
     processFenceLine(bytes, lineStart, i, state);
     lineStart = i + 1;
     const id = state.blockLanguageId;
     const block = id >= 0 && id !== language.id ? languageById(id) : undefined;
     if (block === currentBlock) continue;
-    if (currentBlock) contentBytes.set(currentBlock, (contentBytes.get(currentBlock) ?? 0) + lineStart - currentStart);
+    // A block ends at its closing fence line, which is not content (threshold accounting).
+    if (currentBlock) {
+      contentBytes.set(currentBlock, (contentBytes.get(currentBlock) ?? 0) + thisLineStart - currentStart);
+    }
     starts ??= [0];
     blocks ??= [undefined];
     starts.push(lineStart);
@@ -158,14 +171,20 @@ export function computeDictSegments(bytes: Uint8Array, language: RegisteredLangu
   if (currentBlock) {
     contentBytes.set(currentBlock, (contentBytes.get(currentBlock) ?? 0) + bytes.length - currentStart);
   }
-  // Phase 2: build segments, indexing only languages whose blocks can repay the index.
-  let hasExtension = false;
+  // Phase 2: index only languages whose blocks can repay it, largest content first.
+  const qualifying = new Set(
+    [...contentBytes.entries()]
+      .filter(([, content]) => content >= MIN_EXTENSION_CONTENT)
+      .toSorted(([a, ca], [b, cb]) => cb - ca || a.id - b.id)
+      .slice(0, MAX_EXTENSION_LANGUAGES)
+      .map(([block]) => block)
+  );
+  if (qualifying.size === 0) return undefined;
   const segments = starts.map((start, i): DictSegment => {
     const block = blocks[i];
-    if (!block || contentBytes.get(block)! < MIN_EXTENSION_CONTENT) {
+    if (!block || !qualifying.has(block)) {
       return { start, extDictionary: undefined, extIndex: undefined, extBase: 0, extWrapperLength: 0 };
     }
-    hasExtension = true;
     return {
       start,
       extDictionary: block.dictionary,
@@ -174,7 +193,7 @@ export function computeDictSegments(bytes: Uint8Array, language: RegisteredLangu
       extWrapperLength: block.wrapperLength,
     };
   });
-  return hasExtension ? segments : undefined;
+  return segments;
 }
 
 /**
