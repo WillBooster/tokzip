@@ -197,7 +197,10 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   const languageId = shippedMode === MODE_STORED ? 0 : language.id;
 
   if (binary) {
-    const out = new TextSink(shippedMode === MODE_STORED ? bytes.length + 8 : 16);
+    // Exact-capacity sink, no growth: the small body is ceil(totalBits / 8) bytes, and every
+    // other body is smaller than the input (fast auto-downgrades to stored otherwise).
+    const outCapacity = 8 + (smallPlanToShip ? Math.ceil(smallPlanToShip.totalBits / 8) : bytes.length);
+    const out = new TextSink(outCapacity);
     out.push(BINARY_MAGIC_VERSION);
     out.push(languageId);
     out.push(flags);
