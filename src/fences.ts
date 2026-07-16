@@ -137,7 +137,14 @@ const MAX_EXTENSION_LANGUAGES = 4;
  * regions match against the frame dictionary exactly like plain v2, and their frames need
  * no registration to decode.
  */
-export function computeDictSegments(bytes: Uint8Array, language: RegisteredLanguage): DictSegment[] | undefined {
+export function computeDictSegments(
+  bytes: Uint8Array,
+  language: RegisteredLanguage,
+  maxDictStart: number
+): DictSegment[] | undefined {
+  // Extension offsets start at the frame dictionary length; when the shipped mode cannot
+  // represent even the first one, indexing block languages would be pure waste.
+  if (language.dictionary.length >= maxDictStart) return undefined;
   if (!bytes.includes(BACKTICK)) return undefined;
   const state: FenceState = { openFenceLength: 0, blockLanguageId: -1 };
   // Phase 1: collect fence transitions and per-language content sizes without touching any

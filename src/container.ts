@@ -4,6 +4,7 @@ import { decodeFastBody, emitFastBody, fastBodyCost, fastPricing } from './fastM
 import { computeDictSegments, usesExtendedDictionary } from './fences.ts';
 import {
   DEFAULT_MAX_OUTPUT_SIZE,
+  FAST_WINDOW,
   FLAG_BYTES,
   FLAG_FENCED,
   MAGIC_VERSION,
@@ -11,6 +12,7 @@ import {
   MODE_SMALL,
   MODE_STORED,
   RESERVED_FLAG_MASK,
+  SMALL_WINDOW,
 } from './format.ts';
 import { dictIndexFor, parse, type Token } from './lz.ts';
 import {
@@ -55,8 +57,9 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   if (mode !== 'fast' && mode !== 'small') throw new RangeError(`invalid mode: ${String(mode)}`);
 
   // Fenced dictionary extension: labeled code fences extend the searchable dictionary space
-  // with the block language's suffix (undefined when the input has no such fence).
-  const segments = computeDictSegments(bytes, language);
+  // with the block language's suffix (undefined when the input has no such fence, or when
+  // the mode's offset bound cannot address the extension at all).
+  const segments = computeDictSegments(bytes, language, mode === 'fast' ? FAST_WINDOW : SMALL_WINDOW);
   const dictIndex = dictIndexFor(language);
 
   const storedCost = packedRawLength(bytes.length);
