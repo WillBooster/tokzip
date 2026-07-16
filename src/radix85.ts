@@ -66,6 +66,7 @@ export class BitWriter {
 
   /** Flushes to bytes: the bitstream zero-padded to a byte boundary (binary frames). */
   toBytes(): Uint8Array {
+    // Math.ceil, not (x + 7) >> 3: bitLength can exceed 2^31, where 32-bit ops truncate.
     const bytes = new Uint8Array(Math.ceil(this.bitLength / 8));
     const fullWords = this.wordCount;
     let at = 0;
@@ -111,6 +112,7 @@ export class BitWriter {
 /** Packs a big-endian byte payload into the 32-bit words a {@link BitReader} consumes (zero-padded tail). */
 export function wordsFromBytes(bytes: Uint8Array, start: number, end: number): Uint32Array {
   const byteLength = end - start;
+  // Math.ceil, not (x + 3) >> 2: byte lengths can exceed 2^31, where 32-bit ops truncate.
   const words = new Uint32Array(Math.ceil(byteLength / 4));
   let w = 0;
   let i = start;

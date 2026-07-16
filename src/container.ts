@@ -98,6 +98,8 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   // The auto-downgrade compares body costs in output units — chars for text frames, bytes
   // for binary frames (fast bodies pack 6 bits per char; small bodies byte-pad their bit
   // stream) — so each channel independently ships its smallest frame.
+  // Math.ceil, not (x + 7) >> 3: bit counts can exceed 2^31 on large inputs, where 32-bit
+  // bitwise ops silently truncate.
   const fastOutCost = (chars: number): number => (binary ? Math.ceil((chars * 6) / 8) : chars);
   const storedCost = binary ? bytes.length : packedRawLength(bytes.length);
   let shippedMode = MODE_STORED;
@@ -336,6 +338,7 @@ function decompressBinary(data: Uint8Array, maxOutputSize: number): { flags: num
 function pushByteVarint(out: TextSink, value: number): void {
   if (value < 0 || !Number.isSafeInteger(value)) throw new RangeError(`invalid varint value: ${value}`);
   do {
+    // Arithmetic, not & / >>>: varint values span 35 bits, beyond 32-bit bitwise range.
     const group = value % 128;
     value = Math.floor(value / 128);
     out.push(value > 0 ? group | 128 : group);

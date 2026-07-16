@@ -264,6 +264,7 @@ export function decodeFastBodyBinary(
 
 /** Bit-packs an emitted `fast` radix-64 char-code stream into the binary-frame body bytes. */
 export function packFastCodes(codes: Uint8Array, count: number): Uint8Array {
+  // Math.ceil, not (x + 7) >> 3: count * 6 can exceed 2^31, where 32-bit ops truncate.
   const out = new Uint8Array(Math.ceil((count * 6) / 8));
   const values = RADIX64_VALUES;
   let acc = 0;
