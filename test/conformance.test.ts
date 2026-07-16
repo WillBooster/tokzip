@@ -57,7 +57,7 @@ describe('container vectors', () => {
   test('invalid mode and reserved flag bits', () => {
     const frame = compress('hello');
     expectDecodeError(frame.slice(0, 2) + 'D' + frame.slice(3), /invalid mode/); // Mode bits = 3.
-    expectDecodeError(frame.slice(0, 2) + 'I' + frame.slice(3), /reserved flag bits/); // Bit 3 set.
+    expectDecodeError(frame.slice(0, 2) + 'Q' + frame.slice(3), /reserved flag bits/); // Bit 4 set.
   });
 
   test('non-canonical size varint', () => {

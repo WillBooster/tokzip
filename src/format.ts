@@ -10,8 +10,14 @@ export const MODE_SMALL = 2;
 
 /** Input-type flag (bit 2 of the flags char): 0 = string (UTF-8), 1 = bytes. */
 export const FLAG_BYTES = 0b100;
-/** Reserved flag bits (5:3): encoders write 0, decoders reject non-zero. */
-export const RESERVED_FLAG_MASK = 0b11_1000;
+/**
+ * Fenced-dictionary flag (bit 3): inside a labeled code fence the dictionary space is
+ * extended with that language's dictionary suffix above the frame dictionary (see fences.ts
+ * and FORMAT.md §6.1).
+ */
+export const FLAG_FENCED = 0b1000;
+/** Reserved flag bits (5:4): encoders write 0, decoders reject non-zero. */
+export const RESERVED_FLAG_MASK = 0b11_0000;
 
 /** Default `maxOutputSize` (64 MiB). */
 export const DEFAULT_MAX_OUTPUT_SIZE = 64 * 1024 * 1024;

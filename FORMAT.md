@@ -64,7 +64,8 @@ zero on encode and ignored on decode.
 [2] flags           radix-64 char:
                       bits 1:0  shipped mode: 0 stored, 1 fast, 2 small; 3 is invalid
                       bit  2    input type: 0 string (UTF-8), 1 bytes
-                      bits 5:3  reserved; encoders write 0, decoders reject non-zero
+                      bit  3    fenced dictionary extension (§6.1)
+                      bits 5:4  reserved; encoders write 0, decoders reject non-zero
 [3…] decompressed size   radix-64 varint (bytes of the decompressed payload)
 […]  body                per shipped mode (sections 5–7)
 ```
@@ -141,6 +142,71 @@ matches, and rep matches.
   depending on offset width, chosen by a greedy parse; in `small`: exact static-table bit
   prices drive a shortest-path optimal parse with path-carried rep state, falling back to a
   bounded price-aware lazy parse beyond the encoder's input bound).
+
+### 6.1 Fenced dictionary extension (flag bit 3)
+
+Documents that embed fenced code blocks (triple-backtick fences, as produced by Markdown and
+LLM output) compress better when dictionary matches inside a block can also address that
+block language's dictionary. Flag bit 3 enables this per frame:
+
+- **Bit 3 = 0**: every dictionary match addresses the frame language's assembled dictionary
+  (the original v2 behavior; such frames are bit-identical to plain v2 frames).
+- **Bit 3 = 1**: the dictionary space is **extended, not switched**. Offsets below the frame
+  language's assembled dictionary length keep their plain-v2 meaning everywhere. Where the
+  **fence state** of the output produced strictly before a match's first output byte names a
+  block language other than the frame language, that language's **dictionary suffix** is
+  addressed contiguously above the frame dictionary: virtual offset
+  `frameDictionaryLength + k` reads suffix byte `k`. The space is contiguous, so a match MAY
+  straddle the boundary. All other streams and tables (entropy tables, literal charsets,
+  contexts, history, reps) stay keyed to the frame language. Because the extension is a
+  strict superset of the plain space, fenced frames never lose frame-dictionary coverage
+  (e.g. prose or native-language comments inside a code block). Parsers are still heuristic,
+  so the reference encoder additionally prices the fenced and plain parses exactly and ships
+  the cheaper frame, preferring plain on ties.
+
+Fence state is derived from the decoded output itself (like the literal context of §8.2), so
+the frame carries nothing beyond the flag bit. It advances one **completed line** at a time:
+a line is a byte range ending at an LF (0x0A); bytes after the last produced LF are pending
+and never affect state. The grammar (normative):
+
+- A **fence line** starts at column 0 with three or more backticks (0x60). Its _info string_
+  is the rest of the line with trailing spaces/tabs/CRs (0x20/0x09/0x0D) and leading
+  spaces/tabs removed.
+- Outside a block, a fence line whose info string contains no backtick **opens** a block,
+  recording its backtick count. The _label_ is the info string up to the first space/tab;
+  labels are matched ASCII-lowercased against the table below. An unknown or empty label
+  keeps the frame language for the block.
+- Inside a block, a fence line with at least the opening backtick count and an **empty** info
+  string **closes** it; every other line (fence-like or not) is content.
+- State transitions take effect at the byte after the fence line's LF. An unclosed block
+  extends to the end of the output.
+
+A dictionary match whose range reaches past the frame dictionary length is valid only where
+the active block language differs from the frame language, and MUST lie entirely within
+`frameDictionaryLength + blockSuffixLength`; decoding such a match with the block language
+unregistered — or where no block language is active — is a structural error. Matches that
+stay below the frame dictionary length decode without any fence evaluation, so blocks that
+contain none need no registration. Encoders MUST set bit 3 **iff** at least one emitted
+dictionary match reaches past the frame dictionary length (offset extension is impossible
+for languages the encoder does not have registered — there is nothing to search).
+
+Normative label table (aliases → language id of §4):
+
+| language   | labels                                  | language   | labels                                  |
+| ---------- | --------------------------------------- | ---------- | --------------------------------------- |
+| c          | `c`, `h`                                | php        | `php`                                   |
+| cpp        | `cpp`, `c++`, `cc`, `cxx`, `hpp`        | python     | `python`, `py`, `python3`               |
+| csharp     | `csharp`, `cs`, `c#`                    | ruby       | `ruby`, `rb`                            |
+| css        | `css`                                   | rust       | `rust`, `rs`                            |
+| dart       | `dart`                                  | typescript | `typescript`, `ts`, `tsx`, `mts`, `cts` |
+| haskell    | `haskell`, `hs`                         | zig        | `zig`                                   |
+| html       | `html`, `htm`                           | text       | `text`, `txt`, `plain`, `plaintext`     |
+| java       | `java`                                  | jsp        | `jsp`                                   |
+| javascript | `javascript`, `js`, `jsx`, `mjs`, `cjs` |            |                                         |
+
+All other labels (including the locale languages, which have no labels) keep the frame
+language. Frames whose fence labels all resolve to the frame language (or to nothing) carry
+bit 3 = 0.
 
 ## 7. `fast` body: char-aligned radix-64 token stream
 
@@ -293,7 +359,8 @@ arrays of §8.2. Tables are validated at registration
 (complete code, alphabet sizes, charset length 64); the dictionary match index is built
 lazily on first compress per language and cached per process (idempotent, re-entrant).
 Compressing with an explicitly requested unregistered language throws; decoding a non-stored
-frame with an unregistered id is a structural error.
+frame with an unregistered id is a structural error, as is decoding a fenced (§6.1)
+extended dictionary match whose block language is unregistered.
 
 **Module data is part of the codec identity.** Non-stored frames reference the registered
 module's dictionary bytes, top-64 charset, context map, and code lengths implicitly — the
@@ -317,4 +384,7 @@ non-canonical varint; `maxOutputSize` exceeded; declared size beyond the body's 
 output capacity (rejected before allocation, even with `maxOutputSize: Infinity`); invalid
 UTF-8 body; non-stored body not smaller than the stored body (e.g. a size-0 `small` frame);
 literal-64 vs literal-raw runs including 1- and 2-byte raw tails; downgrade with
-fast-ineligible tokens.
+fast-ineligible tokens; fenced frames (flag bit 3): extended-dictionary round-trips in both
+modes, label normalization (case, aliases, CRLF, longer fences), unlabeled/unknown labels and
+close-fence rules keeping the plain space, unregistered block language on an actual extended
+match, and bit 3 = 0 whenever no extended dictionary match ships.

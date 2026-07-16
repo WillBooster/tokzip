@@ -24,6 +24,24 @@ export interface DictToken {
 export type Token = LiteralToken | HistoryToken | DictToken;
 
 /**
+ * A run of input positions where the dictionary space is extended past the frame language's
+ * assembled dictionary with a fenced block language's suffix (see fences.ts and
+ * FORMAT.md §6.1). Segments are contiguous and ascending; the first starts at 0; unswitched
+ * runs carry no extension. The space active at a token's start position applies to the whole
+ * token. Frame-dictionary matches keep their plain-v2 offsets in every segment.
+ */
+export interface DictSegment {
+  start: number;
+  /** Extension source: the block language's assembled dictionary, or undefined when none. */
+  extDictionary: Uint8Array | undefined;
+  extIndex: DictIndex | undefined;
+  /** Virtual offset of extension position `cand` = `cand + extBase` (frameLen - wrapperLen). */
+  extBase: number;
+  /** Extension positions below this are wrapper bytes the frame dictionary already covers. */
+  extWrapperLength: number;
+}
+
+/**
  * Exact `small`-mode bit prices in slot-table form. Enables the optimal (shortest-path) parse:
  * every price is a plain array lookup, so the DP inner loop stays allocation- and call-free.
  */
@@ -187,7 +205,8 @@ export function parse(
   bytes: Uint8Array,
   dictionary: Uint8Array,
   dictIndex: DictIndex | undefined,
-  pricing: ParsePricing
+  pricing: ParsePricing,
+  segments?: DictSegment[]
 ): Token[] {
   if (bytes.length === 0) return [];
   if (pricing.optimal && bytes.length <= OPTIMAL_MAX_INPUT) {
@@ -198,10 +217,11 @@ export function parse(
       pricing.window,
       pricing.maxDictStart,
       pricing.optimal,
-      pricing.litCostPrefix
+      pricing.litCostPrefix,
+      segments
     );
   }
-  return parseGreedy(bytes, dictionary, dictIndex, pricing);
+  return parseGreedy(bytes, dictionary, dictIndex, pricing, segments);
 }
 
 // Scratch buffers reused across calls (compress is synchronous; JS is single-threaded).
@@ -214,9 +234,10 @@ let dpSrc = new Int32Array(0);
 let dpKind = new Uint8Array(0);
 let dpDist = new Int32Array(0);
 let dpReps = new Int32Array(0);
-// Pareto match candidates collected per position (length strictly ascending).
-const candDist = new Int32Array(OPTIMAL_DEPTH_SHORT + OPTIMAL_DEPTH);
-const candLen = new Int32Array(OPTIMAL_DEPTH_SHORT + OPTIMAL_DEPTH);
+// Pareto match candidates collected per position (length strictly ascending; sized for a
+// frame-dictionary walk plus a fenced-extension walk).
+const candDist = new Int32Array(2 * (OPTIMAL_DEPTH_SHORT + OPTIMAL_DEPTH));
+const candLen = new Int32Array(2 * (OPTIMAL_DEPTH_SHORT + OPTIMAL_DEPTH));
 
 function headFor(pool: Map<number, Int32Array>, bits: number): Int32Array {
   let head = pool.get(bits);
@@ -251,9 +272,16 @@ function parseOptimal(
   window: number,
   maxDictStart: number,
   prices: SlotPricing,
-  litCostPrefix: Float64Array
+  litCostPrefix: Float64Array,
+  segments?: DictSegment[]
 ): Token[] {
   const n = bytes.length;
+  let segIndex = 0;
+  let extDictionary = segments?.[0]!.extDictionary;
+  let extIndex = segments?.[0]!.extIndex;
+  let extBase = segments?.[0]!.extBase ?? 0;
+  let extWrapperLength = segments?.[0]!.extWrapperLength ?? 0;
+  let segNext = segments && segments.length > 1 ? segments[1]!.start : n + 1;
   const { histSlotBits, dictSlotBits, repSlotBits, histOffsetSlotBits, dictOffsetSlotBits } = prices;
 
   const bits = hashBitsFor(n);
@@ -284,6 +312,16 @@ function parseOptimal(
   reps[3] = INITIAL_REPS[3]!;
 
   for (let i = 0; i < n; i++) {
+    // Fence-segment cursor: extension searches at position i use the segment covering i.
+    while (i >= segNext) {
+      segIndex++;
+      const seg = segments![segIndex]!;
+      extDictionary = seg.extDictionary;
+      extIndex = seg.extIndex;
+      extBase = seg.extBase;
+      extWrapperLength = seg.extWrapperLength;
+      segNext = segIndex + 1 < segments!.length ? segments![segIndex + 1]!.start : n + 1;
+    }
     const base = cost[i]!;
     const ri = i * 4;
     const rep0 = reps[ri]!;
@@ -515,47 +553,29 @@ function parseOptimal(
         // dictionary matches essentially never win, but an equal-length one can (dictionary
         // tokens/offsets use their own context tables), and a strictly longer one often does.
         const dictFloor = bestExplicit > maxM ? bestExplicit : maxM;
-        if (dictIndex && dictFloor <= cap) {
-          let candCountD = 0;
-          {
-            let bestM = dictFloor >= SUFFICIENT_LEN ? dictFloor - 1 : MIN_LEN_EXPLICIT - 1;
-            if (dictFloor < SUFFICIENT_LEN) {
-              let cand = dictIndex.head[hash4(bytes, i, dictIndex.hashShift)]!;
-              let depth = OPTIMAL_DICT_DEPTH_SHORT;
-              // Chains ascend by offset, so the first out-of-range candidate ends the walk.
-              while (cand >= 0 && cand < maxDictStart && depth-- > 0) {
-                if (dictionary[cand + bestM] === bytes[i + bestM]) {
-                  const dcap = dictionary.length - cand < cap ? dictionary.length - cand : cap;
-                  const m = matchLength(bytes, i, dictionary, cand, dcap);
-                  if (m > bestM) {
-                    candDist[candCountD] = cand;
-                    candLen[candCountD] = m;
-                    candCountD++;
-                    bestM = m;
-                    if (m === cap || m >= SUFFICIENT_LEN) break;
-                  }
-                }
-                cand = dictIndex.prev[cand]!;
-              }
-            }
-            if (bestM < cap && i + 6 <= n) {
-              let cand6 = dictIndex.head6[hash6(bytes, i, dictIndex.hashShift)]!;
-              let depth6 = OPTIMAL_DICT_DEPTH;
-              while (cand6 >= 0 && cand6 < maxDictStart && depth6-- > 0) {
-                if (dictionary[cand6 + bestM] === bytes[i + bestM]) {
-                  const dcap = dictionary.length - cand6 < cap ? dictionary.length - cand6 : cap;
-                  const m = matchLength(bytes, i, dictionary, cand6, dcap);
-                  if (m > bestM) {
-                    candDist[candCountD] = cand6;
-                    candLen[candCountD] = m;
-                    candCountD++;
-                    bestM = m;
-                    if (m === cap || m >= SUFFICIENT_LEN) break;
-                  }
-                }
-                cand6 = dictIndex.prev6[cand6]!;
-              }
-            }
+        if ((dictIndex || extIndex) && dictFloor <= cap) {
+          const initialBest = dictFloor >= SUFFICIENT_LEN ? dictFloor - 1 : MIN_LEN_EXPLICIT - 1;
+          let candCountD = dictIndex
+            ? collectDictCandidates(bytes, i, n, cap, initialBest, dictionary, dictIndex, maxDictStart, 0, 0, 0)
+            : 0;
+          // Fenced extension (§6.1): the block language's suffix addressed above the frame
+          // dictionary. Equal-length extension matches never beat frame ones (higher offset),
+          // so the walk is floored at the best frame-dictionary length.
+          if (extIndex && extDictionary && maxDictStart > extBase) {
+            const extInitial = candCountD > 0 ? candLen[candCountD - 1]! : initialBest;
+            candCountD = collectDictCandidates(
+              bytes,
+              i,
+              n,
+              cap,
+              extInitial,
+              extDictionary,
+              extIndex,
+              maxDictStart - extBase,
+              extWrapperLength,
+              extBase,
+              candCountD
+            );
           }
           if (candCountD > 0 && candLen[candCountD - 1]! >= CUT_LEN) {
             const start = candDist[candCountD - 1]!;
@@ -617,6 +637,67 @@ function parseOptimal(
   }
   tokens.reverse();
   return tokens;
+}
+
+/**
+ * Two-tier chain walk over a preset-dictionary index collecting the Pareto candidate set
+ * (lengths strictly ascending) into candDist/candLen from `candStart`, storing candidate
+ * offsets as `position + offsetBase`. Chains ascend by position, so a position at or above
+ * `posLimit` ends the walk; positions below `skipBelow` are wrapper bytes the frame
+ * dictionary already covers at cheaper offsets and are stepped over. Returns the new count.
+ */
+function collectDictCandidates(
+  bytes: Uint8Array,
+  i: number,
+  n: number,
+  cap: number,
+  initialBest: number,
+  dictionary: Uint8Array,
+  index: DictIndex,
+  posLimit: number,
+  skipBelow: number,
+  offsetBase: number,
+  candStart: number
+): number {
+  let candCount = candStart;
+  let bestM = initialBest;
+  if (bestM < SUFFICIENT_LEN) {
+    let cand = index.head[hash4(bytes, i, index.hashShift)]!;
+    let depth = OPTIMAL_DICT_DEPTH_SHORT;
+    while (cand >= 0 && cand < posLimit && depth-- > 0) {
+      if (cand >= skipBelow && dictionary[cand + bestM] === bytes[i + bestM]) {
+        const dcap = dictionary.length - cand < cap ? dictionary.length - cand : cap;
+        const m = matchLength(bytes, i, dictionary, cand, dcap);
+        if (m > bestM) {
+          candDist[candCount] = cand + offsetBase;
+          candLen[candCount] = m;
+          candCount++;
+          bestM = m;
+          if (m === cap || m >= SUFFICIENT_LEN) break;
+        }
+      }
+      cand = index.prev[cand]!;
+    }
+  }
+  if (bestM < cap && i + 6 <= n) {
+    let cand6 = index.head6[hash6(bytes, i, index.hashShift)]!;
+    let depth6 = OPTIMAL_DICT_DEPTH;
+    while (cand6 >= 0 && cand6 < posLimit && depth6-- > 0) {
+      if (cand6 >= skipBelow && dictionary[cand6 + bestM] === bytes[i + bestM]) {
+        const dcap = dictionary.length - cand6 < cap ? dictionary.length - cand6 : cap;
+        const m = matchLength(bytes, i, dictionary, cand6, dcap);
+        if (m > bestM) {
+          candDist[candCount] = cand6 + offsetBase;
+          candLen[candCount] = m;
+          candCount++;
+          bestM = m;
+          if (m === cap || m >= SUFFICIENT_LEN) break;
+        }
+      }
+      cand6 = index.prev6[cand6]!;
+    }
+  }
+  return candCount;
 }
 
 function updateRep(
@@ -708,11 +789,18 @@ function parseGreedy(
   bytes: Uint8Array,
   dictionary: Uint8Array,
   dictIndex: DictIndex | undefined,
-  pricing: ParsePricing
+  pricing: ParsePricing,
+  segments?: DictSegment[]
 ): Token[] {
   const n = bytes.length;
   const tokens: Token[] = [];
   const { litCostPrefix, window, maxDictStart } = pricing;
+  let segIndex = 0;
+  let extDictionary = segments?.[0]!.extDictionary;
+  let extIndex = segments?.[0]!.extIndex;
+  let extBase = segments?.[0]!.extBase ?? 0;
+  let extWrapperLength = segments?.[0]!.extWrapperLength ?? 0;
+  let segNext = segments && segments.length > 1 ? segments[1]!.start : n + 1;
 
   const bits = hashBitsFor(n);
   const shift = 32 - bits;
@@ -734,6 +822,16 @@ function parseGreedy(
   let bestStart = 0;
 
   const findBest = (pos: number): boolean => {
+    // Fence-segment cursor (pos only moves forward across calls, including the lazy probe).
+    while (pos >= segNext) {
+      segIndex++;
+      const seg = segments![segIndex]!;
+      extDictionary = seg.extDictionary;
+      extIndex = seg.extIndex;
+      extBase = seg.extBase;
+      extWrapperLength = seg.extWrapperLength;
+      segNext = segIndex + 1 < segments!.length ? segments![segIndex + 1]!.start : n + 1;
+    }
     const cap = n - pos < MATCH_LEN_CAP ? n - pos : MATCH_LEN_CAP;
     bestKind = 0;
     bestSavings = 0;
@@ -785,14 +883,14 @@ function parseGreedy(
         }
         cand = prev[cand]!;
       }
+      // Two-tier dictionary search (see the optimal parser): shallow 4-byte-hash walk for
+      // short matches, then the selective 6-byte-hash chain for long ones. A found
+      // rep/history match floors the search at one byte less than its length — shorter
+      // dictionary matches essentially never win, but an equal-length one can (cheaper
+      // cost wins the savings comparison), and a strictly longer one often does.
+      const sufficient = bestKind !== 0 && bestLen >= SUFFICIENT_LEN;
+      let bestMD = sufficient ? bestLen - 1 : MIN_LEN_EXPLICIT - 1;
       if (dictIndex) {
-        // Two-tier dictionary search (see the optimal parser): shallow 4-byte-hash walk for
-        // short matches, then the selective 6-byte-hash chain for long ones. A found
-        // rep/history match floors the search at one byte less than its length — shorter
-        // dictionary matches essentially never win, but an equal-length one can (cheaper
-        // cost wins the savings comparison), and a strictly longer one often does.
-        const sufficient = bestKind !== 0 && bestLen >= SUFFICIENT_LEN;
-        let bestMD = sufficient ? bestLen - 1 : MIN_LEN_EXPLICIT - 1;
         if (!sufficient) {
           let dcand = dictIndex.head[hash4(bytes, pos, dictIndex.hashShift)]!;
           let depthD = GREEDY_DICT_DEPTH_SHORT;
@@ -840,6 +938,62 @@ function parseGreedy(
               }
             }
             dcand6 = dictIndex.prev6[dcand6]!;
+          }
+        }
+      }
+      // Fenced extension (§6.1): the block language's suffix addressed above the frame
+      // dictionary, floored at the best frame-dictionary length (an equal-length extension
+      // match pays a higher offset, so only strictly longer ones can win). Wrapper positions
+      // are stepped over — the frame dictionary already covers them at cheaper offsets.
+      if (extIndex && extDictionary && maxDictStart > extBase && bestMD < cap) {
+        const posLimit = maxDictStart - extBase;
+        const extSufficient = sufficient || bestMD >= SUFFICIENT_LEN;
+        if (!extSufficient) {
+          let ecand = extIndex.head[hash4(bytes, pos, extIndex.hashShift)]!;
+          let depthE = GREEDY_DICT_DEPTH_SHORT;
+          while (ecand >= 0 && ecand < posLimit && depthE-- > 0) {
+            if (ecand >= extWrapperLength && extDictionary[ecand + bestMD] === bytes[pos + bestMD]) {
+              const dcap = extDictionary.length - ecand < cap ? extDictionary.length - ecand : cap;
+              const len = matchLength(bytes, pos, extDictionary, ecand, dcap);
+              if (len > bestMD) {
+                bestMD = len;
+                const cost = pricing.dictCost(ecand + extBase, len);
+                const savings = litCostPrefix[pos + len]! - litBase - cost;
+                if (savings > 0 && savings > bestSavings) {
+                  bestSavings = savings;
+                  bestCost = cost;
+                  bestLen = len;
+                  bestKind = 2;
+                  bestStart = ecand + extBase;
+                }
+                if (len === cap || len >= SUFFICIENT_LEN) break;
+              }
+            }
+            ecand = extIndex.prev[ecand]!;
+          }
+        }
+        if (bestMD < cap && (extSufficient || bestMD < SUFFICIENT_LEN) && pos + 6 <= n) {
+          let ecand6 = extIndex.head6[hash6(bytes, pos, extIndex.hashShift)]!;
+          let depthE6 = GREEDY_DICT_DEPTH;
+          while (ecand6 >= 0 && ecand6 < posLimit && depthE6-- > 0) {
+            if (ecand6 >= extWrapperLength && extDictionary[ecand6 + bestMD] === bytes[pos + bestMD]) {
+              const dcap = extDictionary.length - ecand6 < cap ? extDictionary.length - ecand6 : cap;
+              const len = matchLength(bytes, pos, extDictionary, ecand6, dcap);
+              if (len > bestMD) {
+                bestMD = len;
+                const cost = pricing.dictCost(ecand6 + extBase, len);
+                const savings = litCostPrefix[pos + len]! - litBase - cost;
+                if (savings > 0 && savings > bestSavings) {
+                  bestSavings = savings;
+                  bestCost = cost;
+                  bestLen = len;
+                  bestKind = 2;
+                  bestStart = ecand6 + extBase;
+                }
+                if (len === cap || len >= SUFFICIENT_LEN) break;
+              }
+            }
+            ecand6 = extIndex.prev6[ecand6]!;
           }
         }
       }

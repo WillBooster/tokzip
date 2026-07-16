@@ -25,6 +25,12 @@ const restored = decompress(packed); // === source
 - **Per-language preset dictionaries** (17 programming languages + 4 locales, tree-shakeable
   modules of up to 512 KB dictionary each) plus a shared wrapper dictionary in core —
   decisive on short inputs where general-purpose compressors have nothing to work with.
+- **Fence-aware dictionary extension**: inside a labeled triple-backtick code block
+  (` ```ts `, ` ```python `, …) the searchable dictionary space automatically grows by that
+  language's dictionary — Markdown docs and LLM output with embedded code get both the
+  surrounding document's dictionary and the right code dictionary per block. Unlabeled or
+  unknown labels keep the plain space; a block language's module must be registered on both
+  sides only when a match actually uses its dictionary (see FORMAT.md §6.1).
 - Never fails on malformed/partial input; corrupt payloads throw a typed `TokzipDecodeError`.
 
 The wire format is specified in [FORMAT.md](FORMAT.md); the design rationale lives in
