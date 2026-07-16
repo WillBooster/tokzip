@@ -116,7 +116,7 @@ function resolveLabel(bytes: Uint8Array, start: number, end: number): number {
 /**
  * Encoder policy (not normative): a block language must cover at least this many input
  * bytes — fence lines excluded — before its extension index is built. Building and
- * process-caching a hash index over a ~512 KB dictionary costs milliseconds and megabytes;
+ * process-caching a hash index over a ~1 MB dictionary costs milliseconds and megabytes;
  * tiny blocks cannot repay that, while for real blocks (median ~122 bytes in the bench
  * corpora) the cache amortizes across the process like the frame-language index does.
  */

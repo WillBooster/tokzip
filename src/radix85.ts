@@ -64,6 +64,27 @@ export class BitWriter {
     this.writeBits(value, 8);
   }
 
+  /** Flushes to bytes: the bitstream zero-padded to a byte boundary (binary frames). */
+  toBytes(): Uint8Array {
+    const bytes = new Uint8Array(Math.ceil(this.bitLength / 8));
+    const fullWords = this.wordCount;
+    let at = 0;
+    for (let w = 0; w < fullWords; w++) {
+      const word = this.words[w]!;
+      bytes[at] = word >>> 24;
+      bytes[at + 1] = (word >>> 16) & 255;
+      bytes[at + 2] = (word >>> 8) & 255;
+      bytes[at + 3] = word & 255;
+      at += 4;
+    }
+    if (this.accBits > 0) {
+      // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
+      const word = (this.acc << (32 - this.accBits)) >>> 0;
+      for (let shift = 24; at < bytes.length; shift -= 8) bytes[at++] = (word >>> shift) & 255;
+    }
+    return bytes;
+  }
+
   /** Flushes to radix-85 text: zero-pads to a 32-bit boundary, then 5 chars per word. */
   toText(): string {
     const wordCount = this.wordCount + (this.accBits > 0 ? 1 : 0);
@@ -85,6 +106,25 @@ export class BitWriter {
     }
     return asciiDecoder.decode(codes);
   }
+}
+
+/** Packs a big-endian byte payload into the 32-bit words a {@link BitReader} consumes (zero-padded tail). */
+export function wordsFromBytes(bytes: Uint8Array, start: number, end: number): Uint32Array {
+  const byteLength = end - start;
+  const words = new Uint32Array(Math.ceil(byteLength / 4));
+  let w = 0;
+  let i = start;
+  for (; i + 4 <= end; i += 4) {
+    // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
+    words[w++] = ((bytes[i]! << 24) | (bytes[i + 1]! << 16) | (bytes[i + 2]! << 8) | bytes[i + 3]!) >>> 0;
+  }
+  if (i < end) {
+    let word = 0;
+    for (let shift = 24; i < end; i++, shift -= 8) word |= bytes[i]! << shift;
+    // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
+    words[w] = word >>> 0;
+  }
+  return words;
 }
 
 /** Decodes a radix-85 payload back to its 32-bit words. */

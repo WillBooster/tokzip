@@ -3,6 +3,12 @@ import { LENGTH_SLOT_COUNT, maxSlotValue } from './slots.ts';
 /** First payload char of every tokzip frame: magic 0b110 in the high 3 bits, version 2 in the low 3. */
 export const MAGIC_VERSION = 0b11_0010;
 
+/**
+ * First byte of every binary tokzip frame: bit 7 set (never a safe-ASCII text frame, whose
+ * chars are all < 0x80) over the same 6-bit magic/version value as the text container.
+ */
+export const BINARY_MAGIC_VERSION = 0b1000_0000 | MAGIC_VERSION;
+
 /** Shipped-mode values in the flags char (bits 1:0). Value 3 is invalid. */
 export const MODE_STORED = 0;
 export const MODE_FAST = 1;

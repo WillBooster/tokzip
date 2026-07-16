@@ -205,7 +205,7 @@ export function encodeFastBody(tokens: Token[], bytes: Uint8Array, language: Reg
 }
 
 /**
- * Decodes a `fast` body in data[pos, end) into exactly `outputSize` bytes, throwing
+ * Decodes a text-frame `fast` body in data[pos, end) into exactly `outputSize` bytes, throwing
  * {@link TokzipDecodeError} on any structural violation.
  */
 export function decodeFastBody(
@@ -216,6 +216,80 @@ export function decodeFastBody(
   language: RegisteredLanguage,
   fenced = false
 ): Uint8Array {
+  const result = decodeFastBodyCore(data, pos, end, outputSize, language, fenced);
+  if (result.pos !== end) throw new TokzipDecodeError('trailing characters after payload');
+  return result.out;
+}
+
+const asciiDecoder = new TextDecoder();
+
+/**
+ * Decodes a binary-frame `fast` body in body[pos, end) into exactly `outputSize` bytes.
+ * The body is the radix-64 char stream bit-packed at 6 bits per char, MSB-first, zero-padded
+ * to a byte boundary; the byte length must be exactly ceil(6·chars/8) (canonical framing).
+ */
+export function decodeFastBodyBinary(
+  body: Uint8Array,
+  pos: number,
+  end: number,
+  outputSize: number,
+  language: RegisteredLanguage,
+  fenced = false
+): Uint8Array {
+  const byteLength = end - pos;
+  const charCount = Math.floor((byteLength * 8) / 6);
+  const codes = new Uint8Array(charCount);
+  let acc = 0;
+  let accBits = 0;
+  let at = 0;
+  for (let i = pos; i < end; i++) {
+    acc = (acc << 8) | body[i]!;
+    accBits += 8;
+    while (accBits >= 6) {
+      accBits -= 6;
+      codes[at++] = RADIX64_CODES[(acc >>> accBits) & 63]!;
+    }
+    acc &= (1 << accBits) - 1;
+  }
+  const result = decodeFastBodyCore(asciiDecoder.decode(codes), 0, charCount, outputSize, language, fenced);
+  // Canonical framing: exactly the consumed chars' bytes, with zero padding bits (at most 7,
+  // so the whole padding sits in the final body byte).
+  if (Math.ceil((result.pos * 6) / 8) !== byteLength) throw new TokzipDecodeError('trailing characters after payload');
+  const padBits = byteLength * 8 - result.pos * 6;
+  if (padBits > 0 && (body[end - 1]! & ((1 << padBits) - 1)) !== 0) {
+    throw new TokzipDecodeError('non-zero padding bits');
+  }
+  return result.out;
+}
+
+/** Bit-packs an emitted `fast` radix-64 char-code stream into the binary-frame body bytes. */
+export function packFastCodes(codes: Uint8Array, count: number): Uint8Array {
+  const out = new Uint8Array(Math.ceil((count * 6) / 8));
+  const values = RADIX64_VALUES;
+  let acc = 0;
+  let accBits = 0;
+  let at = 0;
+  for (let i = 0; i < count; i++) {
+    acc = (acc << 6) | values[codes[i]!]!;
+    accBits += 6;
+    if (accBits >= 8) {
+      accBits -= 8;
+      out[at++] = (acc >>> accBits) & 255;
+    }
+  }
+  if (accBits > 0) out[at] = (acc << (8 - accBits)) & 255;
+  return out;
+}
+
+/** Shared `fast` decode loop; returns the output and the position after the consumed chars. */
+function decodeFastBodyCore(
+  data: string,
+  pos: number,
+  end: number,
+  outputSize: number,
+  language: RegisteredLanguage,
+  fenced: boolean
+): { out: Uint8Array; pos: number } {
   // Structural output bound, checked before allocating: every token consumes at least one
   // char and produces at most MATCH_LEN_CAP bytes, so a declared size beyond that cannot be
   // produced by this body (this also stops forged huge-size frames from forcing enormous
@@ -350,6 +424,5 @@ export function decodeFastBody(
     }
     produced += length;
   }
-  if (pos !== end) throw new TokzipDecodeError('trailing characters after payload');
-  return out;
+  return { out, pos };
 }

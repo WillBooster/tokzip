@@ -21,7 +21,7 @@ import {
 } from './format.ts';
 import { buildDecoder, buildEncoder, type HuffmanEncoder, MAX_CODE_LENGTH } from './huffman.ts';
 import type { ParsePricing, SlotPricing, Token } from './lz.ts';
-import { BitReader, BitWriter, decodeRadix85 } from './radix85.ts';
+import { BitReader, BitWriter, decodeRadix85, wordsFromBytes } from './radix85.ts';
 import {
   extraBitsOf,
   extraValueOf,
@@ -390,8 +390,11 @@ function encodersFor(tables: EntropyTables): ContextEncoders {
   return encoders;
 }
 
-/** Serializes a planned `small` body through the fused radix-85 writer (single pass). */
-export function emitSmallBody(plan: SmallPlan, language: RegisteredLanguage): string {
+/**
+ * Serializes a planned `small` body into a bit writer (single pass). The caller flushes it
+ * as fused radix-85 text (text frames) or as byte-padded raw bits (binary frames).
+ */
+export function emitSmallBody(plan: SmallPlan, language: RegisteredLanguage): BitWriter {
   const collected = plan.collected;
   const encoders = encodersFor(language.tables);
   const writer = new BitWriter();
@@ -439,7 +442,7 @@ export function emitSmallBody(plan: SmallPlan, language: RegisteredLanguage): st
       if (extra > 0) writer.writeBits(collected.offsetExtraValues[i]!, extra);
     }
   }
-  return writer.toText();
+  return writer;
 }
 
 function readSymbol(cursor: BitReader, table: Uint16Array): number {
@@ -490,7 +493,7 @@ function decodersFor(tables: EntropyTables): ContextDecoders {
   return decoders;
 }
 
-/** Decodes a `small` body in data[pos, end) into exactly `outputSize` bytes. */
+/** Decodes a text-frame `small` body in data[pos, end) into exactly `outputSize` bytes. */
 export function decodeSmallBody(
   data: string,
   pos: number,
@@ -500,6 +503,34 @@ export function decodeSmallBody(
   fenced = false
 ): Uint8Array {
   const words = decodeRadix85(data, pos, end);
+  return decodeSmallWords(words, words.length * 32, 32, outputSize, language, fenced);
+}
+
+/** Decodes a binary-frame `small` body in body[pos, end) into exactly `outputSize` bytes. */
+export function decodeSmallBodyBinary(
+  body: Uint8Array,
+  pos: number,
+  end: number,
+  outputSize: number,
+  language: RegisteredLanguage,
+  fenced = false
+): Uint8Array {
+  return decodeSmallWords(wordsFromBytes(body, pos, end), (end - pos) * 8, 8, outputSize, language, fenced);
+}
+
+/**
+ * Words-based `small` decode core. `payloadBits` is the exact on-the-wire payload size
+ * (a multiple of `alignBits`: 32 for radix-85 text frames, 8 for binary frames); bits past
+ * the consumed streams up to `payloadBits` are canonical zero padding and are verified.
+ */
+function decodeSmallWords(
+  words: Uint32Array,
+  payloadBits: number,
+  alignBits: number,
+  outputSize: number,
+  language: RegisteredLanguage,
+  fenced: boolean
+): Uint8Array {
   const header = new BitReader(words);
   const modes = header.readBits(3);
   const tokenCount = header.readVarint();
@@ -509,7 +540,7 @@ export function decodeSmallBody(
   const litStart = header.bitPosition;
   const tokenStart = litStart + litBitLength;
   const offsetStart = tokenStart + tokenBitLength;
-  if (offsetStart > words.length * 32) throw new TokzipDecodeError('stream lengths exceed payload');
+  if (offsetStart > payloadBits) throw new TokzipDecodeError('stream lengths exceed payload');
   // Structural output bound, checked before allocating: every token consumes at least one
   // token-stream bit and produces at most MATCH_LEN_CAP bytes, so a declared size beyond
   // that cannot be produced by this body (this also stops forged huge-size frames from
@@ -630,12 +661,12 @@ export function decodeSmallBody(
   if (litCursor.bitPosition !== tokenStart || tokenCursor.bitPosition !== offsetStart) {
     throw new TokzipDecodeError('stream length mismatch');
   }
-  // Trailing characters are a structural error: only the final word's zero padding may remain.
-  if (Math.ceil(Math.max(offsetCursor.bitPosition, 1) / 32) !== words.length) {
+  // Trailing units are a structural error: only the final unit's zero padding may remain.
+  if (Math.ceil(Math.max(offsetCursor.bitPosition, 1) / alignBits) * alignBits !== payloadBits) {
     throw new TokzipDecodeError('trailing characters after payload');
   }
   // The padding itself must be zero (canonical frames; catches tail corruption).
-  for (let remaining = words.length * 32 - offsetCursor.bitPosition; remaining > 0;) {
+  for (let remaining = payloadBits - offsetCursor.bitPosition; remaining > 0;) {
     const take = Math.min(24, remaining);
     if (offsetCursor.readBits(take) !== 0) throw new TokzipDecodeError('non-zero padding bits');
     remaining -= take;
