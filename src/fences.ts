@@ -72,9 +72,9 @@ function processFenceLine(bytes: Uint8Array, start: number, end: number, state: 
   const fenceLength = fenceEnd - start;
   if (fenceLength < 3) return;
   let restEnd = end;
-  while (restEnd > fenceEnd && isFenceSpace(bytes[restEnd - 1]!)) restEnd--;
+  while (restEnd > fenceEnd && isTrailingSpace(bytes[restEnd - 1]!)) restEnd--;
   let restStart = fenceEnd;
-  while (restStart < restEnd && isFenceSpace(bytes[restStart]!)) restStart++;
+  while (restStart < restEnd && isSpaceTab(bytes[restStart]!)) restStart++;
   if (state.openFenceLength > 0) {
     if (fenceLength >= state.openFenceLength && restStart === restEnd) {
       state.openFenceLength = 0;
@@ -84,14 +84,19 @@ function processFenceLine(bytes: Uint8Array, start: number, end: number, state: 
   }
   for (let i = restStart; i < restEnd; i++) if (bytes[i] === BACKTICK) return;
   let labelEnd = restStart;
-  while (labelEnd < restEnd && !isFenceSpace(bytes[labelEnd]!)) labelEnd++;
+  while (labelEnd < restEnd && !isSpaceTab(bytes[labelEnd]!)) labelEnd++;
   state.openFenceLength = fenceLength;
   state.blockLanguageId = resolveLabel(bytes, restStart, labelEnd);
 }
 
-/** Space, tab, and CR (so CRLF line endings need no special casing). */
-function isFenceSpace(byte: number): boolean {
+/** Trailing trim also strips CR so CRLF line endings need no special casing (normative). */
+function isTrailingSpace(byte: number): boolean {
   return byte === 0x20 || byte === 0x09 || byte === 0x0D;
+}
+
+/** Leading trim and label termination admit only space/tab — a lone CR is label content. */
+function isSpaceTab(byte: number): boolean {
+  return byte === 0x20 || byte === 0x09;
 }
 
 /** Maps a raw label to its language id, or -1 for unknown labels (keep the frame language). */
@@ -109,17 +114,30 @@ function resolveLabel(bytes: Uint8Array, start: number, end: number): number {
 }
 
 /**
+ * Encoder policy (not normative): a block language must cover at least this many input
+ * bytes before its extension index is built. Building and process-caching a hash index over
+ * a ~512 KB dictionary costs milliseconds and megabytes, which tiny blocks cannot repay.
+ */
+const MIN_EXTENSION_CONTENT = 64;
+
+/**
  * Encoder pre-scan: splits the input into dictionary segments at fence transitions.
  * Returns undefined when no position has an extension (the common case, decided by a cheap
- * backtick scan first). A block language that is unknown, unregistered, or the frame
- * language itself yields no extension — such regions match against the frame dictionary
- * exactly like plain v2, and their frames need no registration to decode.
+ * backtick scan first). A block language that is unknown, unregistered, the frame language
+ * itself, or below {@link MIN_EXTENSION_CONTENT} total content yields no extension — such
+ * regions match against the frame dictionary exactly like plain v2, and their frames need
+ * no registration to decode.
  */
 export function computeDictSegments(bytes: Uint8Array, language: RegisteredLanguage): DictSegment[] | undefined {
   if (!bytes.includes(BACKTICK)) return undefined;
   const state: FenceState = { openFenceLength: 0, blockLanguageId: -1 };
-  let segments: DictSegment[] | undefined;
+  // Phase 1: collect fence transitions and per-language content sizes without touching any
+  // dictionary index, so unhelpful fences cost only the line scan.
+  let starts: number[] | undefined;
+  let blocks: (RegisteredLanguage | undefined)[] | undefined;
+  const contentBytes = new Map<RegisteredLanguage, number>();
   let currentBlock: RegisteredLanguage | undefined;
+  let currentStart = 0;
   let lineStart = 0;
   for (let i = 0; i < bytes.length; i++) {
     if (bytes[i] !== LF) continue;
@@ -128,23 +146,35 @@ export function computeDictSegments(bytes: Uint8Array, language: RegisteredLangu
     const id = state.blockLanguageId;
     const block = id >= 0 && id !== language.id ? languageById(id) : undefined;
     if (block === currentBlock) continue;
+    if (currentBlock) contentBytes.set(currentBlock, (contentBytes.get(currentBlock) ?? 0) + lineStart - currentStart);
+    starts ??= [0];
+    blocks ??= [undefined];
+    starts.push(lineStart);
+    blocks.push(block);
     currentBlock = block;
-    segments ??= [segmentFor(0, undefined, language)];
-    segments.push(segmentFor(lineStart, block, language));
+    currentStart = lineStart;
   }
-  // All fences resolved to the frame language (or to nothing): no extension anywhere.
-  if (segments && segments.every((segment) => segment.extDictionary === undefined)) return undefined;
-  return segments;
-}
-
-function segmentFor(start: number, block: RegisteredLanguage | undefined, frame: RegisteredLanguage): DictSegment {
-  return {
-    start,
-    extDictionary: block?.dictionary,
-    extIndex: block && dictIndexFor(block),
-    extBase: block ? frame.dictionary.length - block.wrapperLength : 0,
-    extWrapperLength: block?.wrapperLength ?? 0,
-  };
+  if (!starts || !blocks) return undefined;
+  if (currentBlock) {
+    contentBytes.set(currentBlock, (contentBytes.get(currentBlock) ?? 0) + bytes.length - currentStart);
+  }
+  // Phase 2: build segments, indexing only languages whose blocks can repay the index.
+  let hasExtension = false;
+  const segments = starts.map((start, i): DictSegment => {
+    const block = blocks[i];
+    if (!block || contentBytes.get(block)! < MIN_EXTENSION_CONTENT) {
+      return { start, extDictionary: undefined, extIndex: undefined, extBase: 0, extWrapperLength: 0 };
+    }
+    hasExtension = true;
+    return {
+      start,
+      extDictionary: block.dictionary,
+      extIndex: dictIndexFor(block),
+      extBase: language.dictionary.length - block.wrapperLength,
+      extWrapperLength: block.wrapperLength,
+    };
+  });
+  return hasExtension ? segments : undefined;
 }
 
 /**

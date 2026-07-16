@@ -25,6 +25,15 @@ export interface Config {
 }
 `;
 const PY_CODE = `import os\nfrom typing import Optional\n\ndef resolve(path: str) -> Optional[str]:\n    return os.path.abspath(path) if os.path.exists(path) else None\n`;
+// Distinct declarations (not repetition, which history matches would cover) so dictionary
+// gains dominate parse-heuristic noise and the flag expectation stays deterministic.
+const LONG_TS_CODE = `${TS_CODE}export async function fetchUsers(limit: number): Promise<readonly string[]> {
+  const response = await fetch(\`/api/users?limit=\${encodeURIComponent(String(limit))}\`);
+  if (!response.ok) throw new Error(\`unexpected status: \${response.status}\`);
+  return (await response.json()) as string[];
+}
+export const DEFAULT_OPTIONS = Object.freeze({ retries: 3, backoffMs: 250 });
+`;
 
 function docWith(label: string, code = TS_CODE): string {
   return `# Usage\n\nInstall the package and call the function as follows.\n\n\`\`\`${label}\n${code}\`\`\`\n\nThe function returns the formatted message.\n`;
@@ -44,8 +53,8 @@ test('fenced round-trips with extended matches in both modes and frame languages
 
 test('extended matches set flag bit 3 and shrink output versus an unknown label', () => {
   for (const mode of MODES) {
-    const fenced = compress(docWith('ts'), { language: 'none', mode });
-    const unknown = compress(docWith('mystery'), { language: 'none', mode });
+    const fenced = compress(docWith('ts', LONG_TS_CODE), { language: 'none', mode });
+    const unknown = compress(docWith('mystery', LONG_TS_CODE), { language: 'none', mode });
     expect(isFenced(fenced)).toBe(true);
     expect(isFenced(unknown)).toBe(false);
     expect(fenced.length).toBeLessThan(unknown.length);
@@ -54,7 +63,7 @@ test('extended matches set flag bit 3 and shrink output versus an unknown label'
 
 test('label aliases and ASCII case both resolve', () => {
   for (const label of ['TS', 'TypeScript', 'tsx', 'typescript']) {
-    const frame = compress(docWith(label), { language: 'none', mode: 'small' });
+    const frame = compress(docWith(label), { language: 'none', mode: 'fast' });
     expect(isFenced(frame)).toBe(true);
     expect(decompress(frame)).toBe(docWith(label));
   }
@@ -68,17 +77,39 @@ test('a block labeled with the frame language stays a plain v2 frame', () => {
 
 test('CRLF fence lines resolve the label and round-trip', () => {
   const doc = docWith('ts').replaceAll('\n', '\r\n');
-  const frame = compress(doc, { language: 'none', mode: 'small' });
-  expect(isFenced(frame)).toBe(true);
-  expect(decompress(frame)).toBe(doc);
+  for (const mode of MODES) {
+    const frame = compress(doc, { language: 'none', mode });
+    expect(isFenced(frame)).toBe(true);
+    expect(decompress(frame)).toBe(doc);
+  }
 });
 
 test('longer fences nest plain-fence content; unclosed blocks extend to the end', () => {
   const nested = `\`\`\`\`ts\n${TS_CODE}\`\`\`ts\ninner fence line is content\n\`\`\`\`\n`;
   const unclosed = `Intro line.\n\`\`\`ts\n${TS_CODE}`;
   for (const doc of [nested, unclosed]) {
+    for (const mode of MODES) {
+      const frame = compress(doc, { language: 'none', mode });
+      expect(isFenced(frame)).toBe(true);
+      expect(decompress(frame)).toBe(doc);
+    }
+  }
+});
+
+test('a lone CR is label content, not a separator (only trailing CRs are trimmed)', () => {
+  for (const opener of ['```\rts', '```ts\rfoo']) {
+    const doc = `${opener}\n${TS_CODE}\`\`\`\n`;
     const frame = compress(doc, { language: 'none', mode: 'small' });
-    expect(isFenced(frame)).toBe(true);
+    expect(isFenced(frame)).toBe(false);
+    expect(decompress(frame)).toBe(doc);
+  }
+});
+
+test('blocks below the extension-content threshold stay plain v2 frames', () => {
+  const doc = 'Intro.\n```ts\nconst tiny = 1;\n```\n';
+  for (const mode of MODES) {
+    const frame = compress(doc, { language: 'none', mode });
+    expect(isFenced(frame)).toBe(false);
     expect(decompress(frame)).toBe(doc);
   }
 });
@@ -103,7 +134,7 @@ test('flag bit 3 on a frame without extended matches decodes identically', () =>
 });
 
 test('decoding an extended match without the block language registered throws', () => {
-  const frame = compress(docWith('ts'), { language: 'none', mode: 'small' });
+  const frame = compress(docWith('ts'), { language: 'none', mode: 'fast' });
   expect(isFenced(frame)).toBe(true);
   // A fresh process registering only core (id 0) must reject the typescript extension.
   const probe = `import { decompress, TokzipDecodeError } from '${import.meta.dir}/../src/index.ts';
@@ -121,7 +152,7 @@ test('TokzipDecodeError stays typed for in-process extended-match bounds violati
   // Flag flipped on a plain frame plus a forged oversized dict offset is covered by the
   // fenced round-trip suite; here the plain out-of-bounds path must still throw when the
   // flag is clear (extended offsets are invalid without it).
-  const frame = compress(docWith('ts'), { language: 'none', mode: 'small' });
+  const frame = compress(docWith('ts'), { language: 'none', mode: 'fast' });
   const cleared = frame.slice(0, 2) + RADIX64[flagsOf(frame) & ~FLAG_FENCED]! + frame.slice(3);
   expect(() => decompress(cleared)).toThrow(TokzipDecodeError);
 });

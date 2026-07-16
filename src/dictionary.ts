@@ -72,7 +72,8 @@ export function registerLanguage(wrapperDictionary: Uint8Array, data: LanguageMo
   if (data.top64.length !== 64) throw new RangeError('top-64 charset must contain exactly 64 bytes');
   // compress selects by name while decompress selects by id: a conflicting registration would
   // let the two maps diverge and silently decode with the wrong dictionary. Re-registering the
-  // same (id, name) pair stays idempotent.
+  // same (id, name) pair is idempotent only for byte-identical module data — module data is
+  // codec identity (FORMAT.md §10), so replacing it would silently invalidate persisted frames.
   const existingById = byId.get(data.id);
   if (existingById && existingById.name !== data.name) {
     throw new RangeError(`language id ${data.id} is already registered as "${existingById.name}"`);
@@ -80,6 +81,12 @@ export function registerLanguage(wrapperDictionary: Uint8Array, data: LanguageMo
   const existingByName = byName.get(data.name);
   if (existingByName && existingByName.id !== data.id) {
     throw new RangeError(`language "${data.name}" is already registered with id ${existingByName.id}`);
+  }
+  if (existingById) {
+    if (!sameModuleData(existingById, data)) {
+      throw new RangeError(`language "${data.name}" is already registered with different module data`);
+    }
+    return;
   }
   validateTables(data.tables);
   const dictionary = new Uint8Array(wrapperDictionary.length + data.dictionarySuffix.length);
@@ -95,13 +102,38 @@ export function registerLanguage(wrapperDictionary: Uint8Array, data: LanguageMo
     name: data.name,
     dictionary,
     wrapperLength: wrapperDictionary.length,
-    top64: data.top64,
+    // Private copies: callers keep their arrays, so later mutation cannot corrupt the codec.
+    top64: new Uint8Array(data.top64),
     top64Index,
-    tables: data.tables,
+    tables: {
+      litContext: new Uint8Array(data.tables.litContext),
+      litClassCount: data.tables.litClassCount,
+      literal: new Uint8Array(data.tables.literal),
+      token: new Uint8Array(data.tables.token),
+      offset: new Uint8Array(data.tables.offset),
+    },
     dictIndex: undefined,
   };
   byId.set(data.id, registered);
   byName.set(data.name, registered);
+}
+
+function sameModuleData(existing: RegisteredLanguage, data: LanguageModuleData): boolean {
+  return (
+    equalBytes(existing.dictionary.subarray(existing.wrapperLength), data.dictionarySuffix) &&
+    equalBytes(existing.top64, data.top64) &&
+    existing.tables.litClassCount === data.tables.litClassCount &&
+    equalBytes(existing.tables.litContext, data.tables.litContext) &&
+    equalBytes(existing.tables.literal, data.tables.literal) &&
+    equalBytes(existing.tables.token, data.tables.token) &&
+    equalBytes(existing.tables.offset, data.tables.offset)
+  );
+}
+
+function equalBytes(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
 }
 
 export function languageByName(name: string): RegisteredLanguage | undefined {

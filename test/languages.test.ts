@@ -39,15 +39,32 @@ test('conflicting registrations are rejected (same id or name must not diverge)'
     top64: typescript.top64,
     tables: typescript.tables,
   };
-  // Same (id, name) pair: idempotent re-registration is allowed.
-  expect(() => registerLanguageModule({ ...base, id: typescript.id, name: 'typescript' })).not.toThrow();
+  // Byte-identical re-registration (e.g. a module imported twice) is an idempotent no-op.
+  expect(() => registerLanguageModule(typescriptModule)).not.toThrow();
+  // Same (id, name) with different module data would silently invalidate persisted frames
+  // (module data is codec identity), so it is rejected instead of replacing the entry.
+  expect(() => registerLanguageModule({ ...base, id: typescript.id, name: 'typescript' })).toThrow(RangeError);
   // Same id under a new name, or same name under a new id: compress (by name) and
   // decompress (by id) would silently disagree on the dictionary.
   expect(() => registerLanguageModule({ ...base, id: typescript.id, name: 'typescript-alias' })).toThrow(RangeError);
   expect(() => registerLanguageModule({ ...base, id: 63, name: 'typescript' })).toThrow(RangeError);
-  // The idempotent re-registration above replaced the trained module with an empty-suffix
-  // one; restore it so later tests (and other files in this process) see the real dictionary.
-  registerLanguageModule(typescriptModule);
+});
+
+test('registration keeps private copies of module arrays (caller mutation is inert)', () => {
+  const top64 = new Uint8Array(typescriptModule.top64);
+  const tables = {
+    litContext: new Uint8Array(typescriptModule.tables.litContext),
+    litClassCount: typescriptModule.tables.litClassCount,
+    literal: new Uint8Array(typescriptModule.tables.literal),
+    token: new Uint8Array(typescriptModule.tables.token),
+    offset: new Uint8Array(typescriptModule.tables.offset),
+  };
+  registerLanguageModule({ id: 62, name: 'mutable-probe', dictionarySuffix: new Uint8Array(0), top64, tables });
+  const source = 'a'.repeat(100);
+  const frame = compress(source, { language: 'mutable-probe' });
+  top64.fill(0x62);
+  tables.literal.fill(0);
+  expect(decompress(frame)).toBe(source);
 });
 
 test('fromBase64 rejects non-ASCII instead of silently decoding it as 0', () => {

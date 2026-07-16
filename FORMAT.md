@@ -160,7 +160,9 @@ block language's dictionary. Flag bit 3 enables this per frame:
   straddle the boundary. All other streams and tables (entropy tables, literal charsets,
   contexts, history, reps) stay keyed to the frame language. Because the extension is a
   strict superset of the plain space, fenced frames never lose frame-dictionary coverage
-  (e.g. prose or native-language comments inside a code block).
+  (e.g. prose or native-language comments inside a code block). Parsers are still heuristic,
+  so the reference encoder additionally prices the fenced and plain parses exactly and ships
+  the cheaper frame, preferring plain on ties.
 
 Fence state is derived from the decoded output itself (like the literal context of §8.2), so
 the frame carries nothing beyond the flag bit. It advances one **completed line** at a time:
