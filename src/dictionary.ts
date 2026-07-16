@@ -64,7 +64,8 @@ const byName = new Map<string, RegisteredLanguage>();
 
 /**
  * Registers a language module. Called by module side-effect imports; validates tables at
- * registration and is idempotent (re-registering the same id/name replaces the entry).
+ * registration. Re-registering byte-identical module data under the same id/name is a
+ * no-op; any diverging registration is rejected (module data is codec identity).
  */
 export function registerLanguage(wrapperDictionary: Uint8Array, data: LanguageModuleData): void {
   if (!Number.isInteger(data.id) || data.id < 0 || data.id > 63)
