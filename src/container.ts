@@ -140,7 +140,7 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
       // frame then stays bit-identical to the plain unfenced frame).
       const plainTokens = parse(bytes, language.dictionary, dictIndex, pricing);
       const plainCost = fastBodyCost(plainTokens, bytes, language)!;
-      if (plainCost <= fastCost) {
+      if (fastOutCost(plainCost) <= fastOutCost(fastCost)) {
         tokens = plainTokens;
         fastCost = plainCost;
       }
@@ -155,9 +155,10 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     // candidate is the cheaper of two token lists: the small (optimal) parse re-priced in fast
     // chars, and a pure fast parse — the optimal parse minimizes bits, so alone it could ship a
     // fast frame larger than mode 'fast' would produce for the same input.
-    // Plan sizes are compared in output units: exact chars for text (radix-85 word rounding
-    // included), exact bits for binary (its bodies round at byte, not word, granularity).
-    const planCost = (plan: SmallPlan): number => (binary ? plan.totalBits : plan.charCost);
+    // Plan sizes are compared in output units — exact chars for text, exact bytes for binary —
+    // so ties at the shipped-frame granularity keep the documented preference for the plainer
+    // encoding (e.g. a byte-tied fenced plan must not add a needless registration dependency).
+    const planCost = (plan: SmallPlan): number => (binary ? Math.ceil(plan.totalBits / 8) : plan.charCost);
     const pricing = smallPricing(bytes, language);
     let smallTokens = parse(bytes, language.dictionary, dictIndex, pricing, segments);
     let plan = planSmallBody(smallTokens, bytes, language);
@@ -189,12 +190,14 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     if (segments) {
       const plainFastTokens = parse(bytes, language.dictionary, dictIndex, fastPricingModel);
       const plainFastCost = fastBodyCost(plainFastTokens, bytes, language)!;
-      if (plainFastCost <= pureFastCost) {
+      if (fastOutCost(plainFastCost) <= fastOutCost(pureFastCost)) {
         fastTokens = plainFastTokens;
         pureFastCost = plainFastCost;
       }
     }
-    const useLazyTokensForFast = lazyFastCost !== undefined && lazyFastCost < pureFastCost;
+    // Output-unit comparison with pure-fast preferred on ties: the lazy (small-parse) tokens
+    // may reach the extended dictionary, so a byte-tied win must not add a fenced dependency.
+    const useLazyTokensForFast = lazyFastCost !== undefined && fastOutCost(lazyFastCost) < fastOutCost(pureFastCost);
     const fastCost = useLazyTokensForFast ? lazyFastCost : pureFastCost;
     const smallCost = binary ? Math.ceil(plan.totalBits / 8) : plan.charCost;
     // Pick the smallest complete frame; on ties the simpler encoding wins (stored, fast, small).

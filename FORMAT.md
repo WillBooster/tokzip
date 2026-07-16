@@ -378,7 +378,7 @@ library version or re-encode; see the tracking issue on versioned module assets.
 Executable vectors live in `test/conformance.test.ts` and `test/roundtrip.test.ts`; the
 normative list mirrors the design issue:
 
-empty input (exact frame `yAAA`); tiny stored frame (exact overhead bound); history /
+empty input (exact frame `zAAA`); tiny stored frame (exact overhead bound); history /
 dictionary / rep / overlap-copy matches; 12-bit vs 18-bit offset forms; single-symbol and
 degenerate streams (raw stream modes); downgrade tie and determinism; invalid table; unknown
 id on non-stored frames; stored frame with nonzero id (decodes); unknown version; reserved
@@ -403,8 +403,8 @@ through the text alphabets, for transports that accept raw bytes. A `fast` body 
 ### 12.1 Frame layout
 
 ```
-[0] magic|version   byte 0xB2: bit 7 set (never a safe-ASCII char) over the text
-                    container's 6-bit magic/version value 0b110_010.
+[0] magic|version   byte 0xB3: bit 7 set (never a safe-ASCII char) over the text
+                    container's 6-bit magic/version value 0b110_011.
 [1] language id     byte; ids per §4.
 [2] flags           byte; bits 3:0 as §3, bits 7:4 reserved (encoders write 0,
                     decoders reject non-zero).
