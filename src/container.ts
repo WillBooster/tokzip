@@ -100,6 +100,8 @@ function readByteVarint(data: Uint8Array, pos: number): { value: number; pos: nu
 export function compress(input: string | Uint8Array, options?: CompressOptions & { output?: 'text' }): string;
 /** Compresses a string (UTF-8) or raw bytes into a dense binary frame. */
 export function compress(input: string | Uint8Array, options: CompressOptions & { output: 'binary' }): Uint8Array;
+/** Fallback for options whose `output` is not statically known (e.g. a `CompressOptions` variable). */
+export function compress(input: string | Uint8Array, options: CompressOptions): string | Uint8Array;
 export function compress(input: string | Uint8Array, options?: CompressOptions): string | Uint8Array {
   const isString = typeof input === 'string';
   const bytes = isString ? textEncoder.encode(input) : input;
