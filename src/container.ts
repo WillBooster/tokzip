@@ -309,6 +309,8 @@ function decompressBinary(data: Uint8Array, maxOutputSize: number): { flags: num
       if (data.length < bodyStart + outputSize) throw new TokzipDecodeError('truncated payload');
       throw new TokzipDecodeError('trailing characters after payload');
     }
+    // Explicit copy, not data.slice(): callers may pass a Buffer, whose slice() returns a
+    // view over the input frame's memory instead of an independent copy.
     bytes = new Uint8Array(outputSize);
     bytes.set(data.subarray(bodyStart, bodyStart + outputSize));
   } else if (mode === MODE_FAST || mode === MODE_SMALL) {

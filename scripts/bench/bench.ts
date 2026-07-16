@@ -157,6 +157,8 @@ function parseArgs(args: string[]): { speed: boolean; jsonPath?: string; languag
     console.error('error: --json requires a path');
     process.exit(1);
   }
+  // Flags (--speed, --binary, --json) are excluded by the '--' prefix check; the --json
+  // value is excluded by position.
   const requested = args.filter((arg, index) => {
     return !arg.startsWith('--') && (jsonIndex === -1 || index !== jsonIndex + 1);
   });
