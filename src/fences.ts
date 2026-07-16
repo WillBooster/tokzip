@@ -134,7 +134,7 @@ const MAX_EXTENSION_LANGUAGES = 4;
  * Returns undefined when no position has an extension (the common case, decided by a cheap
  * backtick scan first). A block language that is unknown, unregistered, the frame language
  * itself, or below {@link MIN_EXTENSION_CONTENT} total content yields no extension — such
- * regions match against the frame dictionary exactly like plain v2, and their frames need
+ * regions match against the frame dictionary exactly like plain unfenced frames, and their frames need
  * no registration to decode.
  */
 export function computeDictSegments(
@@ -206,7 +206,7 @@ export function computeDictSegments(
 /**
  * True when a dictionary token addresses the extended space above the frame dictionary —
  * the normative condition for setting FLAG_FENCED, so frames whose matches all stay inside
- * the frame dictionary remain bit-identical to plain v2 frames.
+ * the frame dictionary remain bit-identical to plain unfenced frames.
  */
 export function usesExtendedDictionary(tokens: Token[], frameDictionaryLength: number): boolean {
   return tokens.some((token) => token.type === 'dict' && token.start + token.len > frameDictionaryLength);

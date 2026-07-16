@@ -1,4 +1,4 @@
-# tokzip frame format (version 2)
+# tokzip frame format (version 3)
 
 This document is the normative wire-format specification for tokzip payloads. It is
 self-contained so the format can be ported to other implementation languages. The reference
@@ -10,7 +10,7 @@ pass, with no binary intermediate and no base64 stage — and the **binary frame
 same streams packed at 8 bits per byte for binary transports. Trailing characters (or bytes)
 after the frame are a structural error. All structural errors MUST be reported as a typed
 decode error (`TokzipDecodeError` in the reference implementation); valid-looking corruption
-MAY decode to wrong output without throwing (there is no integrity checksum in v2; a flag
+MAY decode to wrong output without throwing (there is no integrity checksum in v3; a flag
 bit is reserved).
 
 ## 1. Alphabets
@@ -62,7 +62,7 @@ zero on encode and ignored on decode.
 ## 3. Frame layout
 
 ```
-[0] magic|version   radix-64 char; value 0b110_010 (50, char 'y') for v2.
+[0] magic|version   radix-64 char; value 0b110_011 (51, char 'z') for v3.
 [1] language id     radix-64 char; 0–63.
 [2] flags           radix-64 char:
                       bits 1:0  shipped mode: 0 stored, 1 fast, 2 small; 3 is invalid
@@ -83,7 +83,7 @@ zero on encode and ignored on decode.
   callers use the bytes path.)
 - Frames are single: any character after the body is a structural error.
 
-## 4. Language ids (v2 allocation, unchanged from v1)
+## 4. Language ids (v3 allocation, unchanged since v1)
 
 | id  | language            |     | id  | language   |
 | --- | ------------------- | --- | --- | ---------- |
@@ -153,9 +153,9 @@ LLM output) compress better when dictionary matches inside a block can also addr
 block language's dictionary. Flag bit 3 enables this per frame:
 
 - **Bit 3 = 0**: every dictionary match addresses the frame language's assembled dictionary
-  (the original v2 behavior; such frames are bit-identical to plain v2 frames).
+  (such frames are bit-identical to plain unfenced frames).
 - **Bit 3 = 1**: the dictionary space is **extended, not switched**. Offsets below the frame
-  language's assembled dictionary length keep their plain-v2 meaning everywhere. Where the
+  language's assembled dictionary length keep their plain unfenced meaning everywhere. Where the
   **fence state** of the output produced strictly before a match's first output byte names a
   block language other than the frame language, that language's **dictionary suffix** is
   addressed contiguously above the frame dictionary: virtual offset

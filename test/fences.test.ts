@@ -69,7 +69,7 @@ test('label aliases and ASCII case both resolve', () => {
   }
 });
 
-test('a block labeled with the frame language stays a plain v2 frame', () => {
+test('a block labeled with the frame language stays a plain unfenced frame', () => {
   const frame = compress(docWith('ts'), { language: 'typescript', mode: 'small' });
   expect(isFenced(frame)).toBe(false);
   expect(decompress(frame)).toBe(docWith('ts'));
@@ -105,7 +105,7 @@ test('a lone CR is label content, not a separator (only trailing CRs are trimmed
   }
 });
 
-test('blocks below the extension-content threshold stay plain v2 frames', () => {
+test('blocks below the extension-content threshold stay plain unfenced frames', () => {
   const doc = 'Intro.\n```ts\nconst tiny = 1;\n```\n';
   for (const mode of MODES) {
     const frame = compress(doc, { language: 'none', mode });

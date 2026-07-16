@@ -101,7 +101,7 @@ export function compress(input: string | Uint8Array, options?: CompressOptions &
 /** Compresses a string (UTF-8) or raw bytes into a dense binary frame. */
 export function compress(input: string | Uint8Array, options: CompressOptions & { output: 'binary' }): Uint8Array;
 /** Fallback for options whose `output` is not statically known (e.g. a `CompressOptions` variable). */
-export function compress(input: string | Uint8Array, options: CompressOptions): string | Uint8Array;
+export function compress(input: string | Uint8Array, options?: CompressOptions): string | Uint8Array;
 export function compress(input: string | Uint8Array, options?: CompressOptions): string | Uint8Array {
   const isString = typeof input === 'string';
   const bytes = isString ? textEncoder.encode(input) : input;
@@ -137,7 +137,7 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     if (segments) {
       // The greedy parse is approximate, so the extended search space can occasionally ship a
       // larger body; compare against the plain parse exactly and prefer plain on ties (the
-      // frame then stays bit-identical to plain v2).
+      // frame then stays bit-identical to the plain unfenced frame).
       const plainTokens = parse(bytes, language.dictionary, dictIndex, pricing);
       const plainCost = fastBodyCost(plainTokens, bytes, language)!;
       if (plainCost <= fastCost) {
@@ -212,7 +212,7 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   }
 
   // Normative: the flag is set iff a shipped dict token reaches above the frame dictionary,
-  // so frames whose matches all stay inside it remain bit-identical to plain v2 frames.
+  // so frames whose matches all stay inside it remain bit-identical to plain unfenced frames.
   const shippedTokens = fastTokensToShip ?? smallTokensToShip;
   const fenced = shippedTokens !== undefined && usesExtendedDictionary(shippedTokens, language.dictionary.length);
   const flags = shippedMode | (isString ? 0 : FLAG_BYTES) | (fenced ? FLAG_FENCED : 0);

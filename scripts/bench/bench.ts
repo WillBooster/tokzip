@@ -153,7 +153,7 @@ function parseArgs(args: string[]): { speed: boolean; jsonPath?: string; languag
   const speed = args.includes('--speed');
   const jsonIndex = args.indexOf('--json');
   const jsonPath = jsonIndex === -1 ? undefined : args[jsonIndex + 1];
-  if (jsonIndex !== -1 && !jsonPath) {
+  if (jsonIndex !== -1 && (!jsonPath || jsonPath.startsWith('--'))) {
     console.error('error: --json requires a path');
     process.exit(1);
   }
