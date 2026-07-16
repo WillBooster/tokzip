@@ -35,6 +35,8 @@ export interface RegisteredLanguage {
   name: string;
   /** Wrapper dictionary + language suffix, contiguous. */
   dictionary: Uint8Array;
+  /** Byte length of the shared wrapper prefix inside {@link dictionary}. */
+  wrapperLength: number;
   top64: Uint8Array;
   /** Maps byte value → literal-64 index, or -1 when the byte is outside the charset. */
   top64Index: Int8Array;
@@ -92,6 +94,7 @@ export function registerLanguage(wrapperDictionary: Uint8Array, data: LanguageMo
     id: data.id,
     name: data.name,
     dictionary,
+    wrapperLength: wrapperDictionary.length,
     top64: data.top64,
     top64Index,
     tables: data.tables,

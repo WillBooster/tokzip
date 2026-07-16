@@ -371,7 +371,7 @@ function chooseLiteralClasses(folds: [Float64Array, Float64Array]): {
 function makeLanguage(dictionary: Uint8Array, top64: Uint8Array, tables: EntropyTables): RegisteredLanguage {
   const top64Index = new Int8Array(256).fill(-1);
   for (let i = 0; i < 64; i++) if (top64Index[top64[i]!] === -1) top64Index[top64[i]!] = i;
-  return { id: -1, name: 'training', dictionary, top64, top64Index, tables, dictIndex: undefined };
+  return { id: -1, name: 'training', dictionary, wrapperLength: 0, top64, top64Index, tables, dictIndex: undefined };
 }
 
 function byteFrequencies(docs: string[]): Float64Array {

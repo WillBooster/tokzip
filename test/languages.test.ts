@@ -4,6 +4,7 @@ import { compress, decompress, LANGUAGE_IDS, registerLanguageModule } from '../s
 // (registerLanguage throws on incomplete codes) before any round-trip below.
 import '../src/languages/index.ts';
 import { languageByName } from '../src/dictionary.ts';
+import { typescriptModule } from '../src/generated/typescript.ts';
 import { fromBase64 } from '../src/moduleData.ts';
 
 const SAMPLES: Record<string, string> = {
@@ -44,6 +45,9 @@ test('conflicting registrations are rejected (same id or name must not diverge)'
   // decompress (by id) would silently disagree on the dictionary.
   expect(() => registerLanguageModule({ ...base, id: typescript.id, name: 'typescript-alias' })).toThrow(RangeError);
   expect(() => registerLanguageModule({ ...base, id: 63, name: 'typescript' })).toThrow(RangeError);
+  // The idempotent re-registration above replaced the trained module with an empty-suffix
+  // one; restore it so later tests (and other files in this process) see the real dictionary.
+  registerLanguageModule(typescriptModule);
 });
 
 test('fromBase64 rejects non-ASCII instead of silently decoding it as 0', () => {

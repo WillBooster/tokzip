@@ -1,5 +1,6 @@
 import type { RegisteredLanguage } from './dictionary.ts';
 import { allocateDecodeBuffer, TokzipDecodeError } from './errors.ts';
+import { copyExtendedDictMatch, FenceTracker } from './fences.ts';
 import {
   FAST_WINDOW,
   INITIAL_REPS,
@@ -212,7 +213,8 @@ export function decodeFastBody(
   pos: number,
   end: number,
   outputSize: number,
-  language: RegisteredLanguage
+  language: RegisteredLanguage,
+  fenced = false
 ): Uint8Array {
   // Structural output bound, checked before allocating: every token consumes at least one
   // char and produces at most MATCH_LEN_CAP bytes, so a declared size beyond that cannot be
@@ -223,6 +225,7 @@ export function decodeFastBody(
   }
   const out = allocateDecodeBuffer(outputSize);
   const { dictionary, top64 } = language;
+  const tracker = fenced ? new FenceTracker(language.id) : undefined;
   let rep0 = INITIAL_REPS[0]!;
   let rep1 = INITIAL_REPS[1]!;
   let rep2 = INITIAL_REPS[2]!;
@@ -328,8 +331,13 @@ export function decodeFastBody(
     if (length > MATCH_LEN_CAP) throw new TokzipDecodeError('match length exceeds cap');
     if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
     if (sourceIsDict) {
-      if (dictStart + length > dictionary.length) throw new TokzipDecodeError('dictionary match out of bounds');
-      out.set(dictionary.subarray(dictStart, dictStart + length), produced);
+      if (dictStart + length <= dictionary.length) {
+        out.set(dictionary.subarray(dictStart, dictStart + length), produced);
+      } else if (tracker) {
+        copyExtendedDictMatch(out, produced, dictStart, length, language, tracker);
+      } else {
+        throw new TokzipDecodeError('dictionary match out of bounds');
+      }
     } else {
       if (dist < 1 || dist > produced) throw new TokzipDecodeError('history match out of bounds');
       if (dist >= length) {

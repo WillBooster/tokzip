@@ -1,5 +1,6 @@
 import type { EntropyTables, RegisteredLanguage } from './dictionary.ts';
 import { allocateDecodeBuffer, TokzipDecodeError } from './errors.ts';
+import { copyExtendedDictMatch, FenceTracker } from './fences.ts';
 import {
   INITIAL_REPS,
   MATCH_LEN_CAP,
@@ -495,7 +496,8 @@ export function decodeSmallBody(
   pos: number,
   end: number,
   outputSize: number,
-  language: RegisteredLanguage
+  language: RegisteredLanguage,
+  fenced = false
 ): Uint8Array {
   const words = decodeRadix85(data, pos, end);
   const header = new BitReader(words);
@@ -536,6 +538,7 @@ export function decodeSmallBody(
   const out = allocateDecodeBuffer(outputSize);
   const { dictionary } = language;
   const { litContext } = language.tables;
+  const tracker = fenced ? new FenceTracker(language.id) : undefined;
   let rep0 = INITIAL_REPS[0]!;
   let rep1 = INITIAL_REPS[1]!;
   let rep2 = INITIAL_REPS[2]!;
@@ -576,8 +579,13 @@ export function decodeSmallBody(
     if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
     if (kind === TOKEN_KIND_DICT) {
       const start = readOffsetValue(OFFSET_CONTEXT_DICT);
-      if (start + length > dictionary.length) throw new TokzipDecodeError('dictionary match out of bounds');
-      out.set(dictionary.subarray(start, start + length), produced);
+      if (start + length <= dictionary.length) {
+        out.set(dictionary.subarray(start, start + length), produced);
+      } else if (tracker) {
+        copyExtendedDictMatch(out, produced, start, length, language, tracker);
+      } else {
+        throw new TokzipDecodeError('dictionary match out of bounds');
+      }
     } else {
       let dist: number;
       if (kind === TOKEN_KIND_HISTORY) {
