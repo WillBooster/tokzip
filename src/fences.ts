@@ -116,7 +116,7 @@ function resolveLabel(bytes: Uint8Array, start: number, end: number): number {
 /**
  * Encoder policy (not normative): a block language must cover at least this many input
  * bytes — fence lines excluded — before its extension index is built. Building and
- * process-caching a hash index over a ~512 KB dictionary costs milliseconds and megabytes;
+ * process-caching a hash index over a ~1 MB dictionary costs milliseconds and megabytes;
  * tiny blocks cannot repay that, while for real blocks (median ~122 bytes in the bench
  * corpora) the cache amortizes across the process like the frame-language index does.
  */
@@ -134,7 +134,7 @@ const MAX_EXTENSION_LANGUAGES = 4;
  * Returns undefined when no position has an extension (the common case, decided by a cheap
  * backtick scan first). A block language that is unknown, unregistered, the frame language
  * itself, or below {@link MIN_EXTENSION_CONTENT} total content yields no extension — such
- * regions match against the frame dictionary exactly like plain v2, and their frames need
+ * regions match against the frame dictionary exactly like plain unfenced frames, and their frames need
  * no registration to decode.
  */
 export function computeDictSegments(
@@ -206,7 +206,7 @@ export function computeDictSegments(
 /**
  * True when a dictionary token addresses the extended space above the frame dictionary —
  * the normative condition for setting FLAG_FENCED, so frames whose matches all stay inside
- * the frame dictionary remain bit-identical to plain v2 frames.
+ * the frame dictionary remain bit-identical to plain unfenced frames.
  */
 export function usesExtendedDictionary(tokens: Token[], frameDictionaryLength: number): boolean {
   return tokens.some((token) => token.type === 'dict' && token.start + token.len > frameDictionaryLength);

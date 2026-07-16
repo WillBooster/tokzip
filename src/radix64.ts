@@ -51,8 +51,19 @@ export class TextSink {
     this.buffer[this.length++] = code;
   }
 
+  /** Appends raw bytes verbatim (binary-frame emission). */
+  append(bytes: Uint8Array): void {
+    this.reserve(bytes.length).set(bytes, this.length);
+    this.length += bytes.length;
+  }
+
   toString(): string {
     return asciiDecoder.decode(this.buffer.subarray(0, this.length));
+  }
+
+  /** Copies out the accumulated bytes (binary-frame emission). */
+  toBytes(): Uint8Array {
+    return this.buffer.slice(0, this.length);
   }
 }
 

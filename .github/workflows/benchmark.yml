@@ -38,15 +38,21 @@ jobs:
           # compress/decompress speed changes in the published series.
           bun-version-file: .tool-versions
       - run: bun install --frozen-lockfile
-      - name: Run benchmark (size + speed + round-trip verification)
+      - name: Run text-channel benchmark (size + speed + round-trip verification)
         run: bun scripts/bench/bench.ts --speed --json .tmp/bench.json
+      - name: Run binary-channel benchmark (size + round-trip verification)
+        # Size and round-trip only: the binary channel runs the same codecs, so speed is
+        # covered by the text run while this pass verifies every binary frame losslessly.
+        run: bun scripts/bench/bench.ts --binary --json .tmp/bench-binary.json
       - uses: actions/upload-artifact@v4
         # Upload even when the benchmark fails (e.g. a round-trip mismatch) so the
         # structured failure report is available for debugging, not just log text.
         if: ${{ !cancelled() }}
         with:
           name: benchmark-result
-          path: .tmp/bench.json
+          path: |
+            .tmp/bench.json
+            .tmp/bench-binary.json
           if-no-files-found: ignore
       - name: Publish result to GitHub Pages branch
         # Only mainline results reach the dashboard: this also excludes workflow_dispatch

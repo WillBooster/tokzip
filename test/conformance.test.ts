@@ -17,7 +17,13 @@ function expectDecodeError(frame: string, message: string | RegExp): void {
 describe('container vectors', () => {
   test('empty input is the exact 4-char stored frame', () => {
     const frame = compress('');
-    expect(frame).toBe('yAAA');
+    expect(frame).toBe('zAAA');
+    expect(decompress(frame)).toBe('');
+  });
+
+  test('empty input is the exact 4-byte binary stored frame', () => {
+    const frame = compress('', { output: 'binary' });
+    expect(frame).toEqual(new Uint8Array([0xB3, 0x00, 0x00, 0x00]));
     expect(decompress(frame)).toBe('');
   });
 
@@ -62,11 +68,11 @@ describe('container vectors', () => {
 
   test('non-canonical size varint', () => {
     // Varint 'gA' encodes value 0 with a redundant continuation group.
-    expectDecodeError('yAAgA', /non-canonical varint/);
+    expectDecodeError('zAAgA', /non-canonical varint/);
   });
 
   test('non-alphabet character', () => {
-    expectDecodeError('y"AA', /non-alphabet character/);
+    expectDecodeError('z"AA', /non-alphabet character/);
   });
 
   test('truncated header and truncated payload', () => {
@@ -93,8 +99,8 @@ describe('container vectors', () => {
     // A small frame declaring 2^34 - 1 bytes with a near-empty body: structurally
     // unproducible, and must throw a typed error (not an engine out-of-memory RangeError)
     // even under the explicit "no cap" setting.
-    expect(() => decompress('yAC______P!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(TokzipDecodeError);
-    expect(() => decompress('yAC______P!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(
+    expect(() => decompress('zAC______P!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(TokzipDecodeError);
+    expect(() => decompress('zAC______P!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(
       /body capacity|allocatable/
     );
   });
@@ -112,9 +118,9 @@ describe('container vectors', () => {
   });
 
   test('a small frame for size 0 is non-canonical and rejected', () => {
-    // The canonical empty frame is the stored 'yAAA'; a size-0 small body can never be
+    // The canonical empty frame is the stored 'zAAA'; a size-0 small body can never be
     // smaller than the (empty) stored body.
-    expectDecodeError('yACA!!!!!', /non-canonical|stored/);
+    expectDecodeError('zACA!!!!!', /non-canonical|stored/);
   });
 
   test('non-stored bodies at least as large as the stored body are rejected', () => {

@@ -1,7 +1,18 @@
 import { LENGTH_SLOT_COUNT, maxSlotValue } from './slots.ts';
 
-/** First payload char of every tokzip frame: magic 0b110 in the high 3 bits, version 2 in the low 3. */
-export const MAGIC_VERSION = 0b11_0010;
+/**
+ * First payload char of every tokzip frame: magic 0b110 in the high 3 bits, version 3 in the
+ * low 3. v3 carries the retrained ~1 MB dictionaries; v2 frames were built against different
+ * dictionary bytes and could silently decode to wrong content, so they are rejected as
+ * 'unknown version' instead.
+ */
+export const MAGIC_VERSION = 0b11_0011;
+
+/**
+ * First byte of every binary tokzip frame: bit 7 set (never a safe-ASCII text frame, whose
+ * chars are all < 0x80) over the same 6-bit magic/version value as the text container.
+ */
+export const BINARY_MAGIC_VERSION = 0b1000_0000 | MAGIC_VERSION;
 
 /** Shipped-mode values in the flags char (bits 1:0). Value 3 is invalid. */
 export const MODE_STORED = 0;
@@ -55,7 +66,7 @@ export const TOKEN_KIND_COUNT = 7;
 export const TOKEN_ALPHABET_SIZE = TOKEN_KIND_COUNT * LENGTH_SLOT_COUNT; // 252
 
 /**
- * `small`-mode context model (v2). Each stream selects its static code table by context:
+ * `small`-mode context model. Each stream selects its static code table by context:
  * token symbols by the previous token's kind (initially litrun), literals by the trained
  * context class of the previous output byte (byte 0 when none), offsets by the match kind.
  */

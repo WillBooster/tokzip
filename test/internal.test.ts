@@ -35,7 +35,7 @@ test('planned small char cost equals the emitted small body length', () => {
     const bytes = encoder.encode(sample);
     const tokens = parse(bytes, language.dictionary, dictIndexFor(language), smallPricing(bytes, language));
     const plan = planSmallBody(tokens, bytes, language);
-    expect(plan.charCost).toBe(emitSmallBody(plan, language).length);
+    expect(plan.charCost).toBe(emitSmallBody(plan, language).toText().length);
   }
 });
 

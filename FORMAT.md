@@ -1,14 +1,17 @@
-# tokzip text frame format (version 2)
+# tokzip frame format (version 3)
 
 This document is the normative wire-format specification for tokzip payloads. It is
 self-contained so the format can be ported to other implementation languages. The reference
 implementation lives under `src/`.
 
-A tokzip payload is a single **text frame**: a safe-ASCII string generated in one pass, with
-no binary intermediate and no base64 stage. Trailing characters after the frame are a
-structural error. All structural errors MUST be reported as a typed decode error
-(`TokzipDecodeError` in the reference implementation); valid-looking corruption MAY decode to
-wrong output without throwing (there is no integrity checksum in v2; a flag bit is reserved).
+A tokzip payload is a single frame in one of two containers sharing the same token model and
+entropy coding: the **text frame** (sections 1–11) — a safe-ASCII string generated in one
+pass, with no binary intermediate and no base64 stage — and the **binary frame** (§12) — the
+same streams packed at 8 bits per byte for binary transports. Trailing characters (or bytes)
+after the frame are a structural error. All structural errors MUST be reported as a typed
+decode error (`TokzipDecodeError` in the reference implementation); valid-looking corruption
+MAY decode to wrong output without throwing (there is no integrity checksum in v3; a flag
+bit is reserved).
 
 ## 1. Alphabets
 
@@ -59,7 +62,7 @@ zero on encode and ignored on decode.
 ## 3. Frame layout
 
 ```
-[0] magic|version   radix-64 char; value 0b110_010 (50, char 'y') for v2.
+[0] magic|version   radix-64 char; value 0b110_011 (51, char 'z') for v3.
 [1] language id     radix-64 char; 0–63.
 [2] flags           radix-64 char:
                       bits 1:0  shipped mode: 0 stored, 1 fast, 2 small; 3 is invalid
@@ -80,7 +83,7 @@ zero on encode and ignored on decode.
   callers use the bytes path.)
 - Frames are single: any character after the body is a structural error.
 
-## 4. Language ids (v2 allocation, unchanged from v1)
+## 4. Language ids (v3 allocation, unchanged since v1)
 
 | id  | language            |     | id  | language   |
 | --- | ------------------- | --- | --- | ---------- |
@@ -150,9 +153,9 @@ LLM output) compress better when dictionary matches inside a block can also addr
 block language's dictionary. Flag bit 3 enables this per frame:
 
 - **Bit 3 = 0**: every dictionary match addresses the frame language's assembled dictionary
-  (the original v2 behavior; such frames are bit-identical to plain v2 frames).
+  (such frames are bit-identical to plain unfenced frames).
 - **Bit 3 = 1**: the dictionary space is **extended, not switched**. Offsets below the frame
-  language's assembled dictionary length keep their plain-v2 meaning everywhere. Where the
+  language's assembled dictionary length keep their plain unfenced meaning everywhere. Where the
   **fence state** of the output produced strictly before a match's first output byte names a
   block language other than the frame language, that language's **dictionary suffix** is
   addressed contiguously above the frame dictionary: virtual offset
@@ -375,7 +378,7 @@ library version or re-encode; see the tracking issue on versioned module assets.
 Executable vectors live in `test/conformance.test.ts` and `test/roundtrip.test.ts`; the
 normative list mirrors the design issue:
 
-empty input (exact frame `yAAA`); tiny stored frame (exact overhead bound); history /
+empty input (exact frame `zAAA`); tiny stored frame (exact overhead bound); history /
 dictionary / rep / overlap-copy matches; 12-bit vs 18-bit offset forms; single-symbol and
 degenerate streams (raw stream modes); downgrade tie and determinism; invalid table; unknown
 id on non-stored frames; stored frame with nonzero id (decodes); unknown version; reserved
@@ -388,3 +391,49 @@ fast-ineligible tokens; fenced frames (flag bit 3): extended-dictionary round-tr
 modes, label normalization (case, aliases, CRLF, longer fences), unlabeled/unknown labels and
 close-fence rules keeping the plain space, unregistered block language on an actual extended
 match, and bit 3 = 0 whenever no extended dictionary match ships.
+
+## 12. Binary frame container
+
+The binary container carries the identical logical content — the same modes, token model,
+dictionaries, entropy coding, and auto-downgrade — packed at 8 bits per byte instead of
+through the text alphabets, for transports that accept raw bytes. A `fast` body loses the
+6-bits-per-char radix-64 tax (÷4/3) and a `small` body the 32-bits-per-5-chars radix-85 tax
+(÷5/4); stored bodies are the raw input bytes with no packing tax at all.
+
+### 12.1 Frame layout
+
+```
+[0] magic|version   byte 0xB3: bit 7 set (never a safe-ASCII char) over the text
+                    container's 6-bit magic/version value 0b110_011.
+[1] language id     byte; ids per §4.
+[2] flags           byte; bits 3:0 as §3, bits 7:4 reserved (encoders write 0,
+                    decoders reject non-zero).
+[3…] decompressed size   byte varint: little-endian 7-bit groups, bit 7 = continue,
+                         canonical (minimal, no zero final group), max 5 bytes (35 bits).
+[…]  body                per shipped mode (§12.2)
+```
+
+A first byte with bit 7 set and the correct magic bits but a different version is "unknown
+version"; any other first byte is "bad magic". Text and binary frames are unambiguous: every
+text-frame character is < 0x80, every binary frame starts ≥ 0x80.
+
+### 12.2 Bodies
+
+- **Stored**: the declared number of raw bytes verbatim. The body byte count MUST equal the
+  declared size exactly.
+- **`fast`**: the §7 radix-64 token stream with each 6-bit character value bit-packed
+  MSB-first, zero-padded to a byte boundary. The body byte count MUST equal exactly
+  `ceil(6 × chars / 8)` for the chars the token stream consumes (so padding is at most 7
+  bits, contained in the final byte), and the padding bits MUST be zero.
+- **`small`**: the §8 bitstream (identical layout and coding, §8.1–8.4) zero-padded to a
+  byte boundary instead of a 32-bit word boundary. The body byte count MUST equal exactly
+  `ceil(bits / 8)` for the bits the streams consume, and the padding bits MUST be zero.
+
+### 12.3 Auto-downgrade in output units
+
+§9 applies unchanged except that frame sizes are compared in **bytes**: stored costs
+`size` bytes, a `fast` body `ceil(6 × chars / 8)` bytes, a `small` body `ceil(bits / 8)`
+bytes. Because the channels round differently, the shipped mode MAY differ between the text
+and binary frames of the same input; each channel independently ships its smallest frame,
+and decoders reject a non-stored binary body that is not strictly smaller than the declared
+size (the binary stored body).

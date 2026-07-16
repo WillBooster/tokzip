@@ -1,8 +1,16 @@
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
-import { decodeFastBody, emitFastBody, fastBodyCost, fastPricing } from './fastMode.ts';
+import {
+  decodeFastBody,
+  decodeFastBodyBinary,
+  emitFastBody,
+  fastBodyCost,
+  fastPricing,
+  packFastCodes,
+} from './fastMode.ts';
 import { computeDictSegments, usesExtendedDictionary } from './fences.ts';
 import {
+  BINARY_MAGIC_VERSION,
   DEFAULT_MAX_OUTPUT_SIZE,
   FAST_WINDOW,
   FLAG_BYTES,
@@ -25,13 +33,26 @@ import {
   readVarint64,
   TextSink,
 } from './radix64.ts';
-import { decodeSmallBody, emitSmallBody, planSmallBody, smallPricing } from './smallMode.ts';
+import {
+  decodeSmallBody,
+  decodeSmallBodyBinary,
+  emitSmallBody,
+  planSmallBody,
+  type SmallPlan,
+  smallPricing,
+} from './smallMode.ts';
 
 export interface CompressOptions {
   /** Language dictionary to use; default 'none' (id 0, wrapper dictionary only). */
   language?: string;
   /** Optimization target; both modes are lossless. Default 'fast'. */
   mode?: 'fast' | 'small';
+  /**
+   * Output channel; default 'text'. 'text' emits a safe-ASCII frame (JSON- and
+   * template-literal-safe); 'binary' emits the same streams packed at 8 bits per byte —
+   * about 25% smaller for `fast` frames and 20% smaller for `small` frames.
+   */
+  output?: 'text' | 'binary';
 }
 
 export interface DecompressOptions {
@@ -45,8 +66,17 @@ const textEncoder = new TextEncoder();
 // BOM-prefixed string returns it intact — decoding is lossless or it throws, never silently lossy.
 const fatalDecoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 
+// Binary-frame byte varints mirror the text container's radix-64 varints: little-endian
+// 7-bit groups, continue bit 7, canonical (minimal) length, 5 groups = 35 bits max.
+const BYTE_VARINT_MAX_BYTES = 5;
+
 /** Compresses a string (UTF-8) or raw bytes into a safe-ASCII text frame. */
-export function compress(input: string | Uint8Array, options?: CompressOptions): string {
+export function compress(input: string | Uint8Array, options?: CompressOptions & { output?: 'text' }): string;
+/** Compresses a string (UTF-8) or raw bytes into a dense binary frame. */
+export function compress(input: string | Uint8Array, options: CompressOptions & { output: 'binary' }): Uint8Array;
+/** Fallback for options whose `output` is not statically known (e.g. a `CompressOptions` variable). */
+export function compress(input: string | Uint8Array, options?: CompressOptions): string | Uint8Array;
+export function compress(input: string | Uint8Array, options?: CompressOptions): string | Uint8Array {
   const isString = typeof input === 'string';
   const bytes = isString ? textEncoder.encode(input) : input;
   const languageName = options?.language ?? 'none';
@@ -55,6 +85,9 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   const mode = options?.mode ?? 'fast';
   // Untyped callers must not silently fall through to the (expensive) small path on typos.
   if (mode !== 'fast' && mode !== 'small') throw new RangeError(`invalid mode: ${String(mode)}`);
+  const output = options?.output ?? 'text';
+  if (output !== 'text' && output !== 'binary') throw new RangeError(`invalid output: ${String(output)}`);
+  const binary = output === 'binary';
 
   // Fenced dictionary extension: labeled code fences extend the searchable dictionary space
   // with the block language's suffix (undefined when the input has no such fence, or when
@@ -62,11 +95,17 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   const segments = computeDictSegments(bytes, language, mode === 'fast' ? FAST_WINDOW : SMALL_WINDOW);
   const dictIndex = dictIndexFor(language);
 
-  const storedCost = packedRawLength(bytes.length);
+  // The auto-downgrade compares body costs in output units — chars for text frames, bytes
+  // for binary frames (fast bodies pack 6 bits per char; small bodies byte-pad their bit
+  // stream) — so each channel independently ships its smallest frame.
+  // Math.ceil, not (x + 7) >> 3: bit counts can exceed 2^31 on large inputs, where 32-bit
+  // bitwise ops silently truncate.
+  const fastOutCost = (chars: number): number => (binary ? Math.ceil((chars * 6) / 8) : chars);
+  const storedCost = binary ? bytes.length : packedRawLength(bytes.length);
   let shippedMode = MODE_STORED;
   let fastTokensToShip: Token[] | undefined;
   let smallTokensToShip: Token[] | undefined;
-  let smallBody = '';
+  let smallPlanToShip: SmallPlan | undefined;
   if (mode === 'fast') {
     const pricing = fastPricing(bytes, language);
     let tokens = parse(bytes, language.dictionary, dictIndex, pricing, segments);
@@ -74,15 +113,15 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     if (segments) {
       // The greedy parse is approximate, so the extended search space can occasionally ship a
       // larger body; compare against the plain parse exactly and prefer plain on ties (the
-      // frame then stays bit-identical to plain v2).
+      // frame then stays bit-identical to the plain unfenced frame).
       const plainTokens = parse(bytes, language.dictionary, dictIndex, pricing);
       const plainCost = fastBodyCost(plainTokens, bytes, language)!;
-      if (plainCost <= fastCost) {
+      if (fastOutCost(plainCost) <= fastOutCost(fastCost)) {
         tokens = plainTokens;
         fastCost = plainCost;
       }
     }
-    if (fastCost < storedCost) {
+    if (fastOutCost(fastCost) < storedCost) {
       shippedMode = MODE_FAST;
       fastTokensToShip = tokens;
     }
@@ -92,6 +131,10 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     // candidate is the cheaper of two token lists: the small (optimal) parse re-priced in fast
     // chars, and a pure fast parse — the optimal parse minimizes bits, so alone it could ship a
     // fast frame larger than mode 'fast' would produce for the same input.
+    // Plan sizes are compared in output units — exact chars for text, exact bytes for binary —
+    // so ties at the shipped-frame granularity keep the documented preference for the plainer
+    // encoding (e.g. a byte-tied fenced plan must not add a needless registration dependency).
+    const planCost = (plan: SmallPlan): number => (binary ? Math.ceil(plan.totalBits / 8) : plan.charCost);
     const pricing = smallPricing(bytes, language);
     let smallTokens = parse(bytes, language.dictionary, dictIndex, pricing, segments);
     let plan = planSmallBody(smallTokens, bytes, language);
@@ -100,7 +143,7 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
       // path: price the plain parse exactly and prefer it on ties.
       const plainTokens = parse(bytes, language.dictionary, dictIndex, pricing);
       const plainPlan = planSmallBody(plainTokens, bytes, language);
-      if (plainPlan.charCost <= plan.charCost) {
+      if (planCost(plainPlan) <= planCost(plan)) {
         smallTokens = plainTokens;
         plan = plainPlan;
       }
@@ -111,7 +154,7 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
       // parse can lose to plain literals; the all-literal plan is O(n) to price, so compare it.
       const allLiteralTokens: Token[] = [{ type: 'lit', start: 0, end: bytes.length }];
       const allLiteralPlan = planSmallBody(allLiteralTokens, bytes, language);
-      if (allLiteralPlan.charCost < plan.charCost) {
+      if (planCost(allLiteralPlan) < planCost(plan)) {
         plan = allLiteralPlan;
         planTokens = allLiteralTokens;
       }
@@ -123,51 +166,88 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     if (segments) {
       const plainFastTokens = parse(bytes, language.dictionary, dictIndex, fastPricingModel);
       const plainFastCost = fastBodyCost(plainFastTokens, bytes, language)!;
-      if (plainFastCost <= pureFastCost) {
+      if (fastOutCost(plainFastCost) <= fastOutCost(pureFastCost)) {
         fastTokens = plainFastTokens;
         pureFastCost = plainFastCost;
       }
     }
-    const useLazyTokensForFast = lazyFastCost !== undefined && lazyFastCost < pureFastCost;
+    // Output-unit comparison with pure-fast preferred on ties: the lazy (small-parse) tokens
+    // may reach the extended dictionary, so a byte-tied win must not add a fenced dependency.
+    const useLazyTokensForFast = lazyFastCost !== undefined && fastOutCost(lazyFastCost) < fastOutCost(pureFastCost);
     const fastCost = useLazyTokensForFast ? lazyFastCost : pureFastCost;
+    const smallCost = planCost(plan);
     // Pick the smallest complete frame; on ties the simpler encoding wins (stored, fast, small).
     let bestCost = storedCost;
-    if (fastCost < bestCost) {
+    if (fastOutCost(fastCost) < bestCost) {
       shippedMode = MODE_FAST;
-      bestCost = fastCost;
+      bestCost = fastOutCost(fastCost);
     }
-    if (plan.charCost < bestCost) shippedMode = MODE_SMALL;
+    if (smallCost < bestCost) shippedMode = MODE_SMALL;
     if (shippedMode === MODE_FAST) fastTokensToShip = useLazyTokensForFast ? smallTokens : fastTokens;
     else if (shippedMode === MODE_SMALL) {
       smallTokensToShip = planTokens;
-      smallBody = emitSmallBody(plan, language);
+      smallPlanToShip = plan;
     }
   }
 
   // Normative: the flag is set iff a shipped dict token reaches above the frame dictionary,
-  // so frames whose matches all stay inside it remain bit-identical to plain v2 frames.
+  // so frames whose matches all stay inside it remain bit-identical to plain unfenced frames.
   const shippedTokens = fastTokensToShip ?? smallTokensToShip;
   const fenced = shippedTokens !== undefined && usesExtendedDictionary(shippedTokens, language.dictionary.length);
+  const flags = shippedMode | (isString ? 0 : FLAG_BYTES) | (fenced ? FLAG_FENCED : 0);
+  // Stored frames always carry language id 0 (decoders ignore it).
+  const languageId = shippedMode === MODE_STORED ? 0 : language.id;
+
+  if (binary) {
+    // Exact-capacity sink, no growth: the small body is ceil(totalBits / 8) bytes, and every
+    // other body is smaller than the input (fast auto-downgrades to stored otherwise).
+    const outCapacity = 8 + (smallPlanToShip ? Math.ceil(smallPlanToShip.totalBits / 8) : bytes.length);
+    const out = new TextSink(outCapacity);
+    out.push(BINARY_MAGIC_VERSION);
+    out.push(languageId);
+    out.push(flags);
+    pushByteVarint(out, bytes.length);
+    if (shippedMode === MODE_STORED) out.append(bytes);
+    else if (fastTokensToShip) {
+      const body = new TextSink(bytes.length + 64);
+      emitFastBody(body, fastTokensToShip, bytes, language);
+      out.append(packFastCodes(body.buffer, body.length));
+    } else out.append(emitSmallBody(smallPlanToShip!, language).toBytes());
+    return out.toBytes();
+  }
 
   const out = new TextSink(shippedMode === MODE_SMALL ? 16 : packedRawLength(bytes.length) + 16);
   out.push(RADIX64_CODES[MAGIC_VERSION]!);
-  // Stored frames always carry language id 0 (decoders ignore it).
-  out.push(RADIX64_CODES[shippedMode === MODE_STORED ? 0 : language.id]!);
-  out.push(RADIX64_CODES[shippedMode | (isString ? 0 : FLAG_BYTES) | (fenced ? FLAG_FENCED : 0)]!);
+  out.push(RADIX64_CODES[languageId]!);
+  out.push(RADIX64_CODES[flags]!);
   pushVarint64(out, bytes.length);
   if (shippedMode === MODE_STORED) pushPackedRaw(out, bytes, 0, bytes.length);
   else if (fastTokensToShip) emitFastBody(out, fastTokensToShip, bytes, language);
-  return out.toString() + smallBody;
+  return out.toString() + (smallPlanToShip ? emitSmallBody(smallPlanToShip, language).toText() : '');
 }
 
-/** Decompresses a tokzip text frame; the return type follows the header's input-type flag. */
-export function decompress(data: string, options?: DecompressOptions): string | Uint8Array {
+/**
+ * Decompresses a tokzip frame — a text frame when given a string, a binary frame when given
+ * bytes; the return type follows the header's input-type flag.
+ */
+export function decompress(data: string | Uint8Array, options?: DecompressOptions): string | Uint8Array {
   const maxOutputSize = options?.maxOutputSize ?? DEFAULT_MAX_OUTPUT_SIZE;
   // NaN would make the size guard below always pass, silently disabling the allocation cap.
   // Infinity is allowed as an explicit "no cap".
   if (Number.isNaN(maxOutputSize) || maxOutputSize < 0) {
     throw new RangeError(`invalid maxOutputSize: ${maxOutputSize}`);
   }
+  const { flags, bytes } =
+    typeof data === 'string' ? decompressText(data, maxOutputSize) : decompressBinary(data, maxOutputSize);
+  if ((flags & FLAG_BYTES) !== 0) return bytes;
+  try {
+    return fatalDecoder.decode(bytes);
+  } catch {
+    throw new TokzipDecodeError('invalid UTF-8 in string frame');
+  }
+}
+
+function decompressText(data: string, maxOutputSize: number): { flags: number; bytes: Uint8Array } {
   const magicVersion = readRadix64(data, 0);
   if (magicVersion !== MAGIC_VERSION) {
     if (magicVersion >>> 3 === MAGIC_VERSION >>> 3) throw new TokzipDecodeError('unknown version');
@@ -177,7 +257,6 @@ export function decompress(data: string, options?: DecompressOptions): string | 
   const flags = readRadix64(data, 2);
   if ((flags & RESERVED_FLAG_MASK) !== 0) throw new TokzipDecodeError('reserved flag bits set');
   const mode = flags & 3;
-  const isBytes = (flags & FLAG_BYTES) !== 0;
   const fenced = (flags & FLAG_FENCED) !== 0;
   const { value: outputSize, pos: bodyStart } = readVarint64(data, 3);
   if (outputSize > maxOutputSize) throw new TokzipDecodeError('declared size exceeds maxOutputSize');
@@ -207,11 +286,78 @@ export function decompress(data: string, options?: DecompressOptions): string | 
   } else {
     throw new TokzipDecodeError('invalid mode');
   }
+  return { flags, bytes };
+}
 
-  if (isBytes) return bytes;
-  try {
-    return fatalDecoder.decode(bytes);
-  } catch {
-    throw new TokzipDecodeError('invalid UTF-8 in string frame');
+function decompressBinary(data: Uint8Array, maxOutputSize: number): { flags: number; bytes: Uint8Array } {
+  if (data.length < 3) throw new TokzipDecodeError('truncated payload');
+  const magicVersion = data[0]!;
+  if (magicVersion !== BINARY_MAGIC_VERSION) {
+    if ((magicVersion & 0b1111_1000) === (BINARY_MAGIC_VERSION & 0b1111_1000)) {
+      throw new TokzipDecodeError('unknown version');
+    }
+    throw new TokzipDecodeError('bad magic');
   }
+  const languageId = data[1]!;
+  const flags = data[2]!;
+  // The binary flags byte reserves bits 7:4 on top of the text container's reserved bits.
+  if ((flags & (0b1111_0000 | RESERVED_FLAG_MASK)) !== 0) throw new TokzipDecodeError('reserved flag bits set');
+  const mode = flags & 3;
+  const fenced = (flags & FLAG_FENCED) !== 0;
+  const { value: outputSize, pos: bodyStart } = readByteVarint(data, 3);
+  if (outputSize > maxOutputSize) throw new TokzipDecodeError('declared size exceeds maxOutputSize');
+
+  let bytes: Uint8Array;
+  if (mode === MODE_STORED) {
+    // Stored frames decode under any language id (zero registration needed).
+    if (data.length !== bodyStart + outputSize) {
+      if (data.length < bodyStart + outputSize) throw new TokzipDecodeError('truncated payload');
+      throw new TokzipDecodeError('trailing characters after payload');
+    }
+    // Explicit copy, not data.slice(): callers may pass a Buffer, whose slice() returns a
+    // view over the input frame's memory instead of an independent copy.
+    bytes = new Uint8Array(outputSize);
+    bytes.set(data.subarray(bodyStart, bodyStart + outputSize));
+  } else if (mode === MODE_FAST || mode === MODE_SMALL) {
+    // Mirrors the text container: a conforming non-stored body is strictly smaller than the
+    // stored body (here the raw byte count), keeping frames canonical and allocations bounded.
+    if (data.length - bodyStart >= outputSize) {
+      throw new TokzipDecodeError('non-canonical frame: body not smaller than stored');
+    }
+    const language: RegisteredLanguage = requireLanguageById(languageId);
+    bytes =
+      mode === MODE_FAST
+        ? decodeFastBodyBinary(data, bodyStart, data.length, outputSize, language, fenced)
+        : decodeSmallBodyBinary(data, bodyStart, data.length, outputSize, language, fenced);
+  } else {
+    throw new TokzipDecodeError('invalid mode');
+  }
+  return { flags, bytes };
+}
+
+function pushByteVarint(out: TextSink, value: number): void {
+  if (value < 0 || !Number.isSafeInteger(value)) throw new RangeError(`invalid varint value: ${value}`);
+  do {
+    // Arithmetic, not & / >>>: varint values span 35 bits, beyond 32-bit bitwise range.
+    const group = value % 128;
+    value = Math.floor(value / 128);
+    out.push(value > 0 ? group | 128 : group);
+  } while (value > 0);
+}
+
+function readByteVarint(data: Uint8Array, pos: number): { value: number; pos: number } {
+  let value = 0;
+  let shift = 1;
+  for (let i = 0; i < BYTE_VARINT_MAX_BYTES; i++) {
+    if (pos >= data.length) throw new TokzipDecodeError('truncated payload');
+    const group = data[pos++]!;
+    value += (group & 127) * shift;
+    if ((group & 128) === 0) {
+      // Canonical form: a multi-byte varint must not end in a zero group.
+      if (i > 0 && (group & 127) === 0) throw new TokzipDecodeError('non-canonical varint');
+      return { value, pos };
+    }
+    shift *= 128;
+  }
+  throw new TokzipDecodeError('varint exceeds bound');
 }

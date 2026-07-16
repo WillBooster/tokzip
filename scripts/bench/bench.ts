@@ -1,11 +1,14 @@
 /**
- * Text-channel compression benchmark on the seeded `bench-v2` corpus split.
+ * Compression benchmark on the seeded `bench-v2` corpus split.
  *
  * Size, lossless round-trip, and (with --speed) end-to-end per-document throughput are
- * measured for tokzip and every competitor. Binary codecs include base64url encode/decode
- * work and use unpadded URL-safe output, matching tokzip's intended transport.
+ * measured for tokzip and every competitor on one of two channels:
+ * - text (default): tokzip text frames vs binary codecs behind unpadded base64url — every
+ *   method pays its complete binary-to-text framing cost, matching a text transport.
+ * - binary (--binary): tokzip binary frames vs the raw codec bytes, no text framing.
  *
- * Usage: bun scripts/bench/bench.ts [--speed] [--json <path>] [<language> ...]
+ * Usage: bun scripts/bench/bench.ts [--binary] [--speed] [--json <path>] [<language> ...]
+ * The corpus roots come from corpusDirs(); set TOKZIP_CORPUS_DIR to benchmark one corpus.
  */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -15,7 +18,7 @@ import { languageByName } from '../../src/dictionary.ts';
 import { compress, decompress } from '../../src/index.ts';
 import '../../src/languages/index.ts';
 import { corpusDirs, type ManifestEntry } from '../corpus.ts';
-import { competitors } from './competitors.ts';
+import { binaryCompetitors, competitors } from './competitors.ts';
 
 const BUCKETS = ['0.5k', '2k', '8k', '24k'] as const;
 const SPEED_SAMPLE_COUNT = 3;
@@ -35,8 +38,9 @@ interface LoadedDoc extends BenchDoc {
 
 interface BenchMethod {
   name: string;
-  compress(doc: LoadedDoc): string;
-  decompress(encoded: string): string;
+  /** Encoded output; `.length` is the measured size (chars on text, bytes on binary). */
+  compress(doc: LoadedDoc): string | Uint8Array;
+  decompress(encoded: string | Uint8Array): string;
   /** Excluded from the speed benchmark (see {@link Competitor.speedExempt}). */
   speedExempt?: boolean;
 }
@@ -44,6 +48,7 @@ interface BenchMethod {
 interface SizeTotals {
   docs: number;
   inputBytes: number;
+  /** Output units per method: chars on the text channel, bytes on the binary channel. */
   outputChars: number[];
 }
 
@@ -65,6 +70,7 @@ interface LanguageReport {
 
 interface BenchReport {
   schemaVersion: 2;
+  channel: 'text' | 'binary';
   commit: string;
   commitTimestamp: string;
   timestamp: string;
@@ -77,22 +83,40 @@ interface BenchReport {
   speed?: Record<string, SpeedResult>;
 }
 
-const METHODS: BenchMethod[] = [
-  tokzipMethod('fast'),
-  tokzipMethod('small'),
-  ...competitors.map((competitor) => ({
-    name: competitor.name,
-    compress: (doc: LoadedDoc) => competitor.compress(doc.content),
-    decompress: (encoded: string) => competitor.decompress(encoded),
-    speedExempt: competitor.speedExempt,
-  })),
-];
+const { binary: BINARY_CHANNEL } = parseChannel(process.argv.slice(2));
+
+const METHODS: BenchMethod[] = BINARY_CHANNEL
+  ? [
+      tokzipMethod('fast', 'binary'),
+      tokzipMethod('small', 'binary'),
+      ...binaryCompetitors.map(
+        (competitor): BenchMethod => ({
+          name: competitor.name,
+          compress: (doc) => competitor.compress(doc.content),
+          decompress: (encoded) => competitor.decompress(encoded as Uint8Array),
+          speedExempt: competitor.speedExempt,
+        })
+      ),
+    ]
+  : [
+      tokzipMethod('fast', 'text'),
+      tokzipMethod('small', 'text'),
+      ...competitors.map(
+        (competitor): BenchMethod => ({
+          name: competitor.name,
+          compress: (doc) => competitor.compress(doc.content),
+          decompress: (encoded) => competitor.decompress(encoded as string),
+          speedExempt: competitor.speedExempt,
+        })
+      ),
+    ];
 const METHOD_NAMES = METHODS.map((method) => method.name);
 
 function main(): void {
   const { speed, jsonPath, languages } = parseArgs(process.argv.slice(2));
   const report: BenchReport = {
     schemaVersion: 2,
+    channel: BINARY_CHANNEL ? 'binary' : 'text',
     commit: process.env['GITHUB_SHA'] ?? gitOutput(['rev-parse', 'HEAD']) ?? 'unknown',
     commitTimestamp: new Date(gitOutput(['show', '-s', '--format=%cI', 'HEAD']) ?? Date.now()).toISOString(),
     timestamp: new Date().toISOString(),
@@ -121,14 +145,20 @@ function main(): void {
   if (report.roundTrip.failures.length > 0) process.exitCode = 1;
 }
 
+function parseChannel(args: string[]): { binary: boolean } {
+  return { binary: args.includes('--binary') };
+}
+
 function parseArgs(args: string[]): { speed: boolean; jsonPath?: string; languages: string[] } {
   const speed = args.includes('--speed');
   const jsonIndex = args.indexOf('--json');
   const jsonPath = jsonIndex === -1 ? undefined : args[jsonIndex + 1];
-  if (jsonIndex !== -1 && !jsonPath) {
+  if (jsonIndex !== -1 && (!jsonPath || jsonPath.startsWith('--'))) {
     console.error('error: --json requires a path');
     process.exit(1);
   }
+  // Flags (--speed, --binary, --json) are excluded by the '--' prefix check; the --json
+  // value is excluded by position.
   const requested = args.filter((arg, index) => {
     return !arg.startsWith('--') && (jsonIndex === -1 || index !== jsonIndex + 1);
   });
@@ -284,10 +314,15 @@ function loadBenchDocs(language: string): BenchDoc[] {
   });
 }
 
-function tokzipMethod(mode: 'fast' | 'small'): BenchMethod {
+function tokzipMethod(mode: 'fast' | 'small', output: 'text' | 'binary'): BenchMethod {
   return {
     name: `tokzip ${mode}`,
-    compress: (doc) => compress(doc.content, { language: doc.registered ? doc.language : 'none', mode }),
+    compress: (doc) => {
+      const language = doc.registered ? doc.language : 'none';
+      return output === 'binary'
+        ? compress(doc.content, { language, mode, output: 'binary' })
+        : compress(doc.content, { language, mode });
+    },
     decompress: (encoded) => decompress(encoded) as string,
   };
 }
@@ -309,7 +344,9 @@ function writeReport(path: string, report: BenchReport): void {
 }
 
 function printTotals(report: BenchReport): void {
-  console.log(`\n=== TOTAL (${report.total.docs} docs, ${Object.keys(report.languages).length} languages) ===`);
+  console.log(
+    `\n=== TOTAL (${report.total.docs} docs, ${Object.keys(report.languages).length} languages, ${report.channel} channel) ===`
+  );
   printHeader('');
   printRow('all', {
     docs: report.total.docs,

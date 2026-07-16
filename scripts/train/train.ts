@@ -38,7 +38,9 @@ import { buildWrapperDictionary } from './wrapperContent.ts';
 const ROOT = join(import.meta.dir, '../..');
 const GENERATED_DIR = join(ROOT, 'src/generated');
 const LANGUAGES_DIR = join(ROOT, 'src/languages');
-const DICTIONARY_BUDGET_BYTES = 512 * 1024;
+// Sized so wrapper + suffix stays below the 1 MB small-mode offset bound (2^20 - 1 is the
+// highest representable dictionary start; fast mode addresses only the first 256 KB either way).
+const DICTIONARY_BUDGET_BYTES = 1024 * 1024 - 8192;
 /** Bound on per-language statistics input; keeps a full training run tractable. */
 const MAX_STATS_BYTES = 32 * 1024 * 1024;
 
