@@ -173,7 +173,7 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     // may reach the extended dictionary, so a byte-tied win must not add a fenced dependency.
     const useLazyTokensForFast = lazyFastCost !== undefined && fastOutCost(lazyFastCost) < fastOutCost(pureFastCost);
     const fastCost = useLazyTokensForFast ? lazyFastCost : pureFastCost;
-    const smallCost = binary ? Math.ceil(plan.totalBits / 8) : plan.charCost;
+    const smallCost = planCost(plan);
     // Pick the smallest complete frame; on ties the simpler encoding wins (stored, fast, small).
     let bestCost = storedCost;
     if (fastOutCost(fastCost) < bestCost) {
