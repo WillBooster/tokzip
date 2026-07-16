@@ -70,32 +70,6 @@ const fatalDecoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 // 7-bit groups, continue bit 7, canonical (minimal) length, 5 groups = 35 bits max.
 const BYTE_VARINT_MAX_BYTES = 5;
 
-function pushByteVarint(out: TextSink, value: number): void {
-  if (value < 0 || !Number.isSafeInteger(value)) throw new RangeError(`invalid varint value: ${value}`);
-  do {
-    const group = value % 128;
-    value = Math.floor(value / 128);
-    out.push(value > 0 ? group | 128 : group);
-  } while (value > 0);
-}
-
-function readByteVarint(data: Uint8Array, pos: number): { value: number; pos: number } {
-  let value = 0;
-  let shift = 1;
-  for (let i = 0; i < BYTE_VARINT_MAX_BYTES; i++) {
-    if (pos >= data.length) throw new TokzipDecodeError('truncated payload');
-    const group = data[pos++]!;
-    value += (group & 127) * shift;
-    if ((group & 128) === 0) {
-      // Canonical form: a multi-byte varint must not end in a zero group.
-      if (i > 0 && (group & 127) === 0) throw new TokzipDecodeError('non-canonical varint');
-      return { value, pos };
-    }
-    shift *= 128;
-  }
-  throw new TokzipDecodeError('varint exceeds bound');
-}
-
 /** Compresses a string (UTF-8) or raw bytes into a safe-ASCII text frame. */
 export function compress(input: string | Uint8Array, options?: CompressOptions & { output?: 'text' }): string;
 /** Compresses a string (UTF-8) or raw bytes into a dense binary frame. */
@@ -352,4 +326,30 @@ function decompressBinary(data: Uint8Array, maxOutputSize: number): { flags: num
     throw new TokzipDecodeError('invalid mode');
   }
   return { flags, bytes };
+}
+
+function pushByteVarint(out: TextSink, value: number): void {
+  if (value < 0 || !Number.isSafeInteger(value)) throw new RangeError(`invalid varint value: ${value}`);
+  do {
+    const group = value % 128;
+    value = Math.floor(value / 128);
+    out.push(value > 0 ? group | 128 : group);
+  } while (value > 0);
+}
+
+function readByteVarint(data: Uint8Array, pos: number): { value: number; pos: number } {
+  let value = 0;
+  let shift = 1;
+  for (let i = 0; i < BYTE_VARINT_MAX_BYTES; i++) {
+    if (pos >= data.length) throw new TokzipDecodeError('truncated payload');
+    const group = data[pos++]!;
+    value += (group & 127) * shift;
+    if ((group & 128) === 0) {
+      // Canonical form: a multi-byte varint must not end in a zero group.
+      if (i > 0 && (group & 127) === 0) throw new TokzipDecodeError('non-canonical varint');
+      return { value, pos };
+    }
+    shift *= 128;
+  }
+  throw new TokzipDecodeError('varint exceeds bound');
 }
