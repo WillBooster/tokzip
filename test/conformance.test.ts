@@ -21,6 +21,12 @@ describe('container vectors', () => {
     expect(decompress(frame)).toBe('');
   });
 
+  test('empty input is the exact 4-byte binary stored frame', () => {
+    const frame = compress('', { output: 'binary' });
+    expect(frame).toEqual(new Uint8Array([0xB3, 0x00, 0x00, 0x00]));
+    expect(decompress(frame)).toBe('');
+  });
+
   test('tiny stored frame overhead is exactly header + size varint', () => {
     const frame = compress('a');
     // 3 header chars + 1 varint char + packed body (1 byte → 2 chars).
