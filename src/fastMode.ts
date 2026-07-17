@@ -434,5 +434,7 @@ function decodeFastBodyCore(
     }
     produced += length;
   }
-  return { out: historyLength > 0 ? out.subarray(historyLength) : out, pos };
+  // slice, not subarray: a view would keep the whole history+output allocation alive for as
+  // long as the caller retains the chunk, multiplying resident memory per decoded block.
+  return { out: historyLength > 0 ? out.slice(historyLength) : out, pos };
 }

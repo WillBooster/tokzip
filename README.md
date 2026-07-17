@@ -66,9 +66,12 @@ ratios: with default options, `mode: 'fast'` benches 1–2% _smaller_ than one-s
 one-shot `small` on multi-megabyte inputs, whose blocks stay inside the optimal parser's
 input bound while one-shot compression falls back to the greedy parse. Memory stays
 O(blockSize + window) on both sides regardless of stream length. Options: `blockSize` trades
-latency/memory for ratio, `carryWindow: false` makes blocks independently decodable, and
-`historyLimit` bounds the carried window (compression-speed lever for small blocks); run
-`bun scripts/bench/streamBench.ts` to see the trade-offs on the seeded corpus.
+latency/memory for ratio in `fast` mode (in `small` mode the 256 KB default is the practical
+ceiling — larger blocks shrink the history budget and past 512 KB lose the optimal parse),
+`carryWindow: false` makes blocks independently decodable, and `historyLimit` bounds the
+carried window (compression-speed lever for small blocks); run
+`bun scripts/bench/streamBench.ts` (add `--history` for the `historyLimit` sweep) to see the
+trade-offs on the seeded corpus.
 
 ## Benchmarks
 

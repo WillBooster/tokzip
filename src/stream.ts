@@ -35,7 +35,13 @@ export interface CompressionStreamOptions {
   language?: string;
   /** Optimization target; both modes are lossless. Default 'fast'. */
   mode?: 'fast' | 'small';
-  /** Raw bytes per compressed block (larger blocks trade latency/memory for ratio). Default 256 KB. */
+  /**
+   * Raw bytes per compressed block. Default 256 KB. In `fast` mode, larger blocks trade
+   * latency/memory for ratio; in `small` mode the default 256 KB is the practical ceiling —
+   * larger blocks shrink the carried-history budget (it keeps history + block inside the
+   * optimal parser's 512 KB input bound), and at ≥ 512 KB carry is impossible and the block
+   * itself exceeds the bound, degrading the parse to greedy.
+   */
   blockSize?: number;
   /**
    * Carries the LZ window across block boundaries (matches may reference the previous blocks'
@@ -102,9 +108,11 @@ class BlockEncoder {
   /** Longest carried history; keeps small-mode combined inputs inside the optimal-parse bound. */
   private readonly historyLimit: number;
   private history: Uint8Array = new Uint8Array(0);
-  private readonly pending: Uint8Array[] = [];
+  private pending: Uint8Array[] = [];
   private pendingLength = 0;
   private headerWritten = false;
+  /** Trailing high surrogate held back from the previous string chunk (see push). */
+  private pendingHighSurrogate = '';
 
   constructor(options?: CompressionStreamOptions) {
     const languageName = options?.language ?? 'none';
@@ -126,14 +134,37 @@ class BlockEncoder {
       throw new RangeError(`invalid historyLimit: ${historyLimit}`);
     }
     this.historyLimit = Math.min(historyLimit, window);
-    // A zero history budget (huge small-mode blocks) degenerates to carry-less blocks; the
-    // header flag must say so, or decoders would seed history the encoder never used.
+    // A zero history budget (huge small-mode blocks, or an explicit historyLimit of 0)
+    // degenerates to carry-less blocks; the header flag must say so, or decoders would seed
+    // history the encoder never used. An explicitly requested carry must not be silently
+    // dropped — fail loudly so the caller fixes the conflicting options.
+    if (options?.carryWindow === true && this.historyLimit === 0) {
+      throw new RangeError('carryWindow: true requires a non-zero history budget; reduce blockSize or historyLimit');
+    }
     this.carryWindow = (options?.carryWindow ?? true) && this.historyLimit > 0;
   }
 
   push(chunk: Uint8Array | string, controller: ByteController): void {
-    const bytes = typeof chunk === 'string' ? textEncoder.encode(chunk) : chunk;
-    if (!(bytes instanceof Uint8Array)) throw new TypeError('chunk must be a Uint8Array or string');
+    let bytes: Uint8Array;
+    if (typeof chunk === 'string') {
+      // Mirror TextEncoderStream: a surrogate pair split across chunk boundaries must not
+      // become two U+FFFD, so a trailing high surrogate is held back and prepended to the
+      // next string chunk (finish() flushes a leftover lone surrogate as U+FFFD).
+      let text = this.pendingHighSurrogate + chunk;
+      this.pendingHighSurrogate = '';
+      const last = text.codePointAt(text.length - 1);
+      if (last !== undefined && last >= 0xD8_00 && last <= 0xDB_FF) {
+        this.pendingHighSurrogate = text.at(-1)!;
+        text = text.slice(0, -1);
+      }
+      bytes = textEncoder.encode(text);
+    } else {
+      if (!(chunk instanceof Uint8Array)) throw new TypeError('chunk must be a Uint8Array or string');
+      // The chunk is retained without copying until its block is emitted. That matches the
+      // platform CompressionStream contract: mutating a chunk after write() is unsupported
+      // and corrupts output identically there, so no defensive copy is paid here.
+      bytes = chunk;
+    }
     if (bytes.length === 0) return;
     this.pending.push(bytes);
     this.pendingLength += bytes.length;
@@ -141,6 +172,15 @@ class BlockEncoder {
   }
 
   finish(controller: ByteController): void {
+    if (this.pendingHighSurrogate) {
+      // A stream ending in a lone high surrogate encodes it as U+FFFD (TextEncoderStream's
+      // flush behavior).
+      const bytes = textEncoder.encode(this.pendingHighSurrogate);
+      this.pendingHighSurrogate = '';
+      this.pending.push(bytes);
+      this.pendingLength += bytes.length;
+      while (this.pendingLength >= this.blockSize) this.emitBlock(this.takeBlock(this.blockSize), controller);
+    }
     if (this.pendingLength > 0) this.emitBlock(this.takeBlock(this.pendingLength), controller);
     const out = new TextSink(4);
     if (!this.headerWritten) this.writeHeader(out);
@@ -158,14 +198,18 @@ class BlockEncoder {
   private takeBlock(size: number): Uint8Array {
     const block = new Uint8Array(size);
     let at = 0;
+    // Consumed chunks are dropped in one batch after the loop: per-chunk Array.shift() would
+    // make block assembly quadratic in the chunk count (e.g. byte-sized writes).
+    let head = 0;
     while (at < size) {
-      const head = this.pending[0]!;
-      const take = Math.min(head.length, size - at);
-      block.set(head.subarray(0, take), at);
+      const chunk = this.pending[head]!;
+      const take = Math.min(chunk.length, size - at);
+      block.set(chunk.subarray(0, take), at);
       at += take;
-      if (take === head.length) this.pending.shift();
-      else this.pending[0] = head.subarray(take);
+      if (take === chunk.length) head++;
+      else this.pending[head] = chunk.subarray(take);
     }
+    if (head > 0) this.pending = this.pending.slice(head);
     this.pendingLength -= size;
     return block;
   }
@@ -201,19 +245,29 @@ class BlockEncoder {
         body = packFastCodes(sink.buffer, sink.length);
       }
     } else {
+      // The small parse must finish before fastPricing runs: each pricing hands the parser a
+      // module-level scratch prefix that is only valid until the next pricing call.
       const pricing = smallPricing(input, language);
-      const tokens = parse(input, language.dictionary, dictIndex, pricing, undefined, historyLength);
-      const plan = planSmallBody(tokens, input, language);
+      const smallTokens = parse(input, language.dictionary, dictIndex, pricing, undefined, historyLength);
+      const plan = planSmallBody(smallTokens, input, language);
       const smallBytes = Math.ceil(plan.totalBits / 8);
-      // The small parse re-priced in fast units (undefined when a token exceeds fast's
-      // offset range); a cheaper fast body ships instead of a marginal small one.
-      const fastChars = fastBodyCost(tokens, input, language);
-      const fastBytes = fastChars === undefined ? Number.POSITIVE_INFINITY : Math.ceil((fastChars * 6) / 8);
+      // Two fast candidates, mirroring the one-shot auto-downgrade: the small (optimal)
+      // parse re-priced in fast units (undefined when a token exceeds fast's offset range),
+      // and a pure fast parse — the optimal parse minimizes bits, so alone it could ship a
+      // fast body larger than mode 'fast' would produce. Pure fast wins ties.
+      const lazyFastChars = fastBodyCost(smallTokens, input, language);
+      const fastPricingModel = fastPricing(input, language);
+      fastPricingModel.lazy = true;
+      const pureFastTokens = parse(input, language.dictionary, dictIndex, fastPricingModel, undefined, historyLength);
+      const pureFastChars = fastBodyCost(pureFastTokens, input, language)!;
+      const useLazyTokens = lazyFastChars !== undefined && lazyFastChars < pureFastChars;
+      const fastChars = useLazyTokens ? lazyFastChars : pureFastChars;
+      const fastBytes = Math.ceil((fastChars * 6) / 8);
       const best = Math.min(block.length, fastBytes, smallBytes);
       if (fastBytes === best && fastBytes < block.length) {
         mode = MODE_FAST;
-        const sink = new TextSink(fastChars!);
-        emitFastBody(sink, tokens, input, language);
+        const sink = new TextSink(fastChars);
+        emitFastBody(sink, useLazyTokens ? smallTokens : pureFastTokens, input, language);
         body = packFastCodes(sink.buffer, sink.length);
       } else if (smallBytes === best && smallBytes < block.length) {
         mode = MODE_SMALL;
@@ -240,8 +294,14 @@ class BlockEncoder {
 class BlockDecoder {
   private readonly maxBlockSize: number;
   private buffer: Uint8Array = new Uint8Array(0);
+  /** Valid bytes in `buffer` are [offset, length); capacity beyond `length` is reusable. */
+  private length = 0;
   private offset = 0;
+  private headerSeen = false;
+  private languageId = 0;
+  /** Resolved lazily on the first non-stored block, so stored-only streams decode with any language id. */
   private language: RegisteredLanguage | undefined;
+  private streamMode = 0;
   private carry = false;
   private window = 0;
   private history: Uint8Array = new Uint8Array(0);
@@ -268,16 +328,29 @@ class BlockDecoder {
   }
 
   private available(): number {
-    return this.buffer.length - this.offset;
+    return this.length - this.offset;
   }
 
+  /**
+   * Appends into a growable buffer with amortized-doubling capacity, compacting consumed
+   * bytes in place first — reallocating per chunk would make block assembly quadratic in
+   * the chunk count.
+   */
   private append(chunk: Uint8Array): void {
-    const remaining = this.buffer.subarray(this.offset);
-    const merged = new Uint8Array(remaining.length + chunk.length);
-    merged.set(remaining);
-    merged.set(chunk, remaining.length);
-    this.buffer = merged;
-    this.offset = 0;
+    const remaining = this.length - this.offset;
+    if (this.buffer.length - this.length < chunk.length) {
+      if (this.buffer.length - remaining >= chunk.length && this.offset > 0) {
+        this.buffer.copyWithin(0, this.offset, this.length);
+      } else {
+        const grown = new Uint8Array(Math.max(remaining + chunk.length, this.buffer.length * 2, 16_384));
+        grown.set(this.buffer.subarray(this.offset, this.length));
+        this.buffer = grown;
+      }
+      this.length = remaining;
+      this.offset = 0;
+    }
+    this.buffer.set(chunk, this.length);
+    this.length += chunk.length;
   }
 
   /** Reads a canonical byte varint at `pos`, or undefined when more input is needed. */
@@ -285,7 +358,7 @@ class BlockDecoder {
     let value = 0;
     let shift = 1;
     for (let i = 0; i < BYTE_VARINT_MAX_BYTES; i++) {
-      if (pos >= this.buffer.length) return undefined;
+      if (pos >= this.length) return undefined;
       const group = this.buffer[pos++]!;
       value += (group & 127) * shift;
       if ((group & 128) === 0) {
@@ -303,7 +376,7 @@ class BlockDecoder {
       if (this.available() > 0) throw new TokzipDecodeError('trailing bytes after end of stream');
       return false;
     }
-    if (!this.language) {
+    if (!this.headerSeen) {
       if (this.available() < 3) return false;
       const magic = this.buffer[this.offset]!;
       if (magic !== STREAM_MAGIC_VERSION) {
@@ -312,12 +385,13 @@ class BlockDecoder {
         }
         throw new TokzipDecodeError('bad magic');
       }
-      const languageId = this.buffer[this.offset + 1]!;
+      this.languageId = this.buffer[this.offset + 1]!;
       const flags = this.buffer[this.offset + 2]!;
       if ((flags & STREAM_RESERVED_FLAG_MASK) !== 0) throw new TokzipDecodeError('reserved flag bits set');
       const mode = flags & 3;
       if (mode !== MODE_FAST && mode !== MODE_SMALL) throw new TokzipDecodeError('invalid mode');
-      this.language = requireLanguageById(languageId);
+      this.headerSeen = true;
+      this.streamMode = mode;
       this.carry = (flags & STREAM_FLAG_CARRY) !== 0;
       this.window = mode === MODE_FAST ? FAST_WINDOW : SMALL_WINDOW;
       this.offset += 3;
@@ -333,32 +407,46 @@ class BlockDecoder {
       if (this.available() > 0) throw new TokzipDecodeError('trailing bytes after end of stream');
       return false;
     }
-    if (lengthField.pos >= this.buffer.length) return false;
+    if (lengthField.pos >= this.length) return false;
     const mode = this.buffer[lengthField.pos]!;
     const rawField = this.tryReadVarint(lengthField.pos + 1);
     if (!rawField) return false;
     const rawLength = rawField.value;
     const bodyStart = rawField.pos;
-    if (this.buffer.length - bodyStart < bodyLength) return false;
 
+    // Every prefix-derived constraint is enforced BEFORE waiting for the body: a hostile
+    // stream declaring a huge body must fail here, not after the decoder has buffered it —
+    // these checks are what bound buffering by maxBlockSize.
     if (rawLength === 0) throw new TokzipDecodeError('empty block');
     if (rawLength > this.maxBlockSize) throw new TokzipDecodeError('declared size exceeds maxBlockSize');
-    const bodyEnd = bodyStart + bodyLength;
-    let out: Uint8Array;
     if (mode === MODE_STORED) {
       if (bodyLength !== rawLength) throw new TokzipDecodeError('stored block length mismatch');
-      out = this.buffer.slice(bodyStart, bodyEnd);
     } else if (mode === MODE_FAST || mode === MODE_SMALL) {
+      // A fast-mode stream retains only the fast window and its encoder never emits small
+      // blocks, so a small block under a fast header is non-canonical (and could reference
+      // history beyond the retained window).
+      if (mode === MODE_SMALL && this.streamMode === MODE_FAST) {
+        throw new TokzipDecodeError('small block in fast stream');
+      }
       // Mirrors the frame containers: a conforming non-stored body is strictly smaller than
       // the stored body, keeping blocks canonical and allocations bounded.
       if (bodyLength >= rawLength) throw new TokzipDecodeError('non-canonical block: body not smaller than stored');
+    } else {
+      throw new TokzipDecodeError('invalid mode');
+    }
+    if (this.length - bodyStart < bodyLength) return false;
+
+    const bodyEnd = bodyStart + bodyLength;
+    let out: Uint8Array;
+    if (mode === MODE_STORED) {
+      out = this.buffer.slice(bodyStart, bodyEnd);
+    } else {
+      const language = (this.language ??= requireLanguageById(this.languageId));
       const history = this.carry && this.history.length > 0 ? this.history : undefined;
       out =
         mode === MODE_FAST
-          ? decodeFastBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, this.language, false, history)
-          : decodeSmallBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, this.language, false, history);
-    } else {
-      throw new TokzipDecodeError('invalid mode');
+          ? decodeFastBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history)
+          : decodeSmallBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history);
     }
     this.offset = bodyEnd;
     // Keep the window's worth of produced output as the next block's history.

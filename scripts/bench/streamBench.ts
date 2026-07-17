@@ -6,7 +6,8 @@
  * Every configuration is round-trip verified; ratio is compressed bytes / input bytes, and
  * speed is end-to-end through the TransformStream pipe (best of SAMPLES runs).
  *
- * Usage: bun scripts/bench/streamBench.ts [--fast-only|--small-only] [<language> ...]
+ * Usage: bun scripts/bench/streamBench.ts [--fast-only|--small-only] [--history] [<language> ...]
+ * --history additionally sweeps `historyLimit` at 16K blocks (the ratio/speed lever).
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -86,7 +87,8 @@ async function benchStream(
   language: string,
   mode: 'fast' | 'small',
   blockSize: number,
-  carryWindow: boolean
+  carryWindow: boolean,
+  historyLimit?: number
 ): Promise<StreamResult> {
   let compressedBytes = 0;
   let compressSeconds = Number.POSITIVE_INFINITY;
@@ -94,7 +96,7 @@ async function benchStream(
   for (let sample = 0; sample < SAMPLES; sample++) {
     const compressStart = performance.now();
     const compressed = await pipeThrough(
-      new TokzipCompressionStream({ language, mode, blockSize, carryWindow }),
+      new TokzipCompressionStream({ language, mode, blockSize, carryWindow, historyLimit }),
       input,
       CHUNK_SIZE
     );
@@ -138,6 +140,7 @@ async function main(): Promise<void> {
     : args.includes('--small-only')
       ? ['small']
       : ['fast', 'small'];
+  const sweepHistory = args.includes('--history');
   const languages = args.filter((arg) => !arg.startsWith('--'));
   const targets = languages.length > 0 ? languages : DEFAULT_LANGUAGES;
 
@@ -157,6 +160,16 @@ async function main(): Promise<void> {
         for (const blockSize of BLOCK_SIZES) {
           const name = `stream ${mode} ${blockSize / 1024}K carry=${carryWindow ? 'on' : 'off'}`;
           const result = await benchStream(name, input, registered, mode, blockSize, carryWindow);
+          printResult(result, input.length, oneShot.compressedBytes);
+        }
+      }
+      if (sweepHistory) {
+        // The historyLimit ratio/speed lever, most visible where history dominates per-block
+        // work: small blocks with carry on.
+        const blockSize = 16 * 1024;
+        for (const historyLimit of [32 * 1024, 64 * 1024, 128 * 1024]) {
+          const name = `stream ${mode} ${blockSize / 1024}K hist=${historyLimit / 1024}K`;
+          const result = await benchStream(name, input, registered, mode, blockSize, true, historyLimit);
           printResult(result, input.length, oneShot.compressedBytes);
         }
       }

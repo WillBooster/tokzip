@@ -679,5 +679,7 @@ function decodeSmallWords(
     if (offsetCursor.readBits(take) !== 0) throw new TokzipDecodeError('non-zero padding bits');
     remaining -= take;
   }
-  return historyLength > 0 ? out.subarray(historyLength) : out;
+  // slice, not subarray: a view would keep the whole history+output allocation alive for as
+  // long as the caller retains the chunk, multiplying resident memory per decoded block.
+  return historyLength > 0 ? out.slice(historyLength) : out;
 }

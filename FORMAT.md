@@ -437,3 +437,67 @@ bytes. Because the channels round differently, the shipped mode MAY differ betwe
 and binary frames of the same input; each channel independently ships its smallest frame,
 and decoders reject a non-stored binary body that is not strictly smaller than the declared
 size (the binary stored body).
+
+## 13. Stream container
+
+Streams carry unbounded input as a sequence of blocks over the binary channel. A stream is
+NOT a frame: it has its own magic allocation and its own version counter (stream-format
+version 0), and blocks reuse the §12.2 body encodings.
+
+### 13.1 Stream layout
+
+```
+[0] magic|version   byte 0b1_111_000v: bit 7 set (binary channel), low-6 magic 0b111
+                    (disjoint from the frame magic 0b110 for every frame version), low
+                    3 bits stream-format version (0).
+[1] language id     byte; 0–255 (the §4 allocation).
+[2] flags           byte:
+                      bits 1:0  stream mode: 1 fast, 2 small; 0 and 3 are invalid
+                      bit  2    window carry-over (§13.3)
+                      bits 7:3  reserved; encoders write 0, decoders reject non-zero
+[…]  blocks          zero or more block records (§13.2)
+[…]  terminator      one 0x00 byte (a zero block-body-length varint)
+```
+
+Byte varints are the §12 byte varints (little-endian 7-bit groups, continue bit 7,
+canonical, max 5 bytes). A first byte with bit 7 set, low-6 magic `0b111`, and a different
+version is "unknown version"; any other non-frame first byte is "bad magic". Bytes after
+the terminator, or a stream ending without it, are structural errors. A stream whose only
+content is the header and terminator encodes the empty input.
+
+### 13.2 Block records
+
+```
+[0…] body length    byte varint, ≥ 1 (0 is the stream terminator)
+[…]  block mode     byte: 0 stored, 1 fast, 2 small
+[…]  raw size       byte varint, ≥ 1 (decompressed bytes of this block)
+[…]  body           §12.2 body for the block mode
+```
+
+- The raw size MUST be validated against the decoder's block limit (implementation default
+  64 MiB), and every constraint below MUST be checked, **before** the decoder buffers the
+  declared body.
+- Stored blocks MUST have body length = raw size and MUST decode without language
+  registration (language id is resolved only when a fast or small block appears).
+- Non-stored bodies MUST be strictly smaller than the raw size (the §9 auto-downgrade
+  applies per block, in bytes); encoders otherwise ship the block stored.
+- Fast-mode streams MUST NOT contain small blocks (their encoders never emit them, and the
+  decoder retains only the fast window). Small-mode streams MAY contain fast blocks (the
+  per-block downgrade), whose token offsets then fit fast's ranges by construction.
+
+### 13.3 Window carry-over (flag bit 2)
+
+With the carry flag set, each non-stored block is decoded with the previous blocks'
+decompressed output seeded as already-produced history:
+
+- History matches MAY reach back into prior blocks' output, up to the stream mode's window
+  (§6: 256 KiB fast, 1 MiB small) behind the current position. Decoders MUST retain at
+  least the window's worth of trailing output. Encoders MAY search any suffix of it (a
+  shorter carried history only forgoes matches; both sides stay aligned because distances
+  are relative to the current position).
+- The `small` literal context (§8.2) chains across the block boundary: the first literal's
+  context byte is the last byte of the previous output, not 0.
+- The rep-offset cache and token context reset to their §6/§8 initial state at every block.
+
+Without the flag, blocks are fully independent (history matches stay inside the block, the
+first literal context byte is 0) and any block prefix of the stream is decodable on its own.
