@@ -1,0 +1,217 @@
+import { describe, expect, test } from 'bun:test';
+import {
+  compress,
+  compressForStorage,
+  decompress,
+  inspectFrame,
+  TokzipCompressionStream,
+  TokzipDecodeError,
+  TokzipDecompressionStream,
+} from '../src/index.ts';
+import '../src/languages/typescript.ts';
+
+/** Deterministic PRNG (mulberry32) so fuzz failures reproduce exactly. */
+// oxlint-disable unicorn/prefer-math-trunc -- >>> 0 converts to unsigned 32-bit; Math.trunc would keep the sign
+function seededRandom(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6D_2B_79_F5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4_294_967_296;
+  };
+}
+// oxlint-enable unicorn/prefer-math-trunc
+
+const SEED_DOCS = [
+  'export function greet(name: string): string {\n  return `Hello, ${name}!`;\n}\n'.repeat(8),
+  '# Notes\n\nSome prose with a fence:\n\n```ts\nconst x: number = 42;\nconsole.log(x);\n```\n'.repeat(4),
+  'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab',
+  JSON.stringify({ items: Array.from({ length: 40 }, (_, i) => ({ id: i, name: `item-${i}` })) }),
+];
+
+/** Decode must either throw TokzipDecodeError or return the exact original — never anything else. */
+function expectSafeDecode(frame: string | Uint8Array, original: string): void {
+  let decoded: string | Uint8Array;
+  try {
+    decoded = decompress(frame);
+  } catch (error) {
+    expect(error).toBeInstanceOf(TokzipDecodeError);
+    return;
+  }
+  // Surviving a mutation is fine only if the content is untouched (CRC-32 guards the rest).
+  expect(decoded).toBe(original);
+}
+
+describe('decoder fuzzing', () => {
+  test('mutated text frames never crash, hang, or decode silently wrong', () => {
+    const random = seededRandom(0xC0_FF_EE);
+    for (const [docIndex, doc] of SEED_DOCS.entries()) {
+      for (const mode of ['fast', 'small'] as const) {
+        const frame = compress(doc, { language: 'typescript', mode });
+        for (let round = 0; round < 150; round++) {
+          const kind = random();
+          let mutated: string;
+          if (kind < 0.4) {
+            // Flip one char to a random printable ASCII char.
+            const at = Math.floor(random() * frame.length);
+            const replacement = String.fromCodePoint(33 + Math.floor(random() * 94));
+            mutated = frame.slice(0, at) + replacement + frame.slice(at + 1);
+          } else if (kind < 0.7) {
+            mutated = frame.slice(0, Math.floor(random() * frame.length));
+          } else {
+            const at = Math.floor(random() * frame.length);
+            const insertion = String.fromCodePoint(33 + Math.floor(random() * 94));
+            mutated = frame.slice(0, at) + insertion + frame.slice(at);
+          }
+          if (mutated === frame) continue;
+          expectSafeDecode(mutated, doc);
+          // docIndex keeps the loop observable so no round is optimized away.
+          expect(docIndex).toBeLessThan(SEED_DOCS.length);
+        }
+      }
+    }
+  });
+
+  test('mutated binary frames never crash, hang, or decode silently wrong', () => {
+    const random = seededRandom(0xBE_EF);
+    for (const doc of SEED_DOCS) {
+      for (const mode of ['fast', 'small'] as const) {
+        const frame = compress(doc, { language: 'typescript', mode, output: 'binary' });
+        for (let round = 0; round < 150; round++) {
+          const mutated = Uint8Array.from(frame);
+          const kind = random();
+          if (kind < 0.5) {
+            const at = Math.floor(random() * mutated.length);
+            mutated[at] = mutated[at]! ^ (1 << Math.floor(random() * 8));
+            expectSafeDecode(mutated, doc);
+          } else {
+            expectSafeDecode(mutated.subarray(0, Math.floor(random() * mutated.length)), doc);
+          }
+        }
+      }
+    }
+  });
+
+  test('random garbage inputs throw typed decode errors', () => {
+    const random = seededRandom(0xDE_AD);
+    for (let round = 0; round < 300; round++) {
+      const length = Math.floor(random() * 64);
+      const text = Array.from({ length }, () => String.fromCodePoint(32 + Math.floor(random() * 95))).join('');
+      try {
+        decompress(text);
+      } catch (error) {
+        expect(error).toBeInstanceOf(TokzipDecodeError);
+      }
+      const bytes = Uint8Array.from({ length }, () => Math.floor(random() * 256));
+      try {
+        decompress(bytes);
+      } catch (error) {
+        expect(error).toBeInstanceOf(TokzipDecodeError);
+      }
+    }
+  });
+
+  test('corrupted streams throw typed decode errors', async () => {
+    const doc = SEED_DOCS[0]!.repeat(8);
+    const compressed = await pumpStream(new TokzipCompressionStream({ language: 'typescript' }), doc);
+    const random = seededRandom(0x5E_ED);
+    for (let round = 0; round < 40; round++) {
+      const mutated = Uint8Array.from(compressed);
+      const at = Math.floor(random() * mutated.length);
+      mutated[at] = mutated[at]! ^ (1 << Math.floor(random() * 8));
+      let output: Uint8Array;
+      try {
+        output = await pumpStream(new TokzipDecompressionStream(), mutated);
+      } catch (error) {
+        expect(error).toBeInstanceOf(TokzipDecodeError);
+        continue;
+      }
+      expect(new TextDecoder().decode(output)).toBe(doc);
+    }
+  });
+});
+
+describe('compressForStorage', () => {
+  test('verified frames round-trip and match plain compress output', () => {
+    for (const doc of SEED_DOCS) {
+      const frame = compressForStorage(doc, { language: 'typescript', mode: 'small' });
+      expect(frame).toBe(compress(doc, { language: 'typescript', mode: 'small' }));
+      expect(decompress(frame)).toBe(doc);
+    }
+  });
+
+  test('byte inputs verify byte-exactly on both channels', () => {
+    const bytes = Uint8Array.from({ length: 500 }, (_, i) => (i * 37) % 256);
+    for (const output of ['text', 'binary'] as const) {
+      const frame = compressForStorage(bytes, { mode: 'small', output });
+      expect(decompress(frame)).toEqual(bytes);
+    }
+  });
+});
+
+describe('inspectFrame', () => {
+  test('reports header facts without registered languages', () => {
+    const doc = SEED_DOCS[0]!;
+    const frame = compress(doc, { language: 'typescript', mode: 'small' });
+    const info = inspectFrame(frame);
+    expect(info.version).toBe(1);
+    expect(info.container).toBe('text');
+    expect(info.contentType).toBe('string');
+    expect(info.contentBytes).toBe(Buffer.byteLength(doc));
+    expect(['fast', 'small', 'stored']).toContain(info.mode);
+
+    const binaryInfo = inspectFrame(compress(doc, { language: 'typescript', mode: 'small', output: 'binary' }));
+    expect(binaryInfo.container).toBe('binary');
+    expect(binaryInfo.contentBytes).toBe(Buffer.byteLength(doc));
+    expect(binaryInfo.checksum).toBe(info.checksum);
+  });
+
+  test('rejects structural violations', () => {
+    const frame = compress('hello world hello world hello world');
+    expect(() => inspectFrame('A' + frame.slice(1))).toThrow(/bad magic/);
+    expect(() => inspectFrame('z' + frame.slice(1))).toThrow(/unknown version/);
+    expect(() => inspectFrame(frame.slice(0, 5))).toThrow(TokzipDecodeError);
+    expect(() => inspectFrame(frame + 'AAAA'.repeat(20))).toThrow(TokzipDecodeError);
+  });
+
+  test('accepts every fuzz-seed frame on both channels', () => {
+    for (const doc of SEED_DOCS) {
+      for (const mode of ['fast', 'small'] as const) {
+        inspectFrame(compress(doc, { language: 'typescript', mode }));
+        inspectFrame(compress(doc, { language: 'typescript', mode, output: 'binary' }));
+      }
+    }
+  });
+});
+
+async function pumpStream(
+  stream: TransformStream<Uint8Array | string, Uint8Array>,
+  input: string | Uint8Array
+): Promise<Uint8Array> {
+  const writer = stream.writable.getWriter();
+  const written = (async () => {
+    await writer.write(input);
+    await writer.close();
+    // A decode error surfaces through the read loop; the mirrored writable rejection would
+    // otherwise be an unhandled rejection that fails the test run.
+  })().catch(() => {});
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  const reader = stream.readable.getReader();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    total += value.length;
+  }
+  await written;
+  const out = new Uint8Array(total);
+  let at = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, at);
+    at += chunk.length;
+  }
+  return out;
+}

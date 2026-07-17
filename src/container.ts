@@ -350,12 +350,42 @@ function decompressBinary(data: Uint8Array, maxOutputSize: number): { flags: num
   return { flags, bytes };
 }
 
+/**
+ * Builds an unconditional stored frame — no tokenizer, no entropy coder, no dictionary.
+ * The last-resort fallback of `compressForStorage`: even if every compression path is
+ * broken, this depends only on the header writers and the raw packing.
+ */
+export function compressStored(input: string | Uint8Array, output: 'text' | 'binary'): string | Uint8Array {
+  const isString = typeof input === 'string';
+  const bytes = isString ? textEncoder.encode(input) : input;
+  const flags = MODE_STORED | (isString ? 0 : FLAG_BYTES);
+  const checksum = crc32(bytes);
+  if (output === 'binary') {
+    const out = new TextSink(8 + CRC_BINARY_BYTES + bytes.length);
+    out.push(BINARY_MAGIC_VERSION);
+    out.push(0);
+    out.push(flags);
+    pushByteVarint(out, bytes.length);
+    pushCrc32Binary(out, checksum);
+    out.append(bytes);
+    return out.toBytes();
+  }
+  const out = new TextSink(packedRawLength(bytes.length) + 24);
+  out.push(RADIX64_CODES[MAGIC_VERSION]!);
+  out.push(RADIX64_CODES[0]!);
+  out.push(RADIX64_CODES[flags]!);
+  pushVarint64(out, bytes.length);
+  pushCrc32Text(out, checksum);
+  pushPackedRaw(out, bytes, 0, bytes.length);
+  return out.toString();
+}
+
 /** Emits a CRC-32 as 6 radix-64 chars: little-endian 6-bit groups, top 4 bits zero. */
 function pushCrc32Text(out: TextSink, crc: number): void {
   for (let i = 0; i < CRC_TEXT_CHARS; i++) out.push(RADIX64_CODES[(crc >>> (i * 6)) & 63]!);
 }
 
-function readCrc32Text(data: string, pos: number): number {
+export function readCrc32Text(data: string, pos: number): number {
   let crc = 0;
   for (let i = 0; i < CRC_TEXT_CHARS; i++) {
     const group = readRadix64(data, pos + i);
@@ -390,7 +420,7 @@ export function pushByteVarint(out: TextSink, value: number): void {
   } while (value > 0);
 }
 
-function readByteVarint(data: Uint8Array, pos: number): { value: number; pos: number } {
+export function readByteVarint(data: Uint8Array, pos: number): { value: number; pos: number } {
   let value = 0;
   let shift = 1;
   for (let i = 0; i < BYTE_VARINT_MAX_BYTES; i++) {
