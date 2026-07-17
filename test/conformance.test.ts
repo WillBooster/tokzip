@@ -15,22 +15,23 @@ function expectDecodeError(frame: string, message: string | RegExp): void {
 }
 
 describe('container vectors', () => {
-  test('empty input is the exact 4-char stored frame', () => {
+  test('empty input is the exact 10-char stored frame', () => {
     const frame = compress('');
-    expect(frame).toBe('zAAA');
+    // Header (3) + size varint (1) + CRC-32 of the empty content (6 chars, value 0).
+    expect(frame).toBe('xAAAAAAAAA');
     expect(decompress(frame)).toBe('');
   });
 
-  test('empty input is the exact 4-byte binary stored frame', () => {
+  test('empty input is the exact 8-byte binary stored frame', () => {
     const frame = compress('', { output: 'binary' });
-    expect(frame).toEqual(new Uint8Array([0xB3, 0x00, 0x00, 0x00]));
+    expect(frame).toEqual(new Uint8Array([0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
     expect(decompress(frame)).toBe('');
   });
 
-  test('tiny stored frame overhead is exactly header + size varint', () => {
+  test('tiny stored frame overhead is exactly header + size varint + checksum', () => {
     const frame = compress('a');
-    // 3 header chars + 1 varint char + packed body (1 byte → 2 chars).
-    expect(frame.length).toBe(3 + 1 + 2);
+    // 3 header chars + 1 varint char + 6 CRC chars + packed body (1 byte → 2 chars).
+    expect(frame.length).toBe(3 + 1 + 6 + 2);
     expect(shippedMode(frame)).toBe(MODE_STORED);
   });
 
@@ -57,7 +58,7 @@ describe('container vectors', () => {
   test('bad magic and unknown version', () => {
     const frame = compress('hello');
     expectDecodeError('A' + frame.slice(1), /bad magic/);
-    expectDecodeError('x' + frame.slice(1), /unknown version/); // Same magic, version 1.
+    expectDecodeError('z' + frame.slice(1), /unknown version/); // Same magic, version 3.
   });
 
   test('invalid mode and reserved flag bits', () => {
@@ -68,11 +69,11 @@ describe('container vectors', () => {
 
   test('non-canonical size varint', () => {
     // Varint 'gA' encodes value 0 with a redundant continuation group.
-    expectDecodeError('zAAgA', /non-canonical varint/);
+    expectDecodeError('xAAgA', /non-canonical varint/);
   });
 
   test('non-alphabet character', () => {
-    expectDecodeError('z"AA', /non-alphabet character/);
+    expectDecodeError('x"AA', /non-alphabet character/);
   });
 
   test('truncated header and truncated payload', () => {
@@ -99,8 +100,10 @@ describe('container vectors', () => {
     // A small frame declaring 2^34 - 1 bytes with a near-empty body: structurally
     // unproducible, and must throw a typed error (not an engine out-of-memory RangeError)
     // even under the explicit "no cap" setting.
-    expect(() => decompress('zAC______P!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(TokzipDecodeError);
-    expect(() => decompress('zAC______P!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(
+    expect(() => decompress('xAC______PAAAAAA!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(
+      TokzipDecodeError
+    );
+    expect(() => decompress('xAC______PAAAAAA!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(
       /body capacity|allocatable/
     );
   });
@@ -118,9 +121,9 @@ describe('container vectors', () => {
   });
 
   test('a small frame for size 0 is non-canonical and rejected', () => {
-    // The canonical empty frame is the stored 'zAAA'; a size-0 small body can never be
+    // The canonical empty frame is the stored 'xAAAAAAAAA'; a size-0 small body can never be
     // smaller than the (empty) stored body.
-    expectDecodeError('zACA!!!!!', /non-canonical|stored/);
+    expectDecodeError('xACAAAAAAA!!!!!', /non-canonical|stored/);
   });
 
   test('non-stored bodies at least as large as the stored body are rejected', () => {
@@ -139,6 +142,33 @@ describe('container vectors', () => {
     expect(lastIndex).toBeLessThan(84);
     const patched = frame.slice(0, -1) + RADIX85_ALPHABET[lastIndex + 1];
     expectDecodeError(patched, /padding|stream|truncated|invalid/);
+  });
+
+  test('a corrupted body that still parses fails the content checksum', () => {
+    const incompressible = 'qwZ7#kP9@mX2vL5%rT8&nB4';
+    const frame = compress(incompressible);
+    expect(shippedMode(frame)).toBe(MODE_STORED);
+    // Flip one packed-raw body char to another alphabet char: the frame stays structurally
+    // valid, so only the CRC-32 catches the corruption.
+    const at = frame.length - 8;
+    const original = frame[at]!;
+    const flipped = original === 'A' ? 'B' : 'A';
+    expectDecodeError(frame.slice(0, at) + flipped + frame.slice(at + 1), /checksum mismatch/);
+  });
+
+  test('a corrupted checksum field is a checksum mismatch', () => {
+    const frame = compress('hello');
+    // CRC chars sit right after the 3-char header + 1-char size varint.
+    const at = 4;
+    const flipped = frame[at] === 'A' ? 'B' : 'A';
+    expectDecodeError(frame.slice(0, at) + flipped + frame.slice(at + 1), /checksum mismatch/);
+  });
+
+  test('binary frames verify the content checksum too', () => {
+    const frame = compress('qwZ7#kP9@mX2vL5%rT8&nB4', { output: 'binary' });
+    const patched = Uint8Array.from(frame);
+    patched[patched.length - 1] = frame.at(-1)! ^ 0xFF;
+    expect(() => decompress(patched)).toThrow(/checksum mismatch/);
   });
 
   test('invalid UTF-8 in a string-typed frame throws', () => {

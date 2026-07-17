@@ -1,3 +1,4 @@
+import { crc32 } from './checksum.ts';
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
 import {
@@ -11,6 +12,8 @@ import {
 import { computeDictSegments, usesExtendedDictionary } from './fences.ts';
 import {
   BINARY_MAGIC_VERSION,
+  CRC_BINARY_BYTES,
+  CRC_TEXT_CHARS,
   DEFAULT_MAX_OUTPUT_SIZE,
   FAST_WINDOW,
   FLAG_BYTES,
@@ -198,15 +201,19 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   // Stored frames always carry language id 0 (decoders ignore it).
   const languageId = shippedMode === MODE_STORED ? 0 : language.id;
 
+  const checksum = crc32(bytes);
+
   if (binary) {
     // Exact-capacity sink, no growth: the small body is ceil(totalBits / 8) bytes, and every
     // other body is smaller than the input (fast auto-downgrades to stored otherwise).
-    const outCapacity = 8 + (smallPlanToShip ? Math.ceil(smallPlanToShip.totalBits / 8) : bytes.length);
+    const outCapacity =
+      8 + CRC_BINARY_BYTES + (smallPlanToShip ? Math.ceil(smallPlanToShip.totalBits / 8) : bytes.length);
     const out = new TextSink(outCapacity);
     out.push(BINARY_MAGIC_VERSION);
     out.push(languageId);
     out.push(flags);
     pushByteVarint(out, bytes.length);
+    pushCrc32Binary(out, checksum);
     if (shippedMode === MODE_STORED) out.append(bytes);
     else if (fastTokensToShip) {
       const body = new TextSink(bytes.length + 64);
@@ -216,11 +223,12 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
     return out.toBytes();
   }
 
-  const out = new TextSink(shippedMode === MODE_SMALL ? 16 : packedRawLength(bytes.length) + 16);
+  const out = new TextSink(shippedMode === MODE_SMALL ? 24 : packedRawLength(bytes.length) + 24);
   out.push(RADIX64_CODES[MAGIC_VERSION]!);
   out.push(RADIX64_CODES[languageId]!);
   out.push(RADIX64_CODES[flags]!);
   pushVarint64(out, bytes.length);
+  pushCrc32Text(out, checksum);
   if (shippedMode === MODE_STORED) pushPackedRaw(out, bytes, 0, bytes.length);
   else if (fastTokensToShip) emitFastBody(out, fastTokensToShip, bytes, language);
   return out.toString() + (smallPlanToShip ? emitSmallBody(smallPlanToShip, language).toText() : '');
@@ -259,8 +267,10 @@ function decompressText(data: string, maxOutputSize: number): { flags: number; b
   if ((flags & RESERVED_FLAG_MASK) !== 0) throw new TokzipDecodeError('reserved flag bits set');
   const mode = flags & 3;
   const fenced = (flags & FLAG_FENCED) !== 0;
-  const { value: outputSize, pos: bodyStart } = readVarint64(data, 3);
+  const { value: outputSize, pos: crcStart } = readVarint64(data, 3);
   if (outputSize > maxOutputSize) throw new TokzipDecodeError('declared size exceeds maxOutputSize');
+  const declaredCrc = readCrc32Text(data, crcStart);
+  const bodyStart = crcStart + CRC_TEXT_CHARS;
 
   let bytes: Uint8Array;
   if (mode === MODE_STORED) {
@@ -287,6 +297,7 @@ function decompressText(data: string, maxOutputSize: number): { flags: number; b
   } else {
     throw new TokzipDecodeError('invalid mode');
   }
+  if (crc32(bytes) !== declaredCrc) throw new TokzipDecodeError('checksum mismatch');
   return { flags, bytes };
 }
 
@@ -305,8 +316,10 @@ function decompressBinary(data: Uint8Array, maxOutputSize: number): { flags: num
   if ((flags & (0b1111_0000 | RESERVED_FLAG_MASK)) !== 0) throw new TokzipDecodeError('reserved flag bits set');
   const mode = flags & 3;
   const fenced = (flags & FLAG_FENCED) !== 0;
-  const { value: outputSize, pos: bodyStart } = readByteVarint(data, 3);
+  const { value: outputSize, pos: crcStart } = readByteVarint(data, 3);
   if (outputSize > maxOutputSize) throw new TokzipDecodeError('declared size exceeds maxOutputSize');
+  const declaredCrc = readCrc32Binary(data, crcStart);
+  const bodyStart = crcStart + CRC_BINARY_BYTES;
 
   let bytes: Uint8Array;
   if (mode === MODE_STORED) {
@@ -333,7 +346,38 @@ function decompressBinary(data: Uint8Array, maxOutputSize: number): { flags: num
   } else {
     throw new TokzipDecodeError('invalid mode');
   }
+  if (crc32(bytes) !== declaredCrc) throw new TokzipDecodeError('checksum mismatch');
   return { flags, bytes };
+}
+
+/** Emits a CRC-32 as 6 radix-64 chars: little-endian 6-bit groups, top 4 bits zero. */
+function pushCrc32Text(out: TextSink, crc: number): void {
+  for (let i = 0; i < CRC_TEXT_CHARS; i++) out.push(RADIX64_CODES[(crc >>> (i * 6)) & 63]!);
+}
+
+function readCrc32Text(data: string, pos: number): number {
+  let crc = 0;
+  for (let i = 0; i < CRC_TEXT_CHARS; i++) {
+    const group = readRadix64(data, pos + i);
+    // Canonical: bits above 31 do not exist, so the last group must fit in 2 bits.
+    if (i === CRC_TEXT_CHARS - 1 && group > 3) throw new TokzipDecodeError('non-canonical checksum');
+    crc |= group << (i * 6);
+  }
+  // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 converts to unsigned; Math.trunc would keep the sign
+  return crc >>> 0;
+}
+
+/** Emits a CRC-32 as 4 little-endian bytes. */
+export function pushCrc32Binary(out: TextSink, crc: number): void {
+  for (let i = 0; i < CRC_BINARY_BYTES; i++) out.push((crc >>> (i * 8)) & 0xFF);
+}
+
+export function readCrc32Binary(data: Uint8Array, pos: number): number {
+  if (pos + CRC_BINARY_BYTES > data.length) throw new TokzipDecodeError('truncated payload');
+  let crc = 0;
+  for (let i = 0; i < CRC_BINARY_BYTES; i++) crc |= data[pos + i]! << (i * 8);
+  // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 converts to unsigned; Math.trunc would keep the sign
+  return crc >>> 0;
 }
 
 export function pushByteVarint(out: TextSink, value: number): void {

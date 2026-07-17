@@ -1,4 +1,5 @@
-import { pushByteVarint } from './container.ts';
+import { crc32 } from './checksum.ts';
+import { pushByteVarint, pushCrc32Binary, readCrc32Binary } from './container.ts';
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
 import { decodeFastBodyBinary, emitFastBody, fastBodyCost, fastPricing, packFastCodes } from './fastMode.ts';
@@ -9,10 +10,10 @@ import { decodeSmallBodyBinary, emitSmallBody, planSmallBody, smallPricing } fro
 
 /**
  * First byte of every tokzip stream: bit 7 set (binary channel) over low-6 magic 0b111 and
- * stream-format version 0 — disjoint from every frame magic (low-6 magic 0b110) so streams
+ * stream-format version 1 — disjoint from every frame magic (low-6 magic 0b110) so streams
  * and one-shot frames can never be confused.
  */
-const STREAM_MAGIC_VERSION = 0b1011_1000;
+const STREAM_MAGIC_VERSION = 0b1011_1001;
 
 /**
  * Stream flags byte: bits 1:0 carry the stream mode (fast/small); bit 2 marks window
@@ -292,11 +293,12 @@ class BlockEncoder {
     }
     if (mode === MODE_STORED) body = block;
 
-    const out = new TextSink(body!.length + 16);
+    const out = new TextSink(body!.length + 20);
     if (!this.headerWritten) this.writeHeader(out);
     pushByteVarint(out, body!.length);
     out.push(mode);
     pushByteVarint(out, block.length);
+    pushCrc32Binary(out, crc32(block));
     out.append(body!);
     controller.enqueue(out.toBytes());
 
@@ -432,7 +434,8 @@ class BlockDecoder {
     const rawField = this.tryReadVarint(lengthField.pos + 1);
     if (!rawField) return false;
     const rawLength = rawField.value;
-    const bodyStart = rawField.pos;
+    // The 4-byte block CRC sits between the raw-length varint and the body.
+    const bodyStart = rawField.pos + 4;
 
     // Every prefix-derived constraint is enforced BEFORE waiting for the body: a hostile
     // stream declaring a huge body must fail here, not after the decoder has buffered it —
@@ -455,6 +458,7 @@ class BlockDecoder {
       throw new TokzipDecodeError('invalid mode');
     }
     if (this.length - bodyStart < bodyLength) return false;
+    const declaredCrc = readCrc32Binary(this.buffer, bodyStart - 4);
 
     const bodyEnd = bodyStart + bodyLength;
     let out: Uint8Array;
@@ -468,6 +472,7 @@ class BlockDecoder {
           ? decodeFastBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history)
           : decodeSmallBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history);
     }
+    if (crc32(out) !== declaredCrc) throw new TokzipDecodeError('checksum mismatch');
     this.offset = bodyEnd;
     // Keep the window's worth of produced output as the next block's history.
     if (this.carry) {

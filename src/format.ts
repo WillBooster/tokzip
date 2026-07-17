@@ -1,12 +1,11 @@
 import { LENGTH_SLOT_COUNT, maxSlotValue } from './slots.ts';
 
 /**
- * First payload char of every tokzip frame: magic 0b110 in the high 3 bits, version 3 in the
- * low 3. v3 carries the retrained ~1 MB dictionaries; v2 frames were built against different
- * dictionary bytes and could silently decode to wrong content, so they are rejected as
- * 'unknown version' instead.
+ * First payload char of every tokzip frame: magic 0b110 in the high 3 bits, version 1 in the
+ * low 3. The format is still evolving pre-release: a version bump invalidates all previously
+ * written frames (decoders reject other versions as 'unknown version', never misdecode).
  */
-export const MAGIC_VERSION = 0b11_0011;
+export const MAGIC_VERSION = 0b11_0001;
 
 /**
  * First byte of every binary tokzip frame: bit 7 set (never a safe-ASCII text frame, whose
@@ -29,6 +28,14 @@ export const FLAG_BYTES = 0b100;
 export const FLAG_FENCED = 0b1000;
 /** Reserved flag bits (5:4): encoders write 0, decoders reject non-zero. */
 export const RESERVED_FLAG_MASK = 0b11_0000;
+
+/**
+ * Fixed width of the header's CRC-32 field: 6 radix-64 chars in text frames (little-endian
+ * 6-bit groups; the top 4 bits of the last group are zero and decoders reject non-zero),
+ * 4 little-endian bytes in binary frames and stream blocks.
+ */
+export const CRC_TEXT_CHARS = 6;
+export const CRC_BINARY_BYTES = 4;
 
 /** Default `maxOutputSize` (64 MiB). */
 export const DEFAULT_MAX_OUTPUT_SIZE = 64 * 1024 * 1024;
