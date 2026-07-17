@@ -1,6 +1,13 @@
 /**
  * Compression benchmark on the seeded `bench-v2` corpus split.
  *
+ * The primary metric is the **session-amortized, dictionary-inclusive ratio**: each
+ * language's bench docs are treated as one client session, and tokzip's per-language
+ * dictionary module is charged once per session at its brotli-compressed transfer size
+ * (what a CDN actually ships; competitors carry no dictionary). Short documents (≤ 4 KB,
+ * the primary workload) are additionally reported as their own session. The classic
+ * dictionary-free ratio stays as a secondary metric.
+ *
  * Size, lossless round-trip, and (with --speed) end-to-end per-document throughput are
  * measured for tokzip and every competitor on one of two channels:
  * - text (default): tokzip text frames vs binary codecs behind unpadded base64url — every
@@ -14,6 +21,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { brotliCompressSync, constants as zlibConstants } from 'node:zlib';
 import { languageByName } from '../../src/dictionary.ts';
 import { compress, decompress } from '../../src/index.ts';
 import '../../src/languages/index.ts';
@@ -21,6 +29,11 @@ import { corpusDirs, type ManifestEntry } from '../corpus.ts';
 import { binaryCompetitors, competitors } from './competitors.ts';
 
 const BUCKETS = ['0.5k', '2k', '8k', '24k'] as const;
+/** Buckets forming the short-document (≤ 4 KB) primary workload. */
+const SHORT_BUCKETS: ReadonlySet<string> = new Set(['0.5k', '2k']);
+/** The browser-native competitor the breakeven analysis is computed against. */
+const REFERENCE_METHOD_TEXT = 'b64url(cs gzip)';
+const REFERENCE_METHOD_BINARY = 'cs gzip';
 const SPEED_SAMPLE_COUNT = 3;
 const SPEED_TARGET_BYTES = 8_000_000;
 
@@ -39,8 +52,10 @@ interface LoadedDoc extends BenchDoc {
 interface BenchMethod {
   name: string;
   /** Encoded output; `.length` is the measured size (chars on text, bytes on binary). */
-  compress(doc: LoadedDoc): string | Uint8Array;
-  decompress(encoded: string | Uint8Array): string;
+  compress(doc: LoadedDoc): string | Uint8Array | Promise<string | Uint8Array>;
+  decompress(encoded: string | Uint8Array): string | Promise<string>;
+  /** True for tokzip modes: the session-amortized metric charges them the dictionary. */
+  usesDictionary?: boolean;
   /** Excluded from the speed benchmark (see {@link Competitor.speedExempt}). */
   speedExempt?: boolean;
 }
@@ -61,25 +76,47 @@ interface SpeedResult {
   samples: number;
 }
 
+interface SessionView {
+  docs: number;
+  inputBytes: number;
+  /** Classic per-document ratio, no dictionary cost (secondary metric). */
+  ratios: Record<string, number>;
+  /** Session-amortized ratio: dictionary transfer charged once per session (primary metric). */
+  amortizedRatios: Record<string, number>;
+}
+
 interface LanguageReport {
   docs: number;
   registered: boolean;
+  /** Brotli-compressed transfer size of this language's dictionary module (0 when none). */
+  dictTransferBytes: number;
   buckets: Record<string, { docs: number; inputBytes: number; ratios: Record<string, number> }>;
   total: { inputBytes: number; ratios: Record<string, number> };
+  session: SessionView;
+  /** The ≤ 4 KB documents as their own session (the primary workload). */
+  shortSession: SessionView;
+  /**
+   * Cumulative input bytes after which each tokzip mode's dictionary pays for itself against
+   * the browser-native reference codec; undefined when it never does.
+   */
+  breakevenBytes: Record<string, number | undefined>;
 }
 
 interface BenchReport {
-  schemaVersion: 2;
+  schemaVersion: 3;
   channel: 'text' | 'binary';
   commit: string;
   commitTimestamp: string;
   timestamp: string;
   runtime: string;
   methods: string[];
+  referenceMethod: string;
   corpus: { split: 'bench-v2'; sha256: string };
   roundTrip: { docs: number; methods: number; checks: number; failures: string[] };
   languages: Record<string, LanguageReport>;
   total: { docs: number; inputBytes: number; ratios: Record<string, number> };
+  session: SessionView;
+  shortSession: SessionView;
   speed?: Record<string, SpeedResult>;
 }
 
@@ -111,35 +148,50 @@ const METHODS: BenchMethod[] = BINARY_CHANNEL
       ),
     ];
 const METHOD_NAMES = METHODS.map((method) => method.name);
+const REFERENCE_METHOD = BINARY_CHANNEL ? REFERENCE_METHOD_BINARY : REFERENCE_METHOD_TEXT;
 
-function main(): void {
+async function main(): Promise<void> {
   const { speed, jsonPath, languages } = parseArgs(process.argv.slice(2));
   const report: BenchReport = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     channel: BINARY_CHANNEL ? 'binary' : 'text',
     commit: process.env['GITHUB_SHA'] ?? gitOutput(['rev-parse', 'HEAD']) ?? 'unknown',
     commitTimestamp: new Date(gitOutput(['show', '-s', '--format=%cI', 'HEAD']) ?? Date.now()).toISOString(),
     timestamp: new Date().toISOString(),
     runtime: `bun ${Bun.version}`,
     methods: METHOD_NAMES,
+    referenceMethod: REFERENCE_METHOD,
     corpus: { split: 'bench-v2', sha256: '' },
     roundTrip: { docs: 0, methods: METHODS.length, checks: 0, failures: [] },
     languages: {},
     total: { docs: 0, inputBytes: 0, ratios: {} },
+    session: emptySession(),
+    shortSession: emptySession(),
   };
   const grandTotals = emptyTotals();
+  const grandShortTotals = emptyTotals();
+  let grandDictBytes = 0;
+  let grandShortDictBytes = 0;
   const loadedDocs: LoadedDoc[] = [];
 
-  for (const language of languages) benchLanguage(language, report, grandTotals, loadedDocs);
+  for (const language of languages) {
+    const result = await benchLanguage(language, report, grandTotals, loadedDocs);
+    if (!result) continue;
+    accumulate(grandShortTotals, result.shortTotals);
+    grandDictBytes += result.dictBytes;
+    if (result.shortTotals.docs > 0) grandShortDictBytes += result.dictBytes;
+  }
   if (grandTotals.docs === 0) {
     console.error('error: no bench documents found (fetch + split the corpus first, or check the language name)');
     process.exit(1);
   }
 
   report.total = { docs: grandTotals.docs, inputBytes: grandTotals.inputBytes, ratios: ratiosOf(grandTotals) };
+  report.session = sessionOf(grandTotals, grandDictBytes);
+  report.shortSession = sessionOf(grandShortTotals, grandShortDictBytes);
   report.corpus.sha256 = corpusHash(loadedDocs);
   printTotals(report);
-  if (speed) report.speed = benchSpeed(loadedDocs);
+  if (speed) report.speed = await benchSpeed(loadedDocs);
   printRoundTrip(report);
   if (jsonPath) writeReport(jsonPath, report);
   if (report.roundTrip.failures.length > 0) process.exitCode = 1;
@@ -179,13 +231,19 @@ function parseArgs(args: string[]): { speed: boolean; jsonPath?: string; languag
   return { speed, jsonPath, languages };
 }
 
-function benchLanguage(language: string, report: BenchReport, grandTotals: SizeTotals, allDocs: LoadedDoc[]): void {
+async function benchLanguage(
+  language: string,
+  report: BenchReport,
+  grandTotals: SizeTotals,
+  allDocs: LoadedDoc[]
+): Promise<{ shortTotals: SizeTotals; dictBytes: number } | undefined> {
   const docs = loadBenchDocs(language);
   if (docs.length === 0) {
     console.log(`\n${language}: no bench split (fetch + split the corpus first)`);
-    return;
+    return undefined;
   }
   const registered = languageByName(language) !== undefined;
+  const dictBytes = registered ? dictionaryTransferBytes(language) : 0;
   const loaded = docs.map((doc) => ({
     ...doc,
     language,
@@ -193,42 +251,61 @@ function benchLanguage(language: string, report: BenchReport, grandTotals: SizeT
     inputBytes: Buffer.byteLength(doc.content),
   }));
   allDocs.push(...loaded);
-  console.log(`\n=== ${language} (${docs.length} bench docs${registered ? '' : ', id-0 fallback'}) ===`);
+  console.log(
+    `\n=== ${language} (${docs.length} bench docs${registered ? `, dict ${formatKb(dictBytes)} brotli` : ', id-0 fallback'}) ===`
+  );
   printHeader('bucket');
 
-  const languageReport: LanguageReport = {
-    docs: docs.length,
-    registered,
-    buckets: {},
-    total: { inputBytes: 0, ratios: {} },
-  };
   const languageTotals = emptyTotals();
+  const shortTotals = emptyTotals();
+  const buckets: LanguageReport['buckets'] = {};
   for (const bucket of BUCKETS) {
     const bucketDocs = loaded.filter((doc) => doc.bucket === bucket);
     if (bucketDocs.length === 0) continue;
     const totals = emptyTotals();
-    for (const doc of bucketDocs) benchDoc(doc, totals, report.roundTrip);
+    for (const doc of bucketDocs) await benchDoc(doc, totals, report.roundTrip);
     accumulate(languageTotals, totals);
-    languageReport.buckets[bucket] = { docs: totals.docs, inputBytes: totals.inputBytes, ratios: ratiosOf(totals) };
+    if (SHORT_BUCKETS.has(bucket)) accumulate(shortTotals, totals);
+    buckets[bucket] = { docs: totals.docs, inputBytes: totals.inputBytes, ratios: ratiosOf(totals) };
     printRow(bucket, totals);
   }
   accumulate(grandTotals, languageTotals);
-  languageReport.total = { inputBytes: languageTotals.inputBytes, ratios: ratiosOf(languageTotals) };
+  const session = sessionOf(languageTotals, dictBytes);
+  const shortSession = sessionOf(shortTotals, dictBytes);
   printRow('all', languageTotals);
-  report.languages[language] = languageReport;
+  printSessionRow('all+dict', session);
+  printSessionRow('sh+dict', shortSession);
+  const breakeven = breakevenOf(languageTotals, dictBytes);
+  if (dictBytes > 0) {
+    const parts = Object.entries(breakeven).map(
+      ([method, bytes]) => `${method}: ${bytes === undefined ? 'never' : formatKb(bytes)}`
+    );
+    console.log(`  dictionary breakeven vs ${REFERENCE_METHOD} — ${parts.join(', ')}`);
+  }
+  report.languages[language] = {
+    docs: docs.length,
+    registered,
+    dictTransferBytes: dictBytes,
+    buckets,
+    total: { inputBytes: languageTotals.inputBytes, ratios: ratiosOf(languageTotals) },
+    session,
+    shortSession,
+    breakevenBytes: breakeven,
+  };
+  return { shortTotals, dictBytes };
 }
 
-function benchDoc(doc: LoadedDoc, totals: SizeTotals, roundTrip: BenchReport['roundTrip']): void {
+async function benchDoc(doc: LoadedDoc, totals: SizeTotals, roundTrip: BenchReport['roundTrip']): Promise<void> {
   totals.docs += 1;
   totals.inputBytes += doc.inputBytes;
   roundTrip.docs += 1;
   for (const [index, method] of METHODS.entries()) {
     let failure: string | undefined;
     try {
-      const encoded = method.compress(doc);
+      const encoded = await method.compress(doc);
       totals.outputChars[index]! += encoded.length;
       roundTrip.checks += 1;
-      if (method.decompress(encoded) !== doc.content) failure = `${doc.language}/${doc.file} (${method.name})`;
+      if ((await method.decompress(encoded)) !== doc.content) failure = `${doc.language}/${doc.file} (${method.name})`;
     } catch (error) {
       failure = `${doc.language}/${doc.file} (${method.name}): ${error}`;
     }
@@ -239,7 +316,62 @@ function benchDoc(doc: LoadedDoc, totals: SizeTotals, roundTrip: BenchReport['ro
   }
 }
 
-function benchSpeed(docs: LoadedDoc[]): Record<string, SpeedResult> {
+/**
+ * Brotli-compressed transfer size of the generated dictionary module — what a CDN actually
+ * sends to a client that needs this language (competitors ship nothing). Cached per language.
+ */
+const dictTransferCache = new Map<string, number>();
+function dictionaryTransferBytes(language: string): number {
+  const cached = dictTransferCache.get(language);
+  if (cached !== undefined) return cached;
+  // Corpus locale dirs are kebab-case (en-US); generated modules are camelCase (enUs).
+  const parts = language.split('-');
+  const moduleName =
+    parts[0]! +
+    parts
+      .slice(1)
+      .map((part) => part[0]! + part.slice(1).toLowerCase())
+      .join('');
+  const modulePath = join(import.meta.dirname, '..', '..', 'src', 'generated', `${moduleName}.ts`);
+  const bytes = existsSync(modulePath)
+    ? brotliCompressSync(readFileSync(modulePath), {
+        params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 11 },
+      }).length
+    : 0;
+  dictTransferCache.set(language, bytes);
+  return bytes;
+}
+
+function sessionOf(totals: SizeTotals, dictBytes: number): SessionView {
+  const amortizedRatios = Object.fromEntries(
+    METHODS.map((method, index) => [
+      method.name,
+      totals.inputBytes === 0
+        ? 0
+        : round4((totals.outputChars[index]! + (method.usesDictionary ? dictBytes : 0)) / totals.inputBytes),
+    ])
+  );
+  return { docs: totals.docs, inputBytes: totals.inputBytes, ratios: ratiosOf(totals), amortizedRatios };
+}
+
+/**
+ * Cumulative input bytes at which a dictionary-carrying method's total transfer (output +
+ * dictionary) drops below the reference codec's, assuming the language's average ratios.
+ */
+function breakevenOf(totals: SizeTotals, dictBytes: number): Record<string, number | undefined> {
+  const referenceIndex = METHOD_NAMES.indexOf(REFERENCE_METHOD);
+  const result: Record<string, number | undefined> = {};
+  if (referenceIndex === -1 || totals.inputBytes === 0) return result;
+  const referenceRatio = totals.outputChars[referenceIndex]! / totals.inputBytes;
+  for (const [index, method] of METHODS.entries()) {
+    if (!method.usesDictionary) continue;
+    const ratio = totals.outputChars[index]! / totals.inputBytes;
+    result[method.name] = ratio < referenceRatio ? Math.ceil(dictBytes / (referenceRatio - ratio)) : undefined;
+  }
+  return result;
+}
+
+async function benchSpeed(docs: LoadedDoc[]): Promise<Record<string, SpeedResult>> {
   console.log(`\n=== END-TO-END SPEED (${SPEED_SAMPLE_COUNT} median samples, per-document framing) ===`);
   const inputBytes = docs.reduce((sum, doc) => sum + doc.inputBytes, 0);
   const iterations = Math.max(1, Math.ceil(SPEED_TARGET_BYTES / inputBytes));
@@ -249,20 +381,27 @@ function benchSpeed(docs: LoadedDoc[]): Record<string, SpeedResult> {
 
   for (const method of METHODS) {
     if (method.speedExempt) continue;
-    const encoded = docs.map((doc) => method.compress(doc));
+    const encoded: (string | Uint8Array)[] = [];
+    for (const doc of docs) encoded.push(await method.compress(doc));
     // Warm both code paths without adding another expensive full q11 corpus pass.
-    for (let index = 0; index < Math.min(32, docs.length); index++) method.decompress(encoded[index]!);
-    const compressSamples = sampleTimes(() => {
+    for (let index = 0; index < Math.min(32, docs.length); index++) await method.decompress(encoded[index]!);
+    const compressSamples = await sampleTimes(async () => {
       let chars = 0;
       for (let iteration = 0; iteration < iterations; iteration++) {
-        for (const doc of docs) chars += method.compress(doc).length;
+        for (const doc of docs) {
+          const out = await method.compress(doc);
+          chars += out.length;
+        }
       }
       return chars;
     });
-    const decompressSamples = sampleTimes(() => {
+    const decompressSamples = await sampleTimes(async () => {
       let chars = 0;
       for (let iteration = 0; iteration < iterations; iteration++) {
-        for (const value of encoded) chars += method.decompress(value).length;
+        for (const value of encoded) {
+          const out = await method.decompress(value);
+          chars += out.length;
+        }
       }
       return chars;
     });
@@ -282,12 +421,12 @@ function benchSpeed(docs: LoadedDoc[]): Record<string, SpeedResult> {
   return result;
 }
 
-function sampleTimes(operation: () => number): number[] {
+async function sampleTimes(operation: () => Promise<number>): Promise<number[]> {
   const times: number[] = [];
   let checksum = 0;
   for (let sample = 0; sample < SPEED_SAMPLE_COUNT; sample++) {
     const started = performance.now();
-    checksum ^= operation();
+    checksum ^= await operation();
     times.push(performance.now() - started);
   }
   // Retain an observable dependency on every operation result so engines cannot discard
@@ -324,6 +463,7 @@ function tokzipMethod(mode: 'fast' | 'small', output: 'text' | 'binary'): BenchM
         : compress(doc.content, { language, mode });
     },
     decompress: (encoded) => decompress(encoded) as string,
+    usesDictionary: true,
   };
 }
 
@@ -353,6 +493,34 @@ function printTotals(report: BenchReport): void {
     inputBytes: report.total.inputBytes,
     outputChars: METHOD_NAMES.map((method) => report.total.ratios[method]! * report.total.inputBytes),
   });
+  printSessionRow('all+dict', report.session);
+  printSessionRow('sh+dict', report.shortSession);
+  console.log(
+    `\nPRIMARY metric: sh+dict = session-amortized ratio on ≤4 KB docs, tokzip charged each\n` +
+      `language's brotli-compressed dictionary once per session; reference codec: ${report.referenceMethod}.`
+  );
+}
+
+function printSessionRow(label: string, session: SessionView): void {
+  if (session.docs === 0) return;
+  console.log(
+    [
+      label.padStart(columnWidth(label)),
+      String(session.docs).padStart(columnWidth('docs')),
+      String(session.inputBytes).padStart(columnWidth('input')),
+      ...METHOD_NAMES.map((method) =>
+        `${((session.amortizedRatios[method] ?? 0) * 100).toFixed(1)}%`.padStart(columnWidth(method))
+      ),
+    ].join('')
+  );
+}
+
+function emptySession(): SessionView {
+  return { docs: 0, inputBytes: 0, ratios: {}, amortizedRatios: {} };
+}
+
+function formatKb(bytes: number): string {
+  return `${(bytes / 1024).toFixed(1)} KB`;
 }
 
 function printHeader(firstColumn: string): void {
@@ -427,4 +595,4 @@ function gitOutput(args: string[]): string | undefined {
 const round1 = (value: number): number => Math.round(value * 10) / 10;
 const round4 = (value: number): number => Math.round(value * 10_000) / 10_000;
 
-main();
+await main();
