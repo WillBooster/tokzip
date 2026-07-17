@@ -176,8 +176,9 @@ function renderLanguageChart(report: ChartReport, theme: Theme): string {
   const series = [
     { method: 'tokzip small', color: theme.seriesSmall, shape: 'circle' as const },
     { method: 'tokzip fast', color: theme.seriesFast, shape: 'triangle' as const },
+    // The browser-native reference codec first, the strongest server-side codec second.
+    { method: 'b64url(cs gzip)', color: theme.seriesZstd, shape: 'diamond' as const },
     { method: 'b64url(brotli q11)', color: theme.seriesBrotli, shape: 'square' as const },
-    { method: 'b64url(zstd -19)', color: theme.seriesZstd, shape: 'diamond' as const },
     // The filter only guards the optional competitors: bench.ts unconditionally measures
     // both tokzip modes, so `series` (and the Math.max spread below) is never empty for
     // any report the benchmark actually produces.

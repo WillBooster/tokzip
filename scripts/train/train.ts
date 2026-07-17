@@ -8,6 +8,7 @@
  *   bun scripts/train/train.ts core            # wrapper dictionary + id-0 generic tables
  *   bun scripts/train/train.ts typescript ...  # one or more language modules
  *   bun scripts/train/train.ts --all           # core + every language with corpus data
+ *   --budget <bytes>                           # dictionary-suffix budget (default 8 KB)
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -38,16 +39,35 @@ import { buildWrapperDictionary } from './wrapperContent.ts';
 const ROOT = join(import.meta.dir, '../..');
 const GENERATED_DIR = join(ROOT, 'src/generated');
 const LANGUAGES_DIR = join(ROOT, 'src/languages');
-// Sized so wrapper + suffix stays below the 1 MB small-mode offset bound (2^20 - 1 is the
-// highest representable dictionary start; fast mode addresses only the first 256 KB either way).
-const DICTIONARY_BUDGET_BYTES = 1024 * 1024 - 8192;
+// Default dictionary budget, chosen by the session-amortized benchmark (short-document
+// sessions charged the brotli-compressed module transfer once): the previous ~1 MB
+// dictionaries never paid for their ~300 KB transfer against browser-native gzip, while
+// the 4–16 KB tiers win it outright — 8 KB is the robust middle (typescript sweep:
+// sh+dict 37.8% @4K / 38.8% @8K / 40.8% @16K / 45.4% @32K vs cs gzip 46.5%). The budget
+// is a client-delivery decision, not an offset-range one (the format addresses up to 1 MB
+// either way — pass --budget to experiment). The hard cap keeps wrapper + suffix below
+// the 1 MB small-mode offset bound (2^20 - 1 is the highest representable start).
+const DEFAULT_DICTIONARY_BUDGET_BYTES = 8 * 1024;
+const MAX_DICTIONARY_BUDGET_BYTES = 1024 * 1024 - 8192;
 /** Bound on per-language statistics input; keeps a full training run tractable. */
 const MAX_STATS_BYTES = 32 * 1024 * 1024;
 
 const textEncoder = new TextEncoder();
 
+let dictionaryBudgetBytes = DEFAULT_DICTIONARY_BUDGET_BYTES;
+
 function main(): void {
   const args = process.argv.slice(2);
+  const budgetIndex = args.indexOf('--budget');
+  if (budgetIndex !== -1) {
+    const value = Number(args[budgetIndex + 1]);
+    if (!Number.isSafeInteger(value) || value <= 0 || value > MAX_DICTIONARY_BUDGET_BYTES) {
+      console.error(`error: --budget must be a positive byte count ≤ ${MAX_DICTIONARY_BUDGET_BYTES}`);
+      process.exit(1);
+    }
+    dictionaryBudgetBytes = value;
+    args.splice(budgetIndex, 2);
+  }
   const targets = args.includes('--all')
     ? ['core', ...Object.keys(LANGUAGE_IDS).filter((name) => name !== 'none' && hasCorpus(name))]
     : args;
@@ -109,7 +129,7 @@ function trainLanguageModule(name: string): void {
   if (docs.length === 0) throw new Error(`no train-split corpus for ${name} under ${CORPUS_DIR}/${name}`);
   const wrapper = buildWrapperDictionary();
   const wrapperText = new TextDecoder().decode(wrapper);
-  const suffix = trainDictionary(docs, DICTIONARY_BUDGET_BYTES, wrapperText);
+  const suffix = trainDictionary(docs, dictionaryBudgetBytes, wrapperText);
   const { top64, tables } = trainStatistics(docs, wrapper, suffix);
 
   const exportName = `${identifierFor(name)}Module`;

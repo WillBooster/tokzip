@@ -28,9 +28,9 @@ import '../../src/languages/index.ts';
 import { corpusDirs, type ManifestEntry } from '../corpus.ts';
 import { binaryCompetitors, competitors } from './competitors.ts';
 
-const BUCKETS = ['0.5k', '2k', '8k', '24k'] as const;
+const BUCKETS = ['0.25k', '0.5k', '2k', '8k', '24k'] as const;
 /** Buckets forming the short-document (≤ 4 KB) primary workload. */
-const SHORT_BUCKETS: ReadonlySet<string> = new Set(['0.5k', '2k']);
+const SHORT_BUCKETS: ReadonlySet<string> = new Set(['0.25k', '0.5k', '2k']);
 /** The browser-native competitor the breakeven analysis is computed against. */
 const REFERENCE_METHOD_TEXT = 'b64url(cs gzip)';
 const REFERENCE_METHOD_BINARY = 'cs gzip';
