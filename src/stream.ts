@@ -30,17 +30,22 @@ const MIN_BLOCK_SIZE = 1 << 10;
 
 const textEncoder = new TextEncoder();
 
+/** Brand check accepting genuine Uint8Arrays from any realm (iframe, vm), unlike instanceof. */
+function isUint8Array(value: unknown): value is Uint8Array {
+  return value instanceof Uint8Array || Object.prototype.toString.call(value) === '[object Uint8Array]';
+}
+
 export interface CompressionStreamOptions {
   /** Language dictionary to use; default 'none' (id 0, wrapper dictionary only). */
   language?: string;
   /** Optimization target; both modes are lossless. Default 'fast'. */
   mode?: 'fast' | 'small';
   /**
-   * Raw bytes per compressed block. Default 256 KB. In `fast` mode, larger blocks trade
-   * latency/memory for ratio; in `small` mode the default 256 KB is the practical ceiling —
-   * larger blocks shrink the carried-history budget (it keeps history + block inside the
-   * optimal parser's 512 KB input bound), and at ≥ 512 KB carry is impossible and the block
-   * itself exceeds the bound, degrading the parse to greedy.
+   * Raw bytes per compressed block. Default 256 KB, minimum 1 KB. In `fast` mode, larger
+   * blocks trade latency/memory for ratio; in `small` mode the default 256 KB is the
+   * practical ceiling — larger blocks shrink the carried-history budget (it keeps
+   * history + block inside the optimal parser's 512 KB input bound), and at ≥ 512 KB carry
+   * is impossible and the block itself exceeds the bound, degrading the parse to greedy.
    */
   blockSize?: number;
   /**
@@ -53,7 +58,9 @@ export interface CompressionStreamOptions {
    * Upper bound on the carried history in bytes (clamped to the mode's window). Carried
    * history is re-priced and re-indexed every block, so small blocks with a full window pay
    * a large speed multiplier; a tighter limit trades ratio for compression speed. Defaults
-   * to the mode's window (small mode also stays inside the optimal-parse input bound).
+   * to the 256 KB window in `fast` mode; in `small` mode it defaults to the remaining
+   * optimal-parse budget, `max(0, 512 KB − blockSize)` capped at the 1 MB window (zero at
+   * `blockSize` ≥ 512 KB, where carry is impossible).
    */
   historyLimit?: number;
 }
@@ -159,7 +166,16 @@ class BlockEncoder {
       }
       bytes = textEncoder.encode(text);
     } else {
-      if (!(chunk instanceof Uint8Array)) throw new TypeError('chunk must be a Uint8Array or string');
+      if (!isUint8Array(chunk)) throw new TypeError('chunk must be a Uint8Array or string');
+      // A byte chunk ends any chance of the held-back surrogate pairing, and its bytes must
+      // land BEFORE the chunk's — flush it as U+FFFD now (per WHATWG encoding, an unmatched
+      // leading surrogate that cannot pair is replaced) instead of reordering it later.
+      if (this.pendingHighSurrogate) {
+        const flushed = textEncoder.encode(this.pendingHighSurrogate);
+        this.pendingHighSurrogate = '';
+        this.pending.push(flushed);
+        this.pendingLength += flushed.length;
+      }
       // The chunk is retained without copying until its block is emitted. That matches the
       // platform CompressionStream contract: mutating a chunk after write() is unsupported
       // and corrupts output identically there, so no defensive copy is paid here.
@@ -309,12 +325,16 @@ class BlockDecoder {
 
   constructor(options?: DecompressionStreamOptions) {
     const maxBlockSize = options?.maxBlockSize ?? DEFAULT_MAX_OUTPUT_SIZE;
-    if (Number.isNaN(maxBlockSize) || maxBlockSize < 0) throw new RangeError(`invalid maxBlockSize: ${maxBlockSize}`);
+    // typeof, not just NaN/negative: an untyped caller passing e.g. '10MB' would compare
+    // false against every size and silently disable the allocation guard.
+    if (typeof maxBlockSize !== 'number' || Number.isNaN(maxBlockSize) || maxBlockSize < 0) {
+      throw new RangeError(`invalid maxBlockSize: ${maxBlockSize}`);
+    }
     this.maxBlockSize = maxBlockSize;
   }
 
   push(chunk: Uint8Array, controller: ByteController): void {
-    if (!(chunk instanceof Uint8Array)) throw new TypeError('chunk must be a Uint8Array');
+    if (!isUint8Array(chunk)) throw new TypeError('chunk must be a Uint8Array');
     if (chunk.length === 0) return;
     if (this.done) throw new TokzipDecodeError('trailing bytes after end of stream');
     this.append(chunk);

@@ -232,9 +232,10 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
  */
 export function decompress(data: string | Uint8Array, options?: DecompressOptions): string | Uint8Array {
   const maxOutputSize = options?.maxOutputSize ?? DEFAULT_MAX_OUTPUT_SIZE;
-  // NaN would make the size guard below always pass, silently disabling the allocation cap.
-  // Infinity is allowed as an explicit "no cap".
-  if (Number.isNaN(maxOutputSize) || maxOutputSize < 0) {
+  // NaN or a non-number (e.g. '10MB' from an untyped caller) would make the size guard below
+  // always pass, silently disabling the allocation cap. Infinity is allowed as an explicit
+  // "no cap".
+  if (typeof maxOutputSize !== 'number' || Number.isNaN(maxOutputSize) || maxOutputSize < 0) {
     throw new RangeError(`invalid maxOutputSize: ${maxOutputSize}`);
   }
   const { flags, bytes } =

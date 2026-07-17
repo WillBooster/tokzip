@@ -447,9 +447,9 @@ version 0), and blocks reuse the §12.2 body encodings.
 ### 13.1 Stream layout
 
 ```
-[0] magic|version   byte 0b1_111_000v: bit 7 set (binary channel), low-6 magic 0b111
-                    (disjoint from the frame magic 0b110 for every frame version), low
-                    3 bits stream-format version (0).
+[0] magic|version   byte 0xB8 (0b1011_1000): bit 7 set (binary channel), bit 6 zero, magic
+                    0b111 in bits 5:3 (disjoint from the frame magic 0b110 for every frame
+                    version), stream-format version (0) in bits 2:0.
 [1] language id     byte; 0–255 (the §4 allocation).
 [2] flags           byte:
                       bits 1:0  stream mode: 1 fast, 2 small; 0 and 3 are invalid
@@ -460,8 +460,9 @@ version 0), and blocks reuse the §12.2 body encodings.
 ```
 
 Byte varints are the §12 byte varints (little-endian 7-bit groups, continue bit 7,
-canonical, max 5 bytes). A first byte with bit 7 set, low-6 magic `0b111`, and a different
-version is "unknown version"; any other non-frame first byte is "bad magic". Bytes after
+canonical, max 5 bytes). A first byte matching `0xB8` in bits 7:3 (bit 7 set, bit 6 zero,
+magic `0b111`) with a different version in bits 2:0 is "unknown version"; any other
+non-frame first byte is "bad magic". Bytes after
 the terminator, or a stream ending without it, are structural errors. A stream whose only
 content is the header and terminator encodes the empty input.
 
