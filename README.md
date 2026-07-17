@@ -43,6 +43,33 @@ const restored2 = decompress(bytes); // === source (Uint8Array in, text/bytes ou
 The wire format is specified in [FORMAT.md](FORMAT.md); the design rationale lives in
 [issue #2](https://github.com/WillBooster/tokzip/issues/2).
 
+## Streaming
+
+`TokzipCompressionStream` / `TokzipDecompressionStream` are Web Streams
+(`TransformStream<Uint8Array | string, Uint8Array>`), so the same code pipes in Node.js 18+
+and browsers — mirroring the built-in `CompressionStream` API. The whole mechanism is hidden
+inside the stream object: input is cut into blocks (256 KB by default), the LZ window is
+carried across block boundaries, and every block independently ships the smallest of
+stored/fast/small bodies.
+
+```ts
+import { TokzipCompressionStream, TokzipDecompressionStream } from './src/index.ts';
+import './src/languages/typescript.ts';
+
+const compressed = readable.pipeThrough(new TokzipCompressionStream({ language: 'typescript' }));
+const restored = compressed.pipeThrough(new TokzipDecompressionStream());
+```
+
+Streams use their own block container (binary channel only) and reach one-shot-or-better
+ratios: with default options, `mode: 'fast'` benches 1–2% _smaller_ than one-shot `fast`
+(streams enable price-aware lazy matching), and `mode: 'small'` benches 3–7% smaller than
+one-shot `small` on multi-megabyte inputs, whose blocks stay inside the optimal parser's
+input bound while one-shot compression falls back to the greedy parse. Memory stays
+O(blockSize + window) on both sides regardless of stream length. Options: `blockSize` trades
+latency/memory for ratio, `carryWindow: false` makes blocks independently decodable, and
+`historyLimit` bounds the carried window (compression-speed lever for small blocks); run
+`bun scripts/bench/streamBench.ts` to see the trade-offs on the seeded corpus.
+
 ## Benchmarks
 
 **Live dashboard (per-commit charts, per-language and per-size tables):

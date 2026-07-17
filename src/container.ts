@@ -335,7 +335,7 @@ function decompressBinary(data: Uint8Array, maxOutputSize: number): { flags: num
   return { flags, bytes };
 }
 
-function pushByteVarint(out: TextSink, value: number): void {
+export function pushByteVarint(out: TextSink, value: number): void {
   if (value < 0 || !Number.isSafeInteger(value)) throw new RangeError(`invalid varint value: ${value}`);
   do {
     // Arithmetic, not & / >>>: varint values span 35 bits, beyond 32-bit bitwise range.

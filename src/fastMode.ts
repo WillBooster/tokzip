@@ -234,7 +234,8 @@ export function decodeFastBodyBinary(
   end: number,
   outputSize: number,
   language: RegisteredLanguage,
-  fenced = false
+  fenced = false,
+  history?: Uint8Array
 ): Uint8Array {
   const byteLength = end - pos;
   const charCount = Math.floor((byteLength * 8) / 6);
@@ -251,7 +252,7 @@ export function decodeFastBodyBinary(
     }
     acc &= (1 << accBits) - 1;
   }
-  const result = decodeFastBodyCore(asciiDecoder.decode(codes), 0, charCount, outputSize, language, fenced);
+  const result = decodeFastBodyCore(asciiDecoder.decode(codes), 0, charCount, outputSize, language, fenced, history);
   // Canonical framing: exactly the consumed chars' bytes, with zero padding bits (at most 7,
   // so the whole padding sits in the final body byte).
   if (Math.ceil((result.pos * 6) / 8) !== byteLength) throw new TokzipDecodeError('trailing characters after payload');
@@ -282,14 +283,19 @@ export function packFastCodes(codes: Uint8Array, count: number): Uint8Array {
   return out;
 }
 
-/** Shared `fast` decode loop; returns the output and the position after the consumed chars. */
+/**
+ * Shared `fast` decode loop; returns the output and the position after the consumed chars.
+ * A `history` prefix (streaming blocks) is seeded as already-produced output: history matches
+ * may reach into it, and only the newly produced `outputSize` bytes are returned.
+ */
 function decodeFastBodyCore(
   data: string,
   pos: number,
   end: number,
   outputSize: number,
   language: RegisteredLanguage,
-  fenced: boolean
+  fenced: boolean,
+  history?: Uint8Array
 ): { out: Uint8Array; pos: number } {
   // Structural output bound, checked before allocating: every token consumes at least one
   // char and produces at most MATCH_LEN_CAP bytes, so a declared size beyond that cannot be
@@ -298,14 +304,17 @@ function decodeFastBodyCore(
   if (outputSize > (end - pos) * MATCH_LEN_CAP) {
     throw new TokzipDecodeError('declared size exceeds body capacity');
   }
-  const out = allocateDecodeBuffer(outputSize);
+  const historyLength = history?.length ?? 0;
+  const target = historyLength + outputSize;
+  const out = allocateDecodeBuffer(target);
+  if (history) out.set(history);
   const { dictionary, top64 } = language;
   const tracker = fenced ? new FenceTracker(language.id) : undefined;
   let rep0 = INITIAL_REPS[0]!;
   let rep1 = INITIAL_REPS[1]!;
   let rep2 = INITIAL_REPS[2]!;
   let rep3 = INITIAL_REPS[3]!;
-  let produced = 0;
+  let produced = historyLength;
 
   const readOffset = (width: number): number => {
     let value = (readRadix64(data, pos) << 6) | readRadix64(data, pos + 1);
@@ -317,7 +326,7 @@ function decodeFastBodyCore(
     return value;
   };
 
-  while (produced < outputSize) {
+  while (produced < target) {
     if (pos >= end) throw new TokzipDecodeError('truncated token stream');
     const tag = readRadix64(data, pos++);
     const kind = tag >>> 3;
@@ -331,7 +340,7 @@ function decodeFastBodyCore(
         pos = result.pos;
       }
       const bodyPos = pos;
-      if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
+      if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
       if (kind === KIND_LIT64) {
         if (bodyPos + length > end) throw new TokzipDecodeError('truncated literal run');
         const values = RADIX64_VALUES;
@@ -404,7 +413,7 @@ function decodeFastBodyCore(
     // Encoders MUST split longer matches (format-wide cap for cross-mode token compatibility;
     // the pre-allocation capacity bound also relies on it), so a longer one is structural.
     if (length > MATCH_LEN_CAP) throw new TokzipDecodeError('match length exceeds cap');
-    if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
+    if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
     if (sourceIsDict) {
       if (dictStart + length <= dictionary.length) {
         out.set(dictionary.subarray(dictStart, dictStart + length), produced);
@@ -425,5 +434,5 @@ function decodeFastBodyCore(
     }
     produced += length;
   }
-  return { out, pos };
+  return { out: historyLength > 0 ? out.subarray(historyLength) : out, pos };
 }

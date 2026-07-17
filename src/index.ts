@@ -5,6 +5,12 @@ import { registerLanguageModule } from './moduleRegistry.ts';
 registerLanguageModule(id0Module);
 
 export { compress, decompress, type CompressOptions, type DecompressOptions } from './container.ts';
+export {
+  TokzipCompressionStream,
+  TokzipDecompressionStream,
+  type CompressionStreamOptions,
+  type DecompressionStreamOptions,
+} from './stream.ts';
 export { TokzipDecodeError } from './errors.ts';
 export { registerLanguageModule } from './moduleRegistry.ts';
 export type { LanguageModuleData } from './dictionary.ts';
