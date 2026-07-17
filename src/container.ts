@@ -232,9 +232,10 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
  */
 export function decompress(data: string | Uint8Array, options?: DecompressOptions): string | Uint8Array {
   const maxOutputSize = options?.maxOutputSize ?? DEFAULT_MAX_OUTPUT_SIZE;
-  // NaN would make the size guard below always pass, silently disabling the allocation cap.
-  // Infinity is allowed as an explicit "no cap".
-  if (Number.isNaN(maxOutputSize) || maxOutputSize < 0) {
+  // NaN or a non-number (e.g. '10MB' from an untyped caller) would make the size guard below
+  // always pass, silently disabling the allocation cap. Infinity is allowed as an explicit
+  // "no cap".
+  if (typeof maxOutputSize !== 'number' || Number.isNaN(maxOutputSize) || maxOutputSize < 0) {
     throw new RangeError(`invalid maxOutputSize: ${maxOutputSize}`);
   }
   const { flags, bytes } =
@@ -335,7 +336,7 @@ function decompressBinary(data: Uint8Array, maxOutputSize: number): { flags: num
   return { flags, bytes };
 }
 
-function pushByteVarint(out: TextSink, value: number): void {
+export function pushByteVarint(out: TextSink, value: number): void {
   if (value < 0 || !Number.isSafeInteger(value)) throw new RangeError(`invalid varint value: ${value}`);
   do {
     // Arithmetic, not & / >>>: varint values span 35 bits, beyond 32-bit bitwise range.

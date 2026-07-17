@@ -83,7 +83,7 @@ export interface ParsePricing {
 const HASH_MULTIPLIER = 0x9E_37_79_B1;
 
 /** Inputs beyond this take the greedy-lazy parser (the DP costs ~40 bytes of scratch per byte). */
-const OPTIMAL_MAX_INPUT = 1 << 19;
+export const OPTIMAL_MAX_INPUT = 1 << 19;
 
 /** Match-finder search depths (chain links walked per position). */
 const GREEDY_DEPTH = 16;
@@ -200,15 +200,20 @@ function insertChains(
  * and the preset dictionary into the token list both wire formats serialize. `small` pricing
  * (with {@link ParsePricing.optimal}) takes an exact-price shortest-path parse; `fast` pricing
  * takes the greedy parser. Rep-cache updates are replayed identically by decoders.
+ *
+ * `parseStart` marks bytes[0, parseStart) as pre-seeded history: those bytes are indexed as
+ * match sources (streaming decoders seed the same bytes as already-produced output) but no
+ * tokens are emitted for them; the returned tokens cover exactly bytes[parseStart, n).
  */
 export function parse(
   bytes: Uint8Array,
   dictionary: Uint8Array,
   dictIndex: DictIndex | undefined,
   pricing: ParsePricing,
-  segments?: DictSegment[]
+  segments?: DictSegment[],
+  parseStart = 0
 ): Token[] {
-  if (bytes.length === 0) return [];
+  if (bytes.length <= parseStart) return [];
   if (pricing.optimal && bytes.length <= OPTIMAL_MAX_INPUT) {
     return parseOptimal(
       bytes,
@@ -218,10 +223,11 @@ export function parse(
       pricing.maxDictStart,
       pricing.optimal,
       pricing.litCostPrefix,
-      segments
+      segments,
+      parseStart
     );
   }
-  return parseGreedy(bytes, dictionary, dictIndex, pricing, segments);
+  return parseGreedy(bytes, dictionary, dictIndex, pricing, segments, parseStart);
 }
 
 // Scratch buffers reused across calls (compress is synchronous; JS is single-threaded).
@@ -273,7 +279,8 @@ function parseOptimal(
   maxDictStart: number,
   prices: SlotPricing,
   litCostPrefix: Float64Array,
-  segments?: DictSegment[]
+  segments?: DictSegment[],
+  parseStart = 0
 ): Token[] {
   const n = bytes.length;
   let segIndex = 0;
@@ -304,14 +311,17 @@ function parseOptimal(
   const kind = dpKind;
   const dist = dpDist;
   const reps = dpReps;
-  cost.fill(Number.POSITIVE_INFINITY, 0, n + 1);
-  cost[0] = 0;
-  reps[0] = INITIAL_REPS[0]!;
-  reps[1] = INITIAL_REPS[1]!;
-  reps[2] = INITIAL_REPS[2]!;
-  reps[3] = INITIAL_REPS[3]!;
+  cost.fill(Number.POSITIVE_INFINITY, parseStart, n + 1);
+  cost[parseStart] = 0;
+  reps[parseStart * 4] = INITIAL_REPS[0]!;
+  reps[parseStart * 4 + 1] = INITIAL_REPS[1]!;
+  reps[parseStart * 4 + 2] = INITIAL_REPS[2]!;
+  reps[parseStart * 4 + 3] = INITIAL_REPS[3]!;
 
-  for (let i = 0; i < n; i++) {
+  // Pre-seeded history: index every history position so the DP can match into it.
+  for (let i = 0; i < parseStart; i++) insertChains(bytes, i, n, shift, head, prev, head6, prev6);
+
+  for (let i = parseStart; i < n; i++) {
     // Fence-segment cursor: extension searches at position i use the segment covering i.
     while (i >= segNext) {
       segIndex++;
@@ -329,15 +339,16 @@ function parseOptimal(
     const rep2 = reps[ri + 2]!;
     const rep3 = reps[ri + 3]!;
     // Token context: the previous token's kind. DP arrival kinds coincide with the token-kind
-    // numbering (litrun 0, history 1, dict 2, rep0–rep3 3–6); position 0 starts at litrun.
-    const ctx = i === 0 ? 0 : kind[i]!;
+    // numbering (litrun 0, history 1, dict 2, rep0–rep3 3–6); the first parsed position
+    // starts at litrun.
+    const ctx = i === parseStart ? 0 : kind[i]!;
     const ctxLen = ctx * LENGTH_SLOT_COUNT;
     const ctxRep = ctx * 4 * LENGTH_SLOT_COUNT;
 
     // Literal step (always available; keeps every position reachable). Opening a new run
     // (position 0, or arriving via a match) pays the run-token floor; extending one is free.
     {
-      const runStart = i === 0 || kind[i]! !== DP_LIT ? prices.litRunStartBits[ctx]! : 0;
+      const runStart = i === parseStart || kind[i]! !== DP_LIT ? prices.litRunStartBits[ctx]! : 0;
       const c = base + (litCostPrefix[i + 1]! - litCostPrefix[i]!) + runStart;
       if (c < cost[i + 1]!) {
         cost[i + 1] = c;
@@ -620,11 +631,11 @@ function parseOptimal(
   // Backtrack: walk arrivals from the end, merging consecutive literal steps into runs.
   const tokens: Token[] = [];
   let j = n;
-  while (j > 0) {
+  while (j > parseStart) {
     const k = kind[j]!;
     if (k === DP_LIT) {
       let start = j - 1;
-      while (start > 0 && kind[start]! === DP_LIT) start--;
+      while (start > parseStart && kind[start]! === DP_LIT) start--;
       tokens.push({ type: 'lit', start, end: j });
       j = start;
     } else {
@@ -790,7 +801,8 @@ function parseGreedy(
   dictionary: Uint8Array,
   dictIndex: DictIndex | undefined,
   pricing: ParsePricing,
-  segments?: DictSegment[]
+  segments?: DictSegment[],
+  parseStart = 0
 ): Token[] {
   const n = bytes.length;
   const tokens: Token[] = [];
@@ -1016,8 +1028,9 @@ function parseGreedy(
   };
 
   const lazy = pricing.lazy;
-  let pos = 0;
-  let litStart = 0;
+  // Pre-seeded history (parseStart > 0): the first insertUpTo indexes it as match sources.
+  let pos = parseStart;
+  let litStart = parseStart;
   while (pos < n) {
     insertUpTo(pos + 1);
     if (!findBest(pos)) {

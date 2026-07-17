@@ -513,9 +513,10 @@ export function decodeSmallBodyBinary(
   end: number,
   outputSize: number,
   language: RegisteredLanguage,
-  fenced = false
+  fenced = false,
+  history?: Uint8Array
 ): Uint8Array {
-  return decodeSmallWords(wordsFromBytes(body, pos, end), (end - pos) * 8, 8, outputSize, language, fenced);
+  return decodeSmallWords(wordsFromBytes(body, pos, end), (end - pos) * 8, 8, outputSize, language, fenced, history);
 }
 
 /**
@@ -529,7 +530,8 @@ function decodeSmallWords(
   alignBits: number,
   outputSize: number,
   language: RegisteredLanguage,
-  fenced: boolean
+  fenced: boolean,
+  history?: Uint8Array
 ): Uint8Array {
   const header = new BitReader(words);
   const modes = header.readBits(3);
@@ -566,7 +568,13 @@ function decodeSmallWords(
     return valueOfSlot(slot, extraBits > 0 ? offsetCursor.readBits(extraBits) : 0);
   };
 
-  const out = allocateDecodeBuffer(outputSize);
+  // A history prefix (streaming blocks) is seeded as already-produced output: history matches
+  // may reach into it, and the literal context chains from its last byte (the encoder's
+  // collectStreams sees that byte as the previous input byte at the block boundary).
+  const historyLength = history?.length ?? 0;
+  const target = historyLength + outputSize;
+  const out = allocateDecodeBuffer(target);
+  if (history) out.set(history);
   const { dictionary } = language;
   const { litContext } = language.tables;
   const tracker = fenced ? new FenceTracker(language.id) : undefined;
@@ -574,9 +582,9 @@ function decodeSmallWords(
   let rep1 = INITIAL_REPS[1]!;
   let rep2 = INITIAL_REPS[2]!;
   let rep3 = INITIAL_REPS[3]!;
-  let produced = 0;
+  let produced = historyLength;
   let prevKind = TOKEN_KIND_LITRUN;
-  let prevByte = 0;
+  let prevByte = historyLength > 0 ? history![historyLength - 1]! : 0;
   for (let t = 0; t < tokenCount; t++) {
     const symbol = tokenHuffman
       ? readSymbol(tokenCursor, decoders.token.get(prevKind))
@@ -590,7 +598,7 @@ function decodeSmallWords(
 
     if (kind === TOKEN_KIND_LITRUN) {
       const length = slotValue + 1;
-      if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
+      if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
       const runEnd = produced + length;
       if (litHuffman) {
         const litDecoders = decoders.literal;
@@ -607,7 +615,7 @@ function decodeSmallWords(
       continue;
     }
     const length = slotValue + MIN_LEN_REP;
-    if (produced + length > outputSize) throw new TokzipDecodeError('declared size exceeded');
+    if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
     if (kind === TOKEN_KIND_DICT) {
       const start = readOffsetValue(OFFSET_CONTEXT_DICT);
       if (start + length <= dictionary.length) {
@@ -657,7 +665,7 @@ function decodeSmallWords(
     produced += length;
     prevByte = out[produced - 1]!;
   }
-  if (produced !== outputSize) throw new TokzipDecodeError('declared size mismatch');
+  if (produced !== target) throw new TokzipDecodeError('declared size mismatch');
   if (litCursor.bitPosition !== tokenStart || tokenCursor.bitPosition !== offsetStart) {
     throw new TokzipDecodeError('stream length mismatch');
   }
@@ -671,5 +679,7 @@ function decodeSmallWords(
     if (offsetCursor.readBits(take) !== 0) throw new TokzipDecodeError('non-zero padding bits');
     remaining -= take;
   }
-  return out;
+  // slice, not subarray: a view would keep the whole history+output allocation alive for as
+  // long as the caller retains the chunk, multiplying resident memory per decoded block.
+  return historyLength > 0 ? out.slice(historyLength) : out;
 }
