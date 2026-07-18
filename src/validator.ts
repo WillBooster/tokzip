@@ -64,6 +64,9 @@ function inspectText(data: string): FrameInfo {
     if (bodyLength < packedRawLength(contentBytes)) throw new TokzipDecodeError('truncated payload');
     if (bodyLength > packedRawLength(contentBytes)) throw new TokzipDecodeError('trailing characters after payload');
   } else if (mode === MODE_FAST || mode === MODE_SMALL) {
+    // A compressed body producing content is at least one unit long; header-only frames
+    // with a nonzero declared size are missing their payload.
+    if (bodyLength === 0 && contentBytes > 0) throw new TokzipDecodeError('truncated payload');
     if (bodyLength >= packedRawLength(contentBytes)) {
       throw new TokzipDecodeError('non-canonical frame: body not smaller than stored');
     }
@@ -94,6 +97,8 @@ function inspectBinary(data: Uint8Array): FrameInfo {
     if (bodyLength < contentBytes) throw new TokzipDecodeError('truncated payload');
     if (bodyLength > contentBytes) throw new TokzipDecodeError('trailing characters after payload');
   } else if (mode === MODE_FAST || mode === MODE_SMALL) {
+    // Mirrors the text inspector: header-only frames with declared content are truncated.
+    if (bodyLength === 0 && contentBytes > 0) throw new TokzipDecodeError('truncated payload');
     if (bodyLength >= contentBytes) {
       throw new TokzipDecodeError('non-canonical frame: body not smaller than stored');
     }

@@ -486,7 +486,9 @@ version 1), and blocks reuse the §12.2 body encodings.
                       bit  2    window carry-over (§13.3)
                       bits 7:3  reserved; encoders write 0, decoders reject non-zero
 […]  blocks          zero or more block records (§13.2)
-[…]  terminator      one 0x00 byte (a zero block-body-length varint)
+[…]  terminator      one 0x00 byte (a zero block-body-length varint), then the total
+                     decompressed size as a byte varint, then 4 little-endian bytes:
+                     the final chained CRC-32 (§13.2) of the whole decompressed stream
 ```
 
 Byte varints are the §12 byte varints (little-endian 7-bit groups, continue bit 7,
@@ -494,7 +496,7 @@ canonical, max 5 bytes). A first byte matching `0xB9` in bits 7:3 (bit 7 set, bi
 magic `0b111`) with a different version in bits 2:0 is "unknown version"; any other
 non-frame first byte is "bad magic". Bytes after
 the terminator, or a stream ending without it, are structural errors. A stream whose only
-content is the header and terminator encodes the empty input.
+content is the header and terminator (total 0, final CRC 0) encodes the empty input.
 
 ### 13.2 Block records
 
@@ -502,9 +504,18 @@ content is the header and terminator encodes the empty input.
 [0…] body length    byte varint, ≥ 1 (0 is the stream terminator)
 […]  block mode     byte: 0 stored, 1 fast, 2 small
 […]  raw size       byte varint, ≥ 1 (decompressed bytes of this block)
-[…]  block checksum 4 little-endian bytes: CRC-32 (§2.4) of this block's decompressed bytes
+[…]  block checksum 4 little-endian bytes: the finalized **chained** CRC-32 (§2.4
+                    polynomial) over ALL decompressed bytes of the stream up to and
+                    including this block (the CRC state carries across blocks and is
+                    finalized per record without resetting)
 […]  body           §12.2 body for the block mode
 ```
+
+The chain makes every record's checksum depend on the entire decompressed prefix, so a
+deleted, reordered, duplicated, or substituted block — each individually intact — fails the
+next checksum, and the terminator's total size + final CRC catch deletion of trailing
+blocks. Decoders MUST verify each block's chained checksum and the terminator's total and
+final CRC, and reject mismatches as structural errors.
 
 - The raw size MUST be validated against the decoder's block limit (implementation default
   64 MiB), and every constraint below MUST be checked, **before** the decoder buffers the

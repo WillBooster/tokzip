@@ -1,4 +1,4 @@
-import { crc32 } from './checksum.ts';
+import { CRC_INITIAL_STATE, crc32Append, crc32Finalize } from './checksum.ts';
 import { pushByteVarint, pushCrc32Binary, readCrc32Binary } from './container.ts';
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
@@ -119,6 +119,9 @@ class BlockEncoder {
   private pending: Uint8Array[] = [];
   private pendingLength = 0;
   private headerWritten = false;
+  /** Chained CRC over all raw bytes emitted so far (see checksum.ts). */
+  private crcState = CRC_INITIAL_STATE;
+  private totalRawBytes = 0;
   /** Trailing high surrogate held back from the previous string chunk (see push). */
   private pendingHighSurrogate = '';
 
@@ -199,9 +202,13 @@ class BlockEncoder {
       while (this.pendingLength >= this.blockSize) this.emitBlock(this.takeBlock(this.blockSize), controller);
     }
     if (this.pendingLength > 0) this.emitBlock(this.takeBlock(this.pendingLength), controller);
-    const out = new TextSink(4);
+    const out = new TextSink(16);
     if (!this.headerWritten) this.writeHeader(out);
     out.push(0); // End-of-stream marker (a zero block-length varint).
+    // Authenticated terminator: total raw size + final chained CRC, so dropping trailing
+    // blocks (every block prefix is internally consistent) is still detected.
+    pushByteVarint(out, this.totalRawBytes);
+    pushCrc32Binary(out, crc32Finalize(this.crcState));
     controller.enqueue(out.toBytes());
   }
 
@@ -298,7 +305,11 @@ class BlockEncoder {
     pushByteVarint(out, body!.length);
     out.push(mode);
     pushByteVarint(out, block.length);
-    pushCrc32Binary(out, crc32(block));
+    // Chained, not per-block: the stored value is the cumulative CRC of every raw byte up
+    // to and including this block, so block deletion/reordering/replay breaks the chain.
+    this.crcState = crc32Append(this.crcState, block);
+    this.totalRawBytes += block.length;
+    pushCrc32Binary(out, crc32Finalize(this.crcState));
     out.append(body!);
     controller.enqueue(out.toBytes());
 
@@ -323,6 +334,9 @@ class BlockDecoder {
   private carry = false;
   private window = 0;
   private history: Uint8Array = new Uint8Array(0);
+  /** Chained CRC over all raw bytes produced so far (mirrors the encoder). */
+  private crcState = CRC_INITIAL_STATE;
+  private totalRawBytes = 0;
   private done = false;
 
   constructor(options?: DecompressionStreamOptions) {
@@ -424,7 +438,15 @@ class BlockDecoder {
     if (!lengthField) return false;
     const bodyLength = lengthField.value;
     if (bodyLength === 0) {
-      this.offset = lengthField.pos;
+      // Authenticated terminator: total raw size + final chained CRC. Verifying it catches
+      // trailing-block deletion, which every per-block check necessarily misses.
+      const totalField = this.tryReadVarint(lengthField.pos);
+      if (!totalField) return false;
+      if (this.length - totalField.pos < 4) return false;
+      const declaredCrc = readCrc32Binary(this.buffer, totalField.pos);
+      if (totalField.value !== this.totalRawBytes) throw new TokzipDecodeError('stream length mismatch');
+      if (declaredCrc !== crc32Finalize(this.crcState)) throw new TokzipDecodeError('checksum mismatch');
+      this.offset = totalField.pos + 4;
       this.done = true;
       if (this.available() > 0) throw new TokzipDecodeError('trailing bytes after end of stream');
       return false;
@@ -472,7 +494,9 @@ class BlockDecoder {
           ? decodeFastBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history)
           : decodeSmallBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history);
     }
-    if (crc32(out) !== declaredCrc) throw new TokzipDecodeError('checksum mismatch');
+    this.crcState = crc32Append(this.crcState, out);
+    this.totalRawBytes += out.length;
+    if (crc32Finalize(this.crcState) !== declaredCrc) throw new TokzipDecodeError('checksum mismatch');
     this.offset = bodyEnd;
     // Keep the window's worth of produced output as the next block's history.
     if (this.carry) {

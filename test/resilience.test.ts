@@ -127,6 +127,69 @@ describe('decoder fuzzing', () => {
   });
 });
 
+/** Parses an encoded stream into [start, end) ranges: header, blocks…, terminator. */
+function streamRanges(encoded: Uint8Array): [number, number][] {
+  const readVarint = (pos: number): [number, number] => {
+    let value = 0;
+    let shift = 1;
+    for (;;) {
+      const group = encoded[pos++]!;
+      value += (group & 127) * shift;
+      if ((group & 128) === 0) return [value, pos];
+      shift *= 128;
+    }
+  };
+  const ranges: [number, number][] = [[0, 3]];
+  let pos = 3;
+  for (;;) {
+    const start = pos;
+    const [bodyLength, afterLength] = readVarint(pos);
+    if (bodyLength === 0) {
+      ranges.push([start, encoded.length]);
+      return ranges;
+    }
+    const [, afterRaw] = readVarint(afterLength + 1);
+    pos = afterRaw + 4 + bodyLength;
+    ranges.push([start, pos]);
+  }
+}
+
+function concatBytes(parts: Uint8Array[]): Uint8Array {
+  const out = new Uint8Array(parts.reduce((sum, part) => sum + part.length, 0));
+  let at = 0;
+  for (const part of parts) {
+    out.set(part, at);
+    at += part.length;
+  }
+  return out;
+}
+
+describe('stream block tampering', () => {
+  async function expectStreamRejected(tampered: Uint8Array): Promise<void> {
+    await expect(pumpStream(new TokzipDecompressionStream(), tampered)).rejects.toThrow(TokzipDecodeError);
+  }
+
+  test('deleting, reordering, or dropping trailing blocks fails the chained checksum', async () => {
+    const input = Uint8Array.from({ length: 3072 }, (_, i) => (i * 7) % 251);
+    const encoded = await pumpStream(new TokzipCompressionStream({ blockSize: 1024, carryWindow: false }), input);
+    const ranges = streamRanges(encoded);
+    expect(ranges.length).toBe(5); // Header + 3 blocks + terminator.
+    const slice = ([start, end]: [number, number]): Uint8Array => encoded.subarray(start, end);
+    const [header, block1, block2, block3, terminator] = ranges;
+    // Deleting a middle block breaks the next block's chained CRC.
+    await expectStreamRejected(concatBytes([slice(header!), slice(block1!), slice(block3!), slice(terminator!)]));
+    // Reordering intact blocks breaks the chain too.
+    await expectStreamRejected(
+      concatBytes([slice(header!), slice(block2!), slice(block1!), slice(block3!), slice(terminator!)])
+    );
+    // Dropping trailing blocks passes every per-block check; the terminator catches it.
+    await expectStreamRejected(concatBytes([slice(header!), slice(block1!), slice(block2!), slice(terminator!)]));
+    // The untampered stream still round-trips.
+    const restored = await pumpStream(new TokzipDecompressionStream(), encoded);
+    expect(restored).toEqual(input);
+  });
+});
+
 describe('compressForStorage', () => {
   test('verified frames round-trip and match plain compress output', () => {
     for (const doc of SEED_DOCS) {

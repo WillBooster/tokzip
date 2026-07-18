@@ -28,8 +28,13 @@ export function compressForStorage(input: string | Uint8Array, options?: Compres
   try {
     const frame = compress(input, options);
     if (roundTrips(frame, input)) return frame;
-  } catch {
-    // Fall through to the stored fallback: a compression failure must never lose data.
+  } catch (error) {
+    // RangeError is compress() rejecting the caller's options (bad mode/output/language) —
+    // rethrow it: silently "recovering" from a typo by ignoring the requested options
+    // would e.g. hand a text frame to a binary storage path. Everything else is an
+    // internal compression failure, which falls through to the stored fallback so a
+    // compressor bug never loses data.
+    if (error instanceof RangeError) throw error;
   }
   const fallback = compressStored(input, output === 'binary' ? 'binary' : 'text');
   if (!roundTrips(fallback, input)) throw new Error('tokzip: stored fallback failed round-trip verification');

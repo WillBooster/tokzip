@@ -190,7 +190,13 @@ async function main(): Promise<void> {
   report.session = sessionOf(grandTotals, grandDictBytes);
   report.shortSession = sessionOf(grandShortTotals, grandShortDictBytes);
   report.corpus.sha256 = corpusHash(loadedDocs);
-  printTotals(report);
+  printTotals({
+    report,
+    grand: grandTotals,
+    short: grandShortTotals,
+    dictBytes: grandDictBytes,
+    shortDictBytes: grandShortDictBytes,
+  });
   if (speed) report.speed = await benchSpeed(loadedDocs);
   printRoundTrip(report);
   if (jsonPath) writeReport(jsonPath, report);
@@ -273,8 +279,8 @@ async function benchLanguage(
   const session = sessionOf(languageTotals, dictBytes);
   const shortSession = sessionOf(shortTotals, dictBytes);
   printRow('all', languageTotals);
-  printSessionRow('all+dict', session);
-  printSessionRow('sh+dict', shortSession);
+  printSessionRow('all+dict', languageTotals, dictBytes);
+  printSessionRow('sh+dict', shortTotals, dictBytes);
   const breakeven = breakevenOf(languageTotals, dictBytes);
   if (dictBytes > 0) {
     const parts = Object.entries(breakeven).map(
@@ -486,33 +492,42 @@ function writeReport(path: string, report: BenchReport): void {
   console.log(`\nwrote ${path}`);
 }
 
-function printTotals(report: BenchReport): void {
+interface TotalsForPrint {
+  report: BenchReport;
+  grand: SizeTotals;
+  short: SizeTotals;
+  dictBytes: number;
+  shortDictBytes: number;
+}
+
+function printTotals({ report, grand, short, dictBytes, shortDictBytes }: TotalsForPrint): void {
   console.log(
     `\n=== TOTAL (${report.total.docs} docs, ${Object.keys(report.languages).length} languages, ${report.channel} channel) ===`
   );
   printHeader('');
-  printRow('all', {
-    docs: report.total.docs,
-    inputBytes: report.total.inputBytes,
-    outputChars: METHOD_NAMES.map((method) => report.total.ratios[method]! * report.total.inputBytes),
-  });
-  printSessionRow('all+dict', report.session);
-  printSessionRow('sh+dict', report.shortSession);
+  // Raw totals, not the report's rounded ratios: reconstructing output sizes from
+  // 4-decimal ratios double-rounds and can contradict the per-language rows by 0.1 pt.
+  printRow('all', grand);
+  printSessionRow('all+dict', grand, dictBytes);
+  printSessionRow('sh+dict', short, shortDictBytes);
   console.log(
     `\nPRIMARY metric: sh+dict = session-amortized ratio on ≤4 KB docs, tokzip charged each\n` +
       `language's brotli-compressed dictionary once per session; reference codec: ${report.referenceMethod}.`
   );
 }
 
-function printSessionRow(label: string, session: SessionView): void {
-  if (session.docs === 0) return;
+/** Session-amortized row computed from raw totals (single rounding at display time). */
+function printSessionRow(label: string, totals: SizeTotals, dictBytes: number): void {
+  if (totals.docs === 0 || totals.inputBytes === 0) return;
   console.log(
     [
       label.padStart(columnWidth(label)),
-      String(session.docs).padStart(columnWidth('docs')),
-      String(session.inputBytes).padStart(columnWidth('input')),
-      ...METHOD_NAMES.map((method) =>
-        `${((session.amortizedRatios[method] ?? 0) * 100).toFixed(1)}%`.padStart(columnWidth(method))
+      String(totals.docs).padStart(columnWidth('docs')),
+      String(totals.inputBytes).padStart(columnWidth('input')),
+      ...METHODS.map((method, index) =>
+        `${(((totals.outputChars[index]! + (method.usesDictionary ? dictBytes : 0)) / totals.inputBytes) * 100).toFixed(1)}%`.padStart(
+          columnWidth(method.name)
+        )
       ),
     ].join('')
   );

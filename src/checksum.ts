@@ -16,7 +16,23 @@ for (let n = 0; n < 256; n++) {
 
 /** CRC-32 of `bytes` as an unsigned 32-bit integer. */
 export function crc32(bytes: Uint8Array): number {
-  return (update(bytes, 0xFF_FF_FF_FF) ^ 0xFF_FF_FF_FF) >>> 0;
+  return crc32Finalize(crc32Append(CRC_INITIAL_STATE, bytes));
+}
+
+/**
+ * Incremental CRC-32 for the stream container's chained block checksums: the state starts
+ * at {@link CRC_INITIAL_STATE}, every decompressed block appends to it, and each block
+ * record stores the finalized cumulative value — so a deleted, reordered, or replayed
+ * block cannot reproduce the chain even though every individual block is intact.
+ */
+export const CRC_INITIAL_STATE = 0xFF_FF_FF_FF;
+
+export function crc32Append(state: number, bytes: Uint8Array): number {
+  return update(bytes, state);
+}
+
+export function crc32Finalize(state: number): number {
+  return (state ^ 0xFF_FF_FF_FF) >>> 0;
 }
 
 /**

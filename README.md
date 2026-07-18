@@ -38,7 +38,9 @@ const restored2 = decompress(bytes); // === source (Uint8Array in, text/bytes ou
 - **Mandatory content checksum**: every frame carries a CRC-32 of the decompressed content
   (the same integrity guarantee gzip provides), verified before any output is returned.
 - **Storage-grade helpers**: `compressForStorage` verifies the frame round-trips to the
-  exact input before returning it and falls back to a plain stored frame on any failure;
+  exact input before returning it and falls back to a plain stored frame on any failure
+  (`compress` mirrors WHATWG `TextEncoder` for lone surrogates — they encode as U+FFFD —
+  while `compressForStorage` rejects such strings up front so stored data is byte-exact);
   `inspectFrame` validates a frame's header/envelope without decompressing — for servers
   that pass client-compressed payloads through to storage untouched.
 - **Fence-aware dictionary extension**: inside a labeled triple-backtick code block

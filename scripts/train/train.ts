@@ -8,7 +8,7 @@
  *   bun scripts/train/train.ts core            # wrapper dictionary + id-0 generic tables
  *   bun scripts/train/train.ts typescript ...  # one or more language modules
  *   bun scripts/train/train.ts --all           # core + every language with corpus data
- *   --budget <bytes>                           # dictionary-suffix budget (default 8 KB)
+ *   --budget <bytes>                           # dictionary-suffix budget (4 KiB – 1 MiB, default 8 KiB)
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -48,6 +48,7 @@ const LANGUAGES_DIR = join(ROOT, 'src/languages');
 // either way — pass --budget to experiment). The hard cap keeps wrapper + suffix below
 // the 1 MB small-mode offset bound (2^20 - 1 is the highest representable start).
 const DEFAULT_DICTIONARY_BUDGET_BYTES = 8 * 1024;
+const MIN_DICTIONARY_BUDGET_BYTES = 4096;
 const MAX_DICTIONARY_BUDGET_BYTES = 1024 * 1024 - 8192;
 /** Bound on per-language statistics input; keeps a full training run tractable. */
 const MAX_STATS_BYTES = 32 * 1024 * 1024;
@@ -61,8 +62,13 @@ function main(): void {
   const budgetIndex = args.indexOf('--budget');
   if (budgetIndex !== -1) {
     const value = Number(args[budgetIndex + 1]);
-    if (!Number.isSafeInteger(value) || value <= 0 || value > MAX_DICTIONARY_BUDGET_BYTES) {
-      console.error(`error: --budget must be a positive byte count ≤ ${MAX_DICTIONARY_BUDGET_BYTES}`);
+    // The floor keeps generated modules usable: fence conformance tests draw their fence
+    // content from the dictionary bytes and the trainer's segment lengths assume room for
+    // real code fragments — a degenerate budget would emit a module that breaks both.
+    if (!Number.isSafeInteger(value) || value < MIN_DICTIONARY_BUDGET_BYTES || value > MAX_DICTIONARY_BUDGET_BYTES) {
+      console.error(
+        `error: --budget must be a byte count in [${MIN_DICTIONARY_BUDGET_BYTES}, ${MAX_DICTIONARY_BUDGET_BYTES}]`
+      );
       process.exit(1);
     }
     dictionaryBudgetBytes = value;

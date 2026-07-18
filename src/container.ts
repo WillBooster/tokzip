@@ -81,6 +81,9 @@ export function compress(input: string | Uint8Array, options: CompressOptions & 
 export function compress(input: string | Uint8Array, options?: CompressOptions): string | Uint8Array;
 export function compress(input: string | Uint8Array, options?: CompressOptions): string | Uint8Array {
   const isString = typeof input === 'string';
+  // Lone surrogates encode as U+FFFD per WHATWG TextEncoder (see FORMAT.md §3) — the same
+  // behavior as the platform CompressionStream pipeline. compressForStorage rejects such
+  // strings up front for callers that need the byte-exact guarantee.
   const bytes = isString ? textEncoder.encode(input) : input;
   const languageName = options?.language ?? 'none';
   const language = languageByName(languageName);
