@@ -1,8 +1,9 @@
 //! tokzip-rs: server-side at-rest compressor for short code / LLM-output documents.
 //!
 //! Frame layout (format v0, pre-release):
-//!   [0] magic 0xC2 (outside the TS binary container's 0b10110xxx namespace,
-//!       where the low 3 bits are a version field — see src/container.ts)
+//!   [0] magic 0xC2 (outside 0xB0-0xBF, which the TS format reserves for its
+//!       binary frames (0b10110xxx, src/container.ts) and streams (0b10111xxx,
+//!       src/stream.ts) with the low 3 bits as a version field)
 //!   [1] version (0)
 //!   [2] method (0 = stored)
 //!   [3..7] CRC-32 (little-endian) of the decompressed content

@@ -68,6 +68,17 @@ fn main() {
         languages.retain(|l| requested.contains(l));
     }
 
+    // The dictionary is built by the external CLI (the in-process ZDICT builder takes
+    // no compression level, so it cannot reproduce the -19 tuning); its version is
+    // part of the cache identity so a CLI upgrade retrains instead of reusing.
+    let zstd_version_output = Command::new("zstd")
+        .arg("--version")
+        .output()
+        .expect("run zstd --version (is the zstd CLI installed?)");
+    let zstd_version = String::from_utf8_lossy(&zstd_version_output.stdout)
+        .trim()
+        .to_string();
+
     let mut totals: BTreeMap<&str, Acc> =
         BUCKETS.iter().map(|(n, _)| (*n, Acc::default())).collect();
 
@@ -77,7 +88,7 @@ fn main() {
             .unwrap_or_else(|e| panic!("cannot read {}: {e}", manifest_path.display()));
         let entries: Vec<ManifestEntry> = manifest
             .lines()
-            .filter(|l| !l.is_empty())
+            .filter(|l| !l.trim().is_empty())
             .map(|l| serde_json::from_str(l).expect("manifest entry"))
             .collect();
 
@@ -88,26 +99,35 @@ fn main() {
             .collect();
         // `l19` in the cache key: dictionary statistics are tuned for the evaluated
         // compression level (passing `-19` below measurably improves the baseline),
-        // so the level is part of the cache identity.
+        // so the level is part of the cache identity, as is the trainer's version.
         let dict_path = dict_dir.join(format!(
             "{lang}-l19-{}.dict",
-            train_fingerprint(&corpus_dir, &train_files)
+            train_fingerprint(&corpus_dir, &train_files, &zstd_version)
         ));
         if !dict_path.exists() {
-            // Train to a temp path and rename atomically so an interrupted or
-            // concurrent run can never leave a partial file at the cache path.
-            let tmp_path = dict_path.with_extension("dict.tmp");
-            let status = Command::new("zstd")
+            // Train to a process-unique temp path and rename atomically so neither an
+            // interrupted run nor two concurrent runs of the same language can leave a
+            // partial file at the cache path (a shared temp name would interleave
+            // writes and even corrupt the cache after a successful rename).
+            let tmp_path = dict_path.with_extension(format!("{}.tmp", std::process::id()));
+            let output = Command::new("zstd")
                 .arg("--train")
                 .args(&train_files)
                 .arg("-19")
                 .arg("-o")
                 .arg(&tmp_path)
-                .arg("-q")
                 .arg("-f")
-                .status()
+                .output()
                 .expect("run zstd --train (is the zstd CLI installed?)");
-            assert!(status.success(), "zstd --train failed for {lang}");
+            // No `-q`: it would also silence zstd's dictionary-quality warnings (e.g.
+            // "size(source)/size(dictionary) should be >= 10"), which flag languages
+            // whose baseline dictionary is knowingly under-trained. Re-emit only those.
+            for line in String::from_utf8_lossy(&output.stderr).lines() {
+                if line.contains("WARNING") || line.trim_start().starts_with('!') {
+                    eprintln!("{lang}: {}", line.trim());
+                }
+            }
+            assert!(output.status.success(), "zstd --train failed for {lang}");
             std::fs::rename(&tmp_path, &dict_path).expect("move dictionary into cache");
         }
         let dict = std::fs::read(&dict_path).expect("read dictionary");
@@ -119,24 +139,27 @@ fn main() {
             dict_path.display()
         );
         // Digesting a level-19 dictionary costs ~5ms; per-document construction would
-        // dominate the whole run, so build the contexts once per language. Both zstd
-        // arms carry a content checksum (tokzip frames always pay their CRC-32) and
-        // drop the 4-byte dictionary ID (a single-dictionary at-rest deployment would
-        // strip it), so framing overhead is comparable across methods.
+        // dominate the whole run, so build the contexts once per language. Framing is
+        // equalized against tokzip's frame: both zstd arms carry a content checksum
+        // (tokzip frames always pay their CRC-32), drop the 4-byte dictionary ID (a
+        // single-dictionary at-rest deployment would strip it), and drop the frame
+        // content size (the tokzip v0 frame encodes no decompressed length either).
         let mut dict_compressor =
             zstd::bulk::Compressor::with_dictionary(19, &dict).expect("zstd compressor");
-        dict_compressor
-            .set_parameter(zstd::zstd_safe::CParameter::ChecksumFlag(true))
-            .expect("enable zstd checksum");
-        dict_compressor
-            .set_parameter(zstd::zstd_safe::CParameter::DictIdFlag(false))
-            .expect("disable zstd dict id");
+        let mut plain_compressor = zstd::bulk::Compressor::new(19).expect("zstd compressor");
+        for compressor in [&mut dict_compressor, &mut plain_compressor] {
+            compressor
+                .set_parameter(zstd::zstd_safe::CParameter::ChecksumFlag(true))
+                .expect("enable zstd checksum");
+            compressor
+                .set_parameter(zstd::zstd_safe::CParameter::DictIdFlag(false))
+                .expect("disable zstd dict id");
+            compressor
+                .set_parameter(zstd::zstd_safe::CParameter::ContentSizeFlag(false))
+                .expect("disable zstd content size");
+        }
         let mut dict_decompressor =
             zstd::bulk::Decompressor::with_dictionary(&dict).expect("zstd decompressor");
-        let mut plain_compressor = zstd::bulk::Compressor::new(19).expect("zstd compressor");
-        plain_compressor
-            .set_parameter(zstd::zstd_safe::CParameter::ChecksumFlag(true))
-            .expect("enable zstd checksum");
         let mut plain_decompressor = zstd::bulk::Decompressor::new().expect("zstd decompressor");
 
         let mut lang_acc = Acc::default();
@@ -213,7 +236,7 @@ fn main() {
         println!("\n[{name}] docs={} raw={}KB", acc.docs, acc.raw / 1024);
         for m in METHODS {
             println!(
-                "  {m:<13} {:>6}  wins={}",
+                "  {m:<13} {:>7}  wins={}",
                 ratio(acc, m),
                 acc.wins.get(m).copied().unwrap_or(0)
             );
@@ -235,7 +258,7 @@ fn ratio(acc: &Acc, method: &str) -> String {
 /// retrains instead of silently reusing a dictionary from different data.
 /// Every field is length-prefixed so boundary shifts between path and content
 /// cannot collide; 32 bits of identity is plenty for a local cache of ~21 entries.
-fn train_fingerprint(corpus_dir: &Path, train_files: &[PathBuf]) -> String {
+fn train_fingerprint(corpus_dir: &Path, train_files: &[PathBuf], zstd_version: &str) -> String {
     let mut hasher = crc32fast::Hasher::new();
     let canonical = corpus_dir
         .canonicalize()
@@ -244,6 +267,7 @@ fn train_fingerprint(corpus_dir: &Path, train_files: &[PathBuf]) -> String {
         hasher.update(&(bytes.len() as u64).to_le_bytes());
         hasher.update(bytes);
     };
+    update(zstd_version.as_bytes());
     update(canonical.to_string_lossy().as_bytes());
     for file in train_files {
         update(file.to_string_lossy().as_bytes());
