@@ -7,6 +7,7 @@ import {
   FLAG_BYTES,
   FLAG_FENCED,
   MAGIC_VERSION,
+  MATCH_LEN_CAP,
   MODE_FAST,
   MODE_SMALL,
   MODE_STORED,
@@ -67,6 +68,11 @@ function inspectText(data: string): FrameInfo {
     // A compressed body producing content is at least one unit long; header-only frames
     // with a nonzero declared size are missing their payload.
     if (bodyLength === 0 && contentBytes > 0) throw new TokzipDecodeError('truncated payload');
+    // Theoretical capacity bound, mirroring the decoders: every fast token consumes ≥ 1
+    // char (small: ≥ 1 bit, 5 chars = 32 bits) and produces ≤ MATCH_LEN_CAP bytes, so a
+    // larger declared size is structurally unproducible from this body.
+    const capacity = mode === MODE_FAST ? bodyLength * MATCH_LEN_CAP : Math.ceil(bodyLength / 5) * 32 * MATCH_LEN_CAP;
+    if (contentBytes > capacity) throw new TokzipDecodeError('declared size exceeds body capacity');
     if (bodyLength >= packedRawLength(contentBytes)) {
       throw new TokzipDecodeError('non-canonical frame: body not smaller than stored');
     }
@@ -99,6 +105,10 @@ function inspectBinary(data: Uint8Array): FrameInfo {
   } else if (mode === MODE_FAST || mode === MODE_SMALL) {
     // Mirrors the text inspector: header-only frames with declared content are truncated.
     if (bodyLength === 0 && contentBytes > 0) throw new TokzipDecodeError('truncated payload');
+    // Binary bodies pack fast chars at 6 bits and small bits at 8 per byte.
+    const capacity =
+      mode === MODE_FAST ? Math.floor((bodyLength * 8) / 6) * MATCH_LEN_CAP : bodyLength * 8 * MATCH_LEN_CAP;
+    if (contentBytes > capacity) throw new TokzipDecodeError('declared size exceeds body capacity');
     if (bodyLength >= contentBytes) {
       throw new TokzipDecodeError('non-canonical frame: body not smaller than stored');
     }

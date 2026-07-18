@@ -247,6 +247,17 @@ describe('inspectFrame', () => {
     expect(() => inspectFrame(frame + 'AAAA'.repeat(20))).toThrow(TokzipDecodeError);
   });
 
+  test('rejects declared sizes beyond the body capacity on both channels', () => {
+    // The repro from review: a fast frame truncated to its first body char but declaring
+    // more content than one char can produce must fail inspection, matching decompress.
+    const oversized = compress('x'.repeat(300_000), { language: 'none', mode: 'fast' });
+    // Keep the header (3 chars + 4-char size varint + 6-char CRC) plus one body char: a
+    // single fast token cannot produce the declared 300,000 bytes.
+    expect(() => inspectFrame(oversized.slice(0, 14))).toThrow(/body capacity|truncated/);
+    const oversizedBinary = compress('x'.repeat(300_000), { language: 'none', mode: 'fast', output: 'binary' });
+    expect(() => inspectFrame(oversizedBinary.subarray(0, 11))).toThrow(/body capacity|truncated/);
+  });
+
   test('accepts every fuzz-seed frame on both channels', () => {
     for (const doc of SEED_DOCS) {
       for (const mode of ['fast', 'small'] as const) {

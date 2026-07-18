@@ -76,11 +76,11 @@ const compressed = readable.pipeThrough(new TokzipCompressionStream({ language: 
 const restored = compressed.pipeThrough(new TokzipDecompressionStream());
 ```
 
-Streams use their own block container (binary channel only) and reach one-shot-or-better
-ratios: with default options, `mode: 'fast'` benches 1–2% _smaller_ than one-shot `fast`
-(streams enable price-aware lazy matching), and `mode: 'small'` benches 3–7% smaller than
-one-shot `small` on multi-megabyte inputs, whose blocks stay inside the optimal parser's
-input bound while one-shot compression falls back to the greedy parse. Memory stays
+Streams use their own block container (binary channel only) and stay close to one-shot
+ratios: with default options, `mode: 'fast'` matches one-shot `fast` to within a fraction
+of a percent (both use the price-aware lazy parse), and `mode: 'small'` benches 3–7%
+smaller than one-shot `small` on multi-megabyte inputs, whose blocks stay inside the
+optimal parser's input bound while one-shot compression falls back to the greedy parse. Memory stays
 O(blockSize + window) on both sides regardless of stream length. Options: `blockSize` trades
 latency/memory for ratio in `fast` mode (in `small` mode the 256 KB default is the practical
 ceiling — larger blocks shrink the history budget and past 512 KB lose the optimal parse),
