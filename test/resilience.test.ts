@@ -267,7 +267,7 @@ describe('inspectFrame', () => {
     expect(() => inspectFrame(small.slice(0, -1))).toThrow(/multiple of 5|non-canonical|truncated/);
     const bodyAt = small.length - 3;
     expect(() => inspectFrame(small.slice(0, bodyAt) + '%' + small.slice(bodyAt + 1))).toThrow(/non-alphabet/);
-    expect(() => inspectFrame(small.slice(0, - 5) + '~~~~~')).toThrow(/out of range|non-alphabet/);
+    expect(() => inspectFrame(small.slice(0, -5) + '~~~~~')).toThrow(/out of range|non-alphabet/);
 
     const fast = compress(doc, { language: 'typescript', mode: 'fast' });
     expect(inspectFrame(fast).mode).toBe('fast');
