@@ -92,8 +92,13 @@ interface SessionView {
 interface LanguageReport {
   docs: number;
   registered: boolean;
-  /** Brotli-compressed transfer size of this language's dictionary module (0 when none). */
-  dictTransferBytes: number;
+  /**
+   * Per-method brotli-compressed dictionary transfer charged to the full session (own
+   * module + fenced dependencies of that method's frames); keyed by method name.
+   */
+  dictTransferBytes: Record<string, number>;
+  /** Same as dictTransferBytes but scoped to the short (≤ 4 KB) session's documents. */
+  shortDictTransferBytes: Record<string, number>;
   buckets: Record<string, { docs: number; inputBytes: number; ratios: Record<string, number> }>;
   total: { inputBytes: number; ratios: Record<string, number> };
   session: SessionView;
@@ -174,16 +179,20 @@ async function main(): Promise<void> {
   };
   const grandTotals = emptyTotals();
   const grandShortTotals = emptyTotals();
-  let grandDictBytes = 0;
-  let grandShortDictBytes = 0;
+  const grandDictBytes: Record<string, number> = {};
+  const grandShortDictBytes: Record<string, number> = {};
   const loadedDocs: LoadedDoc[] = [];
 
   for (const language of languages) {
     const result = await benchLanguage(language, report, grandTotals, loadedDocs);
     if (!result) continue;
     accumulate(grandShortTotals, result.shortTotals);
-    grandDictBytes += result.dictBytes;
-    grandShortDictBytes += result.shortDictBytes;
+    for (const [method, bytes] of Object.entries(result.dictBytes)) {
+      grandDictBytes[method] = (grandDictBytes[method] ?? 0) + bytes;
+    }
+    for (const [method, bytes] of Object.entries(result.shortDictBytes)) {
+      grandShortDictBytes[method] = (grandShortDictBytes[method] ?? 0) + bytes;
+    }
   }
   if (grandTotals.docs === 0) {
     console.error('error: no bench documents found (fetch + split the corpus first, or check the language name)');
@@ -246,7 +255,9 @@ async function benchLanguage(
   report: BenchReport,
   grandTotals: SizeTotals,
   allDocs: LoadedDoc[]
-): Promise<{ shortTotals: SizeTotals; dictBytes: number; shortDictBytes: number } | undefined> {
+): Promise<
+  { shortTotals: SizeTotals; dictBytes: Record<string, number>; shortDictBytes: Record<string, number> } | undefined
+> {
   const docs = loadBenchDocs(language);
   if (docs.length === 0) {
     console.log(`\n${language}: no bench split (fetch + split the corpus first)`);
@@ -283,8 +294,13 @@ async function benchLanguage(
     printRow(bucket, totals);
   }
   accumulate(grandTotals, languageTotals);
-  const sessionDictBytes = dictBytes + fencedCollector.sessionExtraBytes();
-  const shortDictBytes = shortTotals.docs > 0 ? dictBytes + fencedCollector.shortExtraBytes() : 0;
+  const sessionDictBytes: Record<string, number> = {};
+  const shortDictBytes: Record<string, number> = {};
+  for (const method of METHODS) {
+    if (!method.usesDictionary) continue;
+    sessionDictBytes[method.name] = dictBytes + fencedCollector.sessionExtraBytes(method.name);
+    shortDictBytes[method.name] = shortTotals.docs > 0 ? dictBytes + fencedCollector.shortExtraBytes(method.name) : 0;
+  }
   const session = sessionOf(languageTotals, sessionDictBytes);
   const shortSession = sessionOf(shortTotals, shortDictBytes);
   printRow('all', languageTotals);
@@ -301,6 +317,7 @@ async function benchLanguage(
     docs: docs.length,
     registered,
     dictTransferBytes: sessionDictBytes,
+    shortDictTransferBytes: shortDictBytes,
     buckets,
     total: { inputBytes: languageTotals.inputBytes, ratios: ratiosOf(languageTotals) },
     session,
@@ -314,7 +331,7 @@ async function benchDoc(
   doc: LoadedDoc,
   totals: SizeTotals,
   roundTrip: BenchReport['roundTrip'],
-  onTokzipFrame?: (doc: LoadedDoc, encoded: string | Uint8Array) => void
+  onTokzipFrame?: (doc: LoadedDoc, methodName: string, encoded: string | Uint8Array) => void
 ): Promise<void> {
   totals.docs += 1;
   totals.inputBytes += doc.inputBytes;
@@ -323,7 +340,7 @@ async function benchDoc(
     let failure: string | undefined;
     try {
       const encoded = await method.compress(doc);
-      if (method.usesDictionary) onTokzipFrame?.(doc, encoded);
+      if (method.usesDictionary) onTokzipFrame?.(doc, method.name, encoded);
       totals.outputChars[index]! += encoded.length;
       roundTrip.checks += 1;
       if ((await method.decompress(encoded)) !== doc.content) failure = `${doc.language}/${doc.file} (${method.name})`;
@@ -339,10 +356,16 @@ async function benchDoc(
 
 const LANGUAGE_NAME_BY_ID = new Map(Object.entries(LANGUAGE_IDS).map(([name, id]) => [id, name]));
 
+function addFencedIds(map: Map<string, Set<number>>, methodName: string, ids: number[]): void {
+  let set = map.get(methodName);
+  if (!set) map.set(methodName, (set = new Set()));
+  for (const id of ids) set.add(id);
+}
+
 interface FencedCollector {
-  collect(doc: LoadedDoc, encoded: string | Uint8Array): void;
-  sessionExtraBytes(): number;
-  shortExtraBytes(): number;
+  collect(doc: LoadedDoc, methodName: string, encoded: string | Uint8Array): void;
+  sessionExtraBytes(methodName: string): number;
+  shortExtraBytes(methodName: string): number;
 }
 
 /**
@@ -354,32 +377,42 @@ interface FencedCollector {
  */
 function makeFencedCollector(): FencedCollector {
   const encoder = new TextEncoder();
-  const sessionIds = new Set<number>();
-  const shortIds = new Set<number>();
-  const scannedDocs = new Set<string>();
-  const transferOf = (ids: Set<number>): number => {
+  // FLAG_FENCED is per encoded frame, so fast and small can depend on different modules —
+  // dependencies are tracked per method, while the per-document fence scan is cached.
+  const sessionIds = new Map<string, Set<number>>();
+  const shortIds = new Map<string, Set<number>>();
+  const docFenceIds = new Map<string, number[]>();
+  const fenceIdsOf = (doc: LoadedDoc): number[] => {
+    const cached = docFenceIds.get(doc.file);
+    if (cached) return cached;
+    const frameId = languageByName(doc.registered ? doc.language : 'none')!.id;
+    const bytes = encoder.encode(doc.content);
+    const tracker = new FenceTracker(frameId);
+    const ids = new Set<number>();
+    for (let i = 0; i < bytes.length; i++) {
+      if (bytes[i] !== 10) continue;
+      const id = tracker.languageIdAt(bytes, i + 1);
+      if (id !== frameId) ids.add(id);
+    }
+    const list = [...ids];
+    docFenceIds.set(doc.file, list);
+    return list;
+  };
+  const transferOf = (map: Map<string, Set<number>>, methodName: string): number => {
     let bytes = 0;
-    for (const id of ids) bytes += dictionaryTransferBytes(LANGUAGE_NAME_BY_ID.get(id) ?? '');
+    for (const id of map.get(methodName) ?? []) bytes += dictionaryTransferBytes(LANGUAGE_NAME_BY_ID.get(id) ?? '');
     return bytes;
   };
   return {
-    collect(doc, encoded) {
+    collect(doc, methodName, encoded) {
       const flags = typeof encoded === 'string' ? RADIX64_ALPHABET.indexOf(encoded[2]!) : encoded[2]!;
-      if ((flags & FLAG_FENCED) === 0 || scannedDocs.has(doc.file)) return;
-      scannedDocs.add(doc.file);
-      const frameId = languageByName(doc.registered ? doc.language : 'none')!.id;
-      const bytes = encoder.encode(doc.content);
-      const tracker = new FenceTracker(frameId);
-      for (let i = 0; i < bytes.length; i++) {
-        if (bytes[i] !== 10) continue;
-        const id = tracker.languageIdAt(bytes, i + 1);
-        if (id === frameId) continue;
-        sessionIds.add(id);
-        if (SHORT_BUCKETS.has(doc.bucket)) shortIds.add(id);
-      }
+      if ((flags & FLAG_FENCED) === 0) return;
+      const ids = fenceIdsOf(doc);
+      addFencedIds(sessionIds, methodName, ids);
+      if (SHORT_BUCKETS.has(doc.bucket)) addFencedIds(shortIds, methodName, ids);
     },
-    sessionExtraBytes: () => transferOf(sessionIds),
-    shortExtraBytes: () => transferOf(shortIds),
+    sessionExtraBytes: (methodName) => transferOf(sessionIds, methodName),
+    shortExtraBytes: (methodName) => transferOf(shortIds, methodName),
   };
 }
 
@@ -409,16 +442,14 @@ function dictionaryTransferBytes(language: string): number {
   return bytes;
 }
 
-function sessionOf(totals: SizeTotals, dictBytes: number): SessionView {
+function sessionOf(totals: SizeTotals, dictBytes: Record<string, number>): SessionView {
   // A corpus can legitimately have no docs in a session (e.g. no short-bucket documents
   // under TOKZIP_CORPUS_DIR); ratiosOf would divide by zero and serialize NaN as null.
   if (totals.inputBytes === 0) return { docs: totals.docs, inputBytes: 0, ratios: {}, amortizedRatios: {} };
   const amortizedRatios = Object.fromEntries(
     METHODS.map((method, index) => [
       method.name,
-      totals.inputBytes === 0
-        ? 0
-        : round4((totals.outputChars[index]! + (method.usesDictionary ? dictBytes : 0)) / totals.inputBytes),
+      round4((totals.outputChars[index]! + (dictBytes[method.name] ?? 0)) / totals.inputBytes),
     ])
   );
   return { docs: totals.docs, inputBytes: totals.inputBytes, ratios: ratiosOf(totals), amortizedRatios };
@@ -428,7 +459,7 @@ function sessionOf(totals: SizeTotals, dictBytes: number): SessionView {
  * Cumulative input bytes at which a dictionary-carrying method's total transfer (output +
  * dictionary) drops below the reference codec's, assuming the language's average ratios.
  */
-function breakevenOf(totals: SizeTotals, dictBytes: number): Record<string, number | undefined> {
+function breakevenOf(totals: SizeTotals, dictBytes: Record<string, number>): Record<string, number | undefined> {
   const referenceIndex = METHOD_NAMES.indexOf(REFERENCE_METHOD);
   const result: Record<string, number | undefined> = {};
   if (referenceIndex === -1 || totals.inputBytes === 0) return result;
@@ -436,7 +467,8 @@ function breakevenOf(totals: SizeTotals, dictBytes: number): Record<string, numb
   for (const [index, method] of METHODS.entries()) {
     if (!method.usesDictionary) continue;
     const ratio = totals.outputChars[index]! / totals.inputBytes;
-    result[method.name] = ratio < referenceRatio ? Math.ceil(dictBytes / (referenceRatio - ratio)) : undefined;
+    result[method.name] =
+      ratio < referenceRatio ? Math.ceil((dictBytes[method.name] ?? 0) / (referenceRatio - ratio)) : undefined;
   }
   return result;
 }
@@ -557,8 +589,8 @@ interface TotalsForPrint {
   report: BenchReport;
   grand: SizeTotals;
   short: SizeTotals;
-  dictBytes: number;
-  shortDictBytes: number;
+  dictBytes: Record<string, number>;
+  shortDictBytes: Record<string, number>;
 }
 
 function printTotals({ report, grand, short, dictBytes, shortDictBytes }: TotalsForPrint): void {
@@ -578,7 +610,7 @@ function printTotals({ report, grand, short, dictBytes, shortDictBytes }: Totals
 }
 
 /** Session-amortized row computed from raw totals (single rounding at display time). */
-function printSessionRow(label: string, totals: SizeTotals, dictBytes: number): void {
+function printSessionRow(label: string, totals: SizeTotals, dictBytes: Record<string, number>): void {
   if (totals.docs === 0 || totals.inputBytes === 0) return;
   console.log(
     [
@@ -586,7 +618,7 @@ function printSessionRow(label: string, totals: SizeTotals, dictBytes: number): 
       String(totals.docs).padStart(columnWidth('docs')),
       String(totals.inputBytes).padStart(columnWidth('input')),
       ...METHODS.map((method, index) =>
-        `${(((totals.outputChars[index]! + (method.usesDictionary ? dictBytes : 0)) / totals.inputBytes) * 100).toFixed(1)}%`.padStart(
+        `${(((totals.outputChars[index]! + (dictBytes[method.name] ?? 0)) / totals.inputBytes) * 100).toFixed(1)}%`.padStart(
           columnWidth(method.name)
         )
       ),

@@ -743,16 +743,24 @@
         // Schema v3 adds the primary metric per language: short-session amortized ratio
         // (dictionary charged once) and the breakeven input volume vs the reference codec.
         const hasSessions = Object.values(latest.languages).some((entry) => entry.shortSession);
+        // dictTransferBytes was a single number in older reports and is a per-method
+        // record (with a short-session counterpart) in current schema-v3 reports.
+        const smallDictOf = (value) => (typeof value === 'number' ? value : value?.['tokzip small']);
         const sessionCells = (entry) => {
           if (!hasSessions) return '';
           const breakeven = entry.breakevenBytes?.['tokzip small'];
+          const fullDict = smallDictOf(entry.dictTransferBytes);
+          // The transfer shown beside the short-session ratio must use the same scope.
+          const shortDict = smallDictOf(entry.shortDictTransferBytes) ?? fullDict;
           return (
             `<td>${formatPercent(entry.shortSession?.amortizedRatios?.['tokzip small'])}</td>` +
-            `<td>${entry.dictTransferBytes ? (entry.dictTransferBytes / 1024).toFixed(1) + ' KB' : '—'}</td>` +
-            `<td>${typeof breakeven === 'number' ? (breakeven / 1024).toFixed(0) + ' KB' : entry.dictTransferBytes ? 'never' : '—'}</td>`
+            `<td>${shortDict ? (shortDict / 1024).toFixed(1) + ' KB' : '—'}</td>` +
+            `<td>${typeof breakeven === 'number' ? (breakeven / 1024).toFixed(0) + ' KB' : fullDict ? 'never' : '—'}</td>`
           );
         };
-        const sessionHeaders = hasSessions ? '<th>small sh+dict</th><th>dict transfer</th><th>breakeven</th>' : '';
+        const sessionHeaders = hasSessions
+          ? '<th>small sh+dict</th><th>sh dict transfer</th><th>breakeven (full session)</th>'
+          : '';
         const rows = Object.entries(latest.languages).map(
           ([language, entry]) =>
             `<tr><td>${language}</td><td>${entry.docs}</td>` +
