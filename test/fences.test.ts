@@ -2,6 +2,7 @@ import { expect, test } from 'bun:test';
 import { compress, decompress, TokzipDecodeError } from '../src/index.ts';
 import '../src/languages/index.ts';
 import { FLAG_FENCED } from '../src/format.ts';
+import { typescriptModule } from '../src/generated/typescript.ts';
 
 const RADIX64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 const MODES = ['fast', 'small'] as const;
@@ -25,15 +26,30 @@ export interface Config {
 }
 `;
 const PY_CODE = `import os\nfrom typing import Optional\n\ndef resolve(path: str) -> Optional[str]:\n    return os.path.abspath(path) if os.path.exists(path) else None\n`;
-// Distinct declarations (not repetition, which history matches would cover) so dictionary
-// gains dominate parse-heuristic noise and the flag expectation stays deterministic.
-const LONG_TS_CODE = `${TS_CODE}export async function fetchUsers(limit: number): Promise<readonly string[]> {
-  const response = await fetch(\`/api/users?limit=\${encodeURIComponent(String(limit))}\`);
-  if (!response.ok) throw new Error(\`unexpected status: \${response.status}\`);
-  return (await response.json()) as string[];
+// Fence content that is guaranteed to be coverable by extended dictionary matches
+// regardless of how the dictionary was trained: a literal printable-ASCII run taken from
+// the shipped typescript dictionary itself. Hand-written sample code would silently stop
+// matching whenever the dictionary is retrained (e.g. at a different --budget).
+const DICT_TS_CODE = `${TS_CODE}${dictionarySnippet()}`;
+
+function dictionarySnippet(): string {
+  const dictText = new TextDecoder('utf-8', { fatal: false }).decode(typescriptModule.dictionarySuffix);
+  // Longest run of printable ASCII / newlines, so the snippet is honest UTF-8 text.
+  let bestStart = 0;
+  let bestLength = 0;
+  let runStart = 0;
+  for (let i = 0; i <= dictText.length; i++) {
+    const code = i < dictText.length ? dictText.codePointAt(i)! : -1;
+    if (code === 10 || (code >= 32 && code < 127)) continue;
+    if (i - runStart > bestLength) {
+      bestStart = runStart;
+      bestLength = i - runStart;
+    }
+    runStart = i + 1;
+  }
+  if (bestLength < 64) throw new Error('typescript dictionary has no usable ASCII run for the fence tests');
+  return `${dictText.slice(bestStart, bestStart + Math.min(bestLength, 400))}\n`;
 }
-export const DEFAULT_OPTIONS = Object.freeze({ retries: 3, backoffMs: 250 });
-`;
 
 function docWith(label: string, code = TS_CODE): string {
   return `# Usage\n\nInstall the package and call the function as follows.\n\n\`\`\`${label}\n${code}\`\`\`\n\nThe function returns the formatted message.\n`;
@@ -53,8 +69,8 @@ test('fenced round-trips with extended matches in both modes and frame languages
 
 test('extended matches set flag bit 3 and shrink output versus an unknown label', () => {
   for (const mode of MODES) {
-    const fenced = compress(docWith('ts', LONG_TS_CODE), { language: 'none', mode });
-    const unknown = compress(docWith('mystery', LONG_TS_CODE), { language: 'none', mode });
+    const fenced = compress(docWith('ts', DICT_TS_CODE), { language: 'none', mode });
+    const unknown = compress(docWith('mystery', DICT_TS_CODE), { language: 'none', mode });
     expect(isFenced(fenced)).toBe(true);
     expect(isFenced(unknown)).toBe(false);
     expect(fenced.length).toBeLessThan(unknown.length);
@@ -85,8 +101,8 @@ test('CRLF fence lines resolve the label and round-trip', () => {
 });
 
 test('longer fences nest plain-fence content; unclosed blocks extend to the end', () => {
-  const nested = `\`\`\`\`ts\n${TS_CODE}\`\`\`ts\ninner fence line is content\n\`\`\`\`\n`;
-  const unclosed = `Intro line.\n\`\`\`ts\n${TS_CODE}`;
+  const nested = `\`\`\`\`ts\n${DICT_TS_CODE}\`\`\`ts\ninner fence line is content\n\`\`\`\`\n`;
+  const unclosed = `Intro line.\n\`\`\`ts\n${DICT_TS_CODE}`;
   for (const doc of [nested, unclosed]) {
     for (const mode of MODES) {
       const frame = compress(doc, { language: 'none', mode });

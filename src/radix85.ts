@@ -155,6 +155,30 @@ export function decodeRadix85(data: string, start: number, end: number): Uint32A
   return words;
 }
 
+/** Validates a radix-85 body (length, alphabet, group range) without allocating the words. */
+export function scanRadix85Body(data: string, start: number, end: number): void {
+  const length = end - start;
+  if (length % 5 !== 0) throw new TokzipDecodeError('radix-85 body length is not a multiple of 5');
+  const values = RADIX85_VALUES;
+  for (let i = start; i < end; i += 5) {
+    const c0 = asciiCodeAt(data, i);
+    const c1 = asciiCodeAt(data, i + 1);
+    const c2 = asciiCodeAt(data, i + 2);
+    const c3 = asciiCodeAt(data, i + 3);
+    const c4 = asciiCodeAt(data, i + 4);
+    if ((c0 | c1 | c2 | c3 | c4) >= 128) throwNonAlphabet(data, i);
+    const v0 = values[c0]!;
+    const v1 = values[c1]!;
+    const v2 = values[c2]!;
+    const v3 = values[c3]!;
+    const v4 = values[c4]!;
+    if ((v0 | v1 | v2 | v3 | v4) < 0) throwNonAlphabet(data, i);
+    if ((((v0 * 85 + v1) * 85 + v2) * 85 + v3) * 85 + v4 > 0xFF_FF_FF_FF) {
+      throw new TokzipDecodeError('radix-85 group out of range');
+    }
+  }
+}
+
 function throwNonAlphabet(data: string, groupStart: number): never {
   for (let d = 0; d < 5; d++) {
     const code = asciiCodeAt(data, groupStart + d);

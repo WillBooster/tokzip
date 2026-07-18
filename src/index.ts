@@ -5,6 +5,8 @@ import { registerLanguageModule } from './moduleRegistry.ts';
 registerLanguageModule(id0Module);
 
 export { compress, decompress, type CompressOptions, type DecompressOptions } from './container.ts';
+export { compressForStorage } from './storage.ts';
+export { inspectFrame, type FrameInfo } from './validator.ts';
 export {
   TokzipCompressionStream,
   TokzipDecompressionStream,

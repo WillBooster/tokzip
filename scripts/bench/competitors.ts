@@ -2,15 +2,20 @@
  * Competitor codecs for both benchmark channels: the text channel wraps each binary codec in
  * unpadded base64url (its complete binary-to-text framing cost), while the binary channel
  * measures the raw codec bytes.
+ *
+ * The primary competitors are the browser-native `CompressionStream` formats (gzip,
+ * deflate-raw), measured through the real Web Streams API — exactly what a client-side
+ * deployment can use without shipping a codec. brotli/zstd/xz are server-side or CLI-only
+ * references.
  */
 import { spawnSync } from 'node:child_process';
-import { brotliCompressSync, brotliDecompressSync, constants as zlibConstants, gunzipSync, gzipSync } from 'node:zlib';
+import { brotliCompressSync, brotliDecompressSync, constants as zlibConstants } from 'node:zlib';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
 export interface Competitor<Encoded extends string | Uint8Array = string> {
   name: string;
-  compress(input: string): Encoded;
-  decompress(encoded: Encoded): string;
+  compress(input: string): Encoded | Promise<Encoded>;
+  decompress(encoded: Encoded): string | Promise<string>;
   /**
    * Excluded from the speed benchmark (size and round-trip only). Used for CLI-backed
    * ratio references whose per-document process-spawn overhead would not measure the codec.
@@ -20,9 +25,41 @@ export interface Competitor<Encoded extends string | Uint8Array = string> {
 
 interface BinaryCodec {
   name: string;
-  compress(bytes: Uint8Array): Uint8Array;
-  decompress(bytes: Uint8Array): Uint8Array;
+  compress(bytes: Uint8Array): Uint8Array | Promise<Uint8Array>;
+  decompress(bytes: Uint8Array): Uint8Array | Promise<Uint8Array>;
   speedExempt?: boolean;
+}
+
+/** Pumps one buffer through a TransformStream (the browser CompressionStream usage). */
+async function transformBytes(
+  // Wide input side: CompressionStream/DecompressionStream accept any BufferSource.
+  stream: TransformStream<ArrayBuffer | ArrayBufferView, Uint8Array>,
+  input: Uint8Array
+): Promise<Uint8Array> {
+  const writer = stream.writable.getWriter();
+  const written = (async () => {
+    await writer.write(input);
+    await writer.close();
+    // A stream failure rejects both sides; the read loop below surfaces it, so the
+    // mirrored write-side rejection must not become an unhandled rejection.
+  })().catch(() => {});
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  const reader = stream.readable.getReader();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    total += value.length;
+  }
+  await written;
+  const out = new Uint8Array(total);
+  let at = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, at);
+    at += chunk.length;
+  }
+  return out;
 }
 
 // oxlint-disable-next-line no-explicit-any -- zstd is only in newer Node/Bun typings
@@ -38,6 +75,20 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 
 const binaryCodecs: BinaryCodec[] = [
+  // Browser-native primary competitors: the only codecs a client-side deployment gets for
+  // free, measured through the actual Web Streams API (per-document stream construction is
+  // part of the measured cost, as it is in a real browser).
+  {
+    name: 'cs gzip',
+    compress: (bytes) => transformBytes(new CompressionStream('gzip'), bytes),
+    decompress: (bytes) => transformBytes(new DecompressionStream('gzip'), bytes),
+  },
+  {
+    name: 'cs deflate-raw',
+    compress: (bytes) => transformBytes(new CompressionStream('deflate-raw'), bytes),
+    decompress: (bytes) => transformBytes(new DecompressionStream('deflate-raw'), bytes),
+  },
+  // Server-side references (not available to browser clients without shipping a codec).
   {
     name: 'brotli q11',
     compress: (bytes) => brotliCompressSync(bytes, { params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 11 } }),
@@ -47,11 +98,6 @@ const binaryCodecs: BinaryCodec[] = [
     name: 'brotli q5',
     compress: (bytes) => brotliCompressSync(bytes, { params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 5 } }),
     decompress: brotliDecompressSync,
-  },
-  {
-    name: 'gzip -6',
-    compress: (bytes) => gzipSync(bytes, { level: 6 }),
-    decompress: gunzipSync,
   },
 ];
 
@@ -95,8 +141,16 @@ export const competitors: Competitor[] = [
       name: `b64url(${codec.name})`,
       // Unpadded base64url is the shortest standard URL-safe framing and is therefore a
       // stronger baseline than the padded base64 previously used by this benchmark.
-      compress: (input) => Buffer.from(codec.compress(encoder.encode(input))).toString('base64url'),
-      decompress: (encoded) => decoder.decode(codec.decompress(Buffer.from(encoded, 'base64url'))),
+      compress: (input) => {
+        const out = codec.compress(encoder.encode(input));
+        return out instanceof Promise
+          ? out.then((bytes) => Buffer.from(bytes).toString('base64url'))
+          : Buffer.from(out).toString('base64url');
+      },
+      decompress: (encoded) => {
+        const out = codec.decompress(Buffer.from(encoded, 'base64url'));
+        return out instanceof Promise ? out.then((bytes) => decoder.decode(bytes)) : decoder.decode(out);
+      },
       speedExempt: codec.speedExempt,
     })
   ),
@@ -111,7 +165,10 @@ export const competitors: Competitor[] = [
 export const binaryCompetitors: Competitor<Uint8Array>[] = binaryCodecs.map((codec) => ({
   name: codec.name,
   compress: (input) => codec.compress(encoder.encode(input)),
-  decompress: (encoded) => decoder.decode(codec.decompress(encoded)),
+  decompress: (encoded) => {
+    const out = codec.decompress(encoded);
+    return out instanceof Promise ? out.then((bytes) => decoder.decode(bytes)) : decoder.decode(out);
+  },
   speedExempt: codec.speedExempt,
 }));
 

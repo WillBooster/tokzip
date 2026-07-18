@@ -1,4 +1,4 @@
-# tokzip frame format (version 3)
+# tokzip frame format (version 1)
 
 This document is the normative wire-format specification for tokzip payloads. It is
 self-contained so the format can be ported to other implementation languages. The reference
@@ -9,9 +9,13 @@ entropy coding: the **text frame** (sections 1–11) — a safe-ASCII string gen
 pass, with no binary intermediate and no base64 stage — and the **binary frame** (§12) — the
 same streams packed at 8 bits per byte for binary transports. Trailing characters (or bytes)
 after the frame are a structural error. All structural errors MUST be reported as a typed
-decode error (`TokzipDecodeError` in the reference implementation); valid-looking corruption
-MAY decode to wrong output without throwing (there is no integrity checksum in v3; a flag
-bit is reserved).
+decode error (`TokzipDecodeError` in the reference implementation). Every frame carries a
+CRC-32 of its decompressed content (§2.4), so corruption that survives the structural checks
+is still caught: decoders MUST verify the checksum before returning output.
+
+The format is pre-release and still evolving: a version bump invalidates all previously
+written payloads (decoders reject other versions as "unknown version", never misdecode
+them), and no cross-version compatibility is provided.
 
 ## 1. Alphabets
 
@@ -59,10 +63,31 @@ characters. Tail rule (normative): 1 trailing byte → 2 characters (byte in the
 bits), 2 trailing bytes → 3 characters (bytes in the high 16 of 18 bits). Padding bits are
 zero on encode and ignored on decode.
 
+### 2.4 Content checksum (CRC-32)
+
+The checksum is CRC-32 as used by gzip and zlib (IEEE 802.3: reflected polynomial
+`0xEDB88320`, initial value and final XOR `0xFFFFFFFF`). For frames it is computed over the
+**decompressed content bytes** (for string inputs, their UTF-8 encoding) **followed by one
+input-type byte**: `0x00` for string frames, `0x01` for bytes frames. Folding the type into
+the checksum domain means a corrupted input-type flag (§3 bit 2) fails the checksum instead
+of silently changing the returned type of byte-identical content. Stream blocks (§13.2)
+carry no type flag, so their checksum covers the raw block bytes only.
+
+- **Text encoding**: 6 radix-64 characters, little-endian 6-bit groups (group `i` holds CRC
+  bits `6i … 6i+5`). The last group holds only bits 30–31; a last group above 3 is a
+  structural error (canonical encoding).
+- **Binary encoding**: 4 little-endian bytes.
+
+Decoders MUST compute the CRC-32 of the decoded content and reject a mismatch as a
+structural error ("checksum mismatch") before returning any output. The checksum guards
+content integrity end to end — a payload that decodes structurally but to the wrong bytes
+(bit flips that survive the entropy coder, a mismatched dictionary, a decoder defect) fails
+loudly instead of returning silently wrong data.
+
 ## 3. Frame layout
 
 ```
-[0] magic|version   radix-64 char; value 0b110_011 (51, char 'z') for v3.
+[0] magic|version   radix-64 char; value 0b110_001 (49, char 'x') for v1.
 [1] language id     radix-64 char; 0–63.
 [2] flags           radix-64 char:
                       bits 1:0  shipped mode: 0 stored, 1 fast, 2 small; 3 is invalid
@@ -70,6 +95,7 @@ zero on encode and ignored on decode.
                       bit  3    fenced dictionary extension (§6.1)
                       bits 5:4  reserved; encoders write 0, decoders reject non-zero
 [3…] decompressed size   radix-64 varint (bytes of the decompressed payload)
+[…]  content checksum    6 radix-64 chars (§2.4)
 […]  body                per shipped mode (sections 5–7)
 ```
 
@@ -83,7 +109,7 @@ zero on encode and ignored on decode.
   callers use the bytes path.)
 - Frames are single: any character after the body is a structural error.
 
-## 4. Language ids (v3 allocation, unchanged since v1)
+## 4. Language ids
 
 | id  | language            |     | id  | language   |
 | --- | ------------------- | --- | --- | ---------- |
@@ -109,8 +135,8 @@ frames need zero registration).
 
 The declared number of bytes, packed per §2.3. The body character count MUST equal exactly
 `packedLength(size)`; anything shorter is truncation, anything longer is trailing characters.
-Total frame overhead is exactly header (3) + size varint — the format never expands input
-beyond that plus the 4/3 packing tax.
+Total frame overhead is exactly header (3) + size varint + checksum (6) — the format never
+expands input beyond that plus the 4/3 packing tax.
 
 ## 6. Dictionaries and the shared LZ token model
 
@@ -349,7 +375,7 @@ Only the winning frame is emitted; ties choose the simpler encoding
 dictionary start ≥ 2^18, or explicit match shorter than 4), the fast candidate is ineligible
 and the comparison is small vs stored. The header records what shipped; decoders branch only
 on that. `fast`-mode encoding performs the same fast-vs-stored comparison. Consequently
-output never expands beyond header + size varint + stored body.
+output never expands beyond header + size varint + checksum + stored body.
 
 Downgrade sizing MUST be exact (not estimated) so the shipped mode is deterministic across
 conforming implementations given the same token list.
@@ -378,7 +404,10 @@ library version or re-encode; see the tracking issue on versioned module assets.
 Executable vectors live in `test/conformance.test.ts` and `test/roundtrip.test.ts`; the
 normative list mirrors the design issue:
 
-empty input (exact frame `zAAA`); tiny stored frame (exact overhead bound); history /
+empty input (exact frame `xAAAN-uASD`); tiny stored frame (exact overhead bound);
+flipped input-type flag alone fails the checksum;
+checksum mismatch on a structurally valid but corrupted body, on a corrupted checksum
+field, and on binary frames; history /
 dictionary / rep / overlap-copy matches; 12-bit vs 18-bit offset forms; single-symbol and
 degenerate streams (raw stream modes); downgrade tie and determinism; invalid table; unknown
 id on non-stored frames; stored frame with nonzero id (decodes); unknown version; reserved
@@ -403,13 +432,14 @@ through the text alphabets, for transports that accept raw bytes. A `fast` body 
 ### 12.1 Frame layout
 
 ```
-[0] magic|version   byte 0xB3: bit 7 set (never a safe-ASCII char) over the text
-                    container's 6-bit magic/version value 0b110_011.
+[0] magic|version   byte 0xB1: bit 7 set (never a safe-ASCII char) over the text
+                    container's 6-bit magic/version value 0b110_001.
 [1] language id     byte; ids per §4.
 [2] flags           byte; bits 3:0 as §3, bits 7:4 reserved (encoders write 0,
                     decoders reject non-zero).
 [3…] decompressed size   byte varint: little-endian 7-bit groups, bit 7 = continue,
                          canonical (minimal, no zero final group), max 5 bytes (35 bits).
+[…]  content checksum    4 little-endian bytes (§2.4)
 […]  body                per shipped mode (§12.2)
 ```
 
@@ -442,29 +472,34 @@ size (the binary stored body).
 
 Streams carry unbounded input as a sequence of blocks over the binary channel. A stream is
 NOT a frame: it has its own magic allocation and its own version counter (stream-format
-version 0), and blocks reuse the §12.2 body encodings.
+version 1), and blocks reuse the §12.2 body encodings.
 
 ### 13.1 Stream layout
 
 ```
-[0] magic|version   byte 0xB8 (0b1011_1000): bit 7 set (binary channel), bit 6 zero, magic
+[0] magic|version   byte 0xB9 (0b1011_1001): bit 7 set (binary channel), bit 6 zero, magic
                     0b111 in bits 5:3 (disjoint from the frame magic 0b110 for every frame
-                    version), stream-format version (0) in bits 2:0.
+                    version), stream-format version (1) in bits 2:0.
 [1] language id     byte; 0–255 (the §4 allocation).
 [2] flags           byte:
                       bits 1:0  stream mode: 1 fast, 2 small; 0 and 3 are invalid
                       bit  2    window carry-over (§13.3)
                       bits 7:3  reserved; encoders write 0, decoders reject non-zero
 […]  blocks          zero or more block records (§13.2)
-[…]  terminator      one 0x00 byte (a zero block-body-length varint)
+[…]  terminator      one 0x00 byte (a zero block-body-length varint), then the total
+                     decompressed size as a byte varint (max 8 bytes — it spans the whole
+                     stream, beyond the per-block 35-bit bound), then 4 little-endian
+                     bytes: the final chained CRC-32 (§13.2) of the decompressed stream
 ```
 
 Byte varints are the §12 byte varints (little-endian 7-bit groups, continue bit 7,
-canonical, max 5 bytes). A first byte matching `0xB8` in bits 7:3 (bit 7 set, bit 6 zero,
+canonical). Block body-length and raw-size fields keep the §12 five-byte (35-bit) maximum;
+only the terminator's total-size varint permits up to 8 bytes, because it spans the whole
+stream. A first byte matching `0xB9` in bits 7:3 (bit 7 set, bit 6 zero,
 magic `0b111`) with a different version in bits 2:0 is "unknown version"; any other
 non-frame first byte is "bad magic". Bytes after
 the terminator, or a stream ending without it, are structural errors. A stream whose only
-content is the header and terminator encodes the empty input.
+content is the header and terminator (total 0, final CRC 0) encodes the empty input.
 
 ### 13.2 Block records
 
@@ -472,8 +507,18 @@ content is the header and terminator encodes the empty input.
 [0…] body length    byte varint, ≥ 1 (0 is the stream terminator)
 […]  block mode     byte: 0 stored, 1 fast, 2 small
 […]  raw size       byte varint, ≥ 1 (decompressed bytes of this block)
+[…]  block checksum 4 little-endian bytes: the finalized **chained** CRC-32 (§2.4
+                    polynomial) over ALL decompressed bytes of the stream up to and
+                    including this block (the CRC state carries across blocks and is
+                    finalized per record without resetting)
 […]  body           §12.2 body for the block mode
 ```
+
+The chain makes every record's checksum depend on the entire decompressed prefix, so a
+deleted, reordered, duplicated, or substituted block — each individually intact — fails the
+next checksum, and the terminator's total size + final CRC catch deletion of trailing
+blocks. Decoders MUST verify each block's chained checksum and the terminator's total and
+final CRC, and reject mismatches as structural errors.
 
 - The raw size MUST be validated against the decoder's block limit (implementation default
   64 MiB), and every constraint below MUST be checked, **before** the decoder buffers the

@@ -1,4 +1,5 @@
-import { pushByteVarint } from './container.ts';
+import { CRC_INITIAL_STATE, crc32Append, crc32Finalize } from './checksum.ts';
+import { pushByteVarint, pushCrc32Binary, readCrc32Binary } from './container.ts';
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
 import { decodeFastBodyBinary, emitFastBody, fastBodyCost, fastPricing, packFastCodes } from './fastMode.ts';
@@ -9,10 +10,10 @@ import { decodeSmallBodyBinary, emitSmallBody, planSmallBody, smallPricing } fro
 
 /**
  * First byte of every tokzip stream: bit 7 set (binary channel) over low-6 magic 0b111 and
- * stream-format version 0 — disjoint from every frame magic (low-6 magic 0b110) so streams
+ * stream-format version 1 — disjoint from every frame magic (low-6 magic 0b110) so streams
  * and one-shot frames can never be confused.
  */
-const STREAM_MAGIC_VERSION = 0b1011_1000;
+const STREAM_MAGIC_VERSION = 0b1011_1001;
 
 /**
  * Stream flags byte: bits 1:0 carry the stream mode (fast/small); bit 2 marks window
@@ -24,6 +25,8 @@ const STREAM_FLAG_CARRY = 0b100;
 const STREAM_RESERVED_FLAG_MASK = 0b1111_1000;
 
 const BYTE_VARINT_MAX_BYTES = 5;
+/** The terminator's total-size varint spans the whole stream: 8 groups = 56 bits ≥ 2^53. */
+const TERMINATOR_VARINT_MAX_BYTES = 8;
 
 const DEFAULT_BLOCK_SIZE = 1 << 18; // 256 KB (matches the fast-mode window).
 const MIN_BLOCK_SIZE = 1 << 10;
@@ -118,6 +121,9 @@ class BlockEncoder {
   private pending: Uint8Array[] = [];
   private pendingLength = 0;
   private headerWritten = false;
+  /** Chained CRC over all raw bytes emitted so far (see checksum.ts). */
+  private crcState = CRC_INITIAL_STATE;
+  private totalRawBytes = 0;
   /** Trailing high surrogate held back from the previous string chunk (see push). */
   private pendingHighSurrogate = '';
 
@@ -181,9 +187,12 @@ class BlockEncoder {
       // and corrupts output identically there, so no defensive copy is paid here.
       bytes = chunk;
     }
-    if (bytes.length === 0) return;
-    this.pending.push(bytes);
-    this.pendingLength += bytes.length;
+    if (bytes.length > 0) {
+      this.pending.push(bytes);
+      this.pendingLength += bytes.length;
+    }
+    // Drained even when this chunk itself was empty: a flushed held-back surrogate above
+    // can push the pending queue past the block size on its own.
     while (this.pendingLength >= this.blockSize) this.emitBlock(this.takeBlock(this.blockSize), controller);
   }
 
@@ -198,9 +207,13 @@ class BlockEncoder {
       while (this.pendingLength >= this.blockSize) this.emitBlock(this.takeBlock(this.blockSize), controller);
     }
     if (this.pendingLength > 0) this.emitBlock(this.takeBlock(this.pendingLength), controller);
-    const out = new TextSink(4);
+    const out = new TextSink(16);
     if (!this.headerWritten) this.writeHeader(out);
     out.push(0); // End-of-stream marker (a zero block-length varint).
+    // Authenticated terminator: total raw size + final chained CRC, so dropping trailing
+    // blocks (every block prefix is internally consistent) is still detected.
+    pushByteVarint(out, this.totalRawBytes);
+    pushCrc32Binary(out, crc32Finalize(this.crcState));
     controller.enqueue(out.toBytes());
   }
 
@@ -292,11 +305,16 @@ class BlockEncoder {
     }
     if (mode === MODE_STORED) body = block;
 
-    const out = new TextSink(body!.length + 16);
+    const out = new TextSink(body!.length + 20);
     if (!this.headerWritten) this.writeHeader(out);
     pushByteVarint(out, body!.length);
     out.push(mode);
     pushByteVarint(out, block.length);
+    // Chained, not per-block: the stored value is the cumulative CRC of every raw byte up
+    // to and including this block, so block deletion/reordering/replay breaks the chain.
+    this.crcState = crc32Append(this.crcState, block);
+    this.totalRawBytes += block.length;
+    pushCrc32Binary(out, crc32Finalize(this.crcState));
     out.append(body!);
     controller.enqueue(out.toBytes());
 
@@ -321,6 +339,9 @@ class BlockDecoder {
   private carry = false;
   private window = 0;
   private history: Uint8Array = new Uint8Array(0);
+  /** Chained CRC over all raw bytes produced so far (mirrors the encoder). */
+  private crcState = CRC_INITIAL_STATE;
+  private totalRawBytes = 0;
   private done = false;
 
   constructor(options?: DecompressionStreamOptions) {
@@ -374,10 +395,10 @@ class BlockDecoder {
   }
 
   /** Reads a canonical byte varint at `pos`, or undefined when more input is needed. */
-  private tryReadVarint(pos: number): { value: number; pos: number } | undefined {
+  private tryReadVarint(pos: number, maxBytes = BYTE_VARINT_MAX_BYTES): { value: number; pos: number } | undefined {
     let value = 0;
     let shift = 1;
-    for (let i = 0; i < BYTE_VARINT_MAX_BYTES; i++) {
+    for (let i = 0; i < maxBytes; i++) {
       if (pos >= this.length) return undefined;
       const group = this.buffer[pos++]!;
       value += (group & 127) * shift;
@@ -422,7 +443,17 @@ class BlockDecoder {
     if (!lengthField) return false;
     const bodyLength = lengthField.value;
     if (bodyLength === 0) {
-      this.offset = lengthField.pos;
+      // Authenticated terminator: total raw size + final chained CRC. Verifying it catches
+      // trailing-block deletion, which every per-block check necessarily misses. The total
+      // spans the whole stream, beyond the per-block 35-bit bound — 8 groups cover 2^53
+      // (Number.MAX_SAFE_INTEGER), which the byte counter cannot exceed anyway.
+      const totalField = this.tryReadVarint(lengthField.pos, TERMINATOR_VARINT_MAX_BYTES);
+      if (!totalField) return false;
+      if (this.length - totalField.pos < 4) return false;
+      const declaredCrc = readCrc32Binary(this.buffer, totalField.pos);
+      if (totalField.value !== this.totalRawBytes) throw new TokzipDecodeError('stream length mismatch');
+      if (declaredCrc !== crc32Finalize(this.crcState)) throw new TokzipDecodeError('checksum mismatch');
+      this.offset = totalField.pos + 4;
       this.done = true;
       if (this.available() > 0) throw new TokzipDecodeError('trailing bytes after end of stream');
       return false;
@@ -432,7 +463,8 @@ class BlockDecoder {
     const rawField = this.tryReadVarint(lengthField.pos + 1);
     if (!rawField) return false;
     const rawLength = rawField.value;
-    const bodyStart = rawField.pos;
+    // The 4-byte block CRC sits between the raw-length varint and the body.
+    const bodyStart = rawField.pos + 4;
 
     // Every prefix-derived constraint is enforced BEFORE waiting for the body: a hostile
     // stream declaring a huge body must fail here, not after the decoder has buffered it —
@@ -455,6 +487,7 @@ class BlockDecoder {
       throw new TokzipDecodeError('invalid mode');
     }
     if (this.length - bodyStart < bodyLength) return false;
+    const declaredCrc = readCrc32Binary(this.buffer, bodyStart - 4);
 
     const bodyEnd = bodyStart + bodyLength;
     let out: Uint8Array;
@@ -468,6 +501,9 @@ class BlockDecoder {
           ? decodeFastBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history)
           : decodeSmallBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history);
     }
+    this.crcState = crc32Append(this.crcState, out);
+    this.totalRawBytes += out.length;
+    if (crc32Finalize(this.crcState) !== declaredCrc) throw new TokzipDecodeError('checksum mismatch');
     this.offset = bodyEnd;
     // Keep the window's worth of produced output as the next block's history.
     if (this.carry) {

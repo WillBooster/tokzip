@@ -64,7 +64,10 @@ export function fastPricing(bytes: Uint8Array, language: RegisteredLanguage): Pa
     repCost: (_r, len) => matchCharCost('rep', 0, len),
     historyCost: (dist, len) => matchCharCost('history', dist - 1, len),
     dictCost: (start, len) => matchCharCost('dict', start, len),
-    lazy: false,
+    // Encoder-side policy (format-compatible): the bounded price-aware lazy step benches
+    // 1–2% smaller for a modest compression-speed cost, which the storage workload
+    // (KB-scale documents compressed client-side) happily pays.
+    lazy: true,
     window: FAST_WINDOW,
     maxDictStart: FAST_WINDOW,
   };
