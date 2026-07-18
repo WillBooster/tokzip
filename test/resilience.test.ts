@@ -258,6 +258,23 @@ describe('inspectFrame', () => {
     expect(() => inspectFrame(oversizedBinary.subarray(0, 11))).toThrow(/body capacity|truncated/);
   });
 
+  test('rejects malformed text bodies (alphabet and radix-85 word boundary)', () => {
+    // Findings from review: these are decidable without decoding, so a pass-through server
+    // must reject them like decompress does.
+    const doc = 'export const value = { answer: 42, name: "example" };\n'.repeat(20);
+    const small = compress(doc, { language: 'typescript', mode: 'small' });
+    expect(inspectFrame(small).mode).toBe('small');
+    expect(() => inspectFrame(small.slice(0, -1))).toThrow(/multiple of 5|non-canonical|truncated/);
+    const bodyAt = small.length - 3;
+    expect(() => inspectFrame(small.slice(0, bodyAt) + '%' + small.slice(bodyAt + 1))).toThrow(/non-alphabet/);
+    expect(() => inspectFrame(small.slice(0, - 5) + '~~~~~')).toThrow(/out of range|non-alphabet/);
+
+    const fast = compress(doc, { language: 'typescript', mode: 'fast' });
+    expect(inspectFrame(fast).mode).toBe('fast');
+    const fastBodyAt = fast.length - 2;
+    expect(() => inspectFrame(fast.slice(0, fastBodyAt) + '%' + fast.slice(fastBodyAt + 1))).toThrow(/non-alphabet/);
+  });
+
   test('accepts every fuzz-seed frame on both channels', () => {
     for (const doc of SEED_DOCS) {
       for (const mode of ['fast', 'small'] as const) {

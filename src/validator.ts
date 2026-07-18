@@ -13,7 +13,8 @@ import {
   MODE_STORED,
   RESERVED_FLAG_MASK,
 } from './format.ts';
-import { packedRawLength, readRadix64, readVarint64 } from './radix64.ts';
+import { asciiCodeAt, packedRawLength, RADIX64_VALUES, readRadix64, readVarint64 } from './radix64.ts';
+import { scanRadix85Body } from './radix85.ts';
 
 /** Header facts of a structurally plausible frame (see {@link inspectFrame}). */
 export interface FrameInfo {
@@ -64,14 +65,19 @@ function inspectText(data: string): FrameInfo {
   if (mode === MODE_STORED) {
     if (bodyLength < packedRawLength(contentBytes)) throw new TokzipDecodeError('truncated payload');
     if (bodyLength > packedRawLength(contentBytes)) throw new TokzipDecodeError('trailing characters after payload');
+    scanRadix64Body(data, bodyStart);
   } else if (mode === MODE_FAST || mode === MODE_SMALL) {
     // A compressed body producing content is at least one unit long; header-only frames
     // with a nonzero declared size are missing their payload.
     if (bodyLength === 0 && contentBytes > 0) throw new TokzipDecodeError('truncated payload');
+    // Body alphabet is decidable without decoding: stored/fast bodies are radix-64, small
+    // bodies are whole 32-bit radix-85 words (which also pins bodyLength % 5 === 0).
+    if (mode === MODE_FAST) scanRadix64Body(data, bodyStart);
+    else scanRadix85Body(data, bodyStart, data.length);
     // Theoretical capacity bound, mirroring the decoders: every fast token consumes ≥ 1
     // char (small: ≥ 1 bit, 5 chars = 32 bits) and produces ≤ MATCH_LEN_CAP bytes, so a
     // larger declared size is structurally unproducible from this body.
-    const capacity = mode === MODE_FAST ? bodyLength * MATCH_LEN_CAP : Math.ceil(bodyLength / 5) * 32 * MATCH_LEN_CAP;
+    const capacity = mode === MODE_FAST ? bodyLength * MATCH_LEN_CAP : (bodyLength / 5) * 32 * MATCH_LEN_CAP;
     if (contentBytes > capacity) throw new TokzipDecodeError('declared size exceeds body capacity');
     if (bodyLength >= packedRawLength(contentBytes)) {
       throw new TokzipDecodeError('non-canonical frame: body not smaller than stored');
@@ -116,6 +122,16 @@ function inspectBinary(data: Uint8Array): FrameInfo {
     throw new TokzipDecodeError('invalid mode');
   }
   return frameInfo('binary', languageId, flags, contentBytes, checksum, data.length);
+}
+
+/** Rejects any non-radix-64 character in a text stored/fast body. */
+function scanRadix64Body(data: string, start: number): void {
+  for (let i = start; i < data.length; i++) {
+    const code = asciiCodeAt(data, i);
+    if (code >= 128 || RADIX64_VALUES[code]! < 0) {
+      throw new TokzipDecodeError(`non-alphabet character at position ${i}`);
+    }
+  }
 }
 
 function frameInfo(

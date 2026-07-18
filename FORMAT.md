@@ -493,7 +493,9 @@ version 1), and blocks reuse the §12.2 body encodings.
 ```
 
 Byte varints are the §12 byte varints (little-endian 7-bit groups, continue bit 7,
-canonical, max 5 bytes). A first byte matching `0xB9` in bits 7:3 (bit 7 set, bit 6 zero,
+canonical). Block body-length and raw-size fields keep the §12 five-byte (35-bit) maximum;
+only the terminator's total-size varint permits up to 8 bytes, because it spans the whole
+stream. A first byte matching `0xB9` in bits 7:3 (bit 7 set, bit 6 zero,
 magic `0b111`) with a different version in bits 2:0 is "unknown version"; any other
 non-frame first byte is "bad magic". Bytes after
 the terminator, or a stream ending without it, are structural errors. A stream whose only
