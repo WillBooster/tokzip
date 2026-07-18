@@ -1,0 +1,33 @@
+name: Rust
+on:
+  pull_request:
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust.yml'
+concurrency:
+  group: rust-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+      - run: cargo fmt --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --locked --release
