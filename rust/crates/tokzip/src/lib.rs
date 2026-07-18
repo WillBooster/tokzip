@@ -66,14 +66,17 @@ pub fn decompress(frame: &[u8], _dictionary: Option<&[u8]>) -> Result<Vec<u8>, D
         return Err(DecodeError::UnsupportedVersion(frame[1]));
     }
     let expected_crc = u32::from_le_bytes([frame[3], frame[4], frame[5], frame[6]]);
-    let content = match frame[2] {
-        0 => frame[HEADER_LEN..].to_vec(),
-        m => return Err(DecodeError::UnknownMethod(m)),
-    };
-    if crc32fast::hash(&content) != expected_crc {
-        return Err(DecodeError::ChecksumMismatch);
+    match frame[2] {
+        // Stored content can be CRC-checked in place, before the output allocation.
+        0 => {
+            let body = &frame[HEADER_LEN..];
+            if crc32fast::hash(body) != expected_crc {
+                return Err(DecodeError::ChecksumMismatch);
+            }
+            Ok(body.to_vec())
+        }
+        m => Err(DecodeError::UnknownMethod(m)),
     }
-    Ok(content)
 }
 
 #[cfg(test)]

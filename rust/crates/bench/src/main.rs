@@ -15,6 +15,7 @@ use std::process::Command;
 #[derive(Deserialize)]
 struct ManifestEntry {
     file: String,
+    #[serde(default)]
     split: String,
     #[serde(default)]
     trainable: bool,
@@ -39,37 +40,57 @@ fn main() {
     let dict_dir = repo_root.join(".tmp/zstd-bench");
     std::fs::create_dir_all(&dict_dir).expect("create dict dir");
 
-    let requested: Vec<String> = std::env::args().skip(1).collect();
+    // A corpus language is a directory with a manifest; other directories (docs,
+    // scratch output, …) are not benchmark targets and are skipped silently.
     let mut languages: Vec<String> = std::fs::read_dir(&corpus_dir)
-        .expect("corpus dir (set TOKZIP_CORPUS_DIR or clone ../tokzip-corpus)")
-        .filter_map(|e| e.ok())
-        .filter(|e| e.path().is_dir())
+        .unwrap_or_else(|e| {
+            panic!(
+                "cannot read corpus dir {} (set TOKZIP_CORPUS_DIR or clone ../tokzip-corpus): {e}",
+                corpus_dir.display()
+            )
+        })
+        .map(|e| e.expect("read corpus dir entry"))
+        .filter(|e| e.path().join("manifest.jsonl").is_file())
         .map(|e| e.file_name().to_string_lossy().into_owned())
-        .filter(|l| requested.is_empty() || requested.contains(l))
         .collect();
     languages.sort();
+
+    let requested: Vec<String> = std::env::args().skip(1).collect();
+    let unknown: Vec<&String> = requested
+        .iter()
+        .filter(|r| !languages.contains(r))
+        .collect();
+    assert!(
+        unknown.is_empty(),
+        "unknown language(s) {unknown:?}; available: {languages:?}"
+    );
+    if !requested.is_empty() {
+        languages.retain(|l| requested.contains(l));
+    }
 
     let mut totals: BTreeMap<&str, Acc> =
         BUCKETS.iter().map(|(n, _)| (*n, Acc::default())).collect();
 
     for lang in &languages {
         let manifest_path = corpus_dir.join(lang).join("manifest.jsonl");
-        let Ok(manifest) = std::fs::read_to_string(&manifest_path) else {
-            continue;
-        };
+        let manifest = std::fs::read_to_string(&manifest_path)
+            .unwrap_or_else(|e| panic!("cannot read {}: {e}", manifest_path.display()));
         let entries: Vec<ManifestEntry> = manifest
             .lines()
             .filter(|l| !l.is_empty())
             .map(|l| serde_json::from_str(l).expect("manifest entry"))
             .collect();
 
-        let dict_path = dict_dir.join(format!("{lang}.dict"));
+        let train_files: Vec<PathBuf> = entries
+            .iter()
+            .filter(|e| e.split == "train" && e.trainable)
+            .map(|e| corpus_dir.join(lang).join(&e.file))
+            .collect();
+        let dict_path = dict_dir.join(format!(
+            "{lang}-{}.dict",
+            train_fingerprint(&corpus_dir, &train_files)
+        ));
         if !dict_path.exists() {
-            let train_files: Vec<PathBuf> = entries
-                .iter()
-                .filter(|e| e.split == "train" && e.trainable)
-                .map(|e| corpus_dir.join(lang).join(&e.file))
-                .collect();
             let status = Command::new("zstd")
                 .arg("--train")
                 .args(&train_files)
@@ -77,10 +98,16 @@ fn main() {
                 .arg(&dict_path)
                 .arg("-q")
                 .status()
-                .expect("run zstd --train");
+                .expect("run zstd --train (is the zstd CLI installed?)");
             assert!(status.success(), "zstd --train failed for {lang}");
         }
         let dict = std::fs::read(&dict_path).expect("read dictionary");
+        // Digesting a level-19 dictionary costs ~5ms; per-document construction would
+        // dominate the whole run, so build the contexts once per language.
+        let mut dict_compressor =
+            zstd::bulk::Compressor::with_dictionary(19, &dict).expect("zstd compressor");
+        let mut dict_decompressor =
+            zstd::bulk::Decompressor::with_dictionary(&dict).expect("zstd decompressor");
 
         let mut lang_acc = Acc::default();
         for entry in entries.iter().filter(|e| e.split == "bench") {
@@ -96,8 +123,14 @@ fn main() {
             );
             sizes.insert("tokzip-rs", frame.len() as u64);
 
-            sizes.insert("zstd19+dict", zstd_round_trip(&raw, Some(&dict)));
-            sizes.insert("zstd19", zstd_round_trip(&raw, None));
+            let with_dict = dict_compressor.compress(&raw).expect("zstd compress");
+            let restored = dict_decompressor
+                .decompress(&with_dict, raw.len() + 1)
+                .expect("zstd decompress");
+            assert_eq!(restored, raw, "zstd+dict round-trip mismatch");
+            sizes.insert("zstd19+dict", with_dict.len() as u64);
+
+            sizes.insert("zstd19", zstd_round_trip_nodict(&raw));
 
             let best = *sizes.values().min().unwrap();
             let raw_len = raw.len();
@@ -127,17 +160,13 @@ fn main() {
         }
         let cells: Vec<String> = METHODS
             .iter()
-            .map(|m| {
-                format!(
-                    "{m} {:.1}%",
-                    100.0 * lang_acc.sizes[m] as f64 / lang_acc.raw as f64
-                )
-            })
+            .map(|m| format!("{m} {}", ratio(&lang_acc, m)))
             .collect();
         println!(
-            "{lang:<11} docs={:>3} raw={:>5}KB  {}",
+            "{lang:<11} docs={:>3} raw={:>5}KB dict={}KB  {}",
             lang_acc.docs,
             lang_acc.raw / 1024,
+            dict.len() / 1024,
             cells.join("  ")
         );
     }
@@ -148,29 +177,42 @@ fn main() {
         println!("\n[{name}] docs={} raw={}KB", acc.docs, acc.raw / 1024);
         for m in METHODS {
             println!(
-                "  {m:<13} {:>6.2}%  wins={}",
-                100.0 * acc.sizes[m] as f64 / acc.raw as f64,
+                "  {m:<13} {:>6}  wins={}",
+                ratio(acc, m),
                 acc.wins.get(m).copied().unwrap_or(0)
             );
         }
     }
 }
 
-fn zstd_round_trip(raw: &[u8], dict: Option<&[u8]>) -> u64 {
-    let compressed = match dict {
-        Some(d) => zstd::bulk::Compressor::with_dictionary(19, d)
-            .expect("zstd compressor")
-            .compress(raw)
-            .expect("zstd compress"),
-        None => zstd::bulk::compress(raw, 19).expect("zstd compress"),
-    };
-    let restored = match dict {
-        Some(d) => zstd::bulk::Decompressor::with_dictionary(d)
-            .expect("zstd decompressor")
-            .decompress(&compressed, raw.len() + 1)
-            .expect("zstd decompress"),
-        None => zstd::bulk::decompress(&compressed, raw.len() + 1).expect("zstd decompress"),
-    };
+/// Compressed/raw percentage, or `n/a` for an empty accumulator.
+fn ratio(acc: &Acc, method: &str) -> String {
+    if acc.raw == 0 {
+        return "n/a".to_string();
+    }
+    let size = acc.sizes.get(method).copied().unwrap_or(0);
+    format!("{:.2}%", 100.0 * size as f64 / acc.raw as f64)
+}
+
+/// Cache key for a trained dictionary: covers the corpus location and the exact
+/// train-file contents, so switching `TOKZIP_CORPUS_DIR` or updating the corpus
+/// retrains instead of silently reusing a dictionary from different data.
+fn train_fingerprint(corpus_dir: &Path, train_files: &[PathBuf]) -> String {
+    let mut hasher = crc32fast::Hasher::new();
+    let canonical = corpus_dir
+        .canonicalize()
+        .unwrap_or_else(|_| corpus_dir.to_path_buf());
+    hasher.update(canonical.to_string_lossy().as_bytes());
+    for file in train_files {
+        hasher.update(file.to_string_lossy().as_bytes());
+        hasher.update(&std::fs::read(file).expect("read train doc"));
+    }
+    format!("{:08x}", hasher.finalize())
+}
+
+fn zstd_round_trip_nodict(raw: &[u8]) -> u64 {
+    let compressed = zstd::bulk::compress(raw, 19).expect("zstd compress");
+    let restored = zstd::bulk::decompress(&compressed, raw.len() + 1).expect("zstd decompress");
     assert_eq!(restored, raw, "zstd round-trip mismatch");
     compressed.len() as u64
 }
