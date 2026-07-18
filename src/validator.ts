@@ -70,10 +70,6 @@ function inspectText(data: string): FrameInfo {
     // A compressed body producing content is at least one unit long; header-only frames
     // with a nonzero declared size are missing their payload.
     if (bodyLength === 0 && contentBytes > 0) throw new TokzipDecodeError('truncated payload');
-    // Body alphabet is decidable without decoding: stored/fast bodies are radix-64, small
-    // bodies are whole 32-bit radix-85 words (which also pins bodyLength % 5 === 0).
-    if (mode === MODE_FAST) scanRadix64Body(data, bodyStart);
-    else scanRadix85Body(data, bodyStart, data.length);
     // Theoretical capacity bound, mirroring the decoders: every fast token consumes ≥ 1
     // char (small: ≥ 1 bit, 5 chars = 32 bits) and produces ≤ MATCH_LEN_CAP bytes, so a
     // larger declared size is structurally unproducible from this body.
@@ -82,6 +78,12 @@ function inspectText(data: string): FrameInfo {
     if (bodyLength >= packedRawLength(contentBytes)) {
       throw new TokzipDecodeError('non-canonical frame: body not smaller than stored');
     }
+    // Body alphabet is decidable without decoding: stored/fast bodies are radix-64, small
+    // bodies are whole 32-bit radix-85 words (which also pins bodyLength % 5 === 0). This
+    // O(body) scan runs LAST, after every constant-time envelope check, so a hostile huge
+    // body cannot buy a linear scan with a header the cheap checks already reject.
+    if (mode === MODE_FAST) scanRadix64Body(data, bodyStart);
+    else scanRadix85Body(data, bodyStart, data.length);
   } else {
     throw new TokzipDecodeError('invalid mode');
   }
