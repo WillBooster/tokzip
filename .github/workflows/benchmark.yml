@@ -30,8 +30,9 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: WillBooster/tokzip-corpus
-          # Rebuilt corpus with the 0.25k short-document bucket (tokzip-corpus PR #5).
-          ref: e60615bb7b3969aea08388375593e93cfe370987
+          # Rebuilt corpus with the 0.25k short-document bucket (tokzip-corpus PR #5,
+          # squash-merged to main — same tree as the reviewed branch commit).
+          ref: c121336e2a874fa1279498996de3919581021bc3
           path: tokzip-corpus
       - uses: oven-sh/setup-bun@v2
         with:
