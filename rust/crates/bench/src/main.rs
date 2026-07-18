@@ -23,6 +23,9 @@ struct ManifestEntry {
     trainable: bool,
 }
 
+/// Evaluated zstd level; also part of the dictionary cache key so changing it
+/// here retrains instead of silently reusing dictionaries tuned for another level.
+const ZSTD_LEVEL: i32 = 19;
 const METHODS: [&str; 3] = ["tokzip-rs", "zstd19+dict", "zstd19"];
 const BUCKETS: [(&str, usize); 3] = [("<=1KB", 1024), ("<=4KB", 4096), ("all", usize::MAX)];
 
@@ -103,7 +106,7 @@ fn main() {
         // compression level (passing `-19` below measurably improves the baseline),
         // so the level is part of the cache identity, as is the trainer's version.
         let dict_path = dict_dir.join(format!(
-            "{lang}-l19-{}.dict",
+            "{lang}-l{ZSTD_LEVEL}-{}.dict",
             train_fingerprint(&corpus_dir, &train_files, &zstd_version)
         ));
         if !dict_path.exists() {
@@ -115,7 +118,7 @@ fn main() {
             let output = Command::new("zstd")
                 .arg("--train")
                 .args(&train_files)
-                .arg("-19")
+                .arg(format!("-{ZSTD_LEVEL}"))
                 .arg("-o")
                 .arg(&tmp_path)
                 .arg("-f")
@@ -154,7 +157,7 @@ fn main() {
                 .flatten()
             {
                 let name = entry.file_name().to_string_lossy().into_owned();
-                if name.starts_with(&format!("{lang}-l19-"))
+                if name.starts_with(&format!("{lang}-l{ZSTD_LEVEL}-"))
                     && name.ends_with(".dict")
                     && entry.path() != dict_path
                 {
@@ -177,8 +180,9 @@ fn main() {
         // single-dictionary at-rest deployment would strip it), and drop the frame
         // content size (the tokzip v0 frame encodes no decompressed length either).
         let mut dict_compressor =
-            zstd::bulk::Compressor::with_dictionary(19, &dict).expect("zstd compressor");
-        let mut plain_compressor = zstd::bulk::Compressor::new(19).expect("zstd compressor");
+            zstd::bulk::Compressor::with_dictionary(ZSTD_LEVEL, &dict).expect("zstd compressor");
+        let mut plain_compressor =
+            zstd::bulk::Compressor::new(ZSTD_LEVEL).expect("zstd compressor");
         for compressor in [&mut dict_compressor, &mut plain_compressor] {
             compressor
                 .set_parameter(zstd::zstd_safe::CParameter::ChecksumFlag(true))
