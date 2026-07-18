@@ -1,4 +1,4 @@
-import { crc32 } from './checksum.ts';
+import { frameChecksum } from './checksum.ts';
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
 import {
@@ -201,7 +201,7 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   // Stored frames always carry language id 0 (decoders ignore it).
   const languageId = shippedMode === MODE_STORED ? 0 : language.id;
 
-  const checksum = crc32(bytes);
+  const checksum = frameChecksum(bytes, !isString);
 
   if (binary) {
     // Exact-capacity sink, no growth: the small body is ceil(totalBits / 8) bytes, and every
@@ -297,7 +297,8 @@ function decompressText(data: string, maxOutputSize: number): { flags: number; b
   } else {
     throw new TokzipDecodeError('invalid mode');
   }
-  if (crc32(bytes) !== declaredCrc) throw new TokzipDecodeError('checksum mismatch');
+  if (frameChecksum(bytes, (flags & FLAG_BYTES) !== 0) !== declaredCrc)
+    throw new TokzipDecodeError('checksum mismatch');
   return { flags, bytes };
 }
 
@@ -346,7 +347,8 @@ function decompressBinary(data: Uint8Array, maxOutputSize: number): { flags: num
   } else {
     throw new TokzipDecodeError('invalid mode');
   }
-  if (crc32(bytes) !== declaredCrc) throw new TokzipDecodeError('checksum mismatch');
+  if (frameChecksum(bytes, (flags & FLAG_BYTES) !== 0) !== declaredCrc)
+    throw new TokzipDecodeError('checksum mismatch');
   return { flags, bytes };
 }
 
@@ -359,7 +361,7 @@ export function compressStored(input: string | Uint8Array, output: 'text' | 'bin
   const isString = typeof input === 'string';
   const bytes = isString ? textEncoder.encode(input) : input;
   const flags = MODE_STORED | (isString ? 0 : FLAG_BYTES);
-  const checksum = crc32(bytes);
+  const checksum = frameChecksum(bytes, !isString);
   if (output === 'binary') {
     const out = new TextSink(8 + CRC_BINARY_BYTES + bytes.length);
     out.push(BINARY_MAGIC_VERSION);

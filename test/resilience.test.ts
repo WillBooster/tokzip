@@ -95,21 +95,15 @@ describe('decoder fuzzing', () => {
   });
 
   test('random garbage inputs throw typed decode errors', () => {
+    // Every sample of this deterministic seed currently throws, so the assertion is
+    // unconditional — a regression that starts accepting malformed input must fail here.
     const random = seededRandom(0xDE_AD);
     for (let round = 0; round < 300; round++) {
       const length = Math.floor(random() * 64);
       const text = Array.from({ length }, () => String.fromCodePoint(32 + Math.floor(random() * 95))).join('');
-      try {
-        decompress(text);
-      } catch (error) {
-        expect(error).toBeInstanceOf(TokzipDecodeError);
-      }
+      expect(() => decompress(text)).toThrow(TokzipDecodeError);
       const bytes = Uint8Array.from({ length }, () => Math.floor(random() * 256));
-      try {
-        decompress(bytes);
-      } catch (error) {
-        expect(error).toBeInstanceOf(TokzipDecodeError);
-      }
+      expect(() => decompress(bytes)).toThrow(TokzipDecodeError);
     }
   });
 
@@ -166,6 +160,20 @@ describe('inspectFrame', () => {
     expect(binaryInfo.container).toBe('binary');
     expect(binaryInfo.contentBytes).toBe(Buffer.byteLength(doc));
     expect(binaryInfo.checksum).toBe(info.checksum);
+  });
+
+  test('inspects non-stored frames whose language id is not registered anywhere', () => {
+    // This process has typescript registered, so patch the frame to an unallocated id:
+    // inspection must still succeed (it never resolves languages — the server property).
+    const frame = compress(SEED_DOCS[0]!, { language: 'typescript', mode: 'small' });
+    expect(inspectFrame(frame).mode).not.toBe('stored');
+    const patchedText = frame[0]! + '9' + frame.slice(2); // Radix-64 value 61: unregistered.
+    expect(inspectFrame(patchedText).languageId).toBe(61);
+
+    const binaryFrame = compress(SEED_DOCS[0]!, { language: 'typescript', mode: 'small', output: 'binary' });
+    const patchedBinary = Uint8Array.from(binaryFrame);
+    patchedBinary[1] = 200; // Far outside any allocation.
+    expect(inspectFrame(patchedBinary).languageId).toBe(200);
   });
 
   test('rejects structural violations', () => {

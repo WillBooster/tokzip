@@ -142,7 +142,7 @@ they can be newer than the pinned table above:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://willbooster.github.io/tokzip/charts/languages-dark.svg" />
-  <img alt="Dot plot of per-language compression ratios for tokzip small, tokzip fast, brotli q11, and zstd -19 on the newest main run" src="https://willbooster.github.io/tokzip/charts/languages-light.svg" />
+  <img alt="Dot plot of per-language compression ratios for tokzip small, tokzip fast, CompressionStream gzip, and brotli q11 on the newest main run" src="https://willbooster.github.io/tokzip/charts/languages-light.svg" />
 </picture>
 
 ```bash

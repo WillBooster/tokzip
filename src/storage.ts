@@ -15,6 +15,15 @@ export function compressForStorage(
 /** Fallback for options whose `output` is not statically known (e.g. a `CompressOptions` variable). */
 export function compressForStorage(input: string | Uint8Array, options?: CompressOptions): string | Uint8Array;
 export function compressForStorage(input: string | Uint8Array, options?: CompressOptions): string | Uint8Array {
+  // Lone surrogates cannot round-trip through UTF-8 (TextEncoder replaces them with
+  // U+FFFD), so the exact-input guarantee is unsatisfiable — fail fast with direction
+  // instead of dying later in the fallback's own verification.
+  if (typeof input === 'string' && !input.isWellFormed()) {
+    throw new RangeError(
+      'tokzip: input contains lone surrogates, which cannot round-trip through UTF-8; ' +
+        'pass input.toWellFormed() (lossy) or byte-exact Uint8Array data instead'
+    );
+  }
   const output = options?.output ?? 'text';
   try {
     const frame = compress(input, options);

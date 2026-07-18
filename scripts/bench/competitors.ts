@@ -40,7 +40,9 @@ async function transformBytes(
   const written = (async () => {
     await writer.write(input);
     await writer.close();
-  })();
+    // A stream failure rejects both sides; the read loop below surfaces it, so the
+    // mirrored write-side rejection must not become an unhandled rejection.
+  })().catch(() => {});
   const chunks: Uint8Array[] = [];
   let total = 0;
   const reader = stream.readable.getReader();

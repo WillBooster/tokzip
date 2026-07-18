@@ -164,7 +164,7 @@ function renderRatioSpeedChart(report: ChartReport, theme: Theme): string | unde
   const megabytes = (report.total.inputBytes / 1_048_576).toFixed(1);
   parts.push(
     `<text x="24" y="30" font-size="15" font-weight="600" fill="${theme.textPrimary}">Compression ratio vs speed</text>`,
-    `<text x="24" y="50" font-size="12" fill="${theme.textSecondary}">bench-v2 corpus (${report.total.docs} docs, ${megabytes} MB), text-channel output, GitHub Actions runner — closer to the bottom-right is better</text>`,
+    `<text x="24" y="50" font-size="12" fill="${theme.textSecondary}">bench-v2 corpus (${report.total.docs} docs, ${megabytes} MB), text channel, dictionary-free secondary metric (see the dashboard for the session-amortized primary) — closer to the bottom-right is better</text>`,
     `<text x="${(plot.left + plot.right) / 2}" y="${height - 16}" text-anchor="middle" font-size="12" fill="${theme.textSecondary}">compression speed (MB/s, log scale) →</text>`,
     `<text transform="translate(18 ${(plot.top + plot.bottom) / 2}) rotate(-90)" text-anchor="middle" font-size="12" fill="${theme.textSecondary}">← output / input (%)</text>`
   );
@@ -235,7 +235,7 @@ function renderLanguageChart(report: ChartReport, theme: Theme): string {
   }
   parts.push(
     `<text x="24" y="30" font-size="15" font-weight="600" fill="${theme.textPrimary}">Compression ratio by language</text>`,
-    `<text x="24" y="50" font-size="12" fill="${theme.textSecondary}">output / input (%) on the bench-v2 split, text-channel output — lower is better</text>`,
+    `<text x="24" y="50" font-size="12" fill="${theme.textSecondary}">output / input (%) on the bench-v2 split, text channel, dictionary-free secondary metric — lower is better</text>`,
     `<text x="${(plot.left + plot.right) / 2}" y="${height - 12}" text-anchor="middle" font-size="12" fill="${theme.textSecondary}">output / input (%)</text>`
   );
   return svgDocument(width, height, theme, parts.join('\n'));

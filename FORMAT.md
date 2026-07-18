@@ -66,8 +66,12 @@ zero on encode and ignored on decode.
 ### 2.4 Content checksum (CRC-32)
 
 The checksum is CRC-32 as used by gzip and zlib (IEEE 802.3: reflected polynomial
-`0xEDB88320`, initial value and final XOR `0xFFFFFFFF`), computed over the **decompressed
-content bytes** (for string inputs, their UTF-8 encoding; the CRC of empty content is 0).
+`0xEDB88320`, initial value and final XOR `0xFFFFFFFF`). For frames it is computed over the
+**decompressed content bytes** (for string inputs, their UTF-8 encoding) **followed by one
+input-type byte**: `0x00` for string frames, `0x01` for bytes frames. Folding the type into
+the checksum domain means a corrupted input-type flag (§3 bit 2) fails the checksum instead
+of silently changing the returned type of byte-identical content. Stream blocks (§13.2)
+carry no type flag, so their checksum covers the raw block bytes only.
 
 - **Text encoding**: 6 radix-64 characters, little-endian 6-bit groups (group `i` holds CRC
   bits `6i … 6i+5`). The last group holds only bits 30–31; a last group above 3 is a
@@ -400,7 +404,8 @@ library version or re-encode; see the tracking issue on versioned module assets.
 Executable vectors live in `test/conformance.test.ts` and `test/roundtrip.test.ts`; the
 normative list mirrors the design issue:
 
-empty input (exact frame `xAAAAAAAAA`); tiny stored frame (exact overhead bound);
+empty input (exact frame `xAAAN-uASD`); tiny stored frame (exact overhead bound);
+flipped input-type flag alone fails the checksum;
 checksum mismatch on a structurally valid but corrupted body, on a corrupted checksum
 field, and on binary frames; history /
 dictionary / rep / overlap-copy matches; 12-bit vs 18-bit offset forms; single-symbol and

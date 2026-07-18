@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+import { frameChecksum } from '../src/checksum.ts';
 import { compress, decompress, TokzipDecodeError } from '../src/index.ts';
 import { MODE_FAST, MODE_SMALL, MODE_STORED } from '../src/format.ts';
 import { RADIX64_ALPHABET } from '../src/radix64.ts';
@@ -17,14 +18,14 @@ function expectDecodeError(frame: string, message: string | RegExp): void {
 describe('container vectors', () => {
   test('empty input is the exact 10-char stored frame', () => {
     const frame = compress('');
-    // Header (3) + size varint (1) + CRC-32 of the empty content (6 chars, value 0).
-    expect(frame).toBe('xAAAAAAAAA');
+    // Header (3) + size varint (1) + CRC-32 of empty content + type byte 0x00 (6 chars).
+    expect(frame).toBe('xAAAN-uASD');
     expect(decompress(frame)).toBe('');
   });
 
   test('empty input is the exact 8-byte binary stored frame', () => {
     const frame = compress('', { output: 'binary' });
-    expect(frame).toEqual(new Uint8Array([0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+    expect(frame).toEqual(new Uint8Array([0xB1, 0x00, 0x00, 0x00, 0x8D, 0xEF, 0x02, 0xD2]));
     expect(decompress(frame)).toBe('');
   });
 
@@ -121,7 +122,7 @@ describe('container vectors', () => {
   });
 
   test('a small frame for size 0 is non-canonical and rejected', () => {
-    // The canonical empty frame is the stored 'xAAAAAAAAA'; a size-0 small body can never be
+    // The canonical empty frame is the stored 'xAAAN-uASD'; a size-0 small body can never be
     // smaller than the (empty) stored body.
     expectDecodeError('xACAAAAAAA!!!!!', /non-canonical|stored/);
   });
@@ -171,12 +172,24 @@ describe('container vectors', () => {
     expect(() => decompress(patched)).toThrow(/checksum mismatch/);
   });
 
+  test('a flipped input-type flag alone is a checksum mismatch', () => {
+    // The type byte is part of the checksum domain, so retyping byte-identical content
+    // (bytes frame → string frame) must fail the CRC, not silently change the return type.
+    const frame = compress(new Uint8Array([0x41, 0x42, 0x43]));
+    expect(frame[2]).toBe('E');
+    expectDecodeError(frame.slice(0, 2) + 'A' + frame.slice(3), /checksum mismatch/);
+  });
+
   test('invalid UTF-8 in a string-typed frame throws', () => {
     const invalid = new Uint8Array([0xFF, 0xFE, 0x41]);
     const frame = compress(invalid);
-    // Flip the input-type flag from bytes to string (stored mode: flags 'E' → 'A').
+    // Flip the input-type flag from bytes to string (stored mode: flags 'E' → 'A') and
+    // recompute the CRC field for the string type, so the UTF-8 check is what fails.
     expect(frame[2]).toBe('E');
-    const patched = frame.slice(0, 2) + 'A' + frame.slice(3);
+    const crc = frameChecksum(invalid, false);
+    let crcChars = '';
+    for (let i = 0; i < 6; i++) crcChars += RADIX64_ALPHABET[(crc >>> (i * 6)) & 63]!;
+    const patched = frame.slice(0, 2) + 'A' + frame[3]! + crcChars + frame.slice(10);
     expect(() => decompress(patched)).toThrow(/invalid UTF-8/);
   });
 });

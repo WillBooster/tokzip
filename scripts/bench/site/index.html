@@ -21,6 +21,7 @@
         --series-brotli-q11: #eda100;
         --series-brotli-q5: #eb6834;
         --series-gzip: #008300;
+        --series-deflate: #5aa02c;
         --series-zstd-19: #4a3aa7;
         --series-zstd-3: #e34948;
         --series-lz: #a63f70;
@@ -41,7 +42,8 @@
           --series-small: #199e70;
           --series-brotli-q11: #c98500;
           --series-brotli-q5: #d95926;
-          --series-gzip: #008300;
+          --series-gzip: #0ca30c;
+          --series-deflate: #6cbf3a;
           --series-zstd-19: #9085e9;
           --series-zstd-3: #e66767;
           --series-lz: #e06fa6;
@@ -282,7 +284,10 @@
         'tokzip small': '--series-small',
         'b64url(brotli q11)': '--series-brotli-q11',
         'b64url(brotli q5)': '--series-brotli-q5',
-        'b64url(gzip -6)': '--series-gzip',
+        'b64url(cs gzip)': '--series-gzip',
+        'b64url(cs deflate-raw)': '--series-deflate',
+        'cs gzip': '--series-gzip',
+        'cs deflate-raw': '--series-deflate',
         'b64url(zstd -19)': '--series-zstd-19',
         'b64url(zstd -3)': '--series-zstd-3',
         'lz-string URI': '--series-lz',
@@ -292,17 +297,17 @@
       const RATIO_SERIES = [
         'tokzip fast',
         'tokzip small',
+        'b64url(cs gzip)',
+        'b64url(cs deflate-raw)',
         'b64url(brotli q11)',
-        'b64url(gzip -6)',
-        'b64url(zstd -19)',
         'lz-string URI',
       ];
 
       const SPEED_SERIES = [
         'tokzip fast',
         'tokzip small',
+        'b64url(cs gzip)',
         'b64url(brotli q5)',
-        'b64url(gzip -6)',
         'b64url(zstd -3)',
         'lz-string URI',
       ];
@@ -312,10 +317,11 @@
       const SNAPSHOT_SERIES = [
         'tokzip small',
         'tokzip fast',
+        'b64url(cs gzip)',
+        'b64url(cs deflate-raw)',
         'b64url(brotli q11)',
-        'b64url(zstd -19)',
         'b64url(brotli q5)',
-        'b64url(gzip -6)',
+        'b64url(zstd -19)',
         'b64url(zstd -3)',
         'b64url(xz -9e)',
         'lz-string URI',
@@ -385,7 +391,33 @@
         const fast = latest.total.ratios['tokzip fast'];
         const competitor = bestCompetitor(latest);
         const failures = latest.roundTrip.failures.length;
-        const tiles = [
+        const tiles = [];
+        // Schema v3: session-amortized, dictionary-inclusive ratios (the primary metric).
+        const reference = latest.referenceMethod;
+        if (latest.shortSession?.amortizedRatios?.['tokzip small'] !== undefined) {
+          const primary = latest.shortSession.amortizedRatios['tokzip small'];
+          const referenceRatio = latest.shortSession.amortizedRatios[reference];
+          tiles.push({
+            label: 'PRIMARY: short session + dict (tokzip small)',
+            value: percent(primary),
+            cls: typeof referenceRatio === 'number' && primary <= referenceRatio ? 'good' : 'bad',
+            note:
+              typeof referenceRatio === 'number'
+                ? `${reference}: ${percent(referenceRatio)} on ≤4 KB docs`
+                : '≤4 KB docs, dictionary charged once per session',
+          });
+        }
+        if (latest.session?.amortizedRatios?.['tokzip small'] !== undefined) {
+          const amortized = latest.session.amortizedRatios['tokzip small'];
+          const referenceRatio = latest.session.amortizedRatios[reference];
+          tiles.push({
+            label: 'Full session + dict (tokzip small)',
+            value: percent(amortized),
+            cls: typeof referenceRatio === 'number' && amortized <= referenceRatio ? 'good' : 'bad',
+            note: typeof referenceRatio === 'number' ? `${reference}: ${percent(referenceRatio)}` : 'all bench docs',
+          });
+        }
+        tiles.push(
           {
             label: 'tokzip small (overall)',
             value: percent(small),
@@ -404,8 +436,8 @@
             value: failures === 0 ? '✓ lossless' : `✗ ${failures} failures`,
             cls: failures === 0 ? 'good' : 'bad',
             note: `${latest.roundTrip.docs} docs, ${latest.roundTrip.methods ?? 2} methods`,
-          },
-        ];
+          }
+        );
         for (const mode of ['small', 'fast']) {
           const speed = speedOfLatest(latest, `tokzip ${mode}`);
           if (speed) {
@@ -708,14 +740,28 @@
       function renderLanguageTable() {
         const latest = runs.at(-1);
         const methods = latest.methods;
+        // Schema v3 adds the primary metric per language: short-session amortized ratio
+        // (dictionary charged once) and the breakeven input volume vs the reference codec.
+        const hasSessions = Object.values(latest.languages).some((entry) => entry.shortSession);
+        const sessionCells = (entry) => {
+          if (!hasSessions) return '';
+          const breakeven = entry.breakevenBytes?.['tokzip small'];
+          return (
+            `<td>${formatPercent(entry.shortSession?.amortizedRatios?.['tokzip small'])}</td>` +
+            `<td>${entry.dictTransferBytes ? (entry.dictTransferBytes / 1024).toFixed(1) + ' KB' : '—'}</td>` +
+            `<td>${typeof breakeven === 'number' ? (breakeven / 1024).toFixed(0) + ' KB' : entry.dictTransferBytes ? 'never' : '—'}</td>`
+          );
+        };
+        const sessionHeaders = hasSessions ? '<th>small sh+dict</th><th>dict transfer</th><th>breakeven</th>' : '';
         const rows = Object.entries(latest.languages).map(
           ([language, entry]) =>
             `<tr><td>${language}</td><td>${entry.docs}</td>` +
+            sessionCells(entry) +
             methods.map((method) => `<td>${formatPercent(entry.total.ratios[method])}</td>`).join('') +
             '</tr>'
         );
         document.querySelector('#languageTable').innerHTML =
-          `<table><thead><tr><th>language</th><th>docs</th>${methods.map((m) => `<th>${m}</th>`).join('')}</tr></thead>` +
+          `<table><thead><tr><th>language</th><th>docs</th>${sessionHeaders}${methods.map((m) => `<th>${m}</th>`).join('')}</tr></thead>` +
           `<tbody>${rows.join('')}</tbody></table>`;
       }
 

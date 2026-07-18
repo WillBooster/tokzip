@@ -343,6 +343,9 @@ function dictionaryTransferBytes(language: string): number {
 }
 
 function sessionOf(totals: SizeTotals, dictBytes: number): SessionView {
+  // A corpus can legitimately have no docs in a session (e.g. no short-bucket documents
+  // under TOKZIP_CORPUS_DIR); ratiosOf would divide by zero and serialize NaN as null.
+  if (totals.inputBytes === 0) return { docs: totals.docs, inputBytes: 0, ratios: {}, amortizedRatios: {} };
   const amortizedRatios = Object.fromEntries(
     METHODS.map((method, index) => [
       method.name,
