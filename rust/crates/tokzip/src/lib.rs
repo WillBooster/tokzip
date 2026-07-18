@@ -70,7 +70,7 @@ pub fn decompress(frame: &[u8], _dictionary: Option<&[u8]>) -> Result<Vec<u8>, D
     let expected_crc = u32::from_le_bytes([frame[3], frame[4], frame[5], frame[6]]);
     match frame[2] {
         // Stored content can be CRC-checked in place, before the output allocation.
-        0 => {
+        m if m == Method::Stored as u8 => {
             let body = &frame[HEADER_LEN..];
             if crc32fast::hash(body) != expected_crc {
                 return Err(DecodeError::ChecksumMismatch);

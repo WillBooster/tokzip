@@ -127,8 +127,27 @@ fn main() {
                     eprintln!("{lang}: {}", line.trim());
                 }
             }
-            assert!(output.status.success(), "zstd --train failed for {lang}");
+            if !output.status.success() {
+                let _ = std::fs::remove_file(&tmp_path);
+                panic!("zstd --train failed for {lang}");
+            }
             std::fs::rename(&tmp_path, &dict_path).expect("move dictionary into cache");
+            // The cache is content-addressed, so old generations accumulate forever;
+            // prune this language's superseded entries (only on the train path, so a
+            // concurrent cache-hit run never has its dictionary deleted mid-read).
+            // `{lang}.dict` (no dash) belongs to the TS harness and is left alone.
+            for entry in std::fs::read_dir(&dict_dir)
+                .expect("read dict dir")
+                .flatten()
+            {
+                let name = entry.file_name().to_string_lossy().into_owned();
+                if name.starts_with(&format!("{lang}-"))
+                    && name.ends_with(".dict")
+                    && entry.path() != dict_path
+                {
+                    let _ = std::fs::remove_file(entry.path());
+                }
+            }
         }
         let dict = std::fs::read(&dict_path).expect("read dictionary");
         // libzstd silently accepts arbitrary bytes as a raw content dictionary, so a
@@ -185,7 +204,10 @@ fn main() {
                 zstd_round_trip(&raw, &mut plain_compressor, &mut plain_decompressor),
             );
 
+            // Credit the win to the first method in METHODS order that hits the
+            // minimum, so `wins` partitions `docs` even when two methods tie.
             let best = *sizes.values().min().unwrap();
+            let winner = *METHODS.iter().find(|m| sizes[*m] == best).unwrap();
             let raw_len = raw.len();
             let matching_totals = BUCKETS
                 .iter()
@@ -202,10 +224,8 @@ fn main() {
                 acc.docs += 1;
                 for (m, s) in &sizes {
                     *acc.sizes.entry(m).or_default() += s;
-                    if *s == best {
-                        *acc.wins.entry(m).or_default() += 1;
-                    }
                 }
+                *acc.wins.entry(winner).or_default() += 1;
             }
         }
         if lang_acc.docs == 0 {
@@ -253,11 +273,15 @@ fn ratio(acc: &Acc, method: &str) -> String {
     format!("{:.2}%", 100.0 * size as f64 / acc.raw as f64)
 }
 
-/// Cache key for a trained dictionary: covers the corpus location and the exact
-/// train-file contents, so switching `TOKZIP_CORPUS_DIR` or updating the corpus
-/// retrains instead of silently reusing a dictionary from different data.
-/// Every field is length-prefixed so boundary shifts between path and content
-/// cannot collide; 32 bits of identity is plenty for a local cache of ~21 entries.
+/// Cache key for a trained dictionary: covers the trainer version, the corpus
+/// location, and the exact train-file contents, so a CLI upgrade, switching
+/// `TOKZIP_CORPUS_DIR`, or updating the corpus retrains instead of silently
+/// reusing a dictionary from different data.
+/// Train files are hashed relative to the canonicalized corpus dir, so the same
+/// corpus reached through a symlink or differently-spelled path fingerprints
+/// identically. Every field is length-prefixed so boundary shifts between path
+/// and content cannot collide; 32 bits of identity is plenty for a local cache
+/// of ~21 entries.
 fn train_fingerprint(corpus_dir: &Path, train_files: &[PathBuf], zstd_version: &str) -> String {
     let mut hasher = crc32fast::Hasher::new();
     let canonical = corpus_dir
@@ -270,7 +294,8 @@ fn train_fingerprint(corpus_dir: &Path, train_files: &[PathBuf], zstd_version: &
     update(zstd_version.as_bytes());
     update(canonical.to_string_lossy().as_bytes());
     for file in train_files {
-        update(file.to_string_lossy().as_bytes());
+        let relative = file.strip_prefix(corpus_dir).unwrap_or(file);
+        update(relative.to_string_lossy().as_bytes());
         update(&std::fs::read(file).expect("read train doc"));
     }
     format!("{:08x}", hasher.finalize())
