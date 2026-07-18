@@ -129,19 +129,27 @@ fn main() {
             }
             if !output.status.success() {
                 let _ = std::fs::remove_file(&tmp_path);
-                panic!("zstd --train failed for {lang}");
+                // zstd reports real failures as `Error N : …`, which the warning
+                // filter above does not match — surface the full stderr here.
+                panic!(
+                    "zstd --train failed for {lang} (exit {:?}):\n{}",
+                    output.status.code(),
+                    String::from_utf8_lossy(&output.stderr).trim()
+                );
             }
             std::fs::rename(&tmp_path, &dict_path).expect("move dictionary into cache");
             // The cache is content-addressed, so old generations accumulate forever;
             // prune this language's superseded entries (only on the train path, so a
             // concurrent cache-hit run never has its dictionary deleted mid-read).
-            // `{lang}.dict` (no dash) belongs to the TS harness and is left alone.
+            // The prefix is anchored on `-l19-`, the namespace this code owns: a bare
+            // `{lang}-` would also match other languages (`en-` vs `en-US-…`) and the
+            // TS harness's `{lang}.dict` files sharing this directory.
             for entry in std::fs::read_dir(&dict_dir)
                 .expect("read dict dir")
                 .flatten()
             {
                 let name = entry.file_name().to_string_lossy().into_owned();
-                if name.starts_with(&format!("{lang}-"))
+                if name.starts_with(&format!("{lang}-l19-"))
                     && name.ends_with(".dict")
                     && entry.path() != dict_path
                 {
