@@ -23,7 +23,11 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { dirname, join } from 'node:path';
 import { brotliCompressSync, constants as zlibConstants } from 'node:zlib';
 import { languageByName } from '../../src/dictionary.ts';
+import { FenceTracker } from '../../src/fences.ts';
+import { FLAG_FENCED } from '../../src/format.ts';
 import { compress, decompress } from '../../src/index.ts';
+import { LANGUAGE_IDS } from '../../src/languageIds.ts';
+import { RADIX64_ALPHABET } from '../../src/radix64.ts';
 import '../../src/languages/index.ts';
 import { corpusDirs, type ManifestEntry } from '../corpus.ts';
 import { binaryCompetitors, competitors } from './competitors.ts';
@@ -179,7 +183,7 @@ async function main(): Promise<void> {
     if (!result) continue;
     accumulate(grandShortTotals, result.shortTotals);
     grandDictBytes += result.dictBytes;
-    if (result.shortTotals.docs > 0) grandShortDictBytes += result.dictBytes;
+    grandShortDictBytes += result.shortDictBytes;
   }
   if (grandTotals.docs === 0) {
     console.error('error: no bench documents found (fetch + split the corpus first, or check the language name)');
@@ -242,7 +246,7 @@ async function benchLanguage(
   report: BenchReport,
   grandTotals: SizeTotals,
   allDocs: LoadedDoc[]
-): Promise<{ shortTotals: SizeTotals; dictBytes: number } | undefined> {
+): Promise<{ shortTotals: SizeTotals; dictBytes: number; shortDictBytes: number } | undefined> {
   const docs = loadBenchDocs(language);
   if (docs.length === 0) {
     console.log(`\n${language}: no bench split (fetch + split the corpus first)`);
@@ -265,23 +269,28 @@ async function benchLanguage(
   const languageTotals = emptyTotals();
   const shortTotals = emptyTotals();
   const buckets: LanguageReport['buckets'] = {};
+  // Fence-aware frames (FLAG_FENCED) additionally require each referenced block language's
+  // module on the decoding side, so those transfers are charged to the session too.
+  const fencedCollector = makeFencedCollector();
   for (const bucket of BUCKETS) {
     const bucketDocs = loaded.filter((doc) => doc.bucket === bucket);
     if (bucketDocs.length === 0) continue;
     const totals = emptyTotals();
-    for (const doc of bucketDocs) await benchDoc(doc, totals, report.roundTrip);
+    for (const doc of bucketDocs) await benchDoc(doc, totals, report.roundTrip, fencedCollector.collect);
     accumulate(languageTotals, totals);
     if (SHORT_BUCKETS.has(bucket)) accumulate(shortTotals, totals);
     buckets[bucket] = { docs: totals.docs, inputBytes: totals.inputBytes, ratios: ratiosOf(totals) };
     printRow(bucket, totals);
   }
   accumulate(grandTotals, languageTotals);
-  const session = sessionOf(languageTotals, dictBytes);
-  const shortSession = sessionOf(shortTotals, dictBytes);
+  const sessionDictBytes = dictBytes + fencedCollector.sessionExtraBytes();
+  const shortDictBytes = shortTotals.docs > 0 ? dictBytes + fencedCollector.shortExtraBytes() : 0;
+  const session = sessionOf(languageTotals, sessionDictBytes);
+  const shortSession = sessionOf(shortTotals, shortDictBytes);
   printRow('all', languageTotals);
-  printSessionRow('all+dict', languageTotals, dictBytes);
-  printSessionRow('sh+dict', shortTotals, dictBytes);
-  const breakeven = breakevenOf(languageTotals, dictBytes);
+  printSessionRow('all+dict', languageTotals, sessionDictBytes);
+  printSessionRow('sh+dict', shortTotals, shortDictBytes);
+  const breakeven = breakevenOf(languageTotals, sessionDictBytes);
   if (dictBytes > 0) {
     const parts = Object.entries(breakeven).map(
       ([method, bytes]) => `${method}: ${bytes === undefined ? 'never' : formatKb(bytes)}`
@@ -291,17 +300,22 @@ async function benchLanguage(
   report.languages[language] = {
     docs: docs.length,
     registered,
-    dictTransferBytes: dictBytes,
+    dictTransferBytes: sessionDictBytes,
     buckets,
     total: { inputBytes: languageTotals.inputBytes, ratios: ratiosOf(languageTotals) },
     session,
     shortSession,
     breakevenBytes: breakeven,
   };
-  return { shortTotals, dictBytes };
+  return { shortTotals, dictBytes: sessionDictBytes, shortDictBytes };
 }
 
-async function benchDoc(doc: LoadedDoc, totals: SizeTotals, roundTrip: BenchReport['roundTrip']): Promise<void> {
+async function benchDoc(
+  doc: LoadedDoc,
+  totals: SizeTotals,
+  roundTrip: BenchReport['roundTrip'],
+  onTokzipFrame?: (doc: LoadedDoc, encoded: string | Uint8Array) => void
+): Promise<void> {
   totals.docs += 1;
   totals.inputBytes += doc.inputBytes;
   roundTrip.docs += 1;
@@ -309,6 +323,7 @@ async function benchDoc(doc: LoadedDoc, totals: SizeTotals, roundTrip: BenchRepo
     let failure: string | undefined;
     try {
       const encoded = await method.compress(doc);
+      if (method.usesDictionary) onTokzipFrame?.(doc, encoded);
       totals.outputChars[index]! += encoded.length;
       roundTrip.checks += 1;
       if ((await method.decompress(encoded)) !== doc.content) failure = `${doc.language}/${doc.file} (${method.name})`;
@@ -320,6 +335,52 @@ async function benchDoc(doc: LoadedDoc, totals: SizeTotals, roundTrip: BenchRepo
       console.error(`ROUND-TRIP FAILURE: ${failure}`);
     }
   }
+}
+
+const LANGUAGE_NAME_BY_ID = new Map(Object.entries(LANGUAGE_IDS).map(([name, id]) => [id, name]));
+
+interface FencedCollector {
+  collect(doc: LoadedDoc, encoded: string | Uint8Array): void;
+  sessionExtraBytes(): number;
+  shortExtraBytes(): number;
+}
+
+/**
+ * Charges fence-extended dictionary dependencies: when a shipped tokzip frame carries
+ * FLAG_FENCED, every registered block language named by the document's fences must also be
+ * delivered to the decoding client, so those modules' transfers join the session cost.
+ * Conservative: fences are charged when any fenced frame ships for the document, without
+ * proving which specific matches reached each extension.
+ */
+function makeFencedCollector(): FencedCollector {
+  const encoder = new TextEncoder();
+  const sessionIds = new Set<number>();
+  const shortIds = new Set<number>();
+  const scannedDocs = new Set<string>();
+  const transferOf = (ids: Set<number>): number => {
+    let bytes = 0;
+    for (const id of ids) bytes += dictionaryTransferBytes(LANGUAGE_NAME_BY_ID.get(id) ?? '');
+    return bytes;
+  };
+  return {
+    collect(doc, encoded) {
+      const flags = typeof encoded === 'string' ? RADIX64_ALPHABET.indexOf(encoded[2]!) : encoded[2]!;
+      if ((flags & FLAG_FENCED) === 0 || scannedDocs.has(doc.file)) return;
+      scannedDocs.add(doc.file);
+      const frameId = languageByName(doc.registered ? doc.language : 'none')!.id;
+      const bytes = encoder.encode(doc.content);
+      const tracker = new FenceTracker(frameId);
+      for (let i = 0; i < bytes.length; i++) {
+        if (bytes[i] !== 10) continue;
+        const id = tracker.languageIdAt(bytes, i + 1);
+        if (id === frameId) continue;
+        sessionIds.add(id);
+        if (SHORT_BUCKETS.has(doc.bucket)) shortIds.add(id);
+      }
+    },
+    sessionExtraBytes: () => transferOf(sessionIds),
+    shortExtraBytes: () => transferOf(shortIds),
+  };
 }
 
 /**

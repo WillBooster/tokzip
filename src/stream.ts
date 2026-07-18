@@ -25,6 +25,8 @@ const STREAM_FLAG_CARRY = 0b100;
 const STREAM_RESERVED_FLAG_MASK = 0b1111_1000;
 
 const BYTE_VARINT_MAX_BYTES = 5;
+/** The terminator's total-size varint spans the whole stream: 8 groups = 56 bits ≥ 2^53. */
+const TERMINATOR_VARINT_MAX_BYTES = 8;
 
 const DEFAULT_BLOCK_SIZE = 1 << 18; // 256 KB (matches the fast-mode window).
 const MIN_BLOCK_SIZE = 1 << 10;
@@ -185,9 +187,12 @@ class BlockEncoder {
       // and corrupts output identically there, so no defensive copy is paid here.
       bytes = chunk;
     }
-    if (bytes.length === 0) return;
-    this.pending.push(bytes);
-    this.pendingLength += bytes.length;
+    if (bytes.length > 0) {
+      this.pending.push(bytes);
+      this.pendingLength += bytes.length;
+    }
+    // Drained even when this chunk itself was empty: a flushed held-back surrogate above
+    // can push the pending queue past the block size on its own.
     while (this.pendingLength >= this.blockSize) this.emitBlock(this.takeBlock(this.blockSize), controller);
   }
 
@@ -390,10 +395,10 @@ class BlockDecoder {
   }
 
   /** Reads a canonical byte varint at `pos`, or undefined when more input is needed. */
-  private tryReadVarint(pos: number): { value: number; pos: number } | undefined {
+  private tryReadVarint(pos: number, maxBytes = BYTE_VARINT_MAX_BYTES): { value: number; pos: number } | undefined {
     let value = 0;
     let shift = 1;
-    for (let i = 0; i < BYTE_VARINT_MAX_BYTES; i++) {
+    for (let i = 0; i < maxBytes; i++) {
       if (pos >= this.length) return undefined;
       const group = this.buffer[pos++]!;
       value += (group & 127) * shift;
@@ -439,8 +444,10 @@ class BlockDecoder {
     const bodyLength = lengthField.value;
     if (bodyLength === 0) {
       // Authenticated terminator: total raw size + final chained CRC. Verifying it catches
-      // trailing-block deletion, which every per-block check necessarily misses.
-      const totalField = this.tryReadVarint(lengthField.pos);
+      // trailing-block deletion, which every per-block check necessarily misses. The total
+      // spans the whole stream, beyond the per-block 35-bit bound — 8 groups cover 2^53
+      // (Number.MAX_SAFE_INTEGER), which the byte counter cannot exceed anyway.
+      const totalField = this.tryReadVarint(lengthField.pos, TERMINATOR_VARINT_MAX_BYTES);
       if (!totalField) return false;
       if (this.length - totalField.pos < 4) return false;
       const declaredCrc = readCrc32Binary(this.buffer, totalField.pos);

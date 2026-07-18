@@ -487,8 +487,9 @@ version 1), and blocks reuse the §12.2 body encodings.
                       bits 7:3  reserved; encoders write 0, decoders reject non-zero
 […]  blocks          zero or more block records (§13.2)
 […]  terminator      one 0x00 byte (a zero block-body-length varint), then the total
-                     decompressed size as a byte varint, then 4 little-endian bytes:
-                     the final chained CRC-32 (§13.2) of the whole decompressed stream
+                     decompressed size as a byte varint (max 8 bytes — it spans the whole
+                     stream, beyond the per-block 35-bit bound), then 4 little-endian
+                     bytes: the final chained CRC-32 (§13.2) of the decompressed stream
 ```
 
 Byte varints are the §12 byte varints (little-endian 7-bit groups, continue bit 7,

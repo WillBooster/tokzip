@@ -18,10 +18,10 @@ export function compressForStorage(input: string | Uint8Array, options?: Compres
   // Lone surrogates cannot round-trip through UTF-8 (TextEncoder replaces them with
   // U+FFFD), so the exact-input guarantee is unsatisfiable — fail fast with direction
   // instead of dying later in the fallback's own verification.
-  if (typeof input === 'string' && !input.isWellFormed()) {
+  if (typeof input === 'string' && !isWellFormedString(input)) {
     throw new RangeError(
       'tokzip: input contains lone surrogates, which cannot round-trip through UTF-8; ' +
-        'pass input.toWellFormed() (lossy) or byte-exact Uint8Array data instead'
+        'pass a well-formed string (String.prototype.toWellFormed is lossy but safe) or byte-exact Uint8Array data'
     );
   }
   const output = options?.output ?? 'text';
@@ -40,6 +40,25 @@ export function compressForStorage(input: string | Uint8Array, options?: Compres
   if (!roundTrips(fallback, input)) throw new Error('tokzip: stored fallback failed round-trip verification');
   return fallback;
 }
+
+/**
+ * Manual surrogate-pair scan instead of String.prototype.isWellFormed: the builtin only
+ * exists from V8 11.3 (Node 20), while this library supports Node 18.
+ */
+// oxlint-disable unicorn/prefer-code-point -- surrogate detection needs raw UTF-16 units; codePointAt would combine valid pairs
+function isWellFormedString(text: string): boolean {
+  for (let i = 0; i < text.length; i++) {
+    const unit = text.charCodeAt(i);
+    if (unit < 0xD8_00 || unit > 0xDF_FF) continue;
+    // A high surrogate must be followed by a low surrogate; a bare low surrogate is lone.
+    if (unit > 0xDB_FF) return false;
+    const next = i + 1 < text.length ? text.charCodeAt(i + 1) : 0;
+    if (next < 0xDC_00 || next > 0xDF_FF) return false;
+    i++;
+  }
+  return true;
+}
+// oxlint-enable unicorn/prefer-code-point
 
 function roundTrips(frame: string | Uint8Array, input: string | Uint8Array): boolean {
   try {

@@ -120,9 +120,10 @@ servers pass frames through**. That shapes two decisions:
 The harness measures two channels separately. The **text channel** (default) compares
 URL-safe text output: binary codecs use unpadded base64url, while tokzip and the `lz-string`
 URI mode already emit text. The **binary channel** (`--binary`) compares tokzip binary
-frames against the raw codec bytes with no text framing. Both channels measure median
-end-to-end per-document throughput and **verify every method on every document round-trips
-losslessly** — any mismatch fails the run.
+frames against the raw codec bytes with no text framing. Both channels **verify every
+method on every document round-trips losslessly** — any mismatch fails the run — and
+`--speed` additionally measures median end-to-end per-document throughput (CI runs the
+speed pass on the text channel only).
 
 Current numbers live on the dashboard (the v1 format reset, the CRC-32 field, and the
 retrained dictionary budget all changed the output sizes, so older pinned tables no longer
