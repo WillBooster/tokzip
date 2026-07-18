@@ -26,7 +26,7 @@ struct ManifestEntry {
 /// Evaluated zstd level; also part of the dictionary cache key so changing it
 /// here retrains instead of silently reusing dictionaries tuned for another level.
 const ZSTD_LEVEL: i32 = 19;
-const METHODS: [&str; 3] = ["tokzip-rs", "zstd19+dict", "zstd19"];
+const METHODS: [&str; 3] = ["tokzip-rs", "zstd+dict", "zstd"];
 const BUCKETS: [(&str, usize); 3] = [("<=1KB", 1024), ("<=4KB", 4096), ("all", usize::MAX)];
 
 #[derive(Default, Clone)]
@@ -124,9 +124,10 @@ fn main() {
                 .arg("-f")
                 .output()
                 .expect("run zstd --train (is the zstd CLI installed?)");
-            // No `-q`: it would also silence zstd's dictionary-quality warnings (e.g.
-            // "size(source)/size(dictionary) should be >= 10"), which flag languages
-            // whose baseline dictionary is knowingly under-trained. Re-emit only those.
+            // No `-q`: it would silence the `!  Warning : data size of samples too
+            // small…` lines (the `WARNING: … size(source)/size(dictionary) …` line
+            // prints regardless), which flag languages whose baseline dictionary is
+            // knowingly under-trained. Re-emit only warning lines, not progress.
             for line in String::from_utf8_lossy(&output.stderr).lines() {
                 if line.contains("WARNING") || line.trim_start().starts_with('!') {
                     eprintln!("{lang}: {}", line.trim());
@@ -213,11 +214,11 @@ fn main() {
             sizes.insert("tokzip-rs", frame.len() as u64);
 
             sizes.insert(
-                "zstd19+dict",
+                "zstd+dict",
                 zstd_round_trip(&raw, &mut dict_compressor, &mut dict_decompressor),
             );
             sizes.insert(
-                "zstd19",
+                "zstd",
                 zstd_round_trip(&raw, &mut plain_compressor, &mut plain_decompressor),
             );
 
@@ -267,7 +268,7 @@ fn main() {
         corpus_dir.display()
     );
 
-    println!("\n=== Totals (compressed/raw %, lower is better) ===");
+    println!("\n=== Totals (zstd level {ZSTD_LEVEL}; compressed/raw %, lower is better) ===");
     for (name, _) in BUCKETS {
         let acc = &totals[name];
         println!("\n[{name}] docs={} raw={}KB", acc.docs, acc.raw / 1024);
