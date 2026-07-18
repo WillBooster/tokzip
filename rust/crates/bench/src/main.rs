@@ -15,7 +15,9 @@ use std::process::Command;
 #[derive(Deserialize)]
 struct ManifestEntry {
     file: String,
-    #[serde(default)]
+    // Required on purpose: every corpus entry carries `split`, and a defaulted
+    // empty value would silently classify docs as neither train nor bench,
+    // making a whole language vanish from the results without an error.
     split: String,
     #[serde(default)]
     trainable: bool,
@@ -139,8 +141,11 @@ fn main() {
             }
             std::fs::rename(&tmp_path, &dict_path).expect("move dictionary into cache");
             // The cache is content-addressed, so old generations accumulate forever;
-            // prune this language's superseded entries (only on the train path, so a
-            // concurrent cache-hit run never has its dictionary deleted mid-read).
+            // prune this language's superseded entries. Pruning only on the train path
+            // keeps concurrent runs of the same fingerprint safe; a concurrent run on a
+            // *different* fingerprint (other corpus/CLI version) can lose its entry
+            // between its existence check and read — it fails cleanly and a rerun
+            // retrains, which we accept instead of adding interprocess locking.
             // The prefix is anchored on `-l19-`, the namespace this code owns: a bare
             // `{lang}-` would also match other languages (`en-` vs `en-US-…`) and the
             // TS harness's `{lang}.dict` files sharing this directory.
@@ -244,7 +249,7 @@ fn main() {
             .map(|m| format!("{m} {}", ratio(&lang_acc, m)))
             .collect();
         println!(
-            "{lang:<11} docs={:>3} raw={:>5}KB dict={}KB  {}",
+            "{lang:<11} docs={:>3} raw={:>5}KB dict={:>3}KB  {}",
             lang_acc.docs,
             lang_acc.raw / 1024,
             dict.len() / 1024,
