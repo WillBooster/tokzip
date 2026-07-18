@@ -2,9 +2,10 @@
 resolver = "2"
 members = ["crates/tokzip", "crates/bench"]
 
+# No license declaration: the repository is private/UNLICENSED (see package.json);
+# both crates set `publish = false`, which lifts Cargo's license-field requirement.
 [workspace.package]
 edition = "2021"
-license = "MIT"
 
 [profile.release]
 lto = true

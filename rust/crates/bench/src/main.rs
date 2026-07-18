@@ -86,28 +86,58 @@ fn main() {
             .filter(|e| e.split == "train" && e.trainable)
             .map(|e| corpus_dir.join(lang).join(&e.file))
             .collect();
+        // `l19` in the cache key: dictionary statistics are tuned for the evaluated
+        // compression level (passing `-19` below measurably improves the baseline),
+        // so the level is part of the cache identity.
         let dict_path = dict_dir.join(format!(
-            "{lang}-{}.dict",
+            "{lang}-l19-{}.dict",
             train_fingerprint(&corpus_dir, &train_files)
         ));
         if !dict_path.exists() {
+            // Train to a temp path and rename atomically so an interrupted or
+            // concurrent run can never leave a partial file at the cache path.
+            let tmp_path = dict_path.with_extension("dict.tmp");
             let status = Command::new("zstd")
                 .arg("--train")
                 .args(&train_files)
+                .arg("-19")
                 .arg("-o")
-                .arg(&dict_path)
+                .arg(&tmp_path)
                 .arg("-q")
+                .arg("-f")
                 .status()
                 .expect("run zstd --train (is the zstd CLI installed?)");
             assert!(status.success(), "zstd --train failed for {lang}");
+            std::fs::rename(&tmp_path, &dict_path).expect("move dictionary into cache");
         }
         let dict = std::fs::read(&dict_path).expect("read dictionary");
+        // libzstd silently accepts arbitrary bytes as a raw content dictionary, so a
+        // corrupt cache entry would degrade ratios without any error — check the magic.
+        assert!(
+            dict.starts_with(&[0x37, 0xA4, 0x30, 0xEC]),
+            "{} is not a trained zstd dictionary; delete it and rerun",
+            dict_path.display()
+        );
         // Digesting a level-19 dictionary costs ~5ms; per-document construction would
-        // dominate the whole run, so build the contexts once per language.
+        // dominate the whole run, so build the contexts once per language. Both zstd
+        // arms carry a content checksum (tokzip frames always pay their CRC-32) and
+        // drop the 4-byte dictionary ID (a single-dictionary at-rest deployment would
+        // strip it), so framing overhead is comparable across methods.
         let mut dict_compressor =
             zstd::bulk::Compressor::with_dictionary(19, &dict).expect("zstd compressor");
+        dict_compressor
+            .set_parameter(zstd::zstd_safe::CParameter::ChecksumFlag(true))
+            .expect("enable zstd checksum");
+        dict_compressor
+            .set_parameter(zstd::zstd_safe::CParameter::DictIdFlag(false))
+            .expect("disable zstd dict id");
         let mut dict_decompressor =
             zstd::bulk::Decompressor::with_dictionary(&dict).expect("zstd decompressor");
+        let mut plain_compressor = zstd::bulk::Compressor::new(19).expect("zstd compressor");
+        plain_compressor
+            .set_parameter(zstd::zstd_safe::CParameter::ChecksumFlag(true))
+            .expect("enable zstd checksum");
+        let mut plain_decompressor = zstd::bulk::Decompressor::new().expect("zstd decompressor");
 
         let mut lang_acc = Acc::default();
         for entry in entries.iter().filter(|e| e.split == "bench") {
@@ -123,14 +153,14 @@ fn main() {
             );
             sizes.insert("tokzip-rs", frame.len() as u64);
 
-            let with_dict = dict_compressor.compress(&raw).expect("zstd compress");
-            let restored = dict_decompressor
-                .decompress(&with_dict, raw.len() + 1)
-                .expect("zstd decompress");
-            assert_eq!(restored, raw, "zstd+dict round-trip mismatch");
-            sizes.insert("zstd19+dict", with_dict.len() as u64);
-
-            sizes.insert("zstd19", zstd_round_trip_nodict(&raw));
+            sizes.insert(
+                "zstd19+dict",
+                zstd_round_trip(&raw, &mut dict_compressor, &mut dict_decompressor),
+            );
+            sizes.insert(
+                "zstd19",
+                zstd_round_trip(&raw, &mut plain_compressor, &mut plain_decompressor),
+            );
 
             let best = *sizes.values().min().unwrap();
             let raw_len = raw.len();
@@ -171,6 +201,12 @@ fn main() {
         );
     }
 
+    assert!(
+        totals["all"].docs > 0,
+        "no bench documents were benchmarked — check the corpus at {}",
+        corpus_dir.display()
+    );
+
     println!("\n=== Totals (compressed/raw %, lower is better) ===");
     for (name, _) in BUCKETS {
         let acc = &totals[name];
@@ -197,22 +233,34 @@ fn ratio(acc: &Acc, method: &str) -> String {
 /// Cache key for a trained dictionary: covers the corpus location and the exact
 /// train-file contents, so switching `TOKZIP_CORPUS_DIR` or updating the corpus
 /// retrains instead of silently reusing a dictionary from different data.
+/// Every field is length-prefixed so boundary shifts between path and content
+/// cannot collide; 32 bits of identity is plenty for a local cache of ~21 entries.
 fn train_fingerprint(corpus_dir: &Path, train_files: &[PathBuf]) -> String {
     let mut hasher = crc32fast::Hasher::new();
     let canonical = corpus_dir
         .canonicalize()
         .unwrap_or_else(|_| corpus_dir.to_path_buf());
-    hasher.update(canonical.to_string_lossy().as_bytes());
+    let mut update = |bytes: &[u8]| {
+        hasher.update(&(bytes.len() as u64).to_le_bytes());
+        hasher.update(bytes);
+    };
+    update(canonical.to_string_lossy().as_bytes());
     for file in train_files {
-        hasher.update(file.to_string_lossy().as_bytes());
-        hasher.update(&std::fs::read(file).expect("read train doc"));
+        update(file.to_string_lossy().as_bytes());
+        update(&std::fs::read(file).expect("read train doc"));
     }
     format!("{:08x}", hasher.finalize())
 }
 
-fn zstd_round_trip_nodict(raw: &[u8]) -> u64 {
-    let compressed = zstd::bulk::compress(raw, 19).expect("zstd compress");
-    let restored = zstd::bulk::decompress(&compressed, raw.len() + 1).expect("zstd decompress");
+fn zstd_round_trip(
+    raw: &[u8],
+    compressor: &mut zstd::bulk::Compressor,
+    decompressor: &mut zstd::bulk::Decompressor,
+) -> u64 {
+    let compressed = compressor.compress(raw).expect("zstd compress");
+    let restored = decompressor
+        .decompress(&compressed, raw.len() + 1)
+        .expect("zstd decompress");
     assert_eq!(restored, raw, "zstd round-trip mismatch");
     compressed.len() as u64
 }
