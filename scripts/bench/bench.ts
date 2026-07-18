@@ -307,7 +307,9 @@ async function benchLanguage(
   printSessionRow('all+dict', languageTotals, sessionDictBytes);
   printSessionRow('sh+dict', shortTotals, shortDictBytes);
   const breakeven = breakevenOf(languageTotals, sessionDictBytes);
-  if (dictBytes > 0) {
+  // Any charged transfer counts, not just the frame language's own module: id-0 frames can
+  // still carry fenced dependencies whose breakeven is worth reporting.
+  if (Object.values(sessionDictBytes).some((bytes) => bytes > 0)) {
     const parts = Object.entries(breakeven).map(
       ([method, bytes]) => `${method}: ${bytes === undefined ? 'never' : formatKb(bytes)}`
     );
