@@ -11,6 +11,7 @@ use serde::Deserialize;
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::time::{Duration, Instant};
 
 #[derive(Deserialize)]
 struct ManifestEntry {
@@ -37,6 +38,13 @@ struct Acc {
     wins: BTreeMap<&'static str, u64>,
 }
 
+/// Wall-clock spent compressing / decompressing per method, whole corpus.
+#[derive(Default)]
+struct Timing {
+    compress: Duration,
+    decompress: Duration,
+}
+
 fn main() {
     let repo_root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
     let corpus_dir = std::env::var("TOKZIP_CORPUS_DIR")
@@ -60,7 +68,18 @@ fn main() {
         .collect();
     languages.sort();
 
-    let requested: Vec<String> = std::env::args().skip(1).collect();
+    // `--maxdict=N` caps the trained dictionary size (bytes) for BOTH arms, so a
+    // sweep compares tokzip and zstd at the same dictionary budget. Default is
+    // the zstd CLI default (~110KB).
+    let mut maxdict: Option<u64> = None;
+    let mut requested: Vec<String> = Vec::new();
+    for arg in std::env::args().skip(1) {
+        if let Some(v) = arg.strip_prefix("--maxdict=") {
+            maxdict = Some(v.parse().expect("--maxdict=<bytes>"));
+        } else {
+            requested.push(arg);
+        }
+    }
     let unknown: Vec<&String> = requested
         .iter()
         .filter(|r| !languages.contains(r))
@@ -86,6 +105,9 @@ fn main() {
 
     let mut totals: BTreeMap<&str, Acc> =
         BUCKETS.iter().map(|(n, _)| (*n, Acc::default())).collect();
+    let mut timings: BTreeMap<&str, Timing> =
+        METHODS.iter().map(|m| (*m, Timing::default())).collect();
+    let mut dict_prep = Duration::ZERO;
 
     for lang in &languages {
         let manifest_path = corpus_dir.join(lang).join("manifest.jsonl");
@@ -105,8 +127,9 @@ fn main() {
         // `l19` in the cache key: dictionary statistics are tuned for the evaluated
         // compression level (passing `-19` below measurably improves the baseline),
         // so the level is part of the cache identity, as is the trainer's version.
+        let maxdict_tag = maxdict.map_or(String::new(), |m| format!("-d{m}"));
         let dict_path = dict_dir.join(format!(
-            "{lang}-l{ZSTD_LEVEL}-{}.dict",
+            "{lang}-l{ZSTD_LEVEL}{maxdict_tag}-{}.dict",
             train_fingerprint(&corpus_dir, &train_files, &zstd_version)
         ));
         if !dict_path.exists() {
@@ -115,13 +138,18 @@ fn main() {
             // partial file at the cache path (a shared temp name would interleave
             // writes and even corrupt the cache after a successful rename).
             let tmp_path = dict_path.with_extension(format!("{}.tmp", std::process::id()));
-            let output = Command::new("zstd")
+            let mut train_cmd = Command::new("zstd");
+            train_cmd
                 .arg("--train")
                 .args(&train_files)
                 .arg(format!("-{ZSTD_LEVEL}"))
                 .arg("-o")
                 .arg(&tmp_path)
-                .arg("-f")
+                .arg("-f");
+            if let Some(m) = maxdict {
+                train_cmd.arg(format!("--maxdict={m}"));
+            }
+            let output = train_cmd
                 .output()
                 .expect("run zstd --train (is the zstd CLI installed?)");
             // No `-q`: it would silence the `!  Warning : data size of samples too
@@ -158,7 +186,7 @@ fn main() {
                 .flatten()
             {
                 let name = entry.file_name().to_string_lossy().into_owned();
-                if name.starts_with(&format!("{lang}-l{ZSTD_LEVEL}-"))
+                if name.starts_with(&format!("{lang}-l{ZSTD_LEVEL}{maxdict_tag}-"))
                     && name.ends_with(".dict")
                     && entry.path() != dict_path
                 {
@@ -199,6 +227,12 @@ fn main() {
             zstd::bulk::Decompressor::with_dictionary(&dict).expect("zstd decompressor");
         let mut plain_decompressor = zstd::bulk::Decompressor::new().expect("zstd decompressor");
 
+        // One-time per-dictionary preparation (match-finder chains + model
+        // priming); amortized across every document stored under this language.
+        let prep_start = Instant::now();
+        let tokzip_dict = tokzip::Dictionary::new(&dict);
+        dict_prep += prep_start.elapsed();
+
         let mut lang_acc = Acc::default();
         for entry in entries.iter().filter(|e| e.split == "bench") {
             let raw =
@@ -206,20 +240,33 @@ fn main() {
 
             let mut sizes: BTreeMap<&'static str, u64> = BTreeMap::new();
 
-            let frame = tokzip::compress(&raw, Some(&dict));
-            assert_eq!(
-                tokzip::decompress(&frame, Some(&dict)).expect("tokzip decode"),
-                raw
-            );
+            let t = timings.get_mut("tokzip-rs").unwrap();
+            let start = Instant::now();
+            let frame = tokzip::compress(&raw, Some(&tokzip_dict));
+            t.compress += start.elapsed();
+            let start = Instant::now();
+            let restored = tokzip::decompress(&frame, Some(&tokzip_dict)).expect("tokzip decode");
+            t.decompress += start.elapsed();
+            assert_eq!(restored, raw, "tokzip round-trip mismatch");
             sizes.insert("tokzip-rs", frame.len() as u64);
 
             sizes.insert(
                 "zstd+dict",
-                zstd_round_trip(&raw, &mut dict_compressor, &mut dict_decompressor),
+                zstd_round_trip(
+                    &raw,
+                    &mut dict_compressor,
+                    &mut dict_decompressor,
+                    timings.get_mut("zstd+dict").unwrap(),
+                ),
             );
             sizes.insert(
                 "zstd",
-                zstd_round_trip(&raw, &mut plain_compressor, &mut plain_decompressor),
+                zstd_round_trip(
+                    &raw,
+                    &mut plain_compressor,
+                    &mut plain_decompressor,
+                    timings.get_mut("zstd").unwrap(),
+                ),
             );
 
             // Credit the win to the first method in METHODS order that hits the
@@ -280,6 +327,21 @@ fn main() {
             );
         }
     }
+
+    let raw_mb = totals["all"].raw as f64 / (1024.0 * 1024.0);
+    println!("\n=== Throughput (whole corpus, single-threaded) ===");
+    println!(
+        "tokzip-rs dictionary prep (once per language): {:.2}s total",
+        dict_prep.as_secs_f64()
+    );
+    for m in METHODS {
+        let t = &timings[m];
+        println!(
+            "  {m:<13} compress {:>8.2} MB/s   decompress {:>8.2} MB/s",
+            raw_mb / t.compress.as_secs_f64(),
+            raw_mb / t.decompress.as_secs_f64()
+        );
+    }
 }
 
 /// Compressed/raw percentage, or `n/a` for an empty accumulator.
@@ -323,11 +385,16 @@ fn zstd_round_trip(
     raw: &[u8],
     compressor: &mut zstd::bulk::Compressor,
     decompressor: &mut zstd::bulk::Decompressor,
+    timing: &mut Timing,
 ) -> u64 {
+    let start = Instant::now();
     let compressed = compressor.compress(raw).expect("zstd compress");
+    timing.compress += start.elapsed();
+    let start = Instant::now();
     let restored = decompressor
         .decompress(&compressed, raw.len() + 1)
         .expect("zstd decompress");
+    timing.decompress += start.elapsed();
     assert_eq!(restored, raw, "zstd round-trip mismatch");
     compressed.len() as u64
 }
