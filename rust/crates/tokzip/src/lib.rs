@@ -22,6 +22,17 @@ pub use lzrc::Dictionary;
 pub const MAGIC: u8 = 0xC2;
 pub const VERSION: u8 = 0;
 const HEADER_LEN: usize = 7;
+/// Upper bound on a frame's declared decompressed length. Caps the output
+/// allocation for untrusted frames so a corrupt varint cannot force an OOM.
+const MAX_DECOMPRESSED_LEN: u64 = 1024 * 1024 * 1024;
+
+/// Returns a process-wide empty [`Dictionary`], built once. Dictionary-less
+/// `compress`/`decompress` calls reuse it instead of re-running the ~640 KB
+/// allocation and priming simulation on every call.
+fn empty_dictionary() -> &'static Dictionary {
+    static EMPTY: std::sync::OnceLock<Dictionary> = std::sync::OnceLock::new();
+    EMPTY.get_or_init(|| Dictionary::new(&[]))
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Method {
@@ -58,13 +69,9 @@ impl std::error::Error for DecodeError {}
 /// [`Dictionary`] to [`decompress`] is required to restore lzrc frames; the
 /// `stored` fallback is dictionary-independent.
 pub fn compress(content: &[u8], dictionary: Option<&Dictionary>) -> Vec<u8> {
-    let empty;
     let dict = match dictionary {
         Some(d) => d,
-        None => {
-            empty = Dictionary::new(&[]);
-            &empty
-        }
+        None => empty_dictionary(),
     };
     let mut frame = Vec::with_capacity(HEADER_LEN + content.len());
     frame.push(MAGIC);
@@ -105,13 +112,14 @@ pub fn decompress(frame: &[u8], dictionary: Option<&Dictionary>) -> Result<Vec<u
         }
         m if m == Method::LzRc as u8 => {
             let (out_len, rc_body) = read_varint(body)?;
-            let empty;
+            // Bound the attacker-controlled length before allocating the output
+            // buffer, so a corrupt frame cannot trigger an OOM abort.
+            if out_len > MAX_DECOMPRESSED_LEN {
+                return Err(DecodeError::Corrupt);
+            }
             let dict = match dictionary {
                 Some(d) => d,
-                None => {
-                    empty = Dictionary::new(&[]);
-                    &empty
-                }
+                None => empty_dictionary(),
             };
             lzrc::decode_doc(dict, rc_body, out_len as usize)?
         }

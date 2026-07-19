@@ -616,20 +616,24 @@ fn run_encode_optimal(
     let mut inserted = start;
     let mut pairs: Vec<(u32, u32)> = Vec::new();
     let mut steps: Vec<Step> = Vec::new();
+    let mut nodes: Vec<Node> = Vec::new();
     while pos < total {
         let end_target = (pos + CHUNK).min(total);
         let max_reach = (end_target + MATCH_MAX).min(total);
         let n = max_reach - pos;
-        let mut nodes = vec![
+        // Reuse the allocation across chunks; `resize` refills every slot, so
+        // stale prices from the previous chunk never leak in.
+        nodes.clear();
+        nodes.resize(
+            n + 1,
             Node {
                 price: INF,
                 prev: 0,
                 step: Step::Literal,
                 state: 0,
                 reps: [0; 4],
-            };
-            n + 1
-        ];
+            },
+        );
         nodes[0].price = 0;
         nodes[0].state = cs.state as u8;
         nodes[0].reps = cs.reps;
