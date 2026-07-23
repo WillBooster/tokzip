@@ -2,7 +2,7 @@
 
 [![Test rust](https://github.com/WillBooster/tokzip/actions/workflows/test-rust.yml/badge.svg)](https://github.com/WillBooster/tokzip/actions/workflows/test-rust.yml)
 [![Test](https://github.com/WillBooster/tokzip/actions/workflows/test.yml/badge.svg)](https://github.com/WillBooster/tokzip/actions/workflows/test.yml)
-[![wbfy](https://img.shields.io/badge/wbfy-4.3.9-1e90ff.svg)](https://github.com/WillBooster/shared/tree/main/packages/wbfy)
+[![wbfy](https://img.shields.io/badge/wbfy-5.1.3-1e90ff.svg)](https://github.com/WillBooster/shared/tree/main/packages/wbfy)
 
 Lossless compressor specialized for **source code and natural-language text** — human-written
 or LLM-generated. Pure TypeScript (no WASM, no native deps), runs in Node/Bun/browsers, and
