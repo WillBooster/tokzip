@@ -7,8 +7,8 @@ import {
   TokzipCompressionStream,
   TokzipDecodeError,
   TokzipDecompressionStream,
-} from '../src/index.ts';
-import '../src/languages/typescript.ts';
+} from '../../src/index.ts';
+import '../../src/languages/typescript.ts';
 
 /** Deterministic PRNG (mulberry32) so fuzz failures reproduce exactly. */
 // oxlint-disable unicorn/prefer-math-trunc -- >>> 0 converts to unsigned 32-bit; Math.trunc would keep the sign

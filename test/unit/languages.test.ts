@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'bun:test';
-import { compress, decompress, LANGUAGE_IDS, registerLanguageModule } from '../src/index.ts';
+import { compress, decompress, LANGUAGE_IDS, registerLanguageModule } from '../../src/index.ts';
 // Importing the barrel registers every trained module, which re-runs table validation
 // (registerLanguage throws on incomplete codes) before any round-trip below.
-import '../src/languages/index.ts';
-import { languageByName } from '../src/dictionary.ts';
-import { typescriptModule } from '../src/generated/typescript.ts';
-import { fromBase64 } from '../src/moduleData.ts';
+import '../../src/languages/index.ts';
+import { languageByName } from '../../src/dictionary.ts';
+import { typescriptModule } from '../../src/generated/typescript.ts';
+import { fromBase64 } from '../../src/moduleData.ts';
 
 const SAMPLES: Record<string, string> = {
   code: 'export async function fetchUser(id: string): Promise<User> {\n  const response = await fetch(`/api/users/${id}`);\n  return (await response.json()) as User;\n}\n'.repeat(
