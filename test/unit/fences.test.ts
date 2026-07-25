@@ -1,8 +1,8 @@
 import { expect, test } from 'bun:test';
-import { compress, decompress, TokzipDecodeError } from '../src/index.ts';
-import '../src/languages/index.ts';
-import { FLAG_FENCED } from '../src/format.ts';
-import { typescriptModule } from '../src/generated/typescript.ts';
+import { compress, decompress, TokzipDecodeError } from '../../src/index.ts';
+import '../../src/languages/index.ts';
+import { FLAG_FENCED } from '../../src/format.ts';
+import { typescriptModule } from '../../src/generated/typescript.ts';
 
 const RADIX64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 const MODES = ['fast', 'small'] as const;
@@ -153,7 +153,7 @@ test('decoding an extended match without the block language registered throws', 
   const frame = compress(docWith('ts'), { language: 'none', mode: 'fast' });
   expect(isFenced(frame)).toBe(true);
   // A fresh process registering only core (id 0) must reject the typescript extension.
-  const probe = `import { decompress, TokzipDecodeError } from '${import.meta.dir}/../src/index.ts';
+  const probe = `import { decompress, TokzipDecodeError } from '${import.meta.dir}/../../src/index.ts';
 try {
   decompress(process.argv.at(-1));
   console.log('NO_ERROR');

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
-import { compress, decompress } from '../src/index.ts';
-import { RADIX64_ALPHABET } from '../src/radix64.ts';
-import { RADIX85_ALPHABET } from '../src/radix85.ts';
-import '../src/languages/typescript.ts';
+import { compress, decompress } from '../../src/index.ts';
+import { RADIX64_ALPHABET } from '../../src/radix64.ts';
+import { RADIX85_ALPHABET } from '../../src/radix85.ts';
+import '../../src/languages/typescript.ts';
 
 // oxlint-disable-next-line no-misused-spread -- both alphabets are pure ASCII
 const SAFE_CHARS = new Set([...RADIX64_ALPHABET, ...RADIX85_ALPHABET]);

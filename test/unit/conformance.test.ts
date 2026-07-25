@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test';
-import { frameChecksum } from '../src/checksum.ts';
-import { compress, decompress, TokzipDecodeError } from '../src/index.ts';
-import { MODE_FAST, MODE_SMALL, MODE_STORED } from '../src/format.ts';
-import { RADIX64_ALPHABET } from '../src/radix64.ts';
-import { RADIX85_ALPHABET } from '../src/radix85.ts';
+import { frameChecksum } from '../../src/checksum.ts';
+import { compress, decompress, TokzipDecodeError } from '../../src/index.ts';
+import { MODE_FAST, MODE_SMALL, MODE_STORED } from '../../src/format.ts';
+import { RADIX64_ALPHABET } from '../../src/radix64.ts';
+import { RADIX85_ALPHABET } from '../../src/radix85.ts';
 
 /** Shipped mode from a frame's flags char (header char 2). */
 function shippedMode(frame: string): number {

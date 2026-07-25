@@ -1,12 +1,12 @@
 import { expect, test } from 'bun:test';
-import '../src/index.ts';
-import { languageByName } from '../src/dictionary.ts';
-import { encodeFastBody, fastBodyCost, fastPricing } from '../src/fastMode.ts';
-import { buildDecoder, buildEncoder, buildLengths, isCompleteCode } from '../src/huffman.ts';
-import { dictIndexFor, parse } from '../src/lz.ts';
-import { BitReader, BitWriter, decodeRadix85, RADIX85_ALPHABET } from '../src/radix85.ts';
-import { emitSmallBody, planSmallBody, smallPricing } from '../src/smallMode.ts';
-import { extraBitsOf, extraValueOf, slotOf, valueOfSlot } from '../src/slots.ts';
+import '../../src/index.ts';
+import { languageByName } from '../../src/dictionary.ts';
+import { encodeFastBody, fastBodyCost, fastPricing } from '../../src/fastMode.ts';
+import { buildDecoder, buildEncoder, buildLengths, isCompleteCode } from '../../src/huffman.ts';
+import { dictIndexFor, parse } from '../../src/lz.ts';
+import { BitReader, BitWriter, decodeRadix85, RADIX85_ALPHABET } from '../../src/radix85.ts';
+import { emitSmallBody, planSmallBody, smallPricing } from '../../src/smallMode.ts';
+import { extraBitsOf, extraValueOf, slotOf, valueOfSlot } from '../../src/slots.ts';
 
 const SAMPLES = [
   'const x = 1;\n'.repeat(40),
