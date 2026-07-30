@@ -8,6 +8,8 @@
  * search depth at O(1) amortized cost per input byte, independent of dictionary size.
  */
 
+import { slotOf } from './slots.ts';
+
 const HASH_MULTIPLIER = 0x9E_37_79_B1;
 
 export interface DictMatcher {
@@ -21,6 +23,13 @@ export interface DictMatcher {
    * forward start).
    */
   stateMinStart: Int32Array;
+  /**
+   * Nearest suffix-link ancestor whose min-start offset slot is strictly smaller (-1 when
+   * none). Offset slots weakly decrease toward the root (occurrence sets grow), so this
+   * chain *is* the slot-merged Pareto front: equal-slot ancestors are redundant against a
+   * deeper candidate (same bit price, and the deeper start supports every shorter length).
+   */
+  paretoParent: Int32Array;
   /** Open-addressing transition table: key = state * 256 + byte + 1, 0 = empty. */
   transKeys: Int32Array;
   transVals: Int32Array;
@@ -112,6 +121,16 @@ export function buildDictMatcher(dictionary: Uint8Array): DictMatcher {
   const stateMinStart = maxEnd;
   for (let s = 0; s < size; s++) stateMinStart[s] = n - 1 - maxEnd[s]!;
 
+  // Pareto-parent chain (see the interface doc). byLen orders parents before children, so
+  // each state can extend its link's chain in O(1).
+  const paretoParent = new Int32Array(size).fill(-1);
+  for (let at = 1; at < size; at++) {
+    const s = byLen[at]!;
+    const parent = stateLink[s]!;
+    if (parent <= 0) continue;
+    paretoParent[s] = slotOf(stateMinStart[parent]!) < slotOf(stateMinStart[s]!) ? parent : paretoParent[parent]!;
+  }
+
   // Freeze the transitions into an open-addressing table for the hot matching-statistics walk.
   let capacity = 8;
   while (capacity < trans.size * 2) capacity <<= 1;
@@ -128,6 +147,7 @@ export function buildDictMatcher(dictionary: Uint8Array): DictMatcher {
     stateLen: stateLen.subarray(0, size),
     stateLink: stateLink.subarray(0, size),
     stateMinStart: stateMinStart.subarray(0, size),
+    paretoParent,
     transKeys,
     transVals,
     transMask,

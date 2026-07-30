@@ -716,7 +716,7 @@ function collectSamCandidates(
 ): number {
   let l = matchLen < cap ? matchLen : cap;
   if (l <= initialBest || l < MIN_LEN_EXPLICIT) return 0;
-  const { stateLen, stateLink, stateMinStart } = matcher;
+  const { stateLen, stateLink, stateMinStart, paretoParent } = matcher;
   // Normalize to the locus covering length l (the walk state can sit deeper than l's own
   // endpos class, whose occurrence set is larger and can start lower).
   let s = matchState;
@@ -727,27 +727,17 @@ function collectSamCandidates(
     candLen[0] = l;
     return 1;
   }
+  // The locus plus its precomputed Pareto-parent chain (strictly decreasing offset slots
+  // toward the root) is the full slot-merged Pareto front — a handful of states, not the
+  // whole suffix-link chain.
   let depth = 0;
-  for (let t = s; t !== 0 && stateLen[t]! > initialBest; t = stateLink[t]!) samStateStack[depth++] = t;
+  for (let t = s; t !== -1 && stateLen[t]! > initialBest; t = paretoParent[t]!) samStateStack[depth++] = t;
   let count = 0;
-  let prevSlot = -1;
   for (let d = depth - 1; d >= 0; d--) {
     const t = samStateStack[d]!;
-    const m = stateLen[t]! < l ? stateLen[t]! : l;
-    const start = stateMinStart[t]!;
-    const slot = slotOf(start);
-    if (count > 0 && slot === prevSlot) {
-      // Same offset slot ⇒ same bit price: the deeper occurrence covers every length the
-      // shallower one did, so it replaces both fields (the start must support the length).
-      candDist[count - 1] = start;
-      candLen[count - 1] = m;
-    } else {
-      candDist[count] = start;
-      candLen[count] = m;
-      count++;
-      prevSlot = slot;
-    }
-    if (m === l) break;
+    candDist[count] = stateMinStart[t]!;
+    candLen[count] = stateLen[t]! < l ? stateLen[t]! : l;
+    count++;
   }
   return count;
 }

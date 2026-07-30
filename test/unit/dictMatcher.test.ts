@@ -1,5 +1,6 @@
 import { expect, test } from 'bun:test';
 import { buildDictMatcher, computeMatchingStatistics } from '../../src/dictMatcher.ts';
+import { slotOf } from '../../src/slots.ts';
 
 /** Deterministic LCG so failures reproduce. */
 function makeRandom(seed: number): () => number {
@@ -57,7 +58,19 @@ test('matching statistics agree with brute force on longest match and per-length
     const msLen = new Int32Array(inputLen);
     const msState = new Int32Array(inputLen);
     computeMatchingStatistics(input, 0, inputLen, matcher, msLen, msState);
-    const { stateLen, stateLink, stateMinStart } = matcher;
+    const { stateLen, stateLink, stateMinStart, paretoParent } = matcher;
+
+    // Offset slots weakly decrease toward the root, and paretoParent is the nearest
+    // strictly-smaller-slot ancestor (the invariants the parse's Pareto walk relies on).
+    for (let s = 1; s < stateLen.length; s++) {
+      const parent = stateLink[s]!;
+      if (parent > 0) expect(slotOf(stateMinStart[parent]!)).toBeLessThanOrEqual(slotOf(stateMinStart[s]!));
+      let expected = parent;
+      while (expected > 0 && slotOf(stateMinStart[expected]!) >= slotOf(stateMinStart[s]!)) {
+        expected = stateLink[expected]!;
+      }
+      expect(paretoParent[s]).toBe(expected > 0 ? expected : -1);
+    }
     for (let i = 0; i < inputLen; i++) {
       expect(msLen[i]).toBe(bruteLongest(dict, input, i));
       // For every length, the state covering it on the suffix-link chain must report the
