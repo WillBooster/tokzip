@@ -1,4 +1,5 @@
 import { OFFSET_SLOT_COUNT } from './slots.ts';
+import type { DictMatcher } from './dictMatcher.ts';
 import { LIT_CLASS_MAX, OFFSET_CONTEXT_COUNT, TOKEN_ALPHABET_SIZE, TOKEN_CONTEXT_COUNT } from './format.ts';
 import { isCompleteCode } from './huffman.ts';
 import { TokzipDecodeError } from './errors.ts';
@@ -43,6 +44,8 @@ export interface RegisteredLanguage {
   tables: EntropyTables;
   /** Lazily built hash index over the dictionary (see lz.ts); cached per process. */
   dictIndex: DictIndex | undefined;
+  /** Lazily built suffix-automaton matcher (see dictMatcher.ts); cached per process. */
+  dictMatcher: DictMatcher | undefined;
 }
 
 export interface DictIndex {
@@ -114,6 +117,7 @@ export function registerLanguage(wrapperDictionary: Uint8Array, data: LanguageMo
       offset: new Uint8Array(data.tables.offset),
     },
     dictIndex: undefined,
+    dictMatcher: undefined,
   };
   byId.set(data.id, registered);
   byName.set(data.name, registered);

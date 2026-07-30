@@ -65,8 +65,18 @@ export function trainDictionary(docs: string[], budgetBytes: number, alreadyCove
   let packed = '';
   let packedBytes = 0;
   let coveredProbe = alreadyCovered;
+  // Containment prefilter: a segment contained in coveredProbe must have every 4-gram of its
+  // prefix present, so an absent leading 4-gram skips the (linear-scan) includes() probe.
+  // Rebuilt incrementally as packed grows; keeps large budgets tractable.
+  const gramSet = new Set<string>();
+  let gramIndexed = 0;
+  const indexGramsUpTo = (probe: string): void => {
+    for (; gramIndexed + 4 <= probe.length; gramIndexed++) gramSet.add(probe.slice(gramIndexed, gramIndexed + 4));
+  };
+  indexGramsUpTo(coveredProbe);
   for (const { segment } of candidates.slice(0, MAX_SELECTED_CANDIDATES)) {
-    if (coveredProbe.includes(segment)) continue;
+    const mayBeCovered = segment.length < 4 || gramSet.has(segment.slice(0, 4));
+    if (mayBeCovered && coveredProbe.includes(segment)) continue;
     const overlap = tailOverlap(packed, segment);
     const addition = segment.slice(overlap);
     const additionBytes = encoder.encode(addition).length;
@@ -74,6 +84,7 @@ export function trainDictionary(docs: string[], budgetBytes: number, alreadyCove
     packed += addition;
     packedBytes += additionBytes;
     coveredProbe = alreadyCovered + packed;
+    indexGramsUpTo(coveredProbe);
     if (packedBytes >= budgetBytes - 4) break;
   }
   return encoder.encode(packed);

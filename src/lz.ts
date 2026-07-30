@@ -1,4 +1,5 @@
 import type { DictIndex, RegisteredLanguage } from './dictionary.ts';
+import { buildDictMatcher, computeMatchingStatistics, type DictMatcher } from './dictMatcher.ts';
 import { INITIAL_REPS, MATCH_LEN_CAP, MIN_LEN_EXPLICIT, MIN_LEN_REP } from './format.ts';
 import { LENGTH_SLOT_COUNT, maxSlotValue, slotOf } from './slots.ts';
 
@@ -78,6 +79,8 @@ export interface ParsePricing {
   maxDictStart: number;
   /** When set, inputs up to {@link OPTIMAL_MAX_INPUT} take the optimal parse instead. */
   optimal?: SlotPricing;
+  /** Exact frame-dictionary matcher for the optimal parse (see dictMatcher.ts). */
+  dictMatcher?: DictMatcher;
 }
 
 const HASH_MULTIPLIER = 0x9E_37_79_B1;
@@ -168,6 +171,12 @@ export function dictIndexFor(language: RegisteredLanguage): DictIndex | undefine
   return language.dictIndex;
 }
 
+/** Builds (or returns the cached) suffix-automaton matcher over a language's dictionary. */
+export function dictMatcherFor(language: RegisteredLanguage): DictMatcher | undefined {
+  if (language.dictionary.length < 4) return undefined;
+  return (language.dictMatcher ??= buildDictMatcher(language.dictionary));
+}
+
 function matchLength(a: Uint8Array, ai: number, b: Uint8Array, bi: number, cap: number): number {
   let len = 0;
   while (len < cap && a[ai + len] === b[bi + len]) len++;
@@ -223,6 +232,9 @@ export function parse(
       pricing.maxDictStart,
       pricing.optimal,
       pricing.litCostPrefix,
+      // The matcher cannot honor a start-offset bound below the dictionary length (it tracks
+      // only the lowest-offset occurrence); the chain walk handles that edge instead.
+      pricing.dictMatcher !== undefined && pricing.maxDictStart >= dictionary.length ? pricing.dictMatcher : undefined,
       segments,
       parseStart
     );
@@ -244,6 +256,11 @@ let dpReps = new Int32Array(0);
 // frame-dictionary walk plus a fenced-extension walk).
 const candDist = new Int32Array(2 * (OPTIMAL_DEPTH_SHORT + OPTIMAL_DEPTH));
 const candLen = new Int32Array(2 * (OPTIMAL_DEPTH_SHORT + OPTIMAL_DEPTH));
+// Matching-statistics scratch for the suffix-automaton dictionary matcher.
+let msLenScratch = new Int32Array(0);
+let msStateScratch = new Int32Array(0);
+// Suffix-link chain states collected per position (below CUT_LEN, so bounded).
+const samStateStack = new Int32Array(CUT_LEN);
 
 function headFor(pool: Map<number, Int32Array>, bits: number): Int32Array {
   let head = pool.get(bits);
@@ -279,6 +296,7 @@ function parseOptimal(
   maxDictStart: number,
   prices: SlotPricing,
   litCostPrefix: Float64Array,
+  dictMatcher: DictMatcher | undefined,
   segments?: DictSegment[],
   parseStart = 0
 ): Token[] {
@@ -320,6 +338,20 @@ function parseOptimal(
 
   // Pre-seeded history: index every history position so the DP can match into it.
   for (let i = 0; i < parseStart; i++) insertChains(bytes, i, n, shift, head, prev, head6, prev6);
+
+  // Exact frame-dictionary matches, precomputed in one backward pass (see dictMatcher.ts).
+  let msLen: Int32Array | undefined;
+  let msState: Int32Array | undefined;
+  if (dictMatcher) {
+    if (msLenScratch.length < n) {
+      const size = Math.max(n, msLenScratch.length * 2, 4096);
+      msLenScratch = new Int32Array(size);
+      msStateScratch = new Int32Array(size);
+    }
+    msLen = msLenScratch;
+    msState = msStateScratch;
+    computeMatchingStatistics(bytes, parseStart, n, dictMatcher, msLen, msState);
+  }
 
   for (let i = parseStart; i < n; i++) {
     // Fence-segment cursor: extension searches at position i use the segment covering i.
@@ -539,10 +571,15 @@ function parseOptimal(
           const m = candLen[c0]!;
           const offBits = histOffsetSlotBits[slotOf(d - 1)]!;
           const denseEnd = m < DENSE_LEN_BOUND ? m : DENSE_LEN_BOUND;
-          for (let len = lo; len <= denseEnd; len++) {
-            const c = base + histSlotBits[ctxLen + slotOf(len - MIN_LEN_REP)]! + offBits;
-            const j = i + len;
-            if (c < cost[j]!) updateHistory(cost, src, kind, dist, reps, i, j, c, d, rep0, rep1, rep2);
+          // Per-slot segments: the price is constant while the length slot stays the same.
+          for (let len = lo; len <= denseEnd;) {
+            const s = slotOf(len - MIN_LEN_REP);
+            const segEnd = Math.min(denseEnd, SLOT_MAX_VALUE[s]! + MIN_LEN_REP);
+            const c = base + histSlotBits[ctxLen + s]! + offBits;
+            for (; len <= segEnd; len++) {
+              const j = i + len;
+              if (c < cost[j]!) updateHistory(cost, src, kind, dist, reps, i, j, c, d, rep0, rep1, rep2);
+            }
           }
           if (m > DENSE_LEN_BOUND) {
             for (let s = slotOf(Math.max(lo, DENSE_LEN_BOUND) - MIN_LEN_REP); s < LENGTH_SLOT_COUNT; s++) {
@@ -566,9 +603,11 @@ function parseOptimal(
         const dictFloor = bestExplicit > maxM ? bestExplicit : maxM;
         if ((dictIndex || extIndex) && dictFloor <= cap) {
           const initialBest = dictFloor >= SUFFICIENT_LEN ? dictFloor - 1 : MIN_LEN_EXPLICIT - 1;
-          let candCountD = dictIndex
-            ? collectDictCandidates(bytes, i, n, cap, initialBest, dictionary, dictIndex, maxDictStart, 0, 0, 0)
-            : 0;
+          let candCountD = dictMatcher
+            ? collectSamCandidates(dictMatcher, msLen![i]!, msState![i]!, cap, initialBest)
+            : dictIndex
+              ? collectDictCandidates(bytes, i, n, cap, initialBest, dictionary, dictIndex, maxDictStart, 0, 0, 0)
+              : 0;
           // Fenced extension (§6.1): the block language's suffix addressed above the frame
           // dictionary. Equal-length extension matches never beat frame ones (higher offset),
           // so the walk is floored at the best frame-dictionary length.
@@ -604,10 +643,15 @@ function parseOptimal(
             const m = candLen[c0]!;
             const offBits = dictOffsetSlotBits[slotOf(start)]!;
             const denseEnd = m < DENSE_LEN_BOUND ? m : DENSE_LEN_BOUND;
-            for (let len = dlo; len <= denseEnd; len++) {
-              const c = base + dictSlotBits[ctxLen + slotOf(len - MIN_LEN_REP)]! + offBits;
-              const j = i + len;
-              if (c < cost[j]!) updateDict(cost, src, kind, dist, reps, i, j, c, start, rep0, rep1, rep2, rep3);
+            // Per-slot segments: the price is constant while the length slot stays the same.
+            for (let len = dlo; len <= denseEnd;) {
+              const s = slotOf(len - MIN_LEN_REP);
+              const segEnd = Math.min(denseEnd, SLOT_MAX_VALUE[s]! + MIN_LEN_REP);
+              const c = base + dictSlotBits[ctxLen + s]! + offBits;
+              for (; len <= segEnd; len++) {
+                const j = i + len;
+                if (c < cost[j]!) updateDict(cost, src, kind, dist, reps, i, j, c, start, rep0, rep1, rep2, rep3);
+              }
             }
             if (m > DENSE_LEN_BOUND) {
               for (let s = slotOf(Math.max(dlo, DENSE_LEN_BOUND) - MIN_LEN_REP); s < LENGTH_SLOT_COUNT; s++) {
@@ -648,6 +692,58 @@ function parseOptimal(
   }
   tokens.reverse();
   return tokens;
+}
+
+/**
+ * Emits the exact Pareto candidate set for the frame dictionary at one input position from
+ * the precomputed matching statistics: ascending lengths into candDist/candLen, where each
+ * candidate's offset is the lowest over all occurrences of that length (suffix-link chain
+ * states; consecutive states in the same offset slot merge — same price, longer reach).
+ * Returns the candidate count.
+ */
+function collectSamCandidates(
+  matcher: DictMatcher,
+  matchLen: number,
+  matchState: number,
+  cap: number,
+  initialBest: number
+): number {
+  let l = matchLen < cap ? matchLen : cap;
+  if (l <= initialBest || l < MIN_LEN_EXPLICIT) return 0;
+  const { stateLen, stateLink, stateMinStart } = matcher;
+  // Normalize to the locus covering length l (the walk state can sit deeper than l's own
+  // endpos class, whose occurrence set is larger and can start lower).
+  let s = matchState;
+  while (stateLen[stateLink[s]!]! >= l) s = stateLink[s]!;
+  if (l >= CUT_LEN) {
+    // Immediate-encoding path: one candidate suffices.
+    candDist[0] = stateMinStart[s]!;
+    candLen[0] = l;
+    return 1;
+  }
+  let depth = 0;
+  for (let t = s; t !== 0 && stateLen[t]! > initialBest; t = stateLink[t]!) samStateStack[depth++] = t;
+  let count = 0;
+  let prevSlot = -1;
+  for (let d = depth - 1; d >= 0; d--) {
+    const t = samStateStack[d]!;
+    const m = stateLen[t]! < l ? stateLen[t]! : l;
+    const start = stateMinStart[t]!;
+    const slot = slotOf(start);
+    if (count > 0 && slot === prevSlot) {
+      // Same offset slot ⇒ same bit price: the deeper occurrence covers every length the
+      // shallower one did, so it replaces both fields (the start must support the length).
+      candDist[count - 1] = start;
+      candLen[count - 1] = m;
+    } else {
+      candDist[count] = start;
+      candLen[count] = m;
+      count++;
+      prevSlot = slot;
+    }
+    if (m === l) break;
+  }
+  return count;
 }
 
 /**

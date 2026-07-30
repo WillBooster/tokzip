@@ -20,7 +20,7 @@ import {
   TOKEN_KIND_REP0,
 } from './format.ts';
 import { buildDecoder, buildEncoder, type HuffmanEncoder, MAX_CODE_LENGTH } from './huffman.ts';
-import type { ParsePricing, SlotPricing, Token } from './lz.ts';
+import { dictMatcherFor, type ParsePricing, type SlotPricing, type Token } from './lz.ts';
 import { BitReader, BitWriter, decodeRadix85, wordsFromBytes } from './radix85.ts';
 import {
   extraBitsOf,
@@ -170,6 +170,7 @@ export function smallPricing(bytes: Uint8Array, language: RegisteredLanguage): P
     window: SMALL_WINDOW,
     maxDictStart: SMALL_WINDOW,
     optimal: parser,
+    dictMatcher: dictMatcherFor(language),
   };
 }
 

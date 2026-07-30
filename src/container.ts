@@ -166,25 +166,37 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
       }
     }
     const lazyFastCost = fastBodyCost(smallTokens, bytes, language);
-    const fastPricingModel = fastPricing(bytes, language);
-    let fastTokens = parse(bytes, language.dictionary, dictIndex, fastPricingModel, segments);
-    let pureFastCost = fastBodyCost(fastTokens, bytes, language)!;
-    if (segments) {
-      const plainFastTokens = parse(bytes, language.dictionary, dictIndex, fastPricingModel);
-      const plainFastCost = fastBodyCost(plainFastTokens, bytes, language)!;
-      if (fastOutCost(plainFastCost) <= fastOutCost(pureFastCost)) {
-        fastTokens = plainFastTokens;
-        pureFastCost = plainFastCost;
+    // The pure fast parse exists only for the rare frames where a fast body beats the small
+    // plan. Empirically the greedy fast parse is never more than ~10% smaller than the small
+    // tokens re-priced in fast chars, so when even that margin cannot reach the small plan's
+    // size the parse is skipped outright (a pure compression-speed win: such frames ship the
+    // small body either way).
+    const fastCanWin = lazyFastCost === undefined || fastOutCost(lazyFastCost) < planCost(plan) * 1.25;
+    let pureFastCost: number | undefined;
+    let fastTokens: Token[] | undefined;
+    if (fastCanWin) {
+      const fastPricingModel = fastPricing(bytes, language);
+      fastTokens = parse(bytes, language.dictionary, dictIndex, fastPricingModel, segments);
+      pureFastCost = fastBodyCost(fastTokens, bytes, language)!;
+      if (segments) {
+        const plainFastTokens = parse(bytes, language.dictionary, dictIndex, fastPricingModel);
+        const plainFastCost = fastBodyCost(plainFastTokens, bytes, language)!;
+        if (fastOutCost(plainFastCost) <= fastOutCost(pureFastCost)) {
+          fastTokens = plainFastTokens;
+          pureFastCost = plainFastCost;
+        }
       }
     }
     // Output-unit comparison with pure-fast preferred on ties: the lazy (small-parse) tokens
     // may reach the extended dictionary, so a byte-tied win must not add a fenced dependency.
-    const useLazyTokensForFast = lazyFastCost !== undefined && fastOutCost(lazyFastCost) < fastOutCost(pureFastCost);
+    const useLazyTokensForFast =
+      lazyFastCost !== undefined &&
+      (pureFastCost === undefined || fastOutCost(lazyFastCost) < fastOutCost(pureFastCost));
     const fastCost = useLazyTokensForFast ? lazyFastCost : pureFastCost;
     const smallCost = planCost(plan);
     // Pick the smallest complete frame; on ties the simpler encoding wins (stored, fast, small).
     let bestCost = storedCost;
-    if (fastOutCost(fastCost) < bestCost) {
+    if (fastCost !== undefined && fastOutCost(fastCost) < bestCost) {
       shippedMode = MODE_FAST;
       bestCost = fastOutCost(fastCost);
     }
