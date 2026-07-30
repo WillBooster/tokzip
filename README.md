@@ -30,12 +30,14 @@ const restored2 = decompress(bytes); // === source (Uint8Array in, text/bytes ou
   the previous token kind, offsets by match kind — through a fused radix-85 writer, with
   normative auto-downgrade so output never expands beyond a stored frame).
 - **Per-language preset dictionaries** (17 programming languages + 4 locales, tree-shakeable
-  modules; default budget 8 KB per language — chosen by the session-amortized benchmark —
-  retrainable up to the full 1 MB `small`-mode offset range via `--budget`) plus a shared
-  wrapper dictionary in core — decisive on short
-  inputs where general-purpose compressors have nothing to work with. Because clients must
-  download a dictionary before using it, the benchmark charges each dictionary's
-  brotli-compressed transfer size against tokzip (see Benchmarks below).
+  modules; default budget 128 KB per language — chosen for the primary storage deployment,
+  where the dictionary ships once with the application and per-document ratio is what counts —
+  retrainable from 4 KB up to the full 1 MB `small`-mode offset range via `--budget`) plus a
+  shared wrapper dictionary in core — decisive on short
+  inputs where general-purpose compressors have nothing to work with. Deployments that
+  instead download a dictionary per client session should retrain smaller (the
+  session-amortized benchmark, which charges each dictionary's brotli-compressed transfer
+  size against tokzip, previously picked 8 KB; see Benchmarks below).
 - **Mandatory content checksum**: every frame carries a CRC-32 of the decompressed content
   (the same integrity guarantee gzip provides), verified before any output is returned.
 - **Storage-grade helpers**: `compressForStorage` verifies the frame round-trips to the
@@ -131,10 +133,13 @@ retrained dictionary budget all changed the output sizes, so older pinned tables
 apply). Two stable findings from the metric redesign: with the previous ~1 MB dictionaries
 the brotli-compressed dictionary transfer (~300 KB per language) never paid for itself
 against browser-native gzip on KB-scale sessions, and dictionary-free tokzip small beats
-`CompressionStream` gzip by roughly 2× on ≤ 1 KB documents — which is why the default
-dictionary budget is now chosen by the session-amortized metric rather than the offset
-range. Dictionaries are trained exclusively on the public corpus — private production
-content never flows into them.
+`CompressionStream` gzip by roughly 2× on ≤ 1 KB documents. The default budget targets the
+storage deployment instead — dictionaries ship with the application, so raw per-document
+ratio governs, and it improves monotonically with budget (typescript short-document sweep:
+32.1% @8 KB / 30.9% @32 KB / 29.1% @128 KB / 27.5% @512 KB) with 128 KB as the chosen
+size/ratio balance; session-delivered deployments should retrain smaller. Dictionaries are
+trained exclusively on the public corpus — private production content never flows into
+them.
 
 The figures below are regenerated from the newest `main` benchmark run on every push, so
 they can be newer than the pinned table above:

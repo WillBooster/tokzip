@@ -35,6 +35,29 @@ export function buildDictMatcher(dictionary: Uint8Array): DictMatcher {
   const stateLink = new Int32Array(maxStates).fill(-1);
   const maxEnd = new Int32Array(maxStates).fill(-1);
   const trans = new Map<number, number>();
+  // Per-state transition byte lists so a clone copies only its source's actual out-edges
+  // (a fixed 256-probe sweep per clone would dominate construction on large dictionaries).
+  const listHead = new Int32Array(maxStates).fill(-1);
+  let listNext = new Int32Array(4 * n + 8);
+  let listByte = new Uint8Array(4 * n + 8);
+  let listCount = 0;
+  const addTransition = (state: number, byte: number, to: number): void => {
+    const key = state * 256 + byte;
+    if (!trans.has(key)) {
+      if (listCount === listNext.length) {
+        const nextNext = new Int32Array(listNext.length * 2);
+        nextNext.set(listNext);
+        listNext = nextNext;
+        const nextByte = new Uint8Array(listByte.length * 2);
+        nextByte.set(listByte);
+        listByte = nextByte;
+      }
+      listByte[listCount] = byte;
+      listNext[listCount] = listHead[state]!;
+      listHead[state] = listCount++;
+    }
+    trans.set(key, to);
+  };
   let last = 0;
   let size = 1;
   // Standard online construction over the reversed dictionary: appending R[e] = dict[n-1-e]
@@ -46,7 +69,7 @@ export function buildDictMatcher(dictionary: Uint8Array): DictMatcher {
     maxEnd[cur] = e;
     let p = last;
     while (p !== -1 && !trans.has(p * 256 + c)) {
-      trans.set(p * 256 + c, cur);
+      addTransition(p, c, cur);
       p = stateLink[p]!;
     }
     if (p === -1) stateLink[cur] = 0;
@@ -57,9 +80,9 @@ export function buildDictMatcher(dictionary: Uint8Array): DictMatcher {
         const clone = size++;
         stateLen[clone] = stateLen[p]! + 1;
         stateLink[clone] = stateLink[q]!;
-        for (let b = 0; b < 256; b++) {
-          const t = trans.get(q * 256 + b);
-          if (t !== undefined) trans.set(clone * 256 + b, t);
+        for (let node = listHead[q]!; node !== -1; node = listNext[node]!) {
+          const b = listByte[node]!;
+          addTransition(clone, b, trans.get(q * 256 + b)!);
         }
         while (p !== -1 && trans.get(p * 256 + c) === q) {
           trans.set(p * 256 + c, clone);

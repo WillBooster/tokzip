@@ -67,6 +67,10 @@ export function fastPricing(bytes: Uint8Array, language: RegisteredLanguage): Pa
     // Encoder-side policy (format-compatible): the bounded price-aware lazy step benches
     // 1–2% smaller for a modest compression-speed cost, which the storage workload
     // (KB-scale documents compressed client-side) happily pays.
+    // No suffix-automaton matcher here: `fast` is speed-first, and the matching-statistics
+    // pass plus full Pareto walks bench ~30% slower than the bounded chain walks for well
+    // under a point of ratio. The greedy fallback of `small` (which prices with
+    // smallPricing) does use the matcher.
     lazy: true,
     window: FAST_WINDOW,
     maxDictStart: FAST_WINDOW,

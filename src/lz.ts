@@ -242,6 +242,12 @@ export function parse(
   return parseGreedy(bytes, dictionary, dictIndex, pricing, segments, parseStart);
 }
 
+/**
+ * Greedy parses beyond this input size keep the hash-chain dictionary search: the
+ * matching-statistics pass allocates 8 bytes of scratch per input byte.
+ */
+const GREEDY_SAM_MAX_INPUT = 1 << 22;
+
 // Scratch buffers reused across calls (compress is synchronous; JS is single-threaded).
 const headPool = new Map<number, Int32Array>();
 const headPool6 = new Map<number, Int32Array>();
@@ -903,6 +909,24 @@ function parseGreedy(
   const n = bytes.length;
   const tokens: Token[] = [];
   const { litCostPrefix, window, maxDictStart } = pricing;
+  // Exact frame-dictionary matches via the suffix automaton (same guard as parse(): the
+  // matcher cannot honor a start bound below the dictionary length).
+  const dictMatcher =
+    pricing.dictMatcher !== undefined && maxDictStart >= dictionary.length && n <= GREEDY_SAM_MAX_INPUT
+      ? pricing.dictMatcher
+      : undefined;
+  let msLen: Int32Array | undefined;
+  let msState: Int32Array | undefined;
+  if (dictMatcher) {
+    if (msLenScratch.length < n) {
+      const size = Math.max(n, msLenScratch.length * 2, 4096);
+      msLenScratch = new Int32Array(size);
+      msStateScratch = new Int32Array(size);
+    }
+    msLen = msLenScratch;
+    msState = msStateScratch;
+    computeMatchingStatistics(bytes, parseStart, n, dictMatcher, msLen, msState);
+  }
   let segIndex = 0;
   let extDictionary = segments?.[0]!.extDictionary;
   let extIndex = segments?.[0]!.extIndex;
@@ -998,7 +1022,25 @@ function parseGreedy(
       // cost wins the savings comparison), and a strictly longer one often does.
       const sufficient = bestKind !== 0 && bestLen >= SUFFICIENT_LEN;
       let bestMD = sufficient ? bestLen - 1 : MIN_LEN_EXPLICIT - 1;
-      if (dictIndex) {
+      if (dictMatcher) {
+        // Exact Pareto candidates from the precomputed matching statistics (ascending length,
+        // lowest offset per length), priced like the chain walk's incremental bests.
+        const candCountD = collectSamCandidates(dictMatcher, msLen![pos]!, msState![pos]!, cap, bestMD);
+        for (let c0 = 0; c0 < candCountD; c0++) {
+          const start = candDist[c0]!;
+          const len = candLen[c0]!;
+          bestMD = len;
+          const cost = pricing.dictCost(start, len);
+          const savings = litCostPrefix[pos + len]! - litBase - cost;
+          if (savings > 0 && savings > bestSavings) {
+            bestSavings = savings;
+            bestCost = cost;
+            bestLen = len;
+            bestKind = 2;
+            bestStart = start;
+          }
+        }
+      } else if (dictIndex) {
         if (!sufficient) {
           let dcand = dictIndex.head[hash4(bytes, pos, dictIndex.hashShift)]!;
           let depthD = GREEDY_DICT_DEPTH_SHORT;

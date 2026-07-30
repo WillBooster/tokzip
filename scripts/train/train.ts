@@ -39,15 +39,16 @@ import { buildWrapperDictionary } from './wrapperContent.ts';
 const ROOT = join(import.meta.dir, '../..');
 const GENERATED_DIR = join(ROOT, 'src/generated');
 const LANGUAGES_DIR = join(ROOT, 'src/languages');
-// Default dictionary budget, chosen by the session-amortized benchmark (short-document
-// sessions charged the brotli-compressed module transfer once): the previous ~1 MB
-// dictionaries never paid for their ~300 KB transfer against browser-native gzip, while
-// the 4–16 KB tiers win it outright — 8 KB is the robust middle (typescript sweep:
-// sh+dict 37.8% @4K / 38.8% @8K / 40.8% @16K / 45.4% @32K vs cs gzip 46.5%). The budget
-// is a client-delivery decision, not an offset-range one (the format addresses up to 1 MB
-// either way — pass --budget to experiment). The hard cap keeps wrapper + suffix below
-// the 1 MB small-mode offset bound (2^20 - 1 is the highest representable start).
-const DEFAULT_DICTIONARY_BUDGET_BYTES = 8 * 1024;
+// Default dictionary budget, chosen for the primary deployment (DB storage of code
+// submissions and LLM outputs, where the dictionary ships once with the application and
+// its transfer never recurs per session): the raw dictionary-inclusive ratio improves
+// monotonically with budget, with clear gains through 128 KB and diminishing returns
+// beyond (typescript small-mode short-doc sweep: 32.1% @8K / 30.9% @32K / 29.1% @128K /
+// 27.5% @512K), while 512 KB quadruples module size and memory for ~1.5 pt more. Clients
+// that download dictionaries per session should retrain with a smaller --budget (the
+// old session-amortized winner was 8 KB). The hard cap keeps wrapper + suffix below the
+// 1 MB small-mode offset bound (2^20 - 1 is the highest representable start).
+const DEFAULT_DICTIONARY_BUDGET_BYTES = 128 * 1024;
 const MIN_DICTIONARY_BUDGET_BYTES = 4096;
 const MAX_DICTIONARY_BUDGET_BYTES = 1024 * 1024 - 8192;
 /** Bound on per-language statistics input; keeps a full training run tractable. */
