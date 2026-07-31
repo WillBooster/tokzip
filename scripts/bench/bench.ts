@@ -363,7 +363,7 @@ function addFencedIds(map: Map<string, Set<number>>, methodName: string, ids: nu
 }
 
 interface FencedCollector {
-  collect(doc: LoadedDoc, methodName: string, encoded: string | Uint8Array): void;
+  collect: (doc: LoadedDoc, methodName: string, encoded: string | Uint8Array) => void;
   sessionExtraBytes(methodName: string): number;
   shortExtraBytes(methodName: string): number;
 }
