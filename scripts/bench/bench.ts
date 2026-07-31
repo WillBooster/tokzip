@@ -285,8 +285,7 @@ async function benchLanguage(
     const bucketDocs = loaded.filter((doc) => doc.bucket === bucket);
     if (bucketDocs.length === 0) continue;
     const totals = emptyTotals();
-    for (const doc of bucketDocs)
-      await benchDoc(doc, totals, report.roundTrip, (d, m, e) => fencedCollector.collect(d, m, e));
+    for (const doc of bucketDocs) await benchDoc(doc, totals, report.roundTrip, fencedCollector.collect);
     accumulate(languageTotals, totals);
     if (SHORT_BUCKETS.has(bucket)) accumulate(shortTotals, totals);
     buckets[bucket] = { docs: totals.docs, inputBytes: totals.inputBytes, ratios: ratiosOf(totals) };
@@ -405,7 +404,9 @@ function makeFencedCollector(): FencedCollector {
     return bytes;
   };
   return {
-    collect(doc, methodName, encoded) {
+    // Arrow property (not a method) so callers can pass the reference directly without an
+    // unbound-method lint hit.
+    collect: (doc, methodName, encoded) => {
       const flags = typeof encoded === 'string' ? RADIX64_ALPHABET.indexOf(encoded[2]!) : encoded[2]!;
       if ((flags & FLAG_FENCED) === 0) return;
       const ids = fenceIdsOf(doc);
