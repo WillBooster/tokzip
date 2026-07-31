@@ -55,10 +55,11 @@ function docWith(label: string, code = TS_CODE): string {
 }
 
 test('fenced round-trips with extended matches in both modes and frame languages', () => {
-  const doc = `${docWith('ts')}\nAnd in Python:\n\n\`\`\`python\n${PY_CODE}\`\`\`\n`;
+  const doc = `${docWith('ts', DICT_TS_CODE)}\nAnd in Python:\n\n\`\`\`python\n${PY_CODE}\`\`\`\n`;
   {
     for (const language of ['none', 'en-US', 'text']) {
       const frame = compress(doc, { language });
+      expect(isFenced(frame)).toBe(true);
       expect(decompress(frame)).toBe(doc);
     }
     const byteFrame = compress(new TextEncoder().encode(doc), { language: 'none' });
@@ -85,9 +86,11 @@ test('label aliases and ASCII case both resolve', () => {
 });
 
 test('a block labeled with the frame language stays a plain unfenced frame', () => {
-  const frame = compress(docWith('ts'), { language: 'typescript' });
+  // DICT_TS_CODE keeps the negative control meaningful: the same document IS fenced under
+  // other frame languages, so `false` here exercises the id !== language.id skip.
+  const frame = compress(docWith('ts', DICT_TS_CODE), { language: 'typescript' });
   expect(isFenced(frame)).toBe(false);
-  expect(decompress(frame)).toBe(docWith('ts'));
+  expect(decompress(frame)).toBe(docWith('ts', DICT_TS_CODE));
 });
 
 test('CRLF fence lines resolve the label and round-trip', () => {
