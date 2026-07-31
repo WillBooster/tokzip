@@ -39,7 +39,7 @@ import {
   TOKEN_KIND_REP0,
 } from '../../src/format.ts';
 import { LANGUAGE_IDS } from '../../src/languageIds.ts';
-import { dictIndexFor, parse } from '../../src/lz.ts';
+import { dictIndexIfNeeded, parse } from '../../src/lz.ts';
 import { toBase64, toBase64U16 } from '../../src/moduleData.ts';
 import { PROB_MAX, PROB_MIN, PROB_SCALE } from '../../src/rangeCoder.ts';
 import { smallPricing } from '../../src/smallMode.ts';
@@ -235,7 +235,7 @@ function collectStatistics(docs: string[], dictionary: Uint8Array, language: Reg
     const bytes = textEncoder.encode(doc);
     statsBytes += bytes.length;
     const literalFold = stats.literal[docIndex % 2]!;
-    const tokens = parse(bytes, dictionary, dictIndexFor(language), smallPricing(bytes, language));
+    const tokens = parse(bytes, dictionary, dictIndexIfNeeded(language, bytes.length), smallPricing(bytes, language));
     let prevKind = TOKEN_KIND_LIT;
     // rep0 replay (identical to the codec's) so matched-literal events see rep0.
     let rep0 = 1;

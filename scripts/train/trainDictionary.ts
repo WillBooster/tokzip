@@ -1,12 +1,14 @@
 /**
- * COVER-like dictionary trainer, scored with the codec cost model rather than raw
- * bytes × frequency: a segment's value is the output chars it saves per occurrence
- * (literal cost of the covered bytes minus tag + offset cost of a dictionary match),
- * so the trainer's objective matches what benchmarks measure.
+ * COVER-like dictionary trainer. Segments are scored with a fixed-cost heuristic — a
+ * segment's value is the bytes it covers per occurrence minus a flat per-reference
+ * overhead — not with the v2 range coder's true (context-, prior-, and slot-dependent)
+ * prices; modeling those exactly here would couple dictionary packing to a model that is
+ * itself trained on the packed dictionary. The flat overhead is a proxy for a typical
+ * dictionary-token cost.
  */
 
 const SEGMENT_LENGTHS = [128, 96, 64, 48, 32, 24, 16, 12, 8, 6, 4] as const;
-/** Approximate fast-mode cost of a dictionary reference (tag + 2–3 offset chars). */
+/** Flat per-reference overhead (bytes a dictionary match roughly costs to encode). */
 const MATCH_OVERHEAD_CHARS = 3.5;
 /** Bound on dictionary-training input (chars) so n-gram counting stays tractable. */
 const MAX_TRAINING_CHARS = 24_000_000;

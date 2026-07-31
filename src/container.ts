@@ -84,16 +84,17 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   if (output !== 'text' && output !== 'binary') throw new RangeError(`invalid output: ${String(output)}`);
   const binary = output === 'binary';
 
-  // Fenced dictionary extension: labeled code fences extend the searchable dictionary space
-  // with the block language's suffix (undefined when the input has no such fence).
-  const segments = computeDictSegments(bytes, language, SMALL_WINDOW);
-  const dictIndex = dictIndexIfNeeded(language, bytes.length);
-
   const storedCost = binary ? bytes.length : packedRawLength(bytes.length);
   let shippedMode = MODE_STORED;
   let bodyToShip: Uint8Array | undefined;
   let fenced = false;
+  // Index building stays inside the non-empty branch: empty input ships the fixed stored
+  // frame without parsing, so it must not pay a first-compress matcher build.
   if (bytes.length > 0) {
+    // Fenced dictionary extension: labeled code fences extend the searchable dictionary
+    // space with the block language's suffix (undefined when the input has no such fence).
+    const segments = computeDictSegments(bytes, language, SMALL_WINDOW);
+    const dictIndex = dictIndexIfNeeded(language, bytes.length);
     // Candidate bodies are compared in output units — bytes on the binary channel, radix-85
     // chars on the text channel (which quantizes to 4-byte words, so 1–3 body bytes often
     // cost zero shipped chars): a candidate must not win a side effect for zero savings.
