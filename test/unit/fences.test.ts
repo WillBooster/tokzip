@@ -55,10 +55,11 @@ function docWith(label: string, code = TS_CODE): string {
 }
 
 test('fenced round-trips with extended matches in both modes and frame languages', () => {
-  const doc = `${docWith('ts')}\nAnd in Python:\n\n\`\`\`python\n${PY_CODE}\`\`\`\n`;
+  const doc = `${docWith('ts', DICT_TS_CODE)}\nAnd in Python:\n\n\`\`\`python\n${PY_CODE}\`\`\`\n`;
   {
     for (const language of ['none', 'en-US', 'text']) {
       const frame = compress(doc, { language });
+      expect(isFenced(frame)).toBe(true);
       expect(decompress(frame)).toBe(doc);
     }
     const byteFrame = compress(new TextEncoder().encode(doc), { language: 'none' });
@@ -78,20 +79,22 @@ test('extended matches set flag bit 3 and shrink output versus an unknown label'
 
 test('label aliases and ASCII case both resolve', () => {
   for (const label of ['TS', 'TypeScript', 'tsx', 'typescript']) {
-    const frame = compress(docWith(label), { language: 'none' });
+    const frame = compress(docWith(label, DICT_TS_CODE), { language: 'none' });
     expect(isFenced(frame)).toBe(true);
-    expect(decompress(frame)).toBe(docWith(label));
+    expect(decompress(frame)).toBe(docWith(label, DICT_TS_CODE));
   }
 });
 
 test('a block labeled with the frame language stays a plain unfenced frame', () => {
-  const frame = compress(docWith('ts'), { language: 'typescript' });
+  // DICT_TS_CODE keeps the document fence-eligible (it IS fenced under other frame
+  // languages), so `false` here is not a vacuous pass caused by an unmatched snippet.
+  const frame = compress(docWith('ts', DICT_TS_CODE), { language: 'typescript' });
   expect(isFenced(frame)).toBe(false);
-  expect(decompress(frame)).toBe(docWith('ts'));
+  expect(decompress(frame)).toBe(docWith('ts', DICT_TS_CODE));
 });
 
 test('CRLF fence lines resolve the label and round-trip', () => {
-  const doc = docWith('ts').replaceAll('\n', '\r\n');
+  const doc = docWith('ts', DICT_TS_CODE).replaceAll('\n', '\r\n');
   {
     const frame = compress(doc, { language: 'none' });
     expect(isFenced(frame)).toBe(true);
@@ -149,7 +152,7 @@ test('flag bit 3 on a frame without extended matches decodes identically', () =>
 });
 
 test('decoding an extended match without the block language registered throws', () => {
-  const frame = compress(docWith('ts'), { language: 'none' });
+  const frame = compress(docWith('ts', DICT_TS_CODE), { language: 'none' });
   expect(isFenced(frame)).toBe(true);
   // A fresh process registering only core (id 0) must reject the typescript extension.
   const probe = `import { decompress, TokzipDecodeError } from '${import.meta.dir}/../../src/index.ts';
@@ -167,7 +170,7 @@ test('TokzipDecodeError stays typed for in-process extended-match bounds violati
   // Flag flipped on a plain frame plus a forged oversized dict offset is covered by the
   // fenced round-trip suite; here the plain out-of-bounds path must still throw when the
   // flag is clear (extended offsets are invalid without it).
-  const frame = compress(docWith('ts'), { language: 'none' });
+  const frame = compress(docWith('ts', DICT_TS_CODE), { language: 'none' });
   const cleared = frame.slice(0, 2) + RADIX64[flagsOf(frame) & ~FLAG_FENCED]! + frame.slice(3);
   expect(() => decompress(cleared)).toThrow(TokzipDecodeError);
 });

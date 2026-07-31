@@ -11,8 +11,13 @@ template-literal-safe radix-85; needs percent-encoding inside URLs) instead of p
 33% base64 tax on a binary stream, or a **dense binary frame** for transports that accept
 raw bytes (when both channels ship the same range-coded body, the text frame pays the 25%
 radix-85 tax on it; each channel independently downgrades to stored, and headers/padding
-make whole-frame ratios vary a little). On the project's code/text corpus it outperforms base64url(brotli -q11) on the text
-channel and raw brotli -q11 on the binary channel, in every language bucket.
+make whole-frame ratios vary a little). On the pinned public benchmark corpus (see
+Benchmarks below) it outperforms base64url(brotli -q11) on the text
+channel in every language and size bucket, and raw brotli -q11 on the binary channel
+overall (25.1% vs 27.1%) and in every language except generic prose `text` (0.3 pp behind —
+brotli's built-in dictionary is strong on large English-prose documents, and individual
+8–24 KB prose/CJK buckets trail by up to ~1.1 pp at the default 16 KB budget; retraining
+at 128 KB via `--budget` wins every bucket on both channels).
 
 ```ts
 import { compress, decompress } from './src/index.ts';
@@ -34,18 +39,20 @@ const restored2 = decompress(bytes); // === source (Uint8Array in, text/bytes ou
   documents adapt to themselves. Normative auto-downgrade: output never expands beyond a
   stored frame.
 - **Per-language preset dictionaries** (17 programming languages + 4 locales, tree-shakeable
-  modules; default budget 128 KB per language — chosen for the primary storage deployment,
-  where the dictionary ships once with the application and per-document ratio is what counts —
-  retrainable from 4 KB up to the full 1 MB offset range via `--budget`) plus a
+  modules; default budget 16 KB per language — chosen for the primary storage deployment,
+  where the dictionary ships once with the application, documents compress inside request
+  handlers on short-lived isolates, and the first-compress index cost matters as much as
+  ratio — retrainable from 4 KB up to the full 1 MB offset range via `--budget`; 128 KB
+  buys ~1.2 pp of overall text-channel ratio at ~6× the index cost below) plus a
   shared wrapper dictionary in core — decisive on short
   inputs where general-purpose compressors have nothing to work with. Deployments that
-  instead download a dictionary per client session should retrain smaller (the
+  instead download a dictionary per client session should retrain smaller still (the
   session-amortized benchmark, which charges each dictionary's brotli-compressed transfer
   size against tokzip, previously picked 8 KB; see Benchmarks below). The first compress
-  per language builds a suffix-automaton matcher over its dictionary (~65 ms and ~7 MB
-  retained at the default budget), cached for the process; long-lived processes that
-  compressed in many languages can drop the caches with `releaseLanguageIndexes()` — they
-  rebuild transparently on the next compress.
+  per language builds a suffix-automaton matcher over its dictionary (~10 ms and ~1 MB
+  retained at the default budget; ~63 ms and ~7 MB at 128 KB), cached for the process;
+  long-lived processes that compressed in many languages can drop the caches with
+  `releaseLanguageIndexes()` — they rebuild transparently on the next compress.
 - **Mandatory content checksum**: every frame carries a CRC-32 of the decompressed content
   (the same integrity guarantee gzip provides), verified before any output is returned.
 - **Storage-grade helpers**: `compressForStorage` verifies the frame round-trips to the
@@ -135,15 +142,18 @@ method on every document round-trips losslessly** — any mismatch fails the run
 speed pass on the text channel only).
 
 Current numbers live on the dashboard (the v2 format reset — one range-coded mode — and
-the retrained 128 KB dictionaries changed all output sizes, so older pinned tables no
+each dictionary retrain can change compressed output sizes, so older pinned tables no
 longer apply). Two stable findings from the metric redesign: with the previous ~1 MB dictionaries
 the brotli-compressed dictionary transfer (~300 KB per language) never paid for itself
 against browser-native gzip on KB-scale sessions, and dictionary-free tokzip beats
 `CompressionStream` gzip by roughly 2× on ≤ 1 KB documents. The default budget targets the
-storage deployment instead — dictionaries ship with the application, so raw per-document
-ratio governs, and it improves monotonically with budget (typescript short-document sweep:
-32.1% @8 KB / 30.9% @32 KB / 29.1% @128 KB / 27.5% @512 KB) with 128 KB as the chosen
-size/ratio balance; session-delivered deployments should retrain smaller. Dictionaries are
+storage deployment — dictionaries ship with the application, so per-document
+ratio and the first-compress index cost govern. Ratio improves monotonically with budget
+(typescript ≤ 4 KB bench documents: 30.0% @16 KB vs 27.8% @128 KB, measured with the
+current trainer), but the index build time and retained memory grow linearly with it, so 16 KB —
+the smallest budget that still beats brotli -q11 in every text-channel bucket — is the
+chosen balance; ratio-first deployments should retrain larger and session-delivered ones
+smaller. Dictionaries are
 trained exclusively on the public corpus — private production content never flows into
 them.
 

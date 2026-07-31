@@ -8,7 +8,7 @@
  *   bun scripts/train/train.ts core            # wrapper dictionary + id-0 generic model
  *   bun scripts/train/train.ts typescript ...  # one or more language modules
  *   bun scripts/train/train.ts --all           # core + every language with corpus data
- *   --budget <bytes>                           # dictionary-suffix budget (4 KiB – 1 MiB, default 128 KiB)
+ *   --budget <bytes>                           # dictionary-suffix budget (4 KiB – 1 MiB, default 16 KiB)
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -52,11 +52,15 @@ const ROOT = join(import.meta.dir, '../..');
 const GENERATED_DIR = join(ROOT, 'src/generated');
 const LANGUAGES_DIR = join(ROOT, 'src/languages');
 // Default dictionary budget, chosen for the primary deployment (DB storage of code
-// submissions and LLM outputs, where the dictionary ships once with the application):
-// ratio improves monotonically with budget with clear gains through 128 KB and diminishing
-// returns beyond. Clients that download dictionaries per session should retrain smaller.
-// The hard cap keeps wrapper + suffix below the 1 MB offset bound.
-const DEFAULT_DICTIONARY_BUDGET_BYTES = 128 * 1024;
+// submissions and LLM outputs, where the dictionary ships once with the application and
+// documents are compressed inside request handlers). Ratio improves monotonically with budget, but so do
+// the per-language costs paid at first compress: the suffix-automaton index build (~10 ms
+// at 16 KB vs ~63 ms at 128 KB) and its retained memory (~1 MB vs ~7 MB) — decisive on
+// short-lived isolates (Cloudflare Workers). 16 KB is the smallest budget that keeps the
+// text channel ahead of brotli -q11 in every language and size bucket (losing ~1.2 pp of
+// overall ratio vs 128 KB); deployments that prioritize ratio can retrain larger via
+// --budget. The hard cap keeps wrapper + suffix below the 1 MB offset bound.
+const DEFAULT_DICTIONARY_BUDGET_BYTES = 16 * 1024;
 const MIN_DICTIONARY_BUDGET_BYTES = 4096;
 const MAX_DICTIONARY_BUDGET_BYTES = 1024 * 1024 - 8192;
 /** Bound on per-language statistics input; keeps a full training run tractable. */
