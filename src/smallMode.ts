@@ -397,9 +397,10 @@ function decodeSmallCore(
       state[index] = prob - (prob >> ADAPT_SHIFT);
       bit = 1;
     }
-    // One renormalization step always suffices: probabilities are clamped to
-    // [PROB_MIN, PROB_MAX], so a decode keeps range ≥ (TOP >> PROB_BITS) × PROB_MIN > 2^16.
-    if (range < TOP) {
+    // Every renormalization block must loop, mirroring RangeDecoder: registerLanguageModule
+    // accepts priors down to 1 (dictionary.ts), and a bit decoded at such an extreme can
+    // shrink range below 2^16, needing more than one byte to renormalize.
+    while (range < TOP) {
       if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
       code = ((code << 8) | body[bpos++]!) >>> 0;
       range = (range << 8) >>> 0;
@@ -424,7 +425,7 @@ function decodeSmallCore(
             state[index] = prob - (prob >> ADAPT_SHIFT);
             node = (node << 1) | 1;
           }
-          if (range < TOP) {
+          while (range < TOP) {
             if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
             code = ((code << 8) | body[bpos++]!) >>> 0;
             range = (range << 8) >>> 0;
@@ -450,7 +451,7 @@ function decodeSmallCore(
             state[index] = prob - (prob >> ADAPT_SHIFT);
             bit = 1;
           }
-          if (range < TOP) {
+          while (range < TOP) {
             if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
             code = ((code << 8) | body[bpos++]!) >>> 0;
             range = (range << 8) >>> 0;
@@ -482,7 +483,7 @@ function decodeSmallCore(
       state[index] = prob - (prob >> ADAPT_SHIFT);
       bit = 1;
     }
-    if (range < TOP) {
+    while (range < TOP) {
       if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
       code = ((code << 8) | body[bpos++]!) >>> 0;
       range = (range << 8) >>> 0;
@@ -507,7 +508,7 @@ function decodeSmallCore(
           state[index] = prob - (prob >> ADAPT_SHIFT);
           node = (node << 1) | 1;
         }
-        if (range < TOP) {
+        while (range < TOP) {
           if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
           code = ((code << 8) | body[bpos++]!) >>> 0;
           range = (range << 8) >>> 0;
@@ -529,7 +530,7 @@ function decodeSmallCore(
         state[index] = prob - (prob >> ADAPT_SHIFT);
         bit = 1;
       }
-      if (range < TOP) {
+      while (range < TOP) {
         if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
         code = ((code << 8) | body[bpos++]!) >>> 0;
         range = (range << 8) >>> 0;
@@ -559,7 +560,7 @@ function decodeSmallCore(
         state[index] = prob - (prob >> ADAPT_SHIFT);
         node = (node << 1) | 1;
       }
-      if (range < TOP) {
+      while (range < TOP) {
         if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
         code = ((code << 8) | body[bpos++]!) >>> 0;
         range = (range << 8) >>> 0;
@@ -577,7 +578,7 @@ function decodeSmallCore(
       } else {
         extraValue = extraValue * 2;
       }
-      if (range < TOP) {
+      while (range < TOP) {
         if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
         code = ((code << 8) | body[bpos++]!) >>> 0;
         range = (range << 8) >>> 0;
@@ -604,7 +605,7 @@ function decodeSmallCore(
           state[index] = prob - (prob >> ADAPT_SHIFT);
           node = (node << 1) | 1;
         }
-        if (range < TOP) {
+        while (range < TOP) {
           if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
           code = ((code << 8) | body[bpos++]!) >>> 0;
           range = (range << 8) >>> 0;
@@ -622,7 +623,7 @@ function decodeSmallCore(
         } else {
           extraValue = extraValue * 2;
         }
-        if (range < TOP) {
+        while (range < TOP) {
           if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
           code = ((code << 8) | body[bpos++]!) >>> 0;
           range = (range << 8) >>> 0;
