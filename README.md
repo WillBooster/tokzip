@@ -11,13 +11,13 @@ template-literal-safe radix-85; needs percent-encoding inside URLs) instead of p
 33% base64 tax on a binary stream, or a **dense binary frame** for transports that accept
 raw bytes (when both channels ship the same range-coded body, the text frame pays the 25%
 radix-85 tax on it; each channel independently downgrades to stored, and headers/padding
-make whole-frame ratios vary a little). On the project's code/text corpus it outperforms base64url(brotli -q11) on the text
+make whole-frame ratios vary a little). On the pinned public benchmark corpus (see
+Benchmarks below) it outperforms base64url(brotli -q11) on the text
 channel in every language and size bucket, and raw brotli -q11 on the binary channel
-overall and in every language except `html` and generic prose `text` (0.7 pp and 0.3 pp
-behind overall — brotli's built-in dictionary is strong on large HTML/English-prose
-documents, and individual 8–24 KB buckets there and in a few other languages trail by up
-to ~1.2 pp at the default 16 KB budget; retraining at 128 KB via `--budget` wins every
-bucket on both channels).
+overall (25.1% vs 27.1%) and in every language except generic prose `text` (0.3 pp behind —
+brotli's built-in dictionary is strong on large English-prose documents, and individual
+8–24 KB prose/CJK buckets trail by up to ~1.1 pp at the default 16 KB budget; retraining
+at 128 KB via `--budget` wins every bucket on both channels).
 
 ```ts
 import { compress, decompress } from './src/index.ts';
