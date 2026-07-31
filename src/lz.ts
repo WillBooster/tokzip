@@ -748,6 +748,9 @@ function collectSamCandidates(
   // Normalize to the locus covering length l (the walk state can sit deeper than l's own
   // endpos class, whose occurrence set is larger and can start lower).
   let s = matchState;
+  // No stateLink[s] !== -1 guard needed: s only moves while the link's length is >= l >= 4,
+  // and only the root (whose length is 0, and whose link is -1) fails that, so s never
+  // reaches the root and the link index stays valid.
   while (stateLen[stateLink[s]!]! >= l) s = stateLink[s]!;
   if (l >= CUT_LEN) {
     // Immediate-encoding path: one candidate suffices.

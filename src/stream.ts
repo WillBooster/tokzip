@@ -1,5 +1,5 @@
 import { CRC_INITIAL_STATE, crc32Append, crc32Finalize } from './checksum.ts';
-import { pushByteVarint, pushCrc32Binary, readCrc32Binary } from './container.ts';
+import { ALL_LITERAL_CANDIDATE_MAX, pushByteVarint, pushCrc32Binary, readCrc32Binary } from './container.ts';
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
 import { DEFAULT_MAX_OUTPUT_SIZE, MODE_SMALL, MODE_STORED, SMALL_WINDOW } from './format.ts';
@@ -248,7 +248,7 @@ class BlockEncoder {
     const pricing = smallPricing(input, language);
     const tokens = parse(input, language.dictionary, dictIndex, pricing, undefined, historyLength);
     let small = encodeSmallBody(tokens, input, language, historyLength);
-    if (block.length <= 512) {
+    if (block.length <= ALL_LITERAL_CANDIDATE_MAX) {
       // Short final blocks mirror the one-shot all-literal candidate (see container.ts):
       // the DP's static-prior pricing can lose to plain literals on short high-entropy tails.
       const literalTokens: Token[] = [{ type: 'lit', start: historyLength, end: input.length }];

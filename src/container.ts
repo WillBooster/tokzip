@@ -53,7 +53,7 @@ export interface DecompressOptions {
  * range encode measurably slows compression when run on every document, so the bound stays
  * comfortably above the observed ceiling while keeping the common path single-encode.
  */
-const ALL_LITERAL_CANDIDATE_MAX = 512;
+export const ALL_LITERAL_CANDIDATE_MAX = 512;
 
 const textEncoder = new TextEncoder();
 // Fatal decoding: invalid UTF-8 in a string-typed frame throws, never U+FFFD insertion.
