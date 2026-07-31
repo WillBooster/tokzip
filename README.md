@@ -13,10 +13,11 @@ raw bytes (when both channels ship the same range-coded body, the text frame pay
 radix-85 tax on it; each channel independently downgrades to stored, and headers/padding
 make whole-frame ratios vary a little). On the project's code/text corpus it outperforms base64url(brotli -q11) on the text
 channel in every language and size bucket, and raw brotli -q11 on the binary channel
-overall and in every language except `html` and generic prose `text` (≤ 0.7 pp behind
-there — brotli's built-in dictionary is strong on large HTML/English-prose documents, and
-a few 8–24 KB buckets tip the same way at the default 16 KB budget; retraining at 128 KB
-via `--budget` wins every bucket on both channels).
+overall and in every language except `html` and generic prose `text` (0.7 pp and 0.3 pp
+behind overall — brotli's built-in dictionary is strong on large HTML/English-prose
+documents, and individual 8–24 KB buckets there and in a few other languages trail by up
+to ~1.2 pp at the default 16 KB budget; retraining at 128 KB via `--budget` wins every
+bucket on both channels).
 
 ```ts
 import { compress, decompress } from './src/index.ts';

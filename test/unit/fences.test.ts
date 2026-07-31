@@ -86,8 +86,8 @@ test('label aliases and ASCII case both resolve', () => {
 });
 
 test('a block labeled with the frame language stays a plain unfenced frame', () => {
-  // DICT_TS_CODE keeps the negative control meaningful: the same document IS fenced under
-  // other frame languages, so `false` here exercises the id !== language.id skip.
+  // DICT_TS_CODE keeps the document fence-eligible (it IS fenced under other frame
+  // languages), so `false` here is not a vacuous pass caused by an unmatched snippet.
   const frame = compress(docWith('ts', DICT_TS_CODE), { language: 'typescript' });
   expect(isFenced(frame)).toBe(false);
   expect(decompress(frame)).toBe(docWith('ts', DICT_TS_CODE));
