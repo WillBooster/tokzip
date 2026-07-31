@@ -4,6 +4,7 @@ import { compress, decompress, LANGUAGE_IDS, registerLanguageModule } from '../.
 // (registerLanguage throws on incomplete codes) before any round-trip below.
 import '../../src/languages/index.ts';
 import { languageByName } from '../../src/dictionary.ts';
+import { modelSizeFor } from '../../src/format.ts';
 import { typescriptModule } from '../../src/generated/typescript.ts';
 import { fromBase64 } from '../../src/moduleData.ts';
 
@@ -62,6 +63,29 @@ test('registration keeps private copies of module arrays (caller mutation is ine
   model.priors.fill(1024);
   model.litContext.fill(0);
   expect(decompress(frame)).toBe(source);
+});
+
+test('custom modules with extreme-but-valid priors round-trip (renormalization regression)', () => {
+  // registerLanguageModule accepts priors in [1, 2047]; the extremes can shrink the range
+  // decoder's range below 2^16 in a single bit decode, so decoder renormalization must
+  // loop rather than read one byte (a single-step shortcut round-trips every trained
+  // module — their priors stay in [31, 2017] — but broke these).
+  const source = 'a'.repeat(100);
+  // Ids 61-63 stay free: 61 is the "unregistered id" fixture in the conformance and
+  // resilience suites (registrations are process-wide), 62/63 are used above.
+  for (const [id, fill] of [
+    [59, 1],
+    [60, 2047],
+  ] as const) {
+    const model = {
+      litContext: new Uint8Array(256),
+      litClassCount: 1,
+      priors: new Uint16Array(modelSizeFor(1)).fill(fill),
+    };
+    registerLanguageModule({ id, name: `extreme-priors-${fill}`, dictionarySuffix: new Uint8Array(0), model });
+    expect(decompress(compress(source, { language: `extreme-priors-${fill}` }))).toBe(source);
+    expect(decompress(compress(source, { language: `extreme-priors-${fill}`, output: 'binary' }))).toBe(source);
+  }
 });
 
 test('fromBase64 rejects non-ASCII instead of silently decoding it as 0', () => {
