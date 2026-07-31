@@ -350,6 +350,8 @@
         matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
       }
 
+      const isTokzipMethod = (method) => method === 'tokzip' || method.startsWith('tokzip ');
+
       // Format v2 renamed the benchmark method 'tokzip small' to 'tokzip' and retired
       // 'tokzip fast'; older stored reports keep the old keys, so map them on load.
       function normalizeRun(value) {
@@ -407,12 +409,12 @@
           const primary = latest.shortSession.amortizedRatios.tokzip;
           const referenceRatio = latest.shortSession.amortizedRatios[reference];
           tiles.push({
-            label: 'PRIMARY: short session + dict (tokzip)',
+            label: 'Short session + dict (tokzip)',
             value: percent(primary),
             cls: typeof referenceRatio === 'number' && primary <= referenceRatio ? 'good' : 'bad',
             note:
               typeof referenceRatio === 'number'
-                ? `${reference}: ${percent(referenceRatio)} on ≤4 KB docs`
+                ? `${reference}: ${percent(referenceRatio)} on ≤4 KB docs (session-delivered deployments)`
                 : '≤4 KB docs, dictionary charged once per session',
           });
         }
@@ -428,9 +430,9 @@
         }
         tiles.push(
           {
-            label: 'tokzip (overall)',
+            label: 'PRIMARY: tokzip per-document (overall)',
             value: percent(small),
-            note: `${latest.total.docs} docs, ${Object.keys(latest.languages).length} languages`,
+            note: `${latest.total.docs} docs, ${Object.keys(latest.languages).length} languages; dictionaries ship with the app`,
           },
           {
             label: `vs ${competitor.method}`,
@@ -577,7 +579,7 @@
                 backgroundColor: seriesColor(point.method, color),
                 borderColor: color('--surface-1'),
                 borderWidth: 2,
-                pointRadius: point.method.startsWith('tokzip ') ? 8 : 6,
+                pointRadius: isTokzipMethod(point.method) ? 8 : 6,
                 pointHoverRadius: 10,
               })),
             },
@@ -839,7 +841,7 @@
 
       function bestCompetitor(run) {
         return run.methods
-          .filter((method) => !method.startsWith('tokzip '))
+          .filter((method) => !isTokzipMethod(method))
           .map((method) => ({ method, ratio: run.total.ratios[method] }))
           .filter((entry) => typeof entry.ratio === 'number')
           .sort((a, b) => a.ratio - b.ratio)[0];

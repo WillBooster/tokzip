@@ -1,12 +1,12 @@
 /**
  * Compression benchmark on the seeded `bench-v2` corpus split.
  *
- * The primary metric is the **session-amortized, dictionary-inclusive ratio**: each
- * language's bench docs are treated as one client session, and tokzip's per-language
- * dictionary module is charged once per session at its brotli-compressed transfer size
- * (what a CDN actually ships; competitors carry no dictionary). Short documents (≤ 4 KB,
- * the primary workload) are additionally reported as their own session. The classic
- * dictionary-free ratio stays as a secondary metric.
+ * The primary metric is the classic **per-document ratio**: the target deployment stores
+ * compressed documents in a database and ships dictionaries with the application, so no
+ * per-session transfer cost applies. The session-amortized, dictionary-inclusive ratio
+ * (each language's bench docs as one client session, tokzip charged the brotli-compressed
+ * module transfer once per session; short ≤ 4 KB documents additionally as their own
+ * session) stays as a secondary metric for session-delivered deployments.
  *
  * Size, lossless round-trip, and (with --speed) end-to-end per-document throughput are
  * measured for tokzip and every competitor on one of two channels:
@@ -378,8 +378,8 @@ interface FencedCollector {
  */
 function makeFencedCollector(): FencedCollector {
   const encoder = new TextEncoder();
-  // FLAG_FENCED is per encoded frame, so fast and small can depend on different modules —
-  // dependencies are tracked per method, while the per-document fence scan is cached.
+  // FLAG_FENCED is per encoded frame; dependencies are tracked per method, while the
+  // per-document fence scan is cached.
   const sessionIds = new Map<string, Set<number>>();
   const shortIds = new Map<string, Set<number>>();
   const docFenceIds = new Map<string, number[]>();
@@ -605,8 +605,10 @@ function printTotals({ report, grand, short, dictBytes, shortDictBytes }: Totals
   printSessionRow('all+dict', grand, dictBytes);
   printSessionRow('sh+dict', short, shortDictBytes);
   console.log(
-    `\nPRIMARY metric: sh+dict = session-amortized ratio on ≤4 KB docs, tokzip charged each\n` +
-      `language's brotli-compressed dictionary once per session; reference codec: ${report.referenceMethod}.`
+    `\nPRIMARY metric: the per-document 'all' ratio (dictionaries ship with the application).\n` +
+      `sh+dict = session-amortized ratio on ≤ 4 KB docs for session-delivered deployments,\n` +
+      `tokzip charged each language's brotli-compressed dictionary once per session;\n` +
+      `reference codec: ${report.referenceMethod}.`
   );
 }
 

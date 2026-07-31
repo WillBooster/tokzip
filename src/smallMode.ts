@@ -27,7 +27,7 @@ import {
   TOKEN_KIND_LIT,
   TOKEN_KIND_REP0,
 } from './format.ts';
-import { dictMatcherFor, type ParsePricing, type SlotPricing, type Token } from './lz.ts';
+import { dictMatcherIfUsable, type ParsePricing, type SlotPricing, type Token } from './lz.ts';
 import { bitPrice, decodeTree, encodeTree, RangeDecoder, RangeEncoder, treePrice } from './rangeCoder.ts';
 import { bytesFromWords, decodeRadix85 } from './radix85.ts';
 import { extraBitsOf, extraValueOf, LENGTH_SLOT_COUNT, OFFSET_SLOT_COUNT, slotOf, valueOfSlot } from './slots.ts';
@@ -65,7 +65,7 @@ export function smallPricing(bytes: Uint8Array, language: RegisteredLanguage): P
     window: SMALL_WINDOW,
     maxDictStart: SMALL_WINDOW,
     optimal: parser,
-    dictMatcher: dictMatcherFor(language),
+    dictMatcher: dictMatcherIfUsable(language, bytes.length),
   };
 }
 

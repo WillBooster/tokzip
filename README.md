@@ -41,7 +41,11 @@ const restored2 = decompress(bytes); // === source (Uint8Array in, text/bytes ou
   inputs where general-purpose compressors have nothing to work with. Deployments that
   instead download a dictionary per client session should retrain smaller (the
   session-amortized benchmark, which charges each dictionary's brotli-compressed transfer
-  size against tokzip, previously picked 8 KB; see Benchmarks below).
+  size against tokzip, previously picked 8 KB; see Benchmarks below). The first compress
+  per language builds a suffix-automaton matcher over its dictionary (~65 ms and ~7 MB
+  retained at the default budget), cached for the process; long-lived processes that
+  compressed in many languages can drop the caches with `releaseLanguageIndexes()` — they
+  rebuild transparently on the next compress.
 - **Mandatory content checksum**: every frame carries a CRC-32 of the decompressed content
   (the same integrity guarantee gzip provides), verified before any output is returned.
 - **Storage-grade helpers**: `compressForStorage` verifies the frame round-trips to the
@@ -107,20 +111,20 @@ natural-language documentation). Every report includes a SHA-256
 fingerprint of the exact corpus bytes so results from changed upstream natural-language
 content are not mistaken for like-for-like codec changes.
 
-The benchmark is built around the intended deployment: **clients compress and decompress;
-servers pass frames through**. That shapes two decisions:
+The benchmark is built around the intended deployment: **documents are compressed into a
+database and dictionaries ship with the application**. That shapes two decisions:
 
-- **The primary competitors are the browser-native `CompressionStream` formats** (gzip,
-  deflate-raw), measured through the real Web Streams API — the only codecs a client gets
-  without shipping one. brotli/zstd/xz appear as server-side/CLI references only.
-- **The primary metric is the session-amortized, dictionary-inclusive ratio.** Each
-  language's bench docs are treated as one client session; tokzip is charged the
-  brotli-compressed transfer size of that language's dictionary module once per session
-  (competitors carry no dictionary). Short documents (≤ 4 KB — the primary workload:
-  code submissions and LLM outputs stored per-save) are additionally reported as their own
-  session, and each language gets a **breakeven analysis**: the cumulative input volume at
-  which the dictionary pays for itself against the reference codec. Classic
-  dictionary-free ratios remain as secondary metrics.
+- **The primary metric is the classic per-document ratio** — no per-session dictionary
+  transfer applies when modules are bundled. Short documents (≤ 4 KB — the primary
+  workload: code submissions and LLM outputs stored per-save) are additionally reported on
+  their own.
+- **The session-amortized, dictionary-inclusive ratio stays as a secondary metric** for
+  session-delivered deployments: each language's bench docs are treated as one client
+  session, tokzip is charged the brotli-compressed transfer size of that language's module
+  once per session (competitors carry no dictionary), and each language gets a
+  **breakeven analysis** — the cumulative input volume at which the dictionary pays for
+  itself against browser-native `CompressionStream` gzip, the reference codec a client
+  gets without shipping one (brotli/zstd/xz appear as server-side/CLI references).
 
 The harness measures two channels separately. The **text channel** (default) compares
 URL-safe text output: binary codecs use unpadded base64url, while tokzip and the `lz-string`
@@ -130,9 +134,9 @@ method on every document round-trips losslessly** — any mismatch fails the run
 `--speed` additionally measures median end-to-end per-document throughput (CI runs the
 speed pass on the text channel only).
 
-Current numbers live on the dashboard (the v1 format reset, the CRC-32 field, and the
-retrained dictionary budget all changed the output sizes, so older pinned tables no longer
-apply). Two stable findings from the metric redesign: with the previous ~1 MB dictionaries
+Current numbers live on the dashboard (the v2 format reset — one range-coded mode — and
+the retrained 128 KB dictionaries changed all output sizes, so older pinned tables no
+longer apply). Two stable findings from the metric redesign: with the previous ~1 MB dictionaries
 the brotli-compressed dictionary transfer (~300 KB per language) never paid for itself
 against browser-native gzip on KB-scale sessions, and dictionary-free tokzip beats
 `CompressionStream` gzip by roughly 2× on ≤ 1 KB documents. The default budget targets the

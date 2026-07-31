@@ -213,10 +213,8 @@ function trainStatistics(docs: string[], wrapper: Uint8Array, suffix: Uint8Array
     }
     dictIndexHolder = language;
     const stats = collectStatistics(docs, dictionary, language);
-    const literalFull = new Float64Array(256 * 256);
-    for (let i = 0; i < literalFull.length; i++) literalFull[i] = stats.literal[0][i]! + stats.literal[1][i]!;
     const { litContext, litClassCount } = chooseLiteralClasses(stats.literal);
-    model = buildModel(stats, literalFull, litContext, litClassCount);
+    model = buildModel(stats, litContext, litClassCount);
   }
   return model;
 }
@@ -327,12 +325,7 @@ function fillTreePriors(priors: Uint16Array, base: number, bits: number, leafFre
   }
 }
 
-function buildModel(
-  stats: StreamStatistics,
-  literalFull: Float64Array,
-  litContext: Uint8Array,
-  litClassCount: number
-): LanguageModel {
+function buildModel(stats: StreamStatistics, litContext: Uint8Array, litClassCount: number): LanguageModel {
   const priors = new Uint16Array(modelSizeFor(litClassCount)).fill(PROB_SCALE >> 1);
   for (let ctx = 0; ctx < TOKEN_KIND_COUNT; ctx++) {
     const row = ctx * TOKEN_KIND_COUNT;
@@ -410,6 +403,13 @@ function chooseLiteralClasses(folds: [Float64Array, Float64Array]): {
   litContext: Uint8Array;
   litClassCount: number;
 } {
+  // Cross-validation needs both folds populated (single-document training fills only one);
+  // with an empty fold every partition scores identically, so extra classes carry no
+  // evidence — fall back to one class instead of letting the tie pick the largest count.
+  const foldTotals = folds.map((fold) => fold.reduce((sum, x) => sum + x, 0));
+  if (foldTotals[0] === 0 || foldTotals[1] === 0) {
+    return { litContext: new Uint8Array(256), litClassCount: 1 };
+  }
   const full = new Float64Array(256 * 256);
   for (let i = 0; i < full.length; i++) full[i] = folds[0][i]! + folds[1][i]!;
   let total = 0;

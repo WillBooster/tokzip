@@ -131,6 +131,20 @@ export function languageByName(name: string): RegisteredLanguage | undefined {
   return byName.get(name);
 }
 
+/**
+ * Drops the lazily built per-language match indexes (hash chains and suffix-automaton
+ * matchers, ~7 MB per language at the default dictionary budget). They rebuild
+ * transparently on the next compress, so this is purely a memory-pressure lever for
+ * long-lived processes that compressed in many languages; frames are unaffected.
+ */
+export function releaseLanguageIndexes(name?: string): void {
+  const targets = name === undefined ? byName.values() : ([byName.get(name)].filter(Boolean) as RegisteredLanguage[]);
+  for (const language of targets) {
+    language.dictIndex = undefined;
+    language.dictMatcher = undefined;
+  }
+}
+
 export function languageById(id: number): RegisteredLanguage | undefined {
   return byId.get(id);
 }

@@ -184,11 +184,22 @@ export function dictMatcherFor(language: RegisteredLanguage): DictMatcher | unde
  * build time on first compress) that the parse never reads.
  */
 export function dictIndexIfNeeded(language: RegisteredLanguage, inputLength: number): DictIndex | undefined {
-  const chainsNeeded =
-    inputLength > GREEDY_SAM_MAX_INPUT ||
-    language.dictionary.length > SMALL_WINDOW ||
-    dictMatcherFor(language) === undefined;
+  const chainsNeeded = !matcherUsable(language, inputLength) || dictMatcherFor(language) === undefined;
   return chainsNeeded ? dictIndexFor(language) : undefined;
+}
+
+/**
+ * The matcher, built only when this input's parse can actually use it (the complement of
+ * {@link dictIndexIfNeeded}): the greedy parser beyond {@link GREEDY_SAM_MAX_INPUT} and any
+ * start bound below the dictionary length fall back to the chain walk, so building the
+ * (much larger) automaton there would retain megabytes the parse never reads.
+ */
+export function dictMatcherIfUsable(language: RegisteredLanguage, inputLength: number): DictMatcher | undefined {
+  return matcherUsable(language, inputLength) ? dictMatcherFor(language) : undefined;
+}
+
+function matcherUsable(language: RegisteredLanguage, inputLength: number): boolean {
+  return inputLength <= GREEDY_SAM_MAX_INPUT && language.dictionary.length <= SMALL_WINDOW;
 }
 
 function matchLength(a: Uint8Array, ai: number, b: Uint8Array, bi: number, cap: number): number {
@@ -199,9 +210,9 @@ function matchLength(a: Uint8Array, ai: number, b: Uint8Array, bi: number, cap: 
 
 /**
  * Shared LZ pass: parses the input against the sliding history window, the rep-offset cache,
- * and the preset dictionary into the token list both wire formats serialize. `small` pricing
- * (with {@link ParsePricing.optimal}) takes an exact-price shortest-path parse; `fast` pricing
- * takes the greedy parser. Rep-cache updates are replayed identically by decoders.
+ * and the preset dictionary into the token list the range coder serializes. Inputs up to
+ * {@link OPTIMAL_MAX_INPUT} take the exact-price shortest-path parse; larger inputs take
+ * the greedy-lazy parser. Rep-cache updates are replayed identically by decoders.
  *
  * `parseStart` marks bytes[0, parseStart) as pre-seeded history: those bytes are indexed as
  * match sources (streaming decoders seed the same bytes as already-produced output) but no
@@ -899,8 +910,7 @@ function updateDict(
 }
 
 /**
- * Greedy (optionally 1-step price-aware lazy) parse used by `fast` mode and by `small` mode
- * beyond the optimal-parse input bound.
+ * Greedy (1-step price-aware lazy) parse used beyond the optimal-parse input bound.
  */
 function parseGreedy(
   bytes: Uint8Array,

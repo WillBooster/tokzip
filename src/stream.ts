@@ -3,7 +3,7 @@ import { pushByteVarint, pushCrc32Binary, readCrc32Binary } from './container.ts
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
 import { DEFAULT_MAX_OUTPUT_SIZE, MODE_SMALL, MODE_STORED, SMALL_WINDOW } from './format.ts';
-import { dictIndexIfNeeded, OPTIMAL_MAX_INPUT, parse } from './lz.ts';
+import { dictIndexIfNeeded, OPTIMAL_MAX_INPUT, parse, type Token } from './lz.ts';
 import { TextSink } from './radix64.ts';
 import { decodeSmallBodyBinary, encodeSmallBody, smallPricing } from './smallMode.ts';
 
@@ -247,7 +247,14 @@ class BlockEncoder {
     // ties prefer the simpler stored encoding.
     const pricing = smallPricing(input, language);
     const tokens = parse(input, language.dictionary, dictIndex, pricing, undefined, historyLength);
-    const small = encodeSmallBody(tokens, input, language, historyLength);
+    let small = encodeSmallBody(tokens, input, language, historyLength);
+    if (block.length <= 512) {
+      // Short final blocks mirror the one-shot all-literal candidate (see container.ts):
+      // the DP's static-prior pricing can lose to plain literals on short high-entropy tails.
+      const literalTokens: Token[] = [{ type: 'lit', start: historyLength, end: input.length }];
+      const literalBody = encodeSmallBody(literalTokens, input, language, historyLength);
+      if (literalBody.length < small.length) small = literalBody;
+    }
     let mode = MODE_STORED;
     let body = block;
     if (small.length < block.length) {

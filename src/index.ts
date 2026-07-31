@@ -15,5 +15,6 @@ export {
 } from './stream.ts';
 export { TokzipDecodeError } from './errors.ts';
 export { registerLanguageModule } from './moduleRegistry.ts';
+export { releaseLanguageIndexes } from './dictionary.ts';
 export type { LanguageModuleData } from './dictionary.ts';
 export { LANGUAGE_IDS } from './languageIds.ts';

@@ -180,10 +180,9 @@ Lengths and offsets use the slot codec (§5): a 6-bit tree codes the slot (36 le
 40 offset slots; a decoded slot beyond its alphabet is "invalid symbol"), then the slot's
 extra bits follow as direct bits. Length value = `len − 2` (minimum match length 2;
 encoders only emit explicit matches of length ≥ 4). Encoders MUST split matches longer
-than 262,145 bytes (`maxSlotValue(36) + 2`). History distances are ≤ 2^20 (`dist = offset
-
-- 1`with offset < 2^20; the history window is 1 MB,`SMALL_WINDOW`) and dictionary starts
-  are < 2^20.
+than 262,145 bytes (`maxSlotValue(36) + 2`). A history distance is the decoded offset
+plus one (`dist = offset + 1`; offsets are < 2^20, so distances are at most 2^20 — the
+1 MB history window, `SMALL_WINDOW`). Dictionary starts are < 2^20.
 
 Model layout (offsets in probability slots):
 
@@ -223,6 +222,20 @@ that differs in any byte from an existing registration of the same id or name MU
 rejected. Frames reference modules by id; decoding a small frame under a different module
 than the encoder used produces garbage that the CRC rejects — it never silently succeeds.
 
+The language-id allocation is normative (unchanged since v1); id 22 is reserved for the
+deferred XML module:
+
+| id  | name    | id  | name       | id  | name            |
+| --- | ------- | --- | ---------- | --- | --------------- |
+| 0   | none    | 8   | html       | 16  | typescript      |
+| 1   | text    | 9   | java       | 17  | zig             |
+| 2   | c       | 10  | jsp        | 18  | en-US           |
+| 3   | cpp     | 11  | javascript | 19  | ja-JP           |
+| 4   | csharp  | 12  | php        | 20  | zh-CN           |
+| 5   | css     | 13  | python     | 21  | zh-TW           |
+| 6   | dart    | 14  | ruby       | 22  | (reserved: xml) |
+| 7   | haskell | 15  | rust       |     |                 |
+
 ### 6.1 Fenced dictionary extension (flag bit 3)
 
 Documents that embed fenced code blocks (triple-backtick fences, as produced by Markdown
@@ -253,8 +266,29 @@ grammar (normative):
   leading spaces/tabs removed.
 - Outside a block, a fence line whose info string contains no backtick **opens** a block,
   recording its backtick count. The _label_ is the info string up to the first space/tab;
-  labels are matched ASCII-lowercased against the language-name table. An unknown or empty
-  label keeps the frame language for the block.
+  labels are matched ASCII-lowercased against the normative alias table below. An unknown
+  or empty label keeps the frame language for the block.
+
+  | language   | labels                                  |
+  | ---------- | --------------------------------------- |
+  | c          | `c`, `h`                                |
+  | cpp        | `cpp`, `c++`, `cc`, `cxx`, `hpp`        |
+  | csharp     | `csharp`, `cs`, `c#`                    |
+  | css        | `css`                                   |
+  | dart       | `dart`                                  |
+  | haskell    | `haskell`, `hs`                         |
+  | html       | `html`, `htm`                           |
+  | java       | `java`                                  |
+  | jsp        | `jsp`                                   |
+  | javascript | `javascript`, `js`, `jsx`, `mjs`, `cjs` |
+  | php        | `php`                                   |
+  | python     | `python`, `py`, `python3`               |
+  | ruby       | `ruby`, `rb`                            |
+  | rust       | `rust`, `rs`                            |
+  | typescript | `typescript`, `ts`, `tsx`, `mts`, `cts` |
+  | zig        | `zig`                                   |
+  | text       | `text`, `txt`, `plain`, `plaintext`     |
+
 - Inside a block, a fence line with at least the opening backtick count and an **empty**
   info string **closes** it; every other line (fence-like or not) is content.
 - State transitions take effect at the byte after the fence line's LF. An unclosed block
