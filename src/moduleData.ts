@@ -25,6 +25,23 @@ export function toBase64(bytes: Uint8Array): string {
   return out.join('');
 }
 
+/** Embeds a Uint16Array (model priors) as base64 of its little-endian bytes. */
+export function toBase64U16(values: Uint16Array): string {
+  const bytes = new Uint8Array(values.length * 2);
+  for (let i = 0; i < values.length; i++) {
+    bytes[i * 2] = values[i]! & 255;
+    bytes[i * 2 + 1] = values[i]! >>> 8;
+  }
+  return toBase64(bytes);
+}
+
+export function fromBase64U16(text: string): Uint16Array {
+  const bytes = fromBase64(text);
+  const values = new Uint16Array(bytes.length >>> 1);
+  for (let i = 0; i < values.length; i++) values[i] = bytes[i * 2]! | (bytes[i * 2 + 1]! << 8);
+  return values;
+}
+
 export function fromBase64(text: string): Uint8Array {
   let end = text.length;
   while (end > 0 && text[end - 1] === '=') end--;

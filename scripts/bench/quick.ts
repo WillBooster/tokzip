@@ -6,7 +6,7 @@ import { compress, decompress } from '../../src/index.ts';
 import '../../src/languages/index.ts';
 import { corpusDirs, type ManifestEntry } from '../corpus.ts';
 
-const mode = (process.argv[2] ?? 'small') as 'fast' | 'small';
+const binary = process.argv.includes('--binary');
 const docs: { content: string; language: string; bytes: number }[] = [];
 for (const corpusDir of corpusDirs()) {
   if (!existsSync(corpusDir)) continue;
@@ -33,11 +33,12 @@ if (inputBytes === 0) {
   console.error('error: no bench documents found (fetch + split the corpus first)');
   process.exit(1);
 }
-let outChars = 0;
-const encoded: string[] = [];
+const output = binary ? 'binary' : 'text';
+let outUnits = 0;
+const encoded: (string | Uint8Array)[] = [];
 for (const d of docs) {
-  const e = compress(d.content, { language: d.language, mode });
-  outChars += e.length;
+  const e = compress(d.content, { language: d.language, output });
+  outUnits += e.length;
   encoded.push(e);
 }
 for (let i = 0; i < docs.length; i++) {
@@ -57,12 +58,12 @@ const timeIt = (op: () => void): number => {
   return (inputBytes * iterations) / 1_048_576 / (median / 1000);
 };
 const cMBps = timeIt(() => {
-  for (const d of docs) compress(d.content, { language: d.language, mode });
+  for (const d of docs) compress(d.content, { language: d.language, output });
 });
 const dMBps = timeIt(() => {
   for (const e of encoded) decompress(e);
 });
 console.log(
-  `${mode}: ratio ${((outChars / inputBytes) * 100).toFixed(2)}% ` +
+  `${output}: ratio ${((outUnits / inputBytes) * 100).toFixed(2)}% ` +
     `compress ${cMBps.toFixed(1)} MB/s decompress ${dMBps.toFixed(1)} MB/s (${docs.length} docs)`
 );

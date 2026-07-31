@@ -9,6 +9,18 @@ import {
   TokzipDecompressionStream,
 } from '../../src/index.ts';
 import '../../src/languages/typescript.ts';
+import { pushVarint64, readVarint64, TextSink } from '../../src/radix64.ts';
+
+/** Char length of the radix-64 varint starting at `pos`. */
+function varintLengthAt(frame: string, pos: number): number {
+  return readVarint64(frame, pos).pos - pos;
+}
+
+function varint64Text(value: number): string {
+  const out = new TextSink(12);
+  pushVarint64(out, value);
+  return out.toString();
+}
 
 /** Deterministic PRNG (mulberry32) so fuzz failures reproduce exactly. */
 // oxlint-disable unicorn/prefer-math-trunc -- >>> 0 converts to unsigned 32-bit; Math.trunc would keep the sign
@@ -48,9 +60,9 @@ describe('decoder fuzzing', () => {
   test('mutated text frames never crash, hang, or decode silently wrong', () => {
     const random = seededRandom(0xC0_FF_EE);
     for (const [docIndex, doc] of SEED_DOCS.entries()) {
-      for (const mode of ['fast', 'small'] as const) {
-        const frame = compress(doc, { language: 'typescript', mode });
-        for (let round = 0; round < 150; round++) {
+      {
+        const frame = compress(doc, { language: 'typescript' });
+        for (let round = 0; round < 300; round++) {
           const kind = random();
           let mutated: string;
           if (kind < 0.4) {
@@ -77,9 +89,9 @@ describe('decoder fuzzing', () => {
   test('mutated binary frames never crash, hang, or decode silently wrong', () => {
     const random = seededRandom(0xBE_EF);
     for (const doc of SEED_DOCS) {
-      for (const mode of ['fast', 'small'] as const) {
-        const frame = compress(doc, { language: 'typescript', mode, output: 'binary' });
-        for (let round = 0; round < 150; round++) {
+      {
+        const frame = compress(doc, { language: 'typescript', output: 'binary' });
+        for (let round = 0; round < 300; round++) {
           const mutated = Uint8Array.from(frame);
           const kind = random();
           if (kind < 0.5) {
@@ -166,6 +178,7 @@ function concatBytes(parts: Uint8Array[]): Uint8Array {
 
 describe('stream block tampering', () => {
   async function expectStreamRejected(tampered: Uint8Array): Promise<void> {
+    // oxlint-disable-next-line typescript/await-thenable -- bun's rejects.toThrow is thenable at runtime
     await expect(pumpStream(new TokzipDecompressionStream(), tampered)).rejects.toThrow(TokzipDecodeError);
   }
 
@@ -193,8 +206,8 @@ describe('stream block tampering', () => {
 describe('compressForStorage', () => {
   test('verified frames round-trip and match plain compress output', () => {
     for (const doc of SEED_DOCS) {
-      const frame = compressForStorage(doc, { language: 'typescript', mode: 'small' });
-      expect(frame).toBe(compress(doc, { language: 'typescript', mode: 'small' }));
+      const frame = compressForStorage(doc, { language: 'typescript' });
+      expect(frame).toBe(compress(doc, { language: 'typescript' }));
       expect(decompress(frame)).toBe(doc);
     }
   });
@@ -202,7 +215,7 @@ describe('compressForStorage', () => {
   test('byte inputs verify byte-exactly on both channels', () => {
     const bytes = Uint8Array.from({ length: 500 }, (_, i) => (i * 37) % 256);
     for (const output of ['text', 'binary'] as const) {
-      const frame = compressForStorage(bytes, { mode: 'small', output });
+      const frame = compressForStorage(bytes, { output });
       expect(decompress(frame)).toEqual(bytes);
     }
   });
@@ -211,15 +224,15 @@ describe('compressForStorage', () => {
 describe('inspectFrame', () => {
   test('reports header facts without registered languages', () => {
     const doc = SEED_DOCS[0]!;
-    const frame = compress(doc, { language: 'typescript', mode: 'small' });
+    const frame = compress(doc, { language: 'typescript' });
     const info = inspectFrame(frame);
-    expect(info.version).toBe(1);
+    expect(info.version).toBe(2);
     expect(info.container).toBe('text');
     expect(info.contentType).toBe('string');
     expect(info.contentBytes).toBe(Buffer.byteLength(doc));
-    expect(['fast', 'small', 'stored']).toContain(info.mode);
+    expect(['small', 'stored']).toContain(info.mode);
 
-    const binaryInfo = inspectFrame(compress(doc, { language: 'typescript', mode: 'small', output: 'binary' }));
+    const binaryInfo = inspectFrame(compress(doc, { language: 'typescript', output: 'binary' }));
     expect(binaryInfo.container).toBe('binary');
     expect(binaryInfo.contentBytes).toBe(Buffer.byteLength(doc));
     expect(binaryInfo.checksum).toBe(info.checksum);
@@ -228,12 +241,12 @@ describe('inspectFrame', () => {
   test('inspects non-stored frames whose language id is not registered anywhere', () => {
     // This process has typescript registered, so patch the frame to an unallocated id:
     // inspection must still succeed (it never resolves languages — the server property).
-    const frame = compress(SEED_DOCS[0]!, { language: 'typescript', mode: 'small' });
+    const frame = compress(SEED_DOCS[0]!, { language: 'typescript' });
     expect(inspectFrame(frame).mode).not.toBe('stored');
     const patchedText = frame[0]! + '9' + frame.slice(2); // Radix-64 value 61: unregistered.
     expect(inspectFrame(patchedText).languageId).toBe(61);
 
-    const binaryFrame = compress(SEED_DOCS[0]!, { language: 'typescript', mode: 'small', output: 'binary' });
+    const binaryFrame = compress(SEED_DOCS[0]!, { language: 'typescript', output: 'binary' });
     const patchedBinary = Uint8Array.from(binaryFrame);
     patchedBinary[1] = 200; // Far outside any allocation.
     expect(inspectFrame(patchedBinary).languageId).toBe(200);
@@ -242,45 +255,41 @@ describe('inspectFrame', () => {
   test('rejects structural violations', () => {
     const frame = compress('hello world hello world hello world');
     expect(() => inspectFrame('A' + frame.slice(1))).toThrow(/bad magic/);
-    expect(() => inspectFrame('z' + frame.slice(1))).toThrow(/unknown version/);
+    expect(() => inspectFrame('x' + frame.slice(1))).toThrow(/unknown version/);
     expect(() => inspectFrame(frame.slice(0, 5))).toThrow(TokzipDecodeError);
     expect(() => inspectFrame(frame + 'AAAA'.repeat(20))).toThrow(TokzipDecodeError);
   });
 
   test('rejects declared sizes beyond the body capacity on both channels', () => {
-    // The repro from review: a fast frame truncated to its first body char but declaring
-    // more content than one char can produce must fail inspection, matching decompress.
-    const oversized = compress('x'.repeat(300_000), { language: 'none', mode: 'fast' });
-    // Keep the header (3 chars + 4-char size varint + 6-char CRC) plus one body char: a
-    // single fast token cannot produce the declared 300,000 bytes.
-    expect(() => inspectFrame(oversized.slice(0, 14))).toThrow(/body capacity|truncated/);
-    const oversizedBinary = compress('x'.repeat(300_000), { language: 'none', mode: 'fast', output: 'binary' });
-    expect(() => inspectFrame(oversizedBinary.subarray(0, 11))).toThrow(/body capacity|truncated/);
+    // A small frame whose declared size exceeds what its tiny body can structurally
+    // produce must fail inspection, matching decompress: 2^34 bytes from a 4-byte body is
+    // beyond the range coder's ceiling. The frame is forged from a real one by replacing
+    // the size varint (chars 3..) — inspectFrame never verifies the CRC, so only the
+    // envelope check can reject it.
+    const real = compress('export const answer = 42;\n'.repeat(50), { language: 'typescript' });
+    expect(inspectFrame(real).mode).toBe('small');
+    const sizeEnd = 3 + varintLengthAt(real, 3);
+    const bigVarint = varint64Text(2 ** 34 - 1);
+    const forged = real.slice(0, 3) + bigVarint + real.slice(sizeEnd, sizeEnd + 6) + '!!!!!';
+    expect(() => inspectFrame(forged)).toThrow(/body capacity/);
   });
 
   test('rejects malformed text bodies (alphabet and radix-85 word boundary)', () => {
     // Findings from review: these are decidable without decoding, so a pass-through server
     // must reject them like decompress does.
     const doc = 'export const value = { answer: 42, name: "example" };\n'.repeat(20);
-    const small = compress(doc, { language: 'typescript', mode: 'small' });
+    const small = compress(doc, { language: 'typescript' });
     expect(inspectFrame(small).mode).toBe('small');
     expect(() => inspectFrame(small.slice(0, -1))).toThrow(/multiple of 5|non-canonical|truncated/);
     const bodyAt = small.length - 3;
     expect(() => inspectFrame(small.slice(0, bodyAt) + '%' + small.slice(bodyAt + 1))).toThrow(/non-alphabet/);
     expect(() => inspectFrame(small.slice(0, -5) + '~~~~~')).toThrow(/out of range|non-alphabet/);
-
-    const fast = compress(doc, { language: 'typescript', mode: 'fast' });
-    expect(inspectFrame(fast).mode).toBe('fast');
-    const fastBodyAt = fast.length - 2;
-    expect(() => inspectFrame(fast.slice(0, fastBodyAt) + '%' + fast.slice(fastBodyAt + 1))).toThrow(/non-alphabet/);
   });
 
   test('accepts every fuzz-seed frame on both channels', () => {
     for (const doc of SEED_DOCS) {
-      for (const mode of ['fast', 'small'] as const) {
-        inspectFrame(compress(doc, { language: 'typescript', mode }));
-        inspectFrame(compress(doc, { language: 'typescript', mode, output: 'binary' }));
-      }
+      inspectFrame(compress(doc, { language: 'typescript' }));
+      inspectFrame(compress(doc, { language: 'typescript', output: 'binary' }));
     }
   });
 });

@@ -20,13 +20,14 @@ const SAMPLES: Record<string, string> = {
 // id-0 tests never reach; a trainer regression that ships a broken module fails here.
 describe('every trained language module round-trips', () => {
   const names = Object.keys(LANGUAGE_IDS).filter((name) => languageByName(name));
-  test('all v1 languages are registered', () => {
+  test('all languages are registered', () => {
     expect(names.length).toBe(Object.keys(LANGUAGE_IDS).length);
   });
   describe.each(names)('%s', (name) => {
-    test.each(['fast', 'small'] as const)('%s mode', (mode) => {
+    test('round-trips', () => {
       for (const sample of Object.values(SAMPLES)) {
-        expect(decompress(compress(sample, { language: name, mode }))).toBe(sample);
+        expect(decompress(compress(sample, { language: name }))).toBe(sample);
+        expect(decompress(compress(sample, { language: name, output: 'binary' }))).toBe(sample);
       }
     });
   });
@@ -36,8 +37,7 @@ test('conflicting registrations are rejected (same id or name must not diverge)'
   const typescript = languageByName('typescript')!;
   const base = {
     dictionarySuffix: new Uint8Array(0),
-    top64: typescript.top64,
-    tables: typescript.tables,
+    model: typescript.model,
   };
   // Byte-identical re-registration (e.g. a module imported twice) is an idempotent no-op.
   expect(() => registerLanguageModule(typescriptModule)).not.toThrow();
@@ -51,19 +51,16 @@ test('conflicting registrations are rejected (same id or name must not diverge)'
 });
 
 test('registration keeps private copies of module arrays (caller mutation is inert)', () => {
-  const top64 = new Uint8Array(typescriptModule.top64);
-  const tables = {
-    litContext: new Uint8Array(typescriptModule.tables.litContext),
-    litClassCount: typescriptModule.tables.litClassCount,
-    literal: new Uint8Array(typescriptModule.tables.literal),
-    token: new Uint8Array(typescriptModule.tables.token),
-    offset: new Uint8Array(typescriptModule.tables.offset),
+  const model = {
+    litContext: new Uint8Array(typescriptModule.model.litContext),
+    litClassCount: typescriptModule.model.litClassCount,
+    priors: new Uint16Array(typescriptModule.model.priors),
   };
-  registerLanguageModule({ id: 62, name: 'mutable-probe', dictionarySuffix: new Uint8Array(0), top64, tables });
+  registerLanguageModule({ id: 62, name: 'mutable-probe', dictionarySuffix: new Uint8Array(0), model });
   const source = 'a'.repeat(100);
   const frame = compress(source, { language: 'mutable-probe' });
-  top64.fill(0x62);
-  tables.literal.fill(0);
+  model.priors.fill(1024);
+  model.litContext.fill(0);
   expect(decompress(frame)).toBe(source);
 });
 

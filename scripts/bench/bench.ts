@@ -133,8 +133,7 @@ const { binary: BINARY_CHANNEL } = parseChannel(process.argv.slice(2));
 
 const METHODS: BenchMethod[] = BINARY_CHANNEL
   ? [
-      tokzipMethod('fast', 'binary'),
-      tokzipMethod('small', 'binary'),
+      tokzipMethod('binary'),
       ...binaryCompetitors.map(
         (competitor): BenchMethod => ({
           name: competitor.name,
@@ -145,8 +144,7 @@ const METHODS: BenchMethod[] = BINARY_CHANNEL
       ),
     ]
   : [
-      tokzipMethod('fast', 'text'),
-      tokzipMethod('small', 'text'),
+      tokzipMethod('text'),
       ...competitors.map(
         (competitor): BenchMethod => ({
           name: competitor.name,
@@ -287,7 +285,8 @@ async function benchLanguage(
     const bucketDocs = loaded.filter((doc) => doc.bucket === bucket);
     if (bucketDocs.length === 0) continue;
     const totals = emptyTotals();
-    for (const doc of bucketDocs) await benchDoc(doc, totals, report.roundTrip, fencedCollector.collect);
+    for (const doc of bucketDocs)
+      await benchDoc(doc, totals, report.roundTrip, (d, m, e) => fencedCollector.collect(d, m, e));
     accumulate(languageTotals, totals);
     if (SHORT_BUCKETS.has(bucket)) accumulate(shortTotals, totals);
     buckets[bucket] = { docs: totals.docs, inputBytes: totals.inputBytes, ratios: ratiosOf(totals) };
@@ -557,14 +556,14 @@ function loadBenchDocs(language: string): BenchDoc[] {
   });
 }
 
-function tokzipMethod(mode: 'fast' | 'small', output: 'text' | 'binary'): BenchMethod {
+function tokzipMethod(output: 'text' | 'binary'): BenchMethod {
   return {
-    name: `tokzip ${mode}`,
+    name: 'tokzip',
     compress: (doc) => {
       const language = doc.registered ? doc.language : 'none';
       return output === 'binary'
-        ? compress(doc.content, { language, mode, output: 'binary' })
-        : compress(doc.content, { language, mode });
+        ? compress(doc.content, { language, output: 'binary' })
+        : compress(doc.content, { language });
     },
     decompress: (encoded) => decompress(encoded) as string,
     usesDictionary: true,

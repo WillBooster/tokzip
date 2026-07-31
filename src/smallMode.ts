@@ -1,102 +1,115 @@
-import type { EntropyTables, RegisteredLanguage } from './dictionary.ts';
+import type { LanguageModel, RegisteredLanguage } from './dictionary.ts';
 import { allocateDecodeBuffer, TokzipDecodeError } from './errors.ts';
 import { copyExtendedDictMatch, FenceTracker } from './fences.ts';
 import {
   INITIAL_REPS,
+  LEN_GROUP_DICT,
+  LEN_GROUP_HISTORY,
+  LEN_GROUP_REP,
+  LITERAL_BLOCK_SIZE,
   MATCH_LEN_CAP,
   MIN_LEN_REP,
-  OFFSET_CONTEXT_COUNT,
-  OFFSET_CONTEXT_DICT,
-  OFFSET_CONTEXT_HISTORY,
-  RAW_LITERAL_BITS,
-  RAW_OFFSET_SLOT_BITS,
-  RAW_TOKEN_BITS,
+  MODEL_IS_DICT,
+  MODEL_IS_MATCH,
+  MODEL_IS_REP,
+  MODEL_LEN_TREE,
+  MODEL_LITERAL,
+  MODEL_OFF_TREE,
+  MODEL_REP_TREE,
+  OFF_GROUP_DICT,
+  OFF_GROUP_HISTORY,
+  offLenBucketOf,
+  SLOT_TREE_BITS,
   SMALL_WINDOW,
-  TOKEN_ALPHABET_SIZE,
-  TOKEN_CONTEXT_COUNT,
+  TOKEN_KIND_COUNT,
   TOKEN_KIND_DICT,
   TOKEN_KIND_HISTORY,
-  TOKEN_KIND_LITRUN,
+  TOKEN_KIND_LIT,
   TOKEN_KIND_REP0,
 } from './format.ts';
-import { buildDecoder, buildEncoder, type HuffmanEncoder, MAX_CODE_LENGTH } from './huffman.ts';
 import { dictMatcherFor, type ParsePricing, type SlotPricing, type Token } from './lz.ts';
-import { BitReader, BitWriter, decodeRadix85, wordsFromBytes } from './radix85.ts';
-import {
-  extraBitsOf,
-  extraValueOf,
-  LENGTH_SLOT_COUNT,
-  maxSlotValue,
-  OFFSET_SLOT_COUNT,
-  slotOf,
-  valueOfSlot,
-} from './slots.ts';
-
-/** Longest literal run one litrun token can carry (runs beyond this split). */
-export const MAX_RUN_LENGTH = maxSlotValue(LENGTH_SLOT_COUNT) + 1;
-
-/** Decode-side lookups replacing a division/modulo per token symbol. */
-const SYMBOL_KIND = new Uint8Array(TOKEN_ALPHABET_SIZE);
-const SYMBOL_SLOT = new Uint8Array(TOKEN_ALPHABET_SIZE);
-for (let symbol = 0; symbol < TOKEN_ALPHABET_SIZE; symbol++) {
-  SYMBOL_KIND[symbol] = Math.trunc(symbol / LENGTH_SLOT_COUNT);
-  SYMBOL_SLOT[symbol] = symbol % LENGTH_SLOT_COUNT;
-}
-
-function bitVarintLength(value: number): number {
-  let length = 8;
-  for (let rest = Math.floor(value / 128); rest > 0; rest = Math.floor(rest / 128)) length += 8;
-  return length;
-}
+import { bitPrice, decodeTree, encodeTree, RangeDecoder, RangeEncoder, treePrice } from './rangeCoder.ts';
+import { bytesFromWords, decodeRadix85 } from './radix85.ts';
+import { extraBitsOf, extraValueOf, LENGTH_SLOT_COUNT, OFFSET_SLOT_COUNT, slotOf, valueOfSlot } from './slots.ts';
 
 /**
- * Exact bit-price tables derived from a language's static context tables, cached per language:
- * the context-indexed slot tables driving the optimal parse, the per-(class, byte) literal
- * prices, and context-averaged token prices for the greedy (large-input) parser, whose
- * stateless pricing callbacks cannot know the previous token kind.
+ * Static bit-price tables derived from a language's priors, cached per language. The
+ * optimal parse prices with the priors (the standard adaptive-coder approximation): exact
+ * for short documents, slightly stale for long ones, and always consistent between the
+ * parser's objective and the emitted stream's starting state.
  */
 interface SmallTables {
   parser: SlotPricing;
-  /** Exact literal bit price, indexed `contextClass * 256 + byte`. */
+  /** Literal bits (byte tree + the literal-continuation isMatch bit), indexed class*256+byte. */
   litBits: Float64Array;
   avgHistSlotBits: Float64Array;
   avgDictSlotBits: Float64Array;
   avgRepSlotBits: Float64Array;
 }
 
-const smallTablesCache = new WeakMap<EntropyTables, SmallTables>();
+const smallTablesCache = new WeakMap<LanguageModel, SmallTables>();
 
-function smallTablesFor(tables: EntropyTables): SmallTables {
-  let cached = smallTablesCache.get(tables);
+function smallTablesFor(model: LanguageModel): SmallTables {
+  let cached = smallTablesCache.get(model);
   if (cached) return cached;
-  const { literal, token, offset, litClassCount } = tables;
-  const litBits = new Float64Array(litClassCount * 256);
-  for (let i = 0; i < litBits.length; i++) litBits[i] = literal[i]! || RAW_LITERAL_BITS;
-  const tokenBits = (ctx: number, symbol: number): number =>
-    token[ctx * TOKEN_ALPHABET_SIZE + symbol]! || RAW_TOKEN_BITS;
+  const p = model.priors;
+  const litClassCount = model.litClassCount;
 
-  const histSlotBits = new Float64Array(TOKEN_CONTEXT_COUNT * LENGTH_SLOT_COUNT);
-  const dictSlotBits = new Float64Array(TOKEN_CONTEXT_COUNT * LENGTH_SLOT_COUNT);
-  const repSlotBits = new Float64Array(TOKEN_CONTEXT_COUNT * 4 * LENGTH_SLOT_COUNT);
-  const litRunStartBits = new Float64Array(TOKEN_CONTEXT_COUNT);
-  for (let ctx = 0; ctx < TOKEN_CONTEXT_COUNT; ctx++) {
-    litRunStartBits[ctx] = tokenBits(ctx, TOKEN_KIND_LITRUN * LENGTH_SLOT_COUNT);
+  const isMatch0 = new Float64Array(TOKEN_KIND_COUNT);
+  const isMatch1 = new Float64Array(TOKEN_KIND_COUNT);
+  const isRep0 = new Float64Array(TOKEN_KIND_COUNT);
+  const isRep1 = new Float64Array(TOKEN_KIND_COUNT);
+  const isDict0 = new Float64Array(TOKEN_KIND_COUNT);
+  const isDict1 = new Float64Array(TOKEN_KIND_COUNT);
+  for (let ctx = 0; ctx < TOKEN_KIND_COUNT; ctx++) {
+    isMatch0[ctx] = bitPrice(p[MODEL_IS_MATCH + ctx]!, 0);
+    isMatch1[ctx] = bitPrice(p[MODEL_IS_MATCH + ctx]!, 1);
+    isRep0[ctx] = bitPrice(p[MODEL_IS_REP + ctx]!, 0);
+    isRep1[ctx] = bitPrice(p[MODEL_IS_REP + ctx]!, 1);
+    isDict0[ctx] = bitPrice(p[MODEL_IS_DICT + ctx]!, 0);
+    isDict1[ctx] = bitPrice(p[MODEL_IS_DICT + ctx]!, 1);
+  }
+  const lenBits = (group: number, slot: number): number =>
+    treePrice(p, MODEL_LEN_TREE + group * 63, SLOT_TREE_BITS, slot) + extraBitsOf(slot);
+
+  const litRunStartBits = new Float64Array(TOKEN_KIND_COUNT);
+  const histSlotBits = new Float64Array(TOKEN_KIND_COUNT * LENGTH_SLOT_COUNT);
+  const dictSlotBits = new Float64Array(TOKEN_KIND_COUNT * LENGTH_SLOT_COUNT);
+  const repSlotBits = new Float64Array(TOKEN_KIND_COUNT * 4 * LENGTH_SLOT_COUNT);
+  for (let ctx = 0; ctx < TOKEN_KIND_COUNT; ctx++) {
+    // Literal continuation (context LIT) is folded into litBits; opening a run from another
+    // context pays the difference (floored at zero — the DP requires non-negative steps).
+    litRunStartBits[ctx] = Math.max(0, isMatch0[ctx]! - isMatch0[TOKEN_KIND_LIT]!);
     for (let s = 0; s < LENGTH_SLOT_COUNT; s++) {
-      const extra = extraBitsOf(s);
-      histSlotBits[ctx * LENGTH_SLOT_COUNT + s] = tokenBits(ctx, TOKEN_KIND_HISTORY * LENGTH_SLOT_COUNT + s) + extra;
-      dictSlotBits[ctx * LENGTH_SLOT_COUNT + s] = tokenBits(ctx, TOKEN_KIND_DICT * LENGTH_SLOT_COUNT + s) + extra;
+      histSlotBits[ctx * LENGTH_SLOT_COUNT + s] =
+        isMatch1[ctx]! + isRep0[ctx]! + isDict0[ctx]! + lenBits(LEN_GROUP_HISTORY, s);
+      dictSlotBits[ctx * LENGTH_SLOT_COUNT + s] =
+        isMatch1[ctx]! + isRep0[ctx]! + isDict1[ctx]! + lenBits(LEN_GROUP_DICT, s);
+      const repLen = lenBits(LEN_GROUP_REP, s);
       for (let r = 0; r < 4; r++) {
         repSlotBits[(ctx * 4 + r) * LENGTH_SLOT_COUNT + s] =
-          tokenBits(ctx, (TOKEN_KIND_REP0 + r) * LENGTH_SLOT_COUNT + s) + extra;
+          isMatch1[ctx]! + isRep1[ctx]! + treePrice(p, MODEL_REP_TREE + ctx * 3, 2, r) + repLen;
       }
     }
   }
+  // Offsets are priced with the ≥ 5 length bucket (the dominant one for slot-varying
+  // lengths); per-bucket exactness matters little to the parse and would quadruple tables.
   const histOffsetSlotBits = new Float64Array(OFFSET_SLOT_COUNT);
   const dictOffsetSlotBits = new Float64Array(OFFSET_SLOT_COUNT);
   for (let s = 0; s < OFFSET_SLOT_COUNT; s++) {
-    const extra = extraBitsOf(s);
-    histOffsetSlotBits[s] = (offset[OFFSET_CONTEXT_HISTORY * OFFSET_SLOT_COUNT + s]! || RAW_OFFSET_SLOT_BITS) + extra;
-    dictOffsetSlotBits[s] = (offset[OFFSET_CONTEXT_DICT * OFFSET_SLOT_COUNT + s]! || RAW_OFFSET_SLOT_BITS) + extra;
+    histOffsetSlotBits[s] =
+      treePrice(p, MODEL_OFF_TREE + (OFF_GROUP_HISTORY * 4 + 3) * 63, SLOT_TREE_BITS, s) + extraBitsOf(s);
+    dictOffsetSlotBits[s] =
+      treePrice(p, MODEL_OFF_TREE + (OFF_GROUP_DICT * 4 + 3) * 63, SLOT_TREE_BITS, s) + extraBitsOf(s);
+  }
+
+  const litBits = new Float64Array(litClassCount * 256);
+  const litContinue = isMatch0[TOKEN_KIND_LIT]!;
+  for (let cls = 0; cls < litClassCount; cls++) {
+    const base = MODEL_LITERAL + cls * LITERAL_BLOCK_SIZE;
+    for (let byte = 0; byte < 256; byte++) {
+      litBits[cls * 256 + byte] = treePrice(p, base, 8, byte) + litContinue;
+    }
   }
 
   const avgHistSlotBits = new Float64Array(LENGTH_SLOT_COUNT);
@@ -105,18 +118,18 @@ function smallTablesFor(tables: EntropyTables): SmallTables {
   for (let s = 0; s < LENGTH_SLOT_COUNT; s++) {
     let hist = 0;
     let dict = 0;
-    for (let ctx = 0; ctx < TOKEN_CONTEXT_COUNT; ctx++) {
+    for (let ctx = 0; ctx < TOKEN_KIND_COUNT; ctx++) {
       hist += histSlotBits[ctx * LENGTH_SLOT_COUNT + s]!;
       dict += dictSlotBits[ctx * LENGTH_SLOT_COUNT + s]!;
     }
-    avgHistSlotBits[s] = hist / TOKEN_CONTEXT_COUNT;
-    avgDictSlotBits[s] = dict / TOKEN_CONTEXT_COUNT;
+    avgHistSlotBits[s] = hist / TOKEN_KIND_COUNT;
+    avgDictSlotBits[s] = dict / TOKEN_KIND_COUNT;
     for (let r = 0; r < 4; r++) {
       let rep = 0;
-      for (let ctx = 0; ctx < TOKEN_CONTEXT_COUNT; ctx++) {
+      for (let ctx = 0; ctx < TOKEN_KIND_COUNT; ctx++) {
         rep += repSlotBits[(ctx * 4 + r) * LENGTH_SLOT_COUNT + s]!;
       }
-      avgRepSlotBits[r * LENGTH_SLOT_COUNT + s] = rep / TOKEN_CONTEXT_COUNT;
+      avgRepSlotBits[r * LENGTH_SLOT_COUNT + s] = rep / TOKEN_KIND_COUNT;
     }
   }
 
@@ -127,25 +140,19 @@ function smallTablesFor(tables: EntropyTables): SmallTables {
     avgDictSlotBits,
     avgRepSlotBits,
   };
-  smallTablesCache.set(tables, cached);
+  smallTablesCache.set(model, cached);
   return cached;
 }
 
-// Scratch prefix buffer reused across calls (compress is synchronous; each pricing's prefix
-// is only read while its own parse runs, and fastMode keeps a separate scratch).
+// Scratch prefix buffer reused across calls (compress is synchronous).
 let smallPrefixScratch = new Float64Array(0);
 
-/**
- * Builds the `small`-mode pricing model: exact output-bit prices from the static per-language
- * context tables. The attached slot tables let the parser run its exact-price optimal parse.
- */
+/** Builds the pricing model driving the shared LZ parser (see {@link smallTablesFor}). */
 export function smallPricing(bytes: Uint8Array, language: RegisteredLanguage): ParsePricing {
-  const tables = smallTablesFor(language.tables);
-  const { litContext } = language.tables;
+  const tables = smallTablesFor(language.model);
+  const { litContext } = language.model;
   const { litBits, parser } = tables;
 
-  // Literal prices are context-exact even inside the DP: the context is the previous input
-  // byte, which does not depend on the tokenization path.
   if (smallPrefixScratch.length < bytes.length + 1) {
     smallPrefixScratch = new Float64Array(Math.max(bytes.length + 1, smallPrefixScratch.length * 2, 4096));
   }
@@ -174,324 +181,100 @@ export function smallPricing(bytes: Uint8Array, language: RegisteredLanguage): P
   };
 }
 
-interface StreamPlan {
-  huffman: boolean;
-  bitLength: number;
-}
+/**
+ * Serializes a token list as a range-coded `small` body. `parseStart` marks pre-seeded
+ * history (streaming blocks): tokens cover bytes[parseStart, n) and the literal context
+ * chains from the last history byte.
+ */
+export function encodeSmallBody(
+  tokens: Token[],
+  bytes: Uint8Array,
+  language: RegisteredLanguage,
+  parseStart = 0
+): Uint8Array {
+  const { litContext, priors } = language.model;
+  const state = new Uint16Array(priors);
+  const encoder = new RangeEncoder();
+  let prevKind = TOKEN_KIND_LIT;
+  let prevByte = parseStart > 0 ? bytes[parseStart - 1]! : 0;
+  let pos = parseStart;
 
-/** A fully priced `small` body: sizes are exact, so the frame comparison never needs emission. */
-export interface SmallPlan {
-  literals: StreamPlan;
-  tokenStream: StreamPlan;
-  offsets: StreamPlan;
-  tokenCount: number;
-  totalBits: number;
-  /** Exact char count of the emitted radix-85 body. */
-  charCost: number;
-  collected: CollectedStreams;
-}
+  // rep0 replay (identical to the decoder's full rep cache, whose other entries the
+  // encoder never reads) so matched literals can read the byte at rep0 distance back.
+  let rep0 = INITIAL_REPS[0]!;
 
-interface CollectedStreams {
-  literalBytes: Uint8Array;
-  /** Literal context class per literal (the trained class of the previous input byte). */
-  literalCtxs: Uint8Array;
-  literalCount: number;
-  tokenSyms: Uint8Array;
-  /** Token context per token (previous token kind; litrun at the start). */
-  tokenCtxs: Uint8Array;
-  tokenExtraBits: Uint8Array;
-  tokenExtraValues: Int32Array;
-  tokenCount: number;
-  offsetSlots: Uint8Array;
-  /** Offset context per offset (history or dict). */
-  offsetCtxs: Uint8Array;
-  offsetExtraBits: Uint8Array;
-  offsetExtraValues: Int32Array;
-  offsetCount: number;
-  tokenExtraTotal: number;
-  offsetExtraTotal: number;
-}
-
-function collectStreams(tokens: Token[], bytes: Uint8Array, tables: EntropyTables): CollectedStreams {
-  const { litContext } = tables;
-  // Every capacity is exact or a safe upper bound: literal runs longer than MAX_RUN_LENGTH
-  // split into extra litrun tokens.
-  const tokenCap = tokens.length + Math.ceil(bytes.length / MAX_RUN_LENGTH) + 1;
-  const s: CollectedStreams = {
-    literalBytes: new Uint8Array(bytes.length),
-    literalCtxs: new Uint8Array(bytes.length),
-    literalCount: 0,
-    tokenSyms: new Uint8Array(tokenCap),
-    tokenCtxs: new Uint8Array(tokenCap),
-    tokenExtraBits: new Uint8Array(tokenCap),
-    tokenExtraValues: new Int32Array(tokenCap),
-    tokenCount: 0,
-    offsetSlots: new Uint8Array(tokens.length),
-    offsetCtxs: new Uint8Array(tokens.length),
-    offsetExtraBits: new Uint8Array(tokens.length),
-    offsetExtraValues: new Int32Array(tokens.length),
-    offsetCount: 0,
-    tokenExtraTotal: 0,
-    offsetExtraTotal: 0,
-  };
-  let prevKind = TOKEN_KIND_LITRUN;
-  const pushToken = (kind: number, lenValue: number): void => {
-    const slot = slotOf(lenValue);
-    const extra = extraBitsOf(slot);
-    const at = s.tokenCount++;
-    s.tokenSyms[at] = kind * LENGTH_SLOT_COUNT + slot;
-    s.tokenCtxs[at] = prevKind;
-    s.tokenExtraBits[at] = extra;
-    s.tokenExtraValues[at] = extraValueOf(lenValue, slot);
-    s.tokenExtraTotal += extra;
-    prevKind = kind;
-  };
-  const pushOffset = (value: number, ctx: number): void => {
+  const encodeLength = (group: number, len: number): void => {
+    const value = len - MIN_LEN_REP;
     const slot = slotOf(value);
+    encodeTree(encoder, state, MODEL_LEN_TREE + group * 63, SLOT_TREE_BITS, slot);
     const extra = extraBitsOf(slot);
-    const at = s.offsetCount++;
-    s.offsetSlots[at] = slot;
-    s.offsetCtxs[at] = ctx;
-    s.offsetExtraBits[at] = extra;
-    s.offsetExtraValues[at] = extraValueOf(value, slot);
-    s.offsetExtraTotal += extra;
+    if (extra > 0) encoder.encodeDirect(extraValueOf(value, slot), extra);
   };
+  const encodeOffset = (group: number, len: number, value: number): void => {
+    const slot = slotOf(value);
+    encodeTree(encoder, state, MODEL_OFF_TREE + (group * 4 + offLenBucketOf(len)) * 63, SLOT_TREE_BITS, slot);
+    const extra = extraBitsOf(slot);
+    if (extra > 0) encoder.encodeDirect(extraValueOf(value, slot), extra);
+  };
+
   for (const token of tokens) {
     if (token.type === 'lit') {
-      // Runs beyond the length-slot alphabet are split into consecutive litrun tokens.
-      for (let start = token.start; start < token.end; start += MAX_RUN_LENGTH) {
-        const end = Math.min(start + MAX_RUN_LENGTH, token.end);
-        pushToken(TOKEN_KIND_LITRUN, end - start - 1);
-        let prevByte = start > 0 ? bytes[start - 1]! : 0;
-        for (let i = start; i < end; i++) {
-          const byte = bytes[i]!;
-          const at = s.literalCount++;
-          s.literalBytes[at] = byte;
-          s.literalCtxs[at] = litContext[prevByte]!;
-          prevByte = byte;
+      for (let i = token.start; i < token.end; i++) {
+        const byte = bytes[i]!;
+        encoder.encodeBit(state, MODEL_IS_MATCH + prevKind, 0);
+        const base = MODEL_LITERAL + litContext[prevByte]! * LITERAL_BLOCK_SIZE;
+        if (prevKind === TOKEN_KIND_LIT || rep0 > i) {
+          encodeTree(encoder, state, base, 8, byte);
+        } else {
+          // Matched literal: the byte at rep0 distance predicts each bit until the first
+          // mismatch (then the plain tree nodes take over).
+          const matchByte = bytes[i - rep0]!;
+          let node = 1;
+          let matched = true;
+          for (let shift = 7; shift >= 0; shift--) {
+            const bit = (byte >>> shift) & 1;
+            if (matched) {
+              const matchBit = (matchByte >>> shift) & 1;
+              encoder.encodeBit(state, base + (((1 + matchBit) << 8) | node) - 1, bit);
+              if (matchBit !== bit) matched = false;
+            } else {
+              encoder.encodeBit(state, base + node - 1, bit);
+            }
+            node = node * 2 + bit;
+          }
         }
+        prevKind = TOKEN_KIND_LIT;
+        prevByte = byte;
       }
-    } else if (token.type === 'history') {
-      if (token.rep >= 0) pushToken(TOKEN_KIND_REP0 + token.rep, token.len - MIN_LEN_REP);
-      else {
-        pushToken(TOKEN_KIND_HISTORY, token.len - MIN_LEN_REP);
-        pushOffset(token.dist - 1, OFFSET_CONTEXT_HISTORY);
-      }
+      pos = token.end;
+      continue;
+    }
+    encoder.encodeBit(state, MODEL_IS_MATCH + prevKind, 1);
+    if (token.type === 'history' && token.rep >= 0) {
+      encoder.encodeBit(state, MODEL_IS_REP + prevKind, 1);
+      encodeTree(encoder, state, MODEL_REP_TREE + prevKind * 3, 2, token.rep);
+      encodeLength(LEN_GROUP_REP, token.len);
+      prevKind = TOKEN_KIND_REP0 + token.rep;
+      rep0 = token.dist;
     } else {
-      pushToken(TOKEN_KIND_DICT, token.len - MIN_LEN_REP);
-      pushOffset(token.start, OFFSET_CONTEXT_DICT);
+      encoder.encodeBit(state, MODEL_IS_REP + prevKind, 0);
+      if (token.type === 'history') {
+        encoder.encodeBit(state, MODEL_IS_DICT + prevKind, 0);
+        encodeLength(LEN_GROUP_HISTORY, token.len);
+        encodeOffset(OFF_GROUP_HISTORY, token.len, token.dist - 1);
+        prevKind = TOKEN_KIND_HISTORY;
+        rep0 = token.dist;
+      } else {
+        encoder.encodeBit(state, MODEL_IS_DICT + prevKind, 1);
+        encodeLength(LEN_GROUP_DICT, token.len);
+        encodeOffset(OFF_GROUP_DICT, token.len, token.start);
+        prevKind = TOKEN_KIND_DICT;
+      }
     }
+    pos += token.len;
+    prevByte = bytes[pos - 1]!;
   }
-  return s;
-}
-
-function planStream(
-  syms: Uint8Array,
-  ctxs: Uint8Array,
-  count: number,
-  lengths: Uint8Array,
-  alphabetSize: number,
-  rawBits: number,
-  extraBitsTotal: number
-): StreamPlan {
-  let huffmanBits = 0;
-  let huffmanUsable = true;
-  for (let i = 0; i < count; i++) {
-    const length = lengths[ctxs[i]! * alphabetSize + syms[i]!]!;
-    if (length === 0) {
-      huffmanUsable = false;
-      break;
-    }
-    huffmanBits += length;
-  }
-  const rawTotal = count * rawBits + extraBitsTotal;
-  if (huffmanUsable && huffmanBits + extraBitsTotal <= rawTotal) {
-    return { huffman: true, bitLength: huffmanBits + extraBitsTotal };
-  }
-  return { huffman: false, bitLength: rawTotal };
-}
-
-/** Prices the complete `small` body for a token list without emitting anything. */
-export function planSmallBody(tokens: Token[], bytes: Uint8Array, language: RegisteredLanguage): SmallPlan {
-  const tables = language.tables;
-  const collected = collectStreams(tokens, bytes, tables);
-  const literals = planStream(
-    collected.literalBytes,
-    collected.literalCtxs,
-    collected.literalCount,
-    tables.literal,
-    256,
-    RAW_LITERAL_BITS,
-    0
-  );
-  const tokenStream = planStream(
-    collected.tokenSyms,
-    collected.tokenCtxs,
-    collected.tokenCount,
-    tables.token,
-    TOKEN_ALPHABET_SIZE,
-    RAW_TOKEN_BITS,
-    collected.tokenExtraTotal
-  );
-  const offsets = planStream(
-    collected.offsetSlots,
-    collected.offsetCtxs,
-    collected.offsetCount,
-    tables.offset,
-    OFFSET_SLOT_COUNT,
-    RAW_OFFSET_SLOT_BITS,
-    collected.offsetExtraTotal
-  );
-  const tokenCount = collected.tokenCount;
-  const totalBits =
-    3 +
-    bitVarintLength(tokenCount) +
-    bitVarintLength(literals.bitLength) +
-    bitVarintLength(tokenStream.bitLength) +
-    literals.bitLength +
-    tokenStream.bitLength +
-    offsets.bitLength;
-  return {
-    literals,
-    tokenStream,
-    offsets,
-    tokenCount,
-    totalBits,
-    charCost: Math.ceil(totalBits / 32) * 5,
-    collected,
-  };
-}
-
-interface ContextEncoders {
-  literal: HuffmanEncoder[];
-  token: HuffmanEncoder[];
-  offset: HuffmanEncoder[];
-}
-
-const encoderCache = new WeakMap<EntropyTables, ContextEncoders>();
-
-function buildEncoders(lengths: Uint8Array, alphabetSize: number): HuffmanEncoder[] {
-  const encoders: HuffmanEncoder[] = [];
-  for (let base = 0; base < lengths.length; base += alphabetSize) {
-    encoders.push(buildEncoder(lengths.subarray(base, base + alphabetSize)));
-  }
-  return encoders;
-}
-
-function encodersFor(tables: EntropyTables): ContextEncoders {
-  let encoders = encoderCache.get(tables);
-  if (!encoders) {
-    encoders = {
-      literal: buildEncoders(tables.literal, 256),
-      token: buildEncoders(tables.token, TOKEN_ALPHABET_SIZE),
-      offset: buildEncoders(tables.offset, OFFSET_SLOT_COUNT),
-    };
-    encoderCache.set(tables, encoders);
-  }
-  return encoders;
-}
-
-/**
- * Serializes a planned `small` body into a bit writer (single pass). The caller flushes it
- * as fused radix-85 text (text frames) or as byte-padded raw bits (binary frames).
- */
-export function emitSmallBody(plan: SmallPlan, language: RegisteredLanguage): BitWriter {
-  const collected = plan.collected;
-  const encoders = encodersFor(language.tables);
-  const writer = new BitWriter();
-  writer.writeBits(
-    (plan.literals.huffman ? 4 : 0) | (plan.tokenStream.huffman ? 2 : 0) | (plan.offsets.huffman ? 1 : 0),
-    3
-  );
-  writer.writeVarint(plan.tokenCount);
-  writer.writeVarint(plan.literals.bitLength);
-  writer.writeVarint(plan.tokenStream.bitLength);
-
-  if (plan.literals.huffman) {
-    const literalEncoders = encoders.literal;
-    for (let i = 0; i < collected.literalCount; i++) {
-      const { codes, lengths } = literalEncoders[collected.literalCtxs[i]!]!;
-      const byte = collected.literalBytes[i]!;
-      writer.writeBits(codes[byte]!, lengths[byte]!);
-    }
-  } else {
-    for (let i = 0; i < collected.literalCount; i++) writer.writeBits(collected.literalBytes[i]!, RAW_LITERAL_BITS);
-  }
-  {
-    const tokenEncoders = encoders.token;
-    const huffman = plan.tokenStream.huffman;
-    for (let i = 0; i < collected.tokenCount; i++) {
-      const symbol = collected.tokenSyms[i]!;
-      if (huffman) {
-        const { codes, lengths } = tokenEncoders[collected.tokenCtxs[i]!]!;
-        writer.writeBits(codes[symbol]!, lengths[symbol]!);
-      } else writer.writeBits(symbol, RAW_TOKEN_BITS);
-      const extra = collected.tokenExtraBits[i]!;
-      if (extra > 0) writer.writeBits(collected.tokenExtraValues[i]!, extra);
-    }
-  }
-  {
-    const offsetEncoders = encoders.offset;
-    const huffman = plan.offsets.huffman;
-    for (let i = 0; i < collected.offsetCount; i++) {
-      const slot = collected.offsetSlots[i]!;
-      if (huffman) {
-        const { codes, lengths } = offsetEncoders[collected.offsetCtxs[i]!]!;
-        writer.writeBits(codes[slot]!, lengths[slot]!);
-      } else writer.writeBits(slot, RAW_OFFSET_SLOT_BITS);
-      const extra = collected.offsetExtraBits[i]!;
-      if (extra > 0) writer.writeBits(collected.offsetExtraValues[i]!, extra);
-    }
-  }
-  return writer;
-}
-
-function readSymbol(cursor: BitReader, table: Uint16Array): number {
-  const entry = table[cursor.peekBits(MAX_CODE_LENGTH)]!;
-  const length = entry & 15;
-  if (length === 0) throw new TokzipDecodeError('invalid symbol');
-  cursor.advance(length);
-  return entry >>> 4;
-}
-
-/** Per-context single-lookup decode tables, built lazily per context and cached. */
-class LazyDecoders {
-  private readonly lengths: Uint8Array;
-  private readonly alphabetSize: number;
-  private readonly tables: (Uint16Array | undefined)[];
-
-  constructor(lengths: Uint8Array, alphabetSize: number, contextCount: number) {
-    this.lengths = lengths;
-    this.alphabetSize = alphabetSize;
-    this.tables = Array.from({ length: contextCount });
-  }
-
-  get(ctx: number): Uint16Array {
-    return (this.tables[ctx] ??= buildDecoder(
-      this.lengths.subarray(ctx * this.alphabetSize, (ctx + 1) * this.alphabetSize)
-    ));
-  }
-}
-
-interface ContextDecoders {
-  literal: LazyDecoders;
-  token: LazyDecoders;
-  offset: LazyDecoders;
-}
-
-const decoderCache = new WeakMap<EntropyTables, ContextDecoders>();
-
-function decodersFor(tables: EntropyTables): ContextDecoders {
-  let decoders = decoderCache.get(tables);
-  if (!decoders) {
-    decoders = {
-      literal: new LazyDecoders(tables.literal, 256, tables.litClassCount),
-      token: new LazyDecoders(tables.token, TOKEN_ALPHABET_SIZE, TOKEN_CONTEXT_COUNT),
-      offset: new LazyDecoders(tables.offset, OFFSET_SLOT_COUNT, OFFSET_CONTEXT_COUNT),
-    };
-    decoderCache.set(tables, decoders);
-  }
-  return decoders;
+  return encoder.finish();
 }
 
 /** Decodes a text-frame `small` body in data[pos, end) into exactly `outputSize` bytes. */
@@ -503,8 +286,8 @@ export function decodeSmallBody(
   language: RegisteredLanguage,
   fenced = false
 ): Uint8Array {
-  const words = decodeRadix85(data, pos, end);
-  return decodeSmallWords(words, words.length * 32, 32, outputSize, language, fenced);
+  const body = bytesFromWords(decodeRadix85(data, pos, end));
+  return decodeSmallCore(body, 0, body.length, outputSize, language, fenced, undefined, 3);
 }
 
 /** Decodes a binary-frame `small` body in body[pos, end) into exactly `outputSize` bytes. */
@@ -517,108 +300,131 @@ export function decodeSmallBodyBinary(
   fenced = false,
   history?: Uint8Array
 ): Uint8Array {
-  return decodeSmallWords(wordsFromBytes(body, pos, end), (end - pos) * 8, 8, outputSize, language, fenced, history);
+  return decodeSmallCore(body, pos, end, outputSize, language, fenced, history, 0);
 }
 
 /**
- * Words-based `small` decode core. `payloadBits` is the exact on-the-wire payload size
- * (a multiple of `alignBits`: 32 for radix-85 text frames, 8 for binary frames); bits past
- * the consumed streams up to `payloadBits` are canonical zero padding and are verified.
+ * Range-coded `small` decode core. `padAllowance` is the number of trailing zero padding
+ * bytes the channel may append (3 for radix-85 text frames, whose payload is padded to a
+ * 32-bit word; 0 for binary frames): the decoder must consume every byte before the
+ * padding, and the padding itself must be zero (canonical frames).
  */
-function decodeSmallWords(
-  words: Uint32Array,
-  payloadBits: number,
-  alignBits: number,
+function decodeSmallCore(
+  body: Uint8Array,
+  pos: number,
+  end: number,
   outputSize: number,
   language: RegisteredLanguage,
   fenced: boolean,
-  history?: Uint8Array
+  history: Uint8Array | undefined,
+  padAllowance: number
 ): Uint8Array {
-  const header = new BitReader(words);
-  const modes = header.readBits(3);
-  const tokenCount = header.readVarint();
-  const litBitLength = header.readVarint();
-  const tokenBitLength = header.readVarint();
-
-  const litStart = header.bitPosition;
-  const tokenStart = litStart + litBitLength;
-  const offsetStart = tokenStart + tokenBitLength;
-  if (offsetStart > payloadBits) throw new TokzipDecodeError('stream lengths exceed payload');
-  // Structural output bound, checked before allocating: every token consumes at least one
-  // token-stream bit and produces at most MATCH_LEN_CAP bytes, so a declared size beyond
-  // that cannot be produced by this body (this also stops forged huge-size frames from
-  // forcing enormous allocations under `maxOutputSize: Infinity`).
-  if (tokenCount > tokenBitLength || outputSize > tokenCount * MATCH_LEN_CAP) {
+  // Structural output bound, checked before allocating: a literal costs ≥ 9 model decisions
+  // and a match ≥ 10, each consuming ≥ 1/46 bit even at the adaptive probability clamp, so
+  // a declared size beyond bodyBits × 5 × MATCH_LEN_CAP cannot be produced by this body
+  // (this stops forged huge-size frames from forcing enormous allocations under
+  // `maxOutputSize: Infinity`).
+  if (outputSize > (end - pos) * 8 * 5 * MATCH_LEN_CAP) {
     throw new TokzipDecodeError('declared size exceeds body capacity');
   }
-  const litCursor = new BitReader(words, litStart);
-  const tokenCursor = new BitReader(words, tokenStart);
-  const offsetCursor = new BitReader(words, offsetStart);
+  const { litContext, priors } = language.model;
+  const state = new Uint16Array(priors);
+  const decoder = new RangeDecoder(body, pos, end);
 
-  const decoders = decodersFor(language.tables);
-  const litHuffman = (modes & 4) !== 0;
-  const tokenHuffman = (modes & 2) !== 0;
-  const offsetHuffman = (modes & 1) !== 0;
-
-  const readOffsetValue = (ctx: number): number => {
-    const slot = offsetHuffman
-      ? readSymbol(offsetCursor, decoders.offset.get(ctx))
-      : offsetCursor.readBits(RAW_OFFSET_SLOT_BITS);
-    if (slot >= OFFSET_SLOT_COUNT) throw new TokzipDecodeError('invalid symbol');
-    const extraBits = extraBitsOf(slot);
-    return valueOfSlot(slot, extraBits > 0 ? offsetCursor.readBits(extraBits) : 0);
-  };
-
-  // A history prefix (streaming blocks) is seeded as already-produced output: history matches
-  // may reach into it, and the literal context chains from its last byte (the encoder's
-  // collectStreams sees that byte as the previous input byte at the block boundary).
   const historyLength = history?.length ?? 0;
   const target = historyLength + outputSize;
   const out = allocateDecodeBuffer(target);
   if (history) out.set(history);
   const { dictionary } = language;
-  const { litContext } = language.tables;
   const tracker = fenced ? new FenceTracker(language.id) : undefined;
   let rep0 = INITIAL_REPS[0]!;
   let rep1 = INITIAL_REPS[1]!;
   let rep2 = INITIAL_REPS[2]!;
   let rep3 = INITIAL_REPS[3]!;
   let produced = historyLength;
-  let prevKind = TOKEN_KIND_LITRUN;
+  let prevKind = TOKEN_KIND_LIT;
   let prevByte = historyLength > 0 ? history![historyLength - 1]! : 0;
-  for (let t = 0; t < tokenCount; t++) {
-    const symbol = tokenHuffman
-      ? readSymbol(tokenCursor, decoders.token.get(prevKind))
-      : tokenCursor.readBits(RAW_TOKEN_BITS);
-    if (symbol >= TOKEN_ALPHABET_SIZE) throw new TokzipDecodeError('invalid symbol');
-    const kind = SYMBOL_KIND[symbol]!;
-    const slot = SYMBOL_SLOT[symbol]!;
-    const extraBits = extraBitsOf(slot);
-    const slotValue = valueOfSlot(slot, extraBits > 0 ? tokenCursor.readBits(extraBits) : 0);
-    prevKind = kind;
 
-    if (kind === TOKEN_KIND_LITRUN) {
-      const length = slotValue + 1;
-      if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
-      const runEnd = produced + length;
-      if (litHuffman) {
-        const litDecoders = decoders.literal;
-        for (let i = produced; i < runEnd; i++) {
-          const byte = readSymbol(litCursor, litDecoders.get(litContext[prevByte]!));
-          out[i] = byte;
-          prevByte = byte;
-        }
+  const readSlotValue = (base: number): number => {
+    const slot = decodeTree(decoder, state, base, SLOT_TREE_BITS);
+    if (slot >= (base >= MODEL_OFF_TREE ? OFFSET_SLOT_COUNT : LENGTH_SLOT_COUNT)) {
+      throw new TokzipDecodeError('invalid symbol');
+    }
+    const extra = extraBitsOf(slot);
+    return valueOfSlot(slot, extra > 0 ? decoder.decodeDirect(extra) : 0);
+  };
+
+  while (produced < target) {
+    if (decoder.decodeBit(state, MODEL_IS_MATCH + prevKind) === 0) {
+      const base = MODEL_LITERAL + litContext[prevByte]! * LITERAL_BLOCK_SIZE;
+      let byte: number;
+      if (prevKind === TOKEN_KIND_LIT || rep0 > produced) {
+        byte = decodeTree(decoder, state, base, 8);
       } else {
-        for (let i = produced; i < runEnd; i++) out[i] = litCursor.readBits(RAW_LITERAL_BITS);
-        prevByte = out[runEnd - 1]!;
+        // Matched literal (mirrors the encoder): the byte at rep0 distance predicts each
+        // bit until the first mismatch.
+        const matchByte = out[produced - rep0]!;
+        let node = 1;
+        let matched = true;
+        for (let shift = 7; shift >= 0; shift--) {
+          let bit: number;
+          if (matched) {
+            const matchBit = (matchByte >>> shift) & 1;
+            bit = decoder.decodeBit(state, base + (((1 + matchBit) << 8) | node) - 1);
+            if (matchBit !== bit) matched = false;
+          } else {
+            bit = decoder.decodeBit(state, base + node - 1);
+          }
+          node = node * 2 + bit;
+        }
+        byte = node - 256;
       }
-      produced = runEnd;
+      out[produced++] = byte;
+      prevByte = byte;
+      prevKind = TOKEN_KIND_LIT;
       continue;
     }
-    const length = slotValue + MIN_LEN_REP;
-    if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
-    if (kind === TOKEN_KIND_DICT) {
-      const start = readOffsetValue(OFFSET_CONTEXT_DICT);
+    let length: number;
+    if (decoder.decodeBit(state, MODEL_IS_REP + prevKind) !== 0) {
+      const repIndex = decodeTree(decoder, state, MODEL_REP_TREE + prevKind * 3, 2);
+      length = readSlotValue(MODEL_LEN_TREE + LEN_GROUP_REP * 63) + MIN_LEN_REP;
+      let dist: number;
+      if (repIndex === 0) dist = rep0;
+      else if (repIndex === 1) {
+        dist = rep1;
+        rep1 = rep0;
+        rep0 = dist;
+      } else if (repIndex === 2) {
+        dist = rep2;
+        rep2 = rep1;
+        rep1 = rep0;
+        rep0 = dist;
+      } else {
+        dist = rep3;
+        rep3 = rep2;
+        rep2 = rep1;
+        rep1 = rep0;
+        rep0 = dist;
+      }
+      if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
+      copyHistory(out, produced, dist, length);
+      produced += length;
+      prevKind = TOKEN_KIND_REP0 + repIndex;
+    } else if (decoder.decodeBit(state, MODEL_IS_DICT + prevKind) === 0) {
+      length = readSlotValue(MODEL_LEN_TREE + LEN_GROUP_HISTORY * 63) + MIN_LEN_REP;
+      const dist = readSlotValue(MODEL_OFF_TREE + (OFF_GROUP_HISTORY * 4 + offLenBucketOf(length)) * 63) + 1;
+      rep3 = rep2;
+      rep2 = rep1;
+      rep1 = rep0;
+      rep0 = dist;
+      if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
+      copyHistory(out, produced, dist, length);
+      produced += length;
+      prevKind = TOKEN_KIND_HISTORY;
+    } else {
+      length = readSlotValue(MODEL_LEN_TREE + LEN_GROUP_DICT * 63) + MIN_LEN_REP;
+      const start = readSlotValue(MODEL_OFF_TREE + (OFF_GROUP_DICT * 4 + offLenBucketOf(length)) * 63);
+      if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
       if (start + length <= dictionary.length) {
         out.set(dictionary.subarray(start, start + length), produced);
       } else if (tracker) {
@@ -626,61 +432,30 @@ function decodeSmallWords(
       } else {
         throw new TokzipDecodeError('dictionary match out of bounds');
       }
-    } else {
-      let dist: number;
-      if (kind === TOKEN_KIND_HISTORY) {
-        dist = readOffsetValue(OFFSET_CONTEXT_HISTORY) + 1;
-        rep3 = rep2;
-        rep2 = rep1;
-        rep1 = rep0;
-        rep0 = dist;
-      } else {
-        const repIndex = kind - TOKEN_KIND_REP0;
-        if (repIndex === 0) dist = rep0;
-        else if (repIndex === 1) {
-          dist = rep1;
-          rep1 = rep0;
-          rep0 = dist;
-        } else if (repIndex === 2) {
-          dist = rep2;
-          rep2 = rep1;
-          rep1 = rep0;
-          rep0 = dist;
-        } else {
-          dist = rep3;
-          rep3 = rep2;
-          rep2 = rep1;
-          rep1 = rep0;
-          rep0 = dist;
-        }
-      }
-      if (dist < 1 || dist > produced) throw new TokzipDecodeError('history match out of bounds');
-      if (dist >= length) {
-        // Non-overlapping: block copy.
-        out.copyWithin(produced, produced - dist, produced - dist + length);
-      } else {
-        const from = produced - dist;
-        for (let i = 0; i < length; i++) out[produced + i] = out[from + i]!;
-      }
+      produced += length;
+      prevKind = TOKEN_KIND_DICT;
     }
-    produced += length;
     prevByte = out[produced - 1]!;
   }
-  if (produced !== target) throw new TokzipDecodeError('declared size mismatch');
-  if (litCursor.bitPosition !== tokenStart || tokenCursor.bitPosition !== offsetStart) {
-    throw new TokzipDecodeError('stream length mismatch');
-  }
-  // Trailing units are a structural error: only the final unit's zero padding may remain.
-  if (Math.ceil(Math.max(offsetCursor.bitPosition, 1) / alignBits) * alignBits !== payloadBits) {
-    throw new TokzipDecodeError('trailing characters after payload');
-  }
-  // The padding itself must be zero (canonical frames; catches tail corruption).
-  for (let remaining = payloadBits - offsetCursor.bitPosition; remaining > 0;) {
-    const take = Math.min(24, remaining);
-    if (offsetCursor.readBits(take) !== 0) throw new TokzipDecodeError('non-zero padding bits');
-    remaining -= take;
+  // Canonical framing: the decoder must have consumed the whole payload up to the channel's
+  // zero padding, and the padding itself must be zero.
+  const consumed = decoder.position;
+  if (end - consumed > padAllowance) throw new TokzipDecodeError('trailing characters after payload');
+  for (let i = consumed; i < end; i++) {
+    if (body[i] !== 0) throw new TokzipDecodeError('non-zero padding bits');
   }
   // slice, not subarray: a view would keep the whole history+output allocation alive for as
   // long as the caller retains the chunk, multiplying resident memory per decoded block.
   return historyLength > 0 ? out.slice(historyLength) : out;
+}
+
+function copyHistory(buffer: Uint8Array, at: number, dist: number, length: number): void {
+  if (dist < 1 || dist > at) throw new TokzipDecodeError('history match out of bounds');
+  if (dist >= length) {
+    buffer.copyWithin(at, at - dist, at - dist + length);
+  } else {
+    // Overlap-copy: history matches may copy bytes produced by the same match.
+    const from = at - dist;
+    for (let i = 0; i < length; i++) buffer[at + i] = buffer[from + i]!;
+  }
 }

@@ -109,6 +109,47 @@ export class BitWriter {
   }
 }
 
+/** Unpacks decoded words back into their big-endian byte payload (including any zero padding). */
+export function bytesFromWords(words: Uint32Array): Uint8Array {
+  const bytes = new Uint8Array(words.length * 4);
+  for (let w = 0, at = 0; w < words.length; w++, at += 4) {
+    const word = words[w]!;
+    bytes[at] = word >>> 24;
+    bytes[at + 1] = (word >>> 16) & 255;
+    bytes[at + 2] = (word >>> 8) & 255;
+    bytes[at + 3] = word & 255;
+  }
+  return bytes;
+}
+
+/** Encodes a byte payload as radix-85 text: zero-padded to a 32-bit word, 5 chars per word. */
+export function radix85FromBytes(bytes: Uint8Array): string {
+  const wordCount = Math.ceil(bytes.length / 4);
+  const codes = new Uint8Array(wordCount * 5);
+  let at = 0;
+  for (let w = 0; w < wordCount; w++) {
+    const i = w * 4;
+    const packed = (bytes[i]! << 24) | ((bytes[i + 1] ?? 0) << 16) | ((bytes[i + 2] ?? 0) << 8) | (bytes[i + 3] ?? 0);
+    // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
+    let word = packed >>> 0;
+    codes[at + 4] = RADIX85_CODES[word % 85]!;
+    word = Math.trunc(word / 85);
+    codes[at + 3] = RADIX85_CODES[word % 85]!;
+    word = Math.trunc(word / 85);
+    codes[at + 2] = RADIX85_CODES[word % 85]!;
+    word = Math.trunc(word / 85);
+    codes[at + 1] = RADIX85_CODES[word % 85]!;
+    codes[at] = RADIX85_CODES[Math.trunc(word / 85)]!;
+    at += 5;
+  }
+  return asciiDecoder.decode(codes);
+}
+
+/** Exact char count {@link radix85FromBytes} produces for `byteLength` bytes. */
+export function radix85Length(byteLength: number): number {
+  return Math.ceil(byteLength / 4) * 5;
+}
+
 /** Packs a big-endian byte payload into the 32-bit words a {@link BitReader} consumes (zero-padded tail). */
 export function wordsFromBytes(bytes: Uint8Array, start: number, end: number): Uint32Array {
   const byteLength = end - start;

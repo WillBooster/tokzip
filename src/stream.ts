@@ -2,33 +2,31 @@ import { CRC_INITIAL_STATE, crc32Append, crc32Finalize } from './checksum.ts';
 import { pushByteVarint, pushCrc32Binary, readCrc32Binary } from './container.ts';
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
-import { decodeFastBodyBinary, emitFastBody, fastBodyCost, fastPricing, packFastCodes } from './fastMode.ts';
-import { DEFAULT_MAX_OUTPUT_SIZE, FAST_WINDOW, MODE_FAST, MODE_SMALL, MODE_STORED, SMALL_WINDOW } from './format.ts';
+import { DEFAULT_MAX_OUTPUT_SIZE, MODE_SMALL, MODE_STORED, SMALL_WINDOW } from './format.ts';
 import { dictIndexFor, OPTIMAL_MAX_INPUT, parse } from './lz.ts';
 import { TextSink } from './radix64.ts';
-import { decodeSmallBodyBinary, emitSmallBody, planSmallBody, smallPricing } from './smallMode.ts';
+import { decodeSmallBodyBinary, encodeSmallBody, smallPricing } from './smallMode.ts';
 
 /**
  * First byte of every tokzip stream: bit 7 set (binary channel) over low-6 magic 0b111 and
- * stream-format version 1 — disjoint from every frame magic (low-6 magic 0b110) so streams
+ * stream-format version 2 — disjoint from every frame magic (low-6 magic 0b110) so streams
  * and one-shot frames can never be confused.
  */
-const STREAM_MAGIC_VERSION = 0b1011_1001;
+const STREAM_MAGIC_VERSION = 0b1011_1010;
 
 /**
- * Stream flags byte: bits 1:0 carry the stream mode (fast/small); bit 2 marks window
- * carry-over (blocks are decoded with the previous blocks' output seeded as history — the
- * small-mode literal context chains across the block boundary, so decoders must know);
- * the rest are reserved.
+ * Stream flags byte: bit 0 marks window carry-over (blocks are decoded with the previous
+ * blocks' output seeded as history — the literal context chains across the block boundary,
+ * so decoders must know); the rest are reserved.
  */
-const STREAM_FLAG_CARRY = 0b100;
-const STREAM_RESERVED_FLAG_MASK = 0b1111_1000;
+const STREAM_FLAG_CARRY = 0b1;
+const STREAM_RESERVED_FLAG_MASK = 0b1111_1110;
 
 const BYTE_VARINT_MAX_BYTES = 5;
 /** The terminator's total-size varint spans the whole stream: 8 groups = 56 bits ≥ 2^53. */
 const TERMINATOR_VARINT_MAX_BYTES = 8;
 
-const DEFAULT_BLOCK_SIZE = 1 << 18; // 256 KB (matches the fast-mode window).
+const DEFAULT_BLOCK_SIZE = 1 << 18; // 256 KB.
 const MIN_BLOCK_SIZE = 1 << 10;
 
 const textEncoder = new TextEncoder();
@@ -41,11 +39,8 @@ function isUint8Array(value: unknown): value is Uint8Array {
 export interface CompressionStreamOptions {
   /** Language dictionary to use; default 'none' (id 0, wrapper dictionary only). */
   language?: string;
-  /** Optimization target; both modes are lossless. Default 'fast'. */
-  mode?: 'fast' | 'small';
   /**
-   * Raw bytes per compressed block. Default 256 KB, minimum 1 KB. In `fast` mode, larger
-   * blocks trade latency/memory for ratio; in `small` mode the default 256 KB is the
+   * Raw bytes per compressed block. Default 256 KB, minimum 1 KB. The default is the
    * practical ceiling — larger blocks shrink the carried-history budget (it keeps
    * history + block inside the optimal parser's 512 KB input bound), and at ≥ 512 KB carry
    * is impossible and the block itself exceeds the bound, degrading the parse to greedy.
@@ -58,12 +53,11 @@ export interface CompressionStreamOptions {
    */
   carryWindow?: boolean;
   /**
-   * Upper bound on the carried history in bytes (clamped to the mode's window). Carried
-   * history is re-priced and re-indexed every block, so small blocks with a full window pay
-   * a large speed multiplier; a tighter limit trades ratio for compression speed. Defaults
-   * to the 256 KB window in `fast` mode; in `small` mode it defaults to the remaining
-   * optimal-parse budget, `max(0, 512 KB − blockSize)` capped at the 1 MB window (zero at
-   * `blockSize` ≥ 512 KB, where carry is impossible).
+   * Upper bound on the carried history in bytes (clamped to the window). Carried history is
+   * re-priced and re-indexed every block, so small blocks with a full window pay a large
+   * speed multiplier; a tighter limit trades ratio for compression speed. Defaults to the
+   * remaining optimal-parse budget, `max(0, 512 KB − blockSize)` capped at the 1 MB window
+   * (zero at `blockSize` ≥ 512 KB, where carry is impossible).
    */
   historyLimit?: number;
 }
@@ -77,7 +71,7 @@ export interface DecompressionStreamOptions {
  * Compresses a byte (or string-chunk) stream into a tokzip stream: a 3-byte stream header
  * followed by independent length-prefixed blocks and a terminator. Works on Web Streams, so
  * it can be piped in Node.js (18+) and browsers alike; the whole compression pipeline —
- * blocking, window carry-over, per-block stored/fast/small selection — is hidden inside.
+ * blocking, window carry-over, per-block stored/small selection — is hidden inside.
  */
 export class TokzipCompressionStream extends TransformStream<Uint8Array | string, Uint8Array> {
   constructor(options?: CompressionStreamOptions) {
@@ -112,10 +106,9 @@ type ByteController = TransformStreamDefaultController<Uint8Array>;
 
 class BlockEncoder {
   private readonly language: RegisteredLanguage;
-  private readonly mode: 'fast' | 'small';
   private readonly blockSize: number;
   private readonly carryWindow: boolean;
-  /** Longest carried history; keeps small-mode combined inputs inside the optimal-parse bound. */
+  /** Longest carried history; keeps combined inputs inside the optimal-parse bound. */
   private readonly historyLimit: number;
   private history: Uint8Array = new Uint8Array(0);
   private pending: Uint8Array[] = [];
@@ -132,25 +125,21 @@ class BlockEncoder {
     const language = languageByName(languageName);
     if (!language) throw new RangeError(`unregistered language: ${languageName}`);
     this.language = language;
-    const mode = options?.mode ?? 'fast';
-    if (mode !== 'fast' && mode !== 'small') throw new RangeError(`invalid mode: ${String(mode)}`);
-    this.mode = mode;
     const blockSize = options?.blockSize ?? DEFAULT_BLOCK_SIZE;
     if (!Number.isSafeInteger(blockSize) || blockSize < MIN_BLOCK_SIZE) {
       throw new RangeError(`invalid blockSize: ${blockSize}`);
     }
     this.blockSize = blockSize;
-    const window = mode === 'fast' ? FAST_WINDOW : SMALL_WINDOW;
-    const defaultLimit = mode === 'small' ? Math.min(window, Math.max(0, OPTIMAL_MAX_INPUT - blockSize)) : window;
+    const defaultLimit = Math.min(SMALL_WINDOW, Math.max(0, OPTIMAL_MAX_INPUT - blockSize));
     const historyLimit = options?.historyLimit ?? defaultLimit;
     if (!Number.isSafeInteger(historyLimit) || historyLimit < 0) {
       throw new RangeError(`invalid historyLimit: ${historyLimit}`);
     }
-    this.historyLimit = Math.min(historyLimit, window);
-    // A zero history budget (huge small-mode blocks, or an explicit historyLimit of 0)
-    // degenerates to carry-less blocks; the header flag must say so, or decoders would seed
-    // history the encoder never used. An explicitly requested carry must not be silently
-    // dropped — fail loudly so the caller fixes the conflicting options.
+    this.historyLimit = Math.min(historyLimit, SMALL_WINDOW);
+    // A zero history budget (huge blocks, or an explicit historyLimit of 0) degenerates to
+    // carry-less blocks; the header flag must say so, or decoders would seed history the
+    // encoder never used. An explicitly requested carry must not be silently dropped — fail
+    // loudly so the caller fixes the conflicting options.
     if (options?.carryWindow === true && this.historyLimit === 0) {
       throw new RangeError('carryWindow: true requires a non-zero history budget; reduce blockSize or historyLimit');
     }
@@ -220,7 +209,7 @@ class BlockEncoder {
   private writeHeader(out: TextSink): void {
     out.push(STREAM_MAGIC_VERSION);
     out.push(this.language.id);
-    out.push((this.mode === 'fast' ? MODE_FAST : MODE_SMALL) | (this.carryWindow ? STREAM_FLAG_CARRY : 0));
+    out.push(this.carryWindow ? STREAM_FLAG_CARRY : 0);
     this.headerWritten = true;
   }
 
@@ -255,59 +244,20 @@ class BlockEncoder {
     const dictIndex = dictIndexFor(language);
 
     // Per-block frame selection mirrors the one-shot auto-downgrade: smallest body wins,
-    // ties prefer the simpler encoding (stored, then fast, then small).
+    // ties prefer the simpler stored encoding.
+    const pricing = smallPricing(input, language);
+    const tokens = parse(input, language.dictionary, dictIndex, pricing, undefined, historyLength);
+    const small = encodeSmallBody(tokens, input, language, historyLength);
     let mode = MODE_STORED;
-    let body: Uint8Array | undefined;
-    if (this.mode === 'fast') {
-      const pricing = fastPricing(input, language);
-      // Encoder-side policy (format-compatible): price-aware lazy matching benches 1–2%
-      // smaller than the plain greedy parse at stream-comparable speeds, so streams — which
-      // already amortize per-block work — take the better parse unconditionally.
-      pricing.lazy = true;
-      const tokens = parse(input, language.dictionary, dictIndex, pricing, undefined, historyLength);
-      // Parse bounds (window, maxDictStart, length caps) keep every token representable.
-      const chars = fastBodyCost(tokens, input, language)!;
-      if (Math.ceil((chars * 6) / 8) < block.length) {
-        mode = MODE_FAST;
-        const sink = new TextSink(chars);
-        emitFastBody(sink, tokens, input, language);
-        body = packFastCodes(sink.buffer, sink.length);
-      }
-    } else {
-      // The small parse must finish before fastPricing runs: each pricing hands the parser a
-      // module-level scratch prefix that is only valid until the next pricing call.
-      const pricing = smallPricing(input, language);
-      const smallTokens = parse(input, language.dictionary, dictIndex, pricing, undefined, historyLength);
-      const plan = planSmallBody(smallTokens, input, language);
-      const smallBytes = Math.ceil(plan.totalBits / 8);
-      // Two fast candidates, mirroring the one-shot auto-downgrade: the small (optimal)
-      // parse re-priced in fast units (undefined when a token exceeds fast's offset range),
-      // and a pure fast parse — the optimal parse minimizes bits, so alone it could ship a
-      // fast body larger than mode 'fast' would produce. Pure fast wins ties.
-      const lazyFastChars = fastBodyCost(smallTokens, input, language);
-      const fastPricingModel = fastPricing(input, language);
-      fastPricingModel.lazy = true;
-      const pureFastTokens = parse(input, language.dictionary, dictIndex, fastPricingModel, undefined, historyLength);
-      const pureFastChars = fastBodyCost(pureFastTokens, input, language)!;
-      const useLazyTokens = lazyFastChars !== undefined && lazyFastChars < pureFastChars;
-      const fastChars = useLazyTokens ? lazyFastChars : pureFastChars;
-      const fastBytes = Math.ceil((fastChars * 6) / 8);
-      const best = Math.min(block.length, fastBytes, smallBytes);
-      if (fastBytes === best && fastBytes < block.length) {
-        mode = MODE_FAST;
-        const sink = new TextSink(fastChars);
-        emitFastBody(sink, useLazyTokens ? smallTokens : pureFastTokens, input, language);
-        body = packFastCodes(sink.buffer, sink.length);
-      } else if (smallBytes === best && smallBytes < block.length) {
-        mode = MODE_SMALL;
-        body = emitSmallBody(plan, language).toBytes();
-      }
+    let body = block;
+    if (small.length < block.length) {
+      mode = MODE_SMALL;
+      body = small;
     }
-    if (mode === MODE_STORED) body = block;
 
-    const out = new TextSink(body!.length + 20);
+    const out = new TextSink(body.length + 20);
     if (!this.headerWritten) this.writeHeader(out);
-    pushByteVarint(out, body!.length);
+    pushByteVarint(out, body.length);
     out.push(mode);
     pushByteVarint(out, block.length);
     // Chained, not per-block: the stored value is the cumulative CRC of every raw byte up
@@ -315,7 +265,7 @@ class BlockEncoder {
     this.crcState = crc32Append(this.crcState, block);
     this.totalRawBytes += block.length;
     pushCrc32Binary(out, crc32Finalize(this.crcState));
-    out.append(body!);
+    out.append(body);
     controller.enqueue(out.toBytes());
 
     if (this.carryWindow) {
@@ -335,9 +285,7 @@ class BlockDecoder {
   private languageId = 0;
   /** Resolved lazily on the first non-stored block, so stored-only streams decode with any language id. */
   private language: RegisteredLanguage | undefined;
-  private streamMode = 0;
   private carry = false;
-  private window = 0;
   private history: Uint8Array = new Uint8Array(0);
   /** Chained CRC over all raw bytes produced so far (mirrors the encoder). */
   private crcState = CRC_INITIAL_STATE;
@@ -429,12 +377,8 @@ class BlockDecoder {
       this.languageId = this.buffer[this.offset + 1]!;
       const flags = this.buffer[this.offset + 2]!;
       if ((flags & STREAM_RESERVED_FLAG_MASK) !== 0) throw new TokzipDecodeError('reserved flag bits set');
-      const mode = flags & 3;
-      if (mode !== MODE_FAST && mode !== MODE_SMALL) throw new TokzipDecodeError('invalid mode');
       this.headerSeen = true;
-      this.streamMode = mode;
       this.carry = (flags & STREAM_FLAG_CARRY) !== 0;
-      this.window = mode === MODE_FAST ? FAST_WINDOW : SMALL_WINDOW;
       this.offset += 3;
       return true;
     }
@@ -473,13 +417,7 @@ class BlockDecoder {
     if (rawLength > this.maxBlockSize) throw new TokzipDecodeError('declared size exceeds maxBlockSize');
     if (mode === MODE_STORED) {
       if (bodyLength !== rawLength) throw new TokzipDecodeError('stored block length mismatch');
-    } else if (mode === MODE_FAST || mode === MODE_SMALL) {
-      // A fast-mode stream retains only the fast window and its encoder never emits small
-      // blocks, so a small block under a fast header is non-canonical (and could reference
-      // history beyond the retained window).
-      if (mode === MODE_SMALL && this.streamMode === MODE_FAST) {
-        throw new TokzipDecodeError('small block in fast stream');
-      }
+    } else if (mode === MODE_SMALL) {
       // Mirrors the frame containers: a conforming non-stored body is strictly smaller than
       // the stored body, keeping blocks canonical and allocations bounded.
       if (bodyLength >= rawLength) throw new TokzipDecodeError('non-canonical block: body not smaller than stored');
@@ -496,10 +434,7 @@ class BlockDecoder {
     } else {
       const language = (this.language ??= requireLanguageById(this.languageId));
       const history = this.carry && this.history.length > 0 ? this.history : undefined;
-      out =
-        mode === MODE_FAST
-          ? decodeFastBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history)
-          : decodeSmallBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history);
+      out = decodeSmallBodyBinary(this.buffer, bodyStart, bodyEnd, rawLength, language, false, history);
     }
     this.crcState = crc32Append(this.crcState, out);
     this.totalRawBytes += out.length;
@@ -507,9 +442,9 @@ class BlockDecoder {
     this.offset = bodyEnd;
     // Keep the window's worth of produced output as the next block's history.
     if (this.carry) {
-      if (out.length >= this.window) this.history = out.slice(out.length - this.window);
+      if (out.length >= SMALL_WINDOW) this.history = out.slice(out.length - SMALL_WINDOW);
       else {
-        const keep = Math.min(this.window, this.history.length + out.length);
+        const keep = Math.min(SMALL_WINDOW, this.history.length + out.length);
         const merged = new Uint8Array(keep);
         const fromHistory = keep - out.length;
         if (fromHistory > 0) merged.set(this.history.subarray(this.history.length - fromHistory));

@@ -7,8 +7,6 @@ import '../../src/languages/typescript.ts';
 // oxlint-disable-next-line no-misused-spread -- both alphabets are pure ASCII
 const SAFE_CHARS = new Set([...RADIX64_ALPHABET, ...RADIX85_ALPHABET]);
 
-const MODES: ('fast' | 'small')[] = ['fast', 'small'];
-
 const STRING_CASES: Record<string, string> = {
   empty: '',
   'single char': 'a',
@@ -25,16 +23,16 @@ const STRING_CASES: Record<string, string> = {
   'long single-char run': 'ab'.repeat(50_000) + 'x'.repeat(100_000),
 };
 
-describe.each(MODES)('%s mode round-trip', (mode) => {
+describe('round-trip', () => {
   for (const [label, original] of Object.entries(STRING_CASES)) {
     test(label, () => {
-      expect(decompress(compress(original, { mode }))).toBe(original);
+      expect(decompress(compress(original))).toBe(original);
     });
   }
 
   test('bytes input round-trips and returns Uint8Array', () => {
     const bytes = new Uint8Array(4096).map((_, i) => (i * 31 + (i >> 3)) & 255);
-    const restored = decompress(compress(bytes, { mode }));
+    const restored = decompress(compress(bytes));
     expect(restored).toBeInstanceOf(Uint8Array);
     expect([...(restored as Uint8Array)]).toEqual([...bytes]);
   });
@@ -46,7 +44,7 @@ describe.each(MODES)('%s mode round-trip', (mode) => {
       seed = (Math.imul(seed, 1_103_515_245) + 12_345) >>> 0;
       return seed & 255;
     });
-    const packed = compress(bytes, { mode });
+    const packed = compress(bytes);
     // Header (3) + size varint (4 for 10000) + packed stored body.
     expect(packed.length).toBeLessThanOrEqual(3 + 4 + Math.ceil((10_000 * 4) / 3) + 1);
     expect([...(decompress(packed) as Uint8Array)]).toEqual([...bytes]);
@@ -54,12 +52,12 @@ describe.each(MODES)('%s mode round-trip', (mode) => {
 
   test('deterministic output', () => {
     const input = STRING_CASES['typescript source']!;
-    expect(compress(input, { mode })).toBe(compress(input, { mode }));
+    expect(compress(input)).toBe(compress(input));
   });
 
   test('output stays in the safe-ASCII alphabet', () => {
     for (const original of Object.values(STRING_CASES)) {
-      const packed = compress(original, { mode });
+      const packed = compress(original);
       // oxlint-disable-next-line no-misused-spread -- payloads are pure ASCII
       expect([...packed].every((c) => SAFE_CHARS.has(c))).toBe(true);
       // JSON-safety: embedding the payload in JSON must survive verbatim.
@@ -76,25 +74,6 @@ describe.each(MODES)('%s mode round-trip', (mode) => {
 test('lone surrogates are replaced with U+FFFD (WHATWG TextEncoder semantics)', () => {
   const input = 'broken \u{D800} surrogate';
   expect(decompress(compress(input))).toBe('broken \u{FFFD} surrogate');
-});
-
-test('small mode is never larger than fast mode', () => {
-  // Includes the counterexample that caught the lazy-tokens-only fast candidate: mixed
-  // dictionary idioms and literal runs where the greedy fast parse beats the lazy one.
-  const cases = [
-    ...Object.values(STRING_CASES),
-    'const a = 1045161295;\n' +
-      'a'.repeat(46) +
-      '```typescript\nconst x = 1;\n```\nconst e = 1913358187;\n' +
-      'a'.repeat(10),
-  ];
-  for (const language of ['none', 'typescript']) {
-    for (const original of cases) {
-      expect(compress(original, { language, mode: 'small' }).length).toBeLessThanOrEqual(
-        compress(original, { language, mode: 'fast' }).length
-      );
-    }
-  }
 });
 
 test('unregistered language throws on compress', () => {
