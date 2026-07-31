@@ -133,7 +133,7 @@ export function languageByName(name: string): RegisteredLanguage | undefined {
 
 /**
  * Drops the lazily built per-language match indexes (hash chains and suffix-automaton
- * matchers, ~7 MB per language at the default dictionary budget). They rebuild
+ * matchers, ~1 MB per language at the default dictionary budget). They rebuild
  * transparently on the next compress, so this is purely a memory-pressure lever for
  * long-lived processes that compressed in many languages; frames are unaffected.
  */

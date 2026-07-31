@@ -78,9 +78,9 @@ test('extended matches set flag bit 3 and shrink output versus an unknown label'
 
 test('label aliases and ASCII case both resolve', () => {
   for (const label of ['TS', 'TypeScript', 'tsx', 'typescript']) {
-    const frame = compress(docWith(label), { language: 'none' });
+    const frame = compress(docWith(label, DICT_TS_CODE), { language: 'none' });
     expect(isFenced(frame)).toBe(true);
-    expect(decompress(frame)).toBe(docWith(label));
+    expect(decompress(frame)).toBe(docWith(label, DICT_TS_CODE));
   }
 });
 
@@ -149,7 +149,7 @@ test('flag bit 3 on a frame without extended matches decodes identically', () =>
 });
 
 test('decoding an extended match without the block language registered throws', () => {
-  const frame = compress(docWith('ts'), { language: 'none' });
+  const frame = compress(docWith('ts', DICT_TS_CODE), { language: 'none' });
   expect(isFenced(frame)).toBe(true);
   // A fresh process registering only core (id 0) must reject the typescript extension.
   const probe = `import { decompress, TokzipDecodeError } from '${import.meta.dir}/../../src/index.ts';
@@ -167,7 +167,7 @@ test('TokzipDecodeError stays typed for in-process extended-match bounds violati
   // Flag flipped on a plain frame plus a forged oversized dict offset is covered by the
   // fenced round-trip suite; here the plain out-of-bounds path must still throw when the
   // flag is clear (extended offsets are invalid without it).
-  const frame = compress(docWith('ts'), { language: 'none' });
+  const frame = compress(docWith('ts', DICT_TS_CODE), { language: 'none' });
   const cleared = frame.slice(0, 2) + RADIX64[flagsOf(frame) & ~FLAG_FENCED]! + frame.slice(3);
   expect(() => decompress(cleared)).toThrow(TokzipDecodeError);
 });
