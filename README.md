@@ -13,7 +13,7 @@ raw bytes (when both channels ship the same range-coded body, the text frame pay
 radix-85 tax on it; each channel independently downgrades to stored, and headers/padding
 make whole-frame ratios vary a little). On the project's code/text corpus it outperforms base64url(brotli -q11) on the text
 channel in every language and size bucket, and raw brotli -q11 on the binary channel
-overall and in every language except `html` and generic prose `text` (≤ 0.4 pp behind
+overall and in every language except `html` and generic prose `text` (≤ 0.7 pp behind
 there — brotli's built-in dictionary is strong on large HTML/English-prose documents, and
 a few 8–24 KB buckets tip the same way at the default 16 KB budget; retraining at 128 KB
 via `--budget` wins every bucket on both channels).
@@ -148,8 +148,8 @@ against browser-native gzip on KB-scale sessions, and dictionary-free tokzip bea
 `CompressionStream` gzip by roughly 2× on ≤ 1 KB documents. The default budget targets the
 storage deployment — dictionaries ship with the application, so per-document
 ratio and the first-compress index cost govern. Ratio improves monotonically with budget
-(typescript short-document sweep: 32.1% @8 KB / 30.9% @32 KB / 29.1% @128 KB / 27.5%
-@512 KB), but the index build time and retained memory grow linearly with it, so 16 KB —
+(typescript ≤ 4 KB bench documents: 30.0% @16 KB vs 27.8% @128 KB, measured with the
+current trainer), but the index build time and retained memory grow linearly with it, so 16 KB —
 the smallest budget that still beats brotli -q11 in every text-channel bucket — is the
 chosen balance; ratio-first deployments should retrain larger and session-delivered ones
 smaller. Dictionaries are
