@@ -16,117 +16,45 @@ for (let i = 0; i < 85; i++) RADIX85_VALUES[RADIX85_ALPHABET.codePointAt(i)!] = 
 
 const asciiDecoder = new TextDecoder();
 
-/**
- * MSB-first bit writer whose flush path is the fused Z85-style block emitter:
- * each full 32-bit word becomes 5 radix-85 chars (25% text tax), single pass, no
- * intermediate binary buffer. The final partial word is zero-padded.
- */
-export class BitWriter {
-  private words: Uint32Array = new Uint32Array(256);
-  private wordCount = 0;
-  private acc = 0;
-  private accBits = 0;
-  /** Total number of bits written so far. */
-  bitLength = 0;
-
-  private pushWord(word: number): void {
-    if (this.wordCount >= this.words.length) {
-      const grown = new Uint32Array(this.words.length * 2);
-      grown.set(this.words);
-      this.words = grown;
-    }
-    this.words[this.wordCount++] = word;
+/** Unpacks decoded words back into their big-endian byte payload (including any zero padding). */
+export function bytesFromWords(words: Uint32Array): Uint8Array {
+  const bytes = new Uint8Array(words.length * 4);
+  for (let w = 0, at = 0; w < words.length; w++, at += 4) {
+    const word = words[w]!;
+    bytes[at] = word >>> 24;
+    bytes[at + 1] = (word >>> 16) & 255;
+    bytes[at + 2] = (word >>> 8) & 255;
+    bytes[at + 3] = word & 255;
   }
-
-  /** Writes the low `count` bits of `value` (0 ≤ count ≤ 24), MSB-first. Callers must pass `value < 2**count`; high bits are not masked. */
-  writeBits(value: number, count: number): void {
-    this.bitLength += count;
-    let bits = this.accBits + count;
-    if (bits < 32) {
-      // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
-      this.acc = ((this.acc << count) | value) >>> 0;
-      this.accBits = bits;
-      return;
-    }
-    bits -= 32;
-    // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
-    this.pushWord(((this.acc << (count - bits)) | (value >>> bits)) >>> 0);
-    this.acc = bits === 0 ? 0 : value & ((1 << bits) - 1);
-    this.accBits = bits;
-  }
-
-  /** Writes an unsigned value of arbitrary magnitude as 8-bit groups: 7 payload bits + continue bit. */
-  writeVarint(value: number): void {
-    while (value > 127) {
-      this.writeBits((value & 127) | 128, 8);
-      value = Math.floor(value / 128);
-    }
-    this.writeBits(value, 8);
-  }
-
-  /** Flushes to bytes: the bitstream zero-padded to a byte boundary (binary frames). */
-  toBytes(): Uint8Array {
-    // Math.ceil, not (x + 7) >> 3: bitLength can exceed 2^31, where 32-bit ops truncate.
-    const bytes = new Uint8Array(Math.ceil(this.bitLength / 8));
-    const fullWords = this.wordCount;
-    let at = 0;
-    for (let w = 0; w < fullWords; w++) {
-      const word = this.words[w]!;
-      bytes[at] = word >>> 24;
-      bytes[at + 1] = (word >>> 16) & 255;
-      bytes[at + 2] = (word >>> 8) & 255;
-      bytes[at + 3] = word & 255;
-      at += 4;
-    }
-    if (this.accBits > 0) {
-      // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
-      const word = (this.acc << (32 - this.accBits)) >>> 0;
-      for (let shift = 24; at < bytes.length; shift -= 8) bytes[at++] = (word >>> shift) & 255;
-    }
-    return bytes;
-  }
-
-  /** Flushes to radix-85 text: zero-pads to a 32-bit boundary, then 5 chars per word. */
-  toText(): string {
-    const wordCount = this.wordCount + (this.accBits > 0 ? 1 : 0);
-    const codes = new Uint8Array(wordCount * 5);
-    let at = 0;
-    for (let w = 0; w < wordCount; w++) {
-      // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
-      let word = w < this.wordCount ? this.words[w]! : (this.acc << (32 - this.accBits)) >>> 0;
-      // Successive division emits the 5 digits least-significant first.
-      codes[at + 4] = RADIX85_CODES[word % 85]!;
-      word = Math.trunc(word / 85);
-      codes[at + 3] = RADIX85_CODES[word % 85]!;
-      word = Math.trunc(word / 85);
-      codes[at + 2] = RADIX85_CODES[word % 85]!;
-      word = Math.trunc(word / 85);
-      codes[at + 1] = RADIX85_CODES[word % 85]!;
-      codes[at] = RADIX85_CODES[Math.trunc(word / 85)]!;
-      at += 5;
-    }
-    return asciiDecoder.decode(codes);
-  }
+  return bytes;
 }
 
-/** Packs a big-endian byte payload into the 32-bit words a {@link BitReader} consumes (zero-padded tail). */
-export function wordsFromBytes(bytes: Uint8Array, start: number, end: number): Uint32Array {
-  const byteLength = end - start;
-  // Math.ceil, not (x + 3) >> 2: byte lengths can exceed 2^31, where 32-bit ops truncate.
-  const words = new Uint32Array(Math.ceil(byteLength / 4));
-  let w = 0;
-  let i = start;
-  for (; i + 4 <= end; i += 4) {
+/** Encodes a byte payload as radix-85 text: zero-padded to a 32-bit word, 5 chars per word. */
+export function radix85FromBytes(bytes: Uint8Array): string {
+  const wordCount = Math.ceil(bytes.length / 4);
+  const codes = new Uint8Array(wordCount * 5);
+  let at = 0;
+  for (let w = 0; w < wordCount; w++) {
+    const i = w * 4;
+    const packed = (bytes[i]! << 24) | ((bytes[i + 1] ?? 0) << 16) | ((bytes[i + 2] ?? 0) << 8) | (bytes[i + 3] ?? 0);
     // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
-    words[w++] = ((bytes[i]! << 24) | (bytes[i + 1]! << 16) | (bytes[i + 2]! << 8) | bytes[i + 3]!) >>> 0;
+    let word = packed >>> 0;
+    codes[at + 4] = RADIX85_CODES[word % 85]!;
+    word = Math.trunc(word / 85);
+    codes[at + 3] = RADIX85_CODES[word % 85]!;
+    word = Math.trunc(word / 85);
+    codes[at + 2] = RADIX85_CODES[word % 85]!;
+    word = Math.trunc(word / 85);
+    codes[at + 1] = RADIX85_CODES[word % 85]!;
+    codes[at] = RADIX85_CODES[Math.trunc(word / 85)]!;
+    at += 5;
   }
-  if (i < end) {
-    let word = 0;
-    for (let shift = 24; i < end; i++, shift -= 8) word |= bytes[i]! << shift;
-    // oxlint-disable-next-line unicorn/prefer-math-trunc -- >>> 0 coerces to uint32, Math.trunc does not
-    words[w] = word >>> 0;
-  }
-  return words;
+  return asciiDecoder.decode(codes);
+}
+
+/** Exact char count {@link radix85FromBytes} produces for `byteLength` bytes. */
+export function radix85Length(byteLength: number): number {
+  return Math.ceil(byteLength / 4) * 5;
 }
 
 /** Decodes a radix-85 payload back to its 32-bit words. */
@@ -187,74 +115,4 @@ function throwNonAlphabet(data: string, groupStart: number): never {
     }
   }
   throw new TokzipDecodeError(`non-alphabet character at position ${groupStart}`);
-}
-
-/** MSB-first bit reader over decoded words; independent readers over the same words act as stream cursors. */
-export class BitReader {
-  private readonly words: Uint32Array;
-  private pos: number;
-  /** Total bit capacity (multiple of 32; includes final zero padding). */
-  readonly bitCapacity: number;
-
-  constructor(words: Uint32Array, bitPos = 0) {
-    this.words = words;
-    this.bitCapacity = words.length * 32;
-    if (bitPos < 0 || bitPos > this.bitCapacity) throw new TokzipDecodeError('bit position out of range');
-    this.pos = bitPos;
-  }
-
-  get bitPosition(): number {
-    return this.pos;
-  }
-
-  /** Reads `count` bits (0 ≤ count ≤ 24), MSB-first. */
-  readBits(count: number): number {
-    const pos = this.pos;
-    if (pos + count > this.bitCapacity) throw new TokzipDecodeError('truncated bitstream');
-    this.pos = pos + count;
-    const offset = pos & 31;
-    const spill = offset + count - 32;
-    // A 32-bit shift is a no-op in JS (shift counts are mod 32); count 0 must yield 0.
-    const first = count === 0 ? 0 : (this.words[pos >>> 5]! << offset) >>> (32 - count);
-    if (spill <= 0) return first;
-    // `first` already has zeros in its low `spill` bits (they were shifted out of word 1).
-    return first + (this.words[(pos >>> 5) + 1]! >>> (32 - spill));
-  }
-
-  /** Peeks `count` bits (1 ≤ count ≤ 24) without consuming, zero-padded beyond capacity. */
-  peekBits(count: number): number {
-    const pos = this.pos;
-    if (pos + count <= this.bitCapacity) {
-      // Hot path: a plain in-bounds read with no cursor mutation.
-      const offset = pos & 31;
-      const spill = offset + count - 32;
-      const first = (this.words[pos >>> 5]! << offset) >>> (32 - count);
-      if (spill <= 0) return first;
-      return first + (this.words[(pos >>> 5) + 1]! >>> (32 - spill));
-    }
-    const available = this.bitCapacity - pos;
-    if (available <= 0) return 0;
-    const value = this.readBits(available);
-    this.pos = pos;
-    return value * 2 ** (count - available);
-  }
-
-  /** Consumes `count` bits previously peeked. */
-  advance(count: number): void {
-    if (this.pos + count > this.bitCapacity) throw new TokzipDecodeError('truncated bitstream');
-    this.pos += count;
-  }
-
-  /** Reads a varint written by {@link BitWriter.writeVarint}. */
-  readVarint(): number {
-    let value = 0;
-    let factor = 1;
-    for (let i = 0; i < 8; i++) {
-      const group = this.readBits(8);
-      value += (group & 127) * factor;
-      if ((group & 128) === 0) return value;
-      factor *= 128;
-    }
-    throw new TokzipDecodeError('varint exceeds bound');
-  }
 }

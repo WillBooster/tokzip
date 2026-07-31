@@ -1,12 +1,14 @@
 /**
- * COVER-like dictionary trainer, scored with the codec cost model rather than raw
- * bytes × frequency: a segment's value is the output chars it saves per occurrence
- * (literal cost of the covered bytes minus tag + offset cost of a dictionary match),
- * so the trainer's objective matches what benchmarks measure.
+ * COVER-like dictionary trainer. Segments are scored with a fixed-cost heuristic — a
+ * segment's value is the bytes it covers per occurrence minus a flat per-reference
+ * overhead — not with the v2 range coder's true (context-, prior-, and slot-dependent)
+ * prices; modeling those exactly here would couple dictionary packing to a model that is
+ * itself trained on the packed dictionary. The flat overhead is a proxy for a typical
+ * dictionary-token cost.
  */
 
 const SEGMENT_LENGTHS = [128, 96, 64, 48, 32, 24, 16, 12, 8, 6, 4] as const;
-/** Approximate fast-mode cost of a dictionary reference (tag + 2–3 offset chars). */
+/** Flat per-reference overhead (bytes a dictionary match roughly costs to encode). */
 const MATCH_OVERHEAD_CHARS = 3.5;
 /** Bound on dictionary-training input (chars) so n-gram counting stays tractable. */
 const MAX_TRAINING_CHARS = 24_000_000;
@@ -65,8 +67,18 @@ export function trainDictionary(docs: string[], budgetBytes: number, alreadyCove
   let packed = '';
   let packedBytes = 0;
   let coveredProbe = alreadyCovered;
+  // Containment prefilter: a segment contained in coveredProbe must have every 4-gram of its
+  // prefix present, so an absent leading 4-gram skips the (linear-scan) includes() probe.
+  // Rebuilt incrementally as packed grows; keeps large budgets tractable.
+  const gramSet = new Set<string>();
+  let gramIndexed = 0;
+  const indexGramsUpTo = (probe: string): void => {
+    for (; gramIndexed + 4 <= probe.length; gramIndexed++) gramSet.add(probe.slice(gramIndexed, gramIndexed + 4));
+  };
+  indexGramsUpTo(coveredProbe);
   for (const { segment } of candidates.slice(0, MAX_SELECTED_CANDIDATES)) {
-    if (coveredProbe.includes(segment)) continue;
+    const mayBeCovered = segment.length < 4 || gramSet.has(segment.slice(0, 4));
+    if (mayBeCovered && coveredProbe.includes(segment)) continue;
     const overlap = tailOverlap(packed, segment);
     const addition = segment.slice(overlap);
     const additionBytes = encoder.encode(addition).length;
@@ -74,6 +86,7 @@ export function trainDictionary(docs: string[], budgetBytes: number, alreadyCove
     packed += addition;
     packedBytes += additionBytes;
     coveredProbe = alreadyCovered + packed;
+    indexGramsUpTo(coveredProbe);
     if (packedBytes >= budgetBytes - 4) break;
   }
   return encoder.encode(packed);

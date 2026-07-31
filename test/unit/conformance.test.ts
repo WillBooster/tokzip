@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { frameChecksum } from '../../src/checksum.ts';
 import { compress, decompress, TokzipDecodeError } from '../../src/index.ts';
-import { MODE_FAST, MODE_SMALL, MODE_STORED } from '../../src/format.ts';
-import { RADIX64_ALPHABET } from '../../src/radix64.ts';
+import { MODE_SMALL, MODE_STORED } from '../../src/format.ts';
+import { readByteVarint } from '../../src/container.ts';
+import { RADIX64_ALPHABET, TextSink, pushVarint64, RADIX64_CODES } from '../../src/radix64.ts';
 import { RADIX85_ALPHABET } from '../../src/radix85.ts';
 
 /** Shipped mode from a frame's flags char (header char 2). */
@@ -15,17 +16,28 @@ function expectDecodeError(frame: string, message: string | RegExp): void {
   expect(() => decompress(frame)).toThrow(message);
 }
 
+/** Builds a text frame header (magic, language 0, flags, size varint, zero CRC). */
+function forgeHeader(flags: number, declaredSize: number): string {
+  const out = new TextSink(24);
+  out.push(RADIX64_CODES[0b11_0010]!);
+  out.push(RADIX64_CODES[0]!);
+  out.push(RADIX64_CODES[flags]!);
+  pushVarint64(out, declaredSize);
+  for (let i = 0; i < 6; i++) out.push(RADIX64_CODES[0]!);
+  return out.toString();
+}
+
 describe('container vectors', () => {
   test('empty input is the exact 10-char stored frame', () => {
     const frame = compress('');
     // Header (3) + size varint (1) + CRC-32 of empty content + type byte 0x00 (6 chars).
-    expect(frame).toBe('xAAAN-uASD');
+    expect(frame).toBe('yAAAN-uASD');
     expect(decompress(frame)).toBe('');
   });
 
   test('empty input is the exact 8-byte binary stored frame', () => {
     const frame = compress('', { output: 'binary' });
-    expect(frame).toEqual(new Uint8Array([0xB1, 0x00, 0x00, 0x00, 0x8D, 0xEF, 0x02, 0xD2]));
+    expect(frame).toEqual(new Uint8Array([0xB2, 0x00, 0x00, 0x00, 0x8D, 0xEF, 0x02, 0xD2]));
     expect(decompress(frame)).toBe('');
   });
 
@@ -38,7 +50,7 @@ describe('container vectors', () => {
 
   test('stored frames carry language id 0', () => {
     const incompressible = 'qwZ7#kP9@mX2vL5';
-    const frame = compress(incompressible, { mode: 'small' });
+    const frame = compress(incompressible);
     expect(shippedMode(frame)).toBe(MODE_STORED);
     expect(frame[1]).toBe('A');
   });
@@ -52,44 +64,46 @@ describe('container vectors', () => {
 
   test('unknown language id on a non-stored frame throws', () => {
     const frame = compress('abcabcabcabcabcabcabcabc');
-    expect(shippedMode(frame)).toBe(MODE_FAST);
+    expect(shippedMode(frame)).toBe(MODE_SMALL);
     expectDecodeError(frame[0]! + '9' + frame.slice(2), /unknown language id/);
   });
 
   test('bad magic and unknown version', () => {
     const frame = compress('hello');
     expectDecodeError('A' + frame.slice(1), /bad magic/);
-    expectDecodeError('z' + frame.slice(1), /unknown version/); // Same magic, version 3.
+    // Same 3-bit magic, version 1 (the retired format) and version 3.
+    expectDecodeError(RADIX64_ALPHABET[0b11_0001]! + frame.slice(1), /unknown version/);
+    expectDecodeError(RADIX64_ALPHABET[0b11_0011]! + frame.slice(1), /unknown version/);
   });
 
   test('invalid mode and reserved flag bits', () => {
     const frame = compress('hello');
     expectDecodeError(frame.slice(0, 2) + 'D' + frame.slice(3), /invalid mode/); // Mode bits = 3.
+    expectDecodeError(frame.slice(0, 2) + 'B' + frame.slice(3), /invalid mode/); // Mode bits = 1 (retired fast).
     expectDecodeError(frame.slice(0, 2) + 'Q' + frame.slice(3), /reserved flag bits/); // Bit 4 set.
   });
 
   test('non-canonical size varint', () => {
     // Varint 'gA' encodes value 0 with a redundant continuation group.
-    expectDecodeError('xAAgA', /non-canonical varint/);
+    expectDecodeError('yAAgA', /non-canonical varint/);
   });
 
   test('non-alphabet character', () => {
-    expectDecodeError('x"AA', /non-alphabet character/);
+    expectDecodeError('y"AA', /non-alphabet character/);
   });
 
   test('truncated header and truncated payload', () => {
     const frame = compress('The quick brown fox jumps over the lazy dog.');
     expectDecodeError('', /truncated/);
     expectDecodeError(frame.slice(0, 2), /truncated/);
-    expectDecodeError(frame.slice(0, -1), /truncated|declared size|stream/);
+    expectDecodeError(frame.slice(0, -1), /truncated|declared size|stream|multiple of 5|stored/);
   });
 
   test('trailing characters after payload', () => {
-    for (const mode of ['fast', 'small'] as const) {
-      const source = 'function f() { return 42; } function g() { return f() + f(); }'.repeat(4);
-      const frame = compress(source, { mode });
-      expectDecodeError(frame + 'AAAAA', /trailing|truncated|stream|multiple of 5|invalid|size/);
-    }
+    const source = 'function f() { return 42; } function g() { return f() + f(); }'.repeat(4);
+    const frame = compress(source);
+    expect(shippedMode(frame)).toBe(MODE_SMALL);
+    expectDecodeError(frame + 'AAAAA', /trailing|truncated|stream|multiple of 5|invalid|size|checksum|stored/);
   });
 
   test('maxOutputSize is enforced before allocation', () => {
@@ -98,15 +112,12 @@ describe('container vectors', () => {
   });
 
   test('a declared size beyond the body capacity is rejected before allocation', () => {
-    // A small frame declaring 2^34 - 1 bytes with a near-empty body: structurally
-    // unproducible, and must throw a typed error (not an engine out-of-memory RangeError)
-    // even under the explicit "no cap" setting.
-    expect(() => decompress('xAC______PAAAAAA!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(
-      TokzipDecodeError
-    );
-    expect(() => decompress('xAC______PAAAAAA!!!!!', { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(
-      /body capacity|allocatable/
-    );
+    // A small frame declaring 2^34 - 1 bytes with a 4-byte body: structurally unproducible,
+    // and must throw a typed error (not an engine out-of-memory RangeError) even under the
+    // explicit "no cap" setting.
+    const forged = forgeHeader(MODE_SMALL, 2 ** 34 - 1) + '!!!!!';
+    expect(() => decompress(forged, { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(TokzipDecodeError);
+    expect(() => decompress(forged, { maxOutputSize: Number.POSITIVE_INFINITY })).toThrow(/body capacity|allocatable/);
   });
 
   test('NaN or negative maxOutputSize is rejected instead of disabling the cap', () => {
@@ -116,33 +127,44 @@ describe('container vectors', () => {
     expect(decompress(frame, { maxOutputSize: Number.POSITIVE_INFINITY })).toBe('x'.repeat(1000)); // Explicit "no cap".
   });
 
-  test('invalid compress mode throws instead of silently using small', () => {
-    expect(() => compress('x', { mode: 'FAST' as 'fast' })).toThrow(RangeError);
-    expect(() => compress('x', { mode: '' as 'fast' })).toThrow(RangeError);
-  });
-
   test('a small frame for size 0 is non-canonical and rejected', () => {
-    // The canonical empty frame is the stored 'xAAAN-uASD'; a size-0 small body can never be
+    // The canonical empty frame is the stored 'yAAAN-uASD'; a size-0 small body can never be
     // smaller than the (empty) stored body.
-    expectDecodeError('xACAAAAAAA!!!!!', /non-canonical|stored/);
+    expectDecodeError(forgeHeader(MODE_SMALL, 0) + '!!!!!', /non-canonical|stored/);
   });
 
   test('non-stored bodies at least as large as the stored body are rejected', () => {
     const frame = compress('abcabcabcabcabcabcabcabcabc');
-    expect(shippedMode(frame)).toBe(MODE_FAST);
-    // Pad the fast body with valid alphabet chars beyond the stored bound.
-    expectDecodeError(frame + 'A'.repeat(64), /non-canonical|stored/);
+    expect(shippedMode(frame)).toBe(MODE_SMALL);
+    // Pad the small body with valid alphabet chars beyond the stored bound.
+    expectDecodeError(frame + '!!!!!'.repeat(13), /non-canonical|stored/);
   });
 
-  test('non-zero padding bits in a small frame are a structural error', () => {
-    const source = 'export function greet(name: string): string {\n  return name;\n}\n'.repeat(5);
-    const frame = compress(source, { mode: 'small' });
-    expect(shippedMode(frame)).toBe(MODE_SMALL);
-    // Incrementing the final radix-85 digit flips only the last word's low (padding) bits.
-    const lastIndex = RADIX85_ALPHABET.indexOf(frame.at(-1)!);
-    expect(lastIndex).toBeLessThan(84);
-    const patched = frame.slice(0, -1) + RADIX85_ALPHABET[lastIndex + 1];
-    expectDecodeError(patched, /padding|stream|truncated|invalid/);
+  test('non-zero padding in a small frame is a structural error', () => {
+    // Find a fixture whose range-coded body does not fill its last radix-85 word, so the
+    // text frame provably carries a zero padding byte; then set that byte to 1. (The range
+    // coder's own flush bytes are not canonicalized — see FORMAT.md §4.2 — so mutating
+    // arbitrary trailing chars is not guaranteed to fail; the padding bytes are.)
+    for (let repeats = 3; repeats < 24; repeats++) {
+      const source = 'export function greet(name: string): string {\n  return name;\n}\n'.repeat(repeats);
+      const binary = compress(source, { output: 'binary' });
+      const text = compress(source);
+      if (shippedMode(text) !== MODE_SMALL) continue;
+      const bodyStart = readByteVarint(binary, 3).pos + 4;
+      const rcLength = binary.length - bodyStart;
+      if (rcLength % 4 === 0) continue; // No padding byte in the text frame's last word.
+      let word = 0;
+      for (const c of text.slice(-5)) word = word * 85 + RADIX85_ALPHABET.indexOf(c);
+      word += 1; // The word's last byte is padding and canonically zero.
+      let patchedGroup = '';
+      for (let i = 0; i < 5; i++) {
+        patchedGroup = RADIX85_ALPHABET[word % 85]! + patchedGroup;
+        word = Math.floor(word / 85);
+      }
+      expectDecodeError(text.slice(0, -5) + patchedGroup, /non-zero padding/);
+      return;
+    }
+    throw new Error('no small fixture with a padded last word found');
   });
 
   test('a corrupted body that still parses fails the content checksum', () => {
@@ -198,50 +220,35 @@ describe('token vectors', () => {
   test('history, rep, and overlap-copy matches round-trip', () => {
     const overlap = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab'; // rep0 dist 1 overlap-copy
     const repeated = 'pattern-x pattern-y pattern-x pattern-y pattern-x';
-    for (const mode of ['fast', 'small'] as const) {
-      expect(decompress(compress(overlap, { mode }))).toBe(overlap);
-      expect(decompress(compress(repeated, { mode }))).toBe(repeated);
-    }
+    expect(decompress(compress(overlap))).toBe(overlap);
+    expect(decompress(compress(repeated))).toBe(repeated);
   });
 
-  test('12-bit vs 18-bit offset forms', () => {
-    // A match whose distance exceeds 4096 forces the 18-bit form.
+  test('long-distance matches round-trip', () => {
+    // A match whose distance exceeds 4096 exercises the large offset slots.
     const unit = 'unique-marker-block-' + 'abcdefghij'.repeat(2);
     const filler = Array.from({ length: 400 }, (_, i) => `filler ${i} ${(i * 7919).toString(36)}`).join('\n');
     const input = unit + filler + unit;
     expect(input.length).toBeGreaterThan(4096 + unit.length);
-    for (const mode of ['fast', 'small'] as const) {
-      expect(decompress(compress(input, { mode }))).toBe(input);
-    }
+    expect(decompress(compress(input))).toBe(input);
   });
 
-  test('literal-64 vs literal-raw runs including 1- and 2-byte raw tails', () => {
+  test('non-ASCII literal tails round-trip', () => {
     for (const tail of ['\u0080', '\u0080\u0081', '\u0080\u0081\u0082']) {
       const input = 'plain ascii text then raw bytes: ' + tail;
-      for (const mode of ['fast', 'small'] as const) {
-        expect(decompress(compress(input, { mode }))).toBe(input);
-      }
+      expect(decompress(compress(input))).toBe(input);
     }
   });
 
   test('dictionary matches round-trip (wrapper dictionary idioms)', () => {
     const input = '```typescript\nexport function demo(): void {}\n```\n';
-    for (const mode of ['fast', 'small'] as const) {
-      expect(decompress(compress(input, { mode }))).toBe(input);
-    }
+    expect(decompress(compress(input))).toBe(input);
   });
 
   test('downgrade determinism: identical inputs ship identical frames', () => {
     const inputs = ['', 'a', 'abcabcabc', 'x'.repeat(500), JSON.stringify({ k: 'v'.repeat(100) })];
     for (const input of inputs) {
-      expect(compress(input, { mode: 'small' })).toBe(compress(input, { mode: 'small' }));
+      expect(compress(input)).toBe(compress(input));
     }
-  });
-
-  test('small mode ships the smallest of stored/fast/small', () => {
-    const compressible = 'const value = 1;\n'.repeat(64);
-    const frame = compress(compressible, { mode: 'small' });
-    expect([MODE_FAST, MODE_SMALL]).toContain(shippedMode(frame));
-    expect(frame.length).toBeLessThan(compress(compressible, { mode: 'fast' }).length + 1);
   });
 });

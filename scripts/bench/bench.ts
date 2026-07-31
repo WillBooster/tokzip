@@ -1,12 +1,12 @@
 /**
  * Compression benchmark on the seeded `bench-v2` corpus split.
  *
- * The primary metric is the **session-amortized, dictionary-inclusive ratio**: each
- * language's bench docs are treated as one client session, and tokzip's per-language
- * dictionary module is charged once per session at its brotli-compressed transfer size
- * (what a CDN actually ships; competitors carry no dictionary). Short documents (≤ 4 KB,
- * the primary workload) are additionally reported as their own session. The classic
- * dictionary-free ratio stays as a secondary metric.
+ * The primary metric is the classic **per-document ratio**: the target deployment stores
+ * compressed documents in a database and ships dictionaries with the application, so no
+ * per-session transfer cost applies. The session-amortized, dictionary-inclusive ratio
+ * (each language's bench docs as one client session, tokzip charged the brotli-compressed
+ * module transfer once per session; short ≤ 4 KB documents additionally as their own
+ * session) stays as a secondary metric for session-delivered deployments.
  *
  * Size, lossless round-trip, and (with --speed) end-to-end per-document throughput are
  * measured for tokzip and every competitor on one of two channels:
@@ -133,8 +133,7 @@ const { binary: BINARY_CHANNEL } = parseChannel(process.argv.slice(2));
 
 const METHODS: BenchMethod[] = BINARY_CHANNEL
   ? [
-      tokzipMethod('fast', 'binary'),
-      tokzipMethod('small', 'binary'),
+      tokzipMethod('binary'),
       ...binaryCompetitors.map(
         (competitor): BenchMethod => ({
           name: competitor.name,
@@ -145,8 +144,7 @@ const METHODS: BenchMethod[] = BINARY_CHANNEL
       ),
     ]
   : [
-      tokzipMethod('fast', 'text'),
-      tokzipMethod('small', 'text'),
+      tokzipMethod('text'),
       ...competitors.map(
         (competitor): BenchMethod => ({
           name: competitor.name,
@@ -365,7 +363,7 @@ function addFencedIds(map: Map<string, Set<number>>, methodName: string, ids: nu
 }
 
 interface FencedCollector {
-  collect(doc: LoadedDoc, methodName: string, encoded: string | Uint8Array): void;
+  collect: (doc: LoadedDoc, methodName: string, encoded: string | Uint8Array) => void;
   sessionExtraBytes(methodName: string): number;
   shortExtraBytes(methodName: string): number;
 }
@@ -379,8 +377,8 @@ interface FencedCollector {
  */
 function makeFencedCollector(): FencedCollector {
   const encoder = new TextEncoder();
-  // FLAG_FENCED is per encoded frame, so fast and small can depend on different modules —
-  // dependencies are tracked per method, while the per-document fence scan is cached.
+  // FLAG_FENCED is per encoded frame; dependencies are tracked per method, while the
+  // per-document fence scan is cached.
   const sessionIds = new Map<string, Set<number>>();
   const shortIds = new Map<string, Set<number>>();
   const docFenceIds = new Map<string, number[]>();
@@ -406,7 +404,9 @@ function makeFencedCollector(): FencedCollector {
     return bytes;
   };
   return {
-    collect(doc, methodName, encoded) {
+    // Arrow property (not a method) so callers can pass the reference directly without an
+    // unbound-method lint hit.
+    collect: (doc, methodName, encoded) => {
       const flags = typeof encoded === 'string' ? RADIX64_ALPHABET.indexOf(encoded[2]!) : encoded[2]!;
       if ((flags & FLAG_FENCED) === 0) return;
       const ids = fenceIdsOf(doc);
@@ -557,14 +557,14 @@ function loadBenchDocs(language: string): BenchDoc[] {
   });
 }
 
-function tokzipMethod(mode: 'fast' | 'small', output: 'text' | 'binary'): BenchMethod {
+function tokzipMethod(output: 'text' | 'binary'): BenchMethod {
   return {
-    name: `tokzip ${mode}`,
+    name: 'tokzip',
     compress: (doc) => {
       const language = doc.registered ? doc.language : 'none';
       return output === 'binary'
-        ? compress(doc.content, { language, mode, output: 'binary' })
-        : compress(doc.content, { language, mode });
+        ? compress(doc.content, { language, output: 'binary' })
+        : compress(doc.content, { language });
     },
     decompress: (encoded) => decompress(encoded) as string,
     usesDictionary: true,
@@ -606,8 +606,10 @@ function printTotals({ report, grand, short, dictBytes, shortDictBytes }: Totals
   printSessionRow('all+dict', grand, dictBytes);
   printSessionRow('sh+dict', short, shortDictBytes);
   console.log(
-    `\nPRIMARY metric: sh+dict = session-amortized ratio on ≤4 KB docs, tokzip charged each\n` +
-      `language's brotli-compressed dictionary once per session; reference codec: ${report.referenceMethod}.`
+    `\nPRIMARY metric: the per-document 'all' ratio (dictionaries ship with the application).\n` +
+      `sh+dict = session-amortized ratio on ≤ 4 KB docs for session-delivered deployments,\n` +
+      `tokzip charged each language's brotli-compressed dictionary once per session;\n` +
+      `reference codec: ${report.referenceMethod}.`
   );
 }
 

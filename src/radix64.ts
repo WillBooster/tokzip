@@ -1,7 +1,7 @@
 import { TokzipDecodeError } from './errors.ts';
 
 /**
- * Radix-64 alphabet (base64url set) used by the container header and `fast` mode.
+ * Radix-64 alphabet (base64url set) used by the container header and stored bodies.
  * Every field is a whole number of 6-bit characters — encode/decode is table lookup only.
  */
 export const RADIX64_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';

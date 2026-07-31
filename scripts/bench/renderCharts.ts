@@ -26,7 +26,6 @@ interface Theme {
   textMuted: string;
   grid: string;
   axis: string;
-  seriesFast: string;
   seriesSmall: string;
   seriesBrotli: string;
   seriesZstd: string;
@@ -49,7 +48,6 @@ const THEMES: Theme[] = [
     textMuted: '#898781',
     grid: '#e1e0d9',
     axis: '#c3c2b7',
-    seriesFast: '#2a78d6',
     seriesSmall: '#1baf7a',
     seriesBrotli: '#eda100',
     seriesZstd: '#4a3aa7',
@@ -63,7 +61,6 @@ const THEMES: Theme[] = [
     textMuted: '#898781',
     grid: '#2c2c2a',
     axis: '#383835',
-    seriesFast: '#3987e5',
     seriesSmall: '#199e70',
     seriesBrotli: '#c98500',
     seriesZstd: '#9085e9',
@@ -174,8 +171,7 @@ function renderRatioSpeedChart(report: ChartReport, theme: Theme): string | unde
 /** Dot plot of per-language ratios: tokzip modes vs the strongest general-purpose codecs. */
 function renderLanguageChart(report: ChartReport, theme: Theme): string {
   const series = [
-    { method: 'tokzip small', color: theme.seriesSmall, shape: 'circle' as const },
-    { method: 'tokzip fast', color: theme.seriesFast, shape: 'triangle' as const },
+    { method: 'tokzip', color: theme.seriesSmall, shape: 'circle' as const },
     // The browser-native reference codec first, the strongest server-side codec second.
     { method: 'b64url(cs gzip)', color: theme.seriesZstd, shape: 'diamond' as const },
     { method: 'b64url(brotli q11)', color: theme.seriesBrotli, shape: 'square' as const },
@@ -185,8 +181,7 @@ function renderLanguageChart(report: ChartReport, theme: Theme): string {
   ].filter((entry) => Object.values(report.languages).some((language) => language.total.ratios[entry.method]));
   const languages = Object.keys(report.languages).toSorted(
     (left, right) =>
-      (report.languages[left]!.total.ratios['tokzip small'] ?? 1) -
-      (report.languages[right]!.total.ratios['tokzip small'] ?? 1)
+      (report.languages[left]!.total.ratios['tokzip'] ?? 1) - (report.languages[right]!.total.ratios['tokzip'] ?? 1)
   );
 
   const width = 880;
@@ -307,8 +302,7 @@ function marker(
 }
 
 function seriesColor(method: string, theme: Theme): string {
-  if (method === 'tokzip fast') return theme.seriesFast;
-  if (method === 'tokzip small') return theme.seriesSmall;
+  if (method === 'tokzip') return theme.seriesSmall;
   return theme.competitor;
 }
 
