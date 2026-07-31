@@ -196,11 +196,11 @@ export function computeMatchingStatistics(
 
 function lookupTransition(matcher: DictMatcher, state: number, byte: number): number {
   const key = state * 256 + byte + 1;
-  const { transKeys, transMask } = matcher;
+  const { transKeys, transVals, transMask } = matcher;
   let idx = Math.imul(key, HASH_MULTIPLIER) & transMask;
   while (true) {
     const k = transKeys[idx]!;
-    if (k === key) return matcher.transVals[idx]!;
+    if (k === key) return transVals[idx]!;
     if (k === 0) return -1;
     idx = (idx + 1) & transMask;
   }
