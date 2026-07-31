@@ -280,8 +280,7 @@
 
       // Fixed per-method colors: a method keeps its hue in every chart on this page.
       const SERIES_COLOR_VARS = {
-        'tokzip fast': '--series-fast',
-        'tokzip small': '--series-small',
+        tokzip: '--series-small',
         'b64url(brotli q11)': '--series-brotli-q11',
         'b64url(brotli q5)': '--series-brotli-q5',
         'b64url(cs gzip)': '--series-gzip',
@@ -295,28 +294,19 @@
       };
 
       const RATIO_SERIES = [
-        'tokzip fast',
-        'tokzip small',
+        'tokzip',
         'b64url(cs gzip)',
         'b64url(cs deflate-raw)',
         'b64url(brotli q11)',
         'lz-string URI',
       ];
 
-      const SPEED_SERIES = [
-        'tokzip fast',
-        'tokzip small',
-        'b64url(cs gzip)',
-        'b64url(brotli q5)',
-        'b64url(zstd -3)',
-        'lz-string URI',
-      ];
+      const SPEED_SERIES = ['tokzip', 'b64url(cs gzip)', 'b64url(brotli q5)', 'b64url(zstd -3)', 'lz-string URI'];
 
       // Ratio-ordered method list for the latest-run charts; the first four are visible
       // by default, the rest start hidden behind their legend entries.
       const SNAPSHOT_SERIES = [
-        'tokzip small',
-        'tokzip fast',
+        'tokzip',
         'b64url(cs gzip)',
         'b64url(cs deflate-raw)',
         'b64url(brotli q11)',
@@ -326,7 +316,7 @@
         'b64url(xz -9e)',
         'lz-string URI',
       ];
-      const SNAPSHOT_VISIBLE_COUNT = 4;
+      const SNAPSHOT_VISIBLE_COUNT = 3;
 
       const charts = [];
       let runs = [];
@@ -350,7 +340,7 @@
         runs = text
           .split('\n')
           .filter((line) => line.trim())
-          .map((line) => JSON.parse(line))
+          .map((line) => normalizeRun(JSON.parse(line)))
           .sort((a, b) => orderKey(a) - orderKey(b));
         if (runs.length === 0) {
           document.querySelector('#empty').hidden = false;
@@ -358,6 +348,28 @@
         }
         render();
         matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+      }
+
+      const isTokzipMethod = (method) => method === 'tokzip' || method.startsWith('tokzip ');
+
+      // Format v2 renamed the benchmark method 'tokzip small' to 'tokzip' and retired
+      // 'tokzip fast'; older stored reports keep the old keys, so map them on load.
+      function normalizeRun(value) {
+        if (Array.isArray(value)) {
+          return value
+            .filter((item) => item !== 'tokzip fast')
+            .map((item) => (item === 'tokzip small' ? 'tokzip' : normalizeRun(item)));
+        }
+        if (value === null || typeof value !== 'object') return value;
+        for (const key of Object.keys(value)) {
+          value[key] = normalizeRun(value[key]);
+          if (key === 'tokzip fast') delete value[key];
+          else if (key === 'tokzip small') {
+            if (!('tokzip' in value)) value.tokzip = value[key];
+            delete value[key];
+          }
+        }
+        return value;
       }
 
       function render() {
@@ -387,31 +399,30 @@
       function renderTiles() {
         const latest = runs.at(-1);
         const percent = (ratio) => (ratio * 100).toFixed(1) + '%';
-        const small = latest.total.ratios['tokzip small'];
-        const fast = latest.total.ratios['tokzip fast'];
+        const small = latest.total.ratios.tokzip;
         const competitor = bestCompetitor(latest);
         const failures = latest.roundTrip.failures.length;
         const tiles = [];
         // Schema v3: session-amortized, dictionary-inclusive ratios (the primary metric).
         const reference = latest.referenceMethod;
-        if (latest.shortSession?.amortizedRatios?.['tokzip small'] !== undefined) {
-          const primary = latest.shortSession.amortizedRatios['tokzip small'];
+        if (latest.shortSession?.amortizedRatios?.tokzip !== undefined) {
+          const primary = latest.shortSession.amortizedRatios.tokzip;
           const referenceRatio = latest.shortSession.amortizedRatios[reference];
           tiles.push({
-            label: 'PRIMARY: short session + dict (tokzip small)',
+            label: 'Short session + dict (tokzip)',
             value: percent(primary),
             cls: typeof referenceRatio === 'number' && primary <= referenceRatio ? 'good' : 'bad',
             note:
               typeof referenceRatio === 'number'
-                ? `${reference}: ${percent(referenceRatio)} on ≤4 KB docs`
+                ? `${reference}: ${percent(referenceRatio)} on ≤4 KB docs (session-delivered deployments)`
                 : '≤4 KB docs, dictionary charged once per session',
           });
         }
-        if (latest.session?.amortizedRatios?.['tokzip small'] !== undefined) {
-          const amortized = latest.session.amortizedRatios['tokzip small'];
+        if (latest.session?.amortizedRatios?.tokzip !== undefined) {
+          const amortized = latest.session.amortizedRatios.tokzip;
           const referenceRatio = latest.session.amortizedRatios[reference];
           tiles.push({
-            label: 'Full session + dict (tokzip small)',
+            label: 'Full session + dict (tokzip)',
             value: percent(amortized),
             cls: typeof referenceRatio === 'number' && amortized <= referenceRatio ? 'good' : 'bad',
             note: typeof referenceRatio === 'number' ? `${reference}: ${percent(referenceRatio)}` : 'all bench docs',
@@ -419,11 +430,10 @@
         }
         tiles.push(
           {
-            label: 'tokzip small (overall)',
+            label: 'PRIMARY: tokzip per-document (overall)',
             value: percent(small),
-            note: `${latest.total.docs} docs, ${Object.keys(latest.languages).length} languages`,
+            note: `${latest.total.docs} docs, ${Object.keys(latest.languages).length} languages; dictionaries ship with the app`,
           },
-          { label: 'tokzip fast (overall)', value: percent(fast), note: 'speed-first mode' },
           {
             label: `vs ${competitor.method}`,
             value:
@@ -438,11 +448,11 @@
             note: `${latest.roundTrip.docs} docs, ${latest.roundTrip.methods ?? 2} methods`,
           }
         );
-        for (const mode of ['small', 'fast']) {
-          const speed = speedOfLatest(latest, `tokzip ${mode}`);
+        {
+          const speed = speedOfLatest(latest, 'tokzip');
           if (speed) {
             tiles.push({
-              label: `tokzip ${mode} speed`,
+              label: 'tokzip speed',
               value: `${speed.compressMBps} MB/s`,
               note: `decompress ${speed.decompressMBps} MB/s`,
             });
@@ -569,7 +579,7 @@
                 backgroundColor: seriesColor(point.method, color),
                 borderColor: color('--surface-1'),
                 borderWidth: 2,
-                pointRadius: point.method.startsWith('tokzip ') ? 8 : 6,
+                pointRadius: isTokzipMethod(point.method) ? 8 : 6,
                 pointHoverRadius: 10,
               })),
             },
@@ -608,9 +618,7 @@
         const latest = runs.at(-1);
         const methods = snapshotMethods(latest);
         const languages = Object.keys(latest.languages).sort(
-          (a, b) =>
-            (latest.languages[a].total.ratios['tokzip small'] ?? 1) -
-            (latest.languages[b].total.ratios['tokzip small'] ?? 1)
+          (a, b) => (latest.languages[a].total.ratios.tokzip ?? 1) - (latest.languages[b].total.ratios.tokzip ?? 1)
         );
         const canvas = document.querySelector('#languageChart');
         canvas.parentElement.style.height = `${languages.length * 44 + 110}px`;
@@ -745,21 +753,21 @@
         const hasSessions = Object.values(latest.languages).some((entry) => entry.shortSession);
         // dictTransferBytes was a single number in older reports and is a per-method
         // record (with a short-session counterpart) in current schema-v3 reports.
-        const smallDictOf = (value) => (typeof value === 'number' ? value : value?.['tokzip small']);
+        const smallDictOf = (value) => (typeof value === 'number' ? value : value?.tokzip);
         const sessionCells = (entry) => {
           if (!hasSessions) return '';
-          const breakeven = entry.breakevenBytes?.['tokzip small'];
+          const breakeven = entry.breakevenBytes?.tokzip;
           const fullDict = smallDictOf(entry.dictTransferBytes);
           // The transfer shown beside the short-session ratio must use the same scope.
           const shortDict = smallDictOf(entry.shortDictTransferBytes) ?? fullDict;
           return (
-            `<td>${formatPercent(entry.shortSession?.amortizedRatios?.['tokzip small'])}</td>` +
+            `<td>${formatPercent(entry.shortSession?.amortizedRatios?.tokzip)}</td>` +
             `<td>${shortDict ? (shortDict / 1024).toFixed(1) + ' KB' : '—'}</td>` +
             `<td>${typeof breakeven === 'number' ? (breakeven / 1024).toFixed(0) + ' KB' : fullDict ? 'never' : '—'}</td>`
           );
         };
         const sessionHeaders = hasSessions
-          ? '<th>small sh+dict</th><th>sh dict transfer</th><th>breakeven (full session)</th>'
+          ? '<th>sh+dict</th><th>sh dict transfer</th><th>breakeven (full session)</th>'
           : '';
         const rows = Object.entries(latest.languages).map(
           ([language, entry]) =>
@@ -833,7 +841,7 @@
 
       function bestCompetitor(run) {
         return run.methods
-          .filter((method) => !method.startsWith('tokzip '))
+          .filter((method) => !isTokzipMethod(method))
           .map((method) => ({ method, ratio: run.total.ratios[method] }))
           .filter((entry) => typeof entry.ratio === 'number')
           .sort((a, b) => a.ratio - b.ratio)[0];
