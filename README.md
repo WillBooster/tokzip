@@ -8,9 +8,10 @@ Lossless compressor specialized for **source code and natural-language text** �
 or LLM-generated. Pure TypeScript (no WASM, no native deps), runs in Node/Bun/browsers, and
 emits either of two output channels: **safe-ASCII text directly** (JSON- and
 template-literal-safe radix-85; needs percent-encoding inside URLs) instead of paying the
-33% base64 tax on a binary stream, or a **dense binary frame** (the same range-coded stream
-at 8 bits per byte — exactly the 25% text tax smaller) for transports that accept raw
-bytes. On the project's code/text corpus it outperforms base64url(brotli -q11) on the text
+33% base64 tax on a binary stream, or a **dense binary frame** for transports that accept
+raw bytes (when both channels ship the same range-coded body, the text frame pays the 25%
+radix-85 tax on it; each channel independently downgrades to stored, and headers/padding
+make whole-frame ratios vary a little). On the project's code/text corpus it outperforms base64url(brotli -q11) on the text
 channel and raw brotli -q11 on the binary channel, in every language bucket.
 
 ```ts
@@ -24,8 +25,9 @@ const bytes = compress(source, { language: 'typescript', output: 'binary' });
 const restored2 = decompress(bytes); // === source (Uint8Array in, text/bytes out per frame)
 ```
 
-- **One mode**: an exact-bit-price optimal LZ parse (suffix-automaton dictionary matching,
-  rep-offset cache) feeding an adaptive binary range coder whose models — literals keyed by
+- **One mode**: an optimal LZ parse priced with the trained priors (exact for inputs up to
+  512 KB, greedy-lazy beyond; suffix-automaton dictionary matching, rep-offset cache)
+  feeding an adaptive binary range coder whose models — literals keyed by
   trained previous-byte classes with LZMA-style matched-literal prediction, match kinds by
   the previous token kind, offsets by length bucket — start from trained per-language
   priors, so short documents get the full benefit of the static statistics while long

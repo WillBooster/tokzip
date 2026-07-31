@@ -132,8 +132,10 @@ export function buildDictMatcher(dictionary: Uint8Array): DictMatcher {
   }
 
   // Freeze the transitions into an open-addressing table for the hot matching-statistics walk.
+  // Sized for a ~0.75 load factor: linear probing stays short there, and the next power of
+  // two would quadruple the table (measured 8 MB of an 11 MB matcher on a 128 KB dictionary).
   let capacity = 8;
-  while (capacity < trans.size * 2) capacity <<= 1;
+  while (capacity * 3 < trans.size * 4) capacity <<= 1;
   const transKeys = new Int32Array(capacity);
   const transVals = new Int32Array(capacity);
   const transMask = capacity - 1;
@@ -144,26 +146,16 @@ export function buildDictMatcher(dictionary: Uint8Array): DictMatcher {
     transVals[idx] = value;
   }
   return {
-    stateLen: stateLen.subarray(0, size),
-    stateLink: stateLink.subarray(0, size),
-    stateMinStart: stateMinStart.subarray(0, size),
+    // slice, not subarray: views would retain the whole maxStates-sized build buffers
+    // (~25% dead memory) for the lifetime of the cached matcher.
+    stateLen: stateLen.slice(0, size),
+    stateLink: stateLink.slice(0, size),
+    stateMinStart: stateMinStart.slice(0, size),
     paretoParent,
     transKeys,
     transVals,
     transMask,
   };
-}
-
-function lookupTransition(matcher: DictMatcher, state: number, byte: number): number {
-  const key = state * 256 + byte + 1;
-  const { transKeys, transMask } = matcher;
-  let idx = Math.imul(key, HASH_MULTIPLIER) & transMask;
-  while (true) {
-    const k = transKeys[idx]!;
-    if (k === key) return matcher.transVals[idx]!;
-    if (k === 0) return -1;
-    idx = (idx + 1) & transMask;
-  }
 }
 
 /**
@@ -199,5 +191,17 @@ export function computeMatchingStatistics(
     }
     msLen[i] = length;
     msState[i] = state;
+  }
+}
+
+function lookupTransition(matcher: DictMatcher, state: number, byte: number): number {
+  const key = state * 256 + byte + 1;
+  const { transKeys, transMask } = matcher;
+  let idx = Math.imul(key, HASH_MULTIPLIER) & transMask;
+  while (true) {
+    const k = transKeys[idx]!;
+    if (k === key) return matcher.transVals[idx]!;
+    if (k === 0) return -1;
+    idx = (idx + 1) & transMask;
   }
 }

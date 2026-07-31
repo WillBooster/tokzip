@@ -6,7 +6,7 @@
  * Every configuration is round-trip verified; ratio is compressed bytes / input bytes, and
  * speed is end-to-end through the TransformStream pipe (best of SAMPLES runs).
  *
- * Usage: bun scripts/bench/streamBench.ts [--fast-only|--small-only] [--history] [<language> ...]
+ * Usage: bun scripts/bench/streamBench.ts [--history] [<language> ...]
  * --history additionally sweeps `historyLimit` at 16K blocks (the ratio/speed lever).
  */
 import { existsSync, readFileSync } from 'node:fs';

@@ -393,47 +393,6 @@ function buildModel(
   return { litContext, litClassCount, priors };
 }
 
-/** Sums joint `[ctx][symbol]` frequencies into `[classOf(ctx)][symbol]` frequencies. */
-function mergeByClass(
-  joint: Float64Array,
-  classOf: Uint8Array,
-  classCount: number,
-  alphabetSize: number
-): Float64Array {
-  const merged = new Float64Array(classCount * alphabetSize);
-  const contextCount = joint.length / alphabetSize;
-  for (let ctx = 0; ctx < contextCount; ctx++) {
-    const target = classOf[ctx]! * alphabetSize;
-    for (let symbol = 0; symbol < alphabetSize; symbol++) {
-      merged[target + symbol]! += joint[ctx * alphabetSize + symbol]!;
-    }
-  }
-  return merged;
-}
-
-/** Total bits (frequency-weighted self-information) of one conditional distribution. */
-function entropyBits(freq: Float64Array): number {
-  let sum = 0;
-  for (const x of freq) sum += x;
-  if (sum === 0) return 0;
-  let bits = 0;
-  for (const x of freq) if (x > 0) bits -= x * Math.log2(x / sum);
-  return bits;
-}
-
-/** Bits to code `evalFreq` under a (smoothed) distribution fit to `trainFreq`. */
-function crossEntropyBits(trainFreq: Float64Array, evalFreq: Float64Array): number {
-  let trainSum = 0;
-  for (const x of trainFreq) trainSum += x;
-  const denominator = trainSum + trainFreq.length * 0.4;
-  let bits = 0;
-  for (let symbol = 0; symbol < trainFreq.length; symbol++) {
-    const count = evalFreq[symbol]!;
-    if (count > 0) bits -= count * Math.log2((trainFreq[symbol]! + 0.4) / denominator);
-  }
-  return bits;
-}
-
 /** Cluster of merged literal contexts (see {@link chooseLiteralClasses}). */
 interface Cluster {
   freq: Float64Array;
@@ -531,6 +490,47 @@ function chooseLiteralClasses(folds: [Float64Array, Float64Array]): {
     }
   }
   return { litContext: candidates.get(bestCount)!, litClassCount: bestCount };
+}
+
+/** Sums joint `[ctx][symbol]` frequencies into `[classOf(ctx)][symbol]` frequencies. */
+function mergeByClass(
+  joint: Float64Array,
+  classOf: Uint8Array,
+  classCount: number,
+  alphabetSize: number
+): Float64Array {
+  const merged = new Float64Array(classCount * alphabetSize);
+  const contextCount = joint.length / alphabetSize;
+  for (let ctx = 0; ctx < contextCount; ctx++) {
+    const target = classOf[ctx]! * alphabetSize;
+    for (let symbol = 0; symbol < alphabetSize; symbol++) {
+      merged[target + symbol]! += joint[ctx * alphabetSize + symbol]!;
+    }
+  }
+  return merged;
+}
+
+/** Total bits (frequency-weighted self-information) of one conditional distribution. */
+function entropyBits(freq: Float64Array): number {
+  let sum = 0;
+  for (const x of freq) sum += x;
+  if (sum === 0) return 0;
+  let bits = 0;
+  for (const x of freq) if (x > 0) bits -= x * Math.log2(x / sum);
+  return bits;
+}
+
+/** Bits to code `evalFreq` under a (smoothed) distribution fit to `trainFreq`. */
+function crossEntropyBits(trainFreq: Float64Array, evalFreq: Float64Array): number {
+  let trainSum = 0;
+  for (const x of trainFreq) trainSum += x;
+  const denominator = trainSum + trainFreq.length * 0.4;
+  let bits = 0;
+  for (let symbol = 0; symbol < trainFreq.length; symbol++) {
+    const count = evalFreq[symbol]!;
+    if (count > 0) bits -= count * Math.log2((trainFreq[symbol]! + 0.4) / denominator);
+  }
+  return bits;
 }
 
 function makeLanguage(dictionary: Uint8Array, model: LanguageModel): RegisteredLanguage {

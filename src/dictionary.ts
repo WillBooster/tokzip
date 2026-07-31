@@ -5,7 +5,7 @@ import { PROB_SCALE } from './rangeCoder.ts';
 
 /**
  * A language's trained coding model: the literal context classes and the initial 11-bit
- * probabilities for every adaptive model node (layout in smallMode.ts). Model data is codec
+ * probabilities for every adaptive model node (layout in format.ts). Model data is codec
  * identity: both sides must run the same priors or decoding diverges.
  */
 export interface LanguageModel {
@@ -13,7 +13,7 @@ export interface LanguageModel {
   litContext: Uint8Array;
   /** Number of trained literal context classes (1–{@link LIT_CLASS_MAX}). */
   litClassCount: number;
-  /** Initial probabilities, P(bit = 0) in [1, 2047], laid out per smallMode.ts. */
+  /** Initial probabilities, P(bit = 0) in [1, 2047], laid out per format.ts. */
   priors: Uint16Array;
 }
 

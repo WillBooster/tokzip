@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { frameChecksum } from '../../src/checksum.ts';
 import { compress, decompress, TokzipDecodeError } from '../../src/index.ts';
 import { MODE_SMALL, MODE_STORED } from '../../src/format.ts';
+import { readByteVarint } from '../../src/container.ts';
 import { RADIX64_ALPHABET, TextSink, pushVarint64, RADIX64_CODES } from '../../src/radix64.ts';
 import { RADIX85_ALPHABET } from '../../src/radix85.ts';
 
@@ -140,15 +141,30 @@ describe('container vectors', () => {
   });
 
   test('non-zero padding in a small frame is a structural error', () => {
-    const source = 'export function greet(name: string): string {\n  return name;\n}\n'.repeat(5);
-    const frame = compress(source);
-    expect(shippedMode(frame)).toBe(MODE_SMALL);
-    // Incrementing the final radix-85 digit flips only the last word's low (padding) bits.
-    const lastIndex = RADIX85_ALPHABET.indexOf(frame.at(-1)!);
-    if (lastIndex < 84) {
-      const patched = frame.slice(0, -1) + RADIX85_ALPHABET[lastIndex + 1];
-      expectDecodeError(patched, /padding|stream|truncated|invalid|trailing|checksum|size/);
+    // Find a fixture whose range-coded body does not fill its last radix-85 word, so the
+    // text frame provably carries a zero padding byte; then set that byte to 1. (The range
+    // coder's own flush bytes are not canonicalized — see FORMAT.md §4.2 — so mutating
+    // arbitrary trailing chars is not guaranteed to fail; the padding bytes are.)
+    for (let repeats = 3; repeats < 24; repeats++) {
+      const source = 'export function greet(name: string): string {\n  return name;\n}\n'.repeat(repeats);
+      const binary = compress(source, { output: 'binary' });
+      const text = compress(source);
+      if (shippedMode(text) !== MODE_SMALL) continue;
+      const bodyStart = readByteVarint(binary, 3).pos + 4;
+      const rcLength = binary.length - bodyStart;
+      if (rcLength % 4 === 0) continue; // No padding byte in the text frame's last word.
+      let word = 0;
+      for (const c of text.slice(-5)) word = word * 85 + RADIX85_ALPHABET.indexOf(c);
+      word += 1; // The word's last byte is padding and canonically zero.
+      let patchedGroup = '';
+      for (let i = 0; i < 5; i++) {
+        patchedGroup = RADIX85_ALPHABET[word % 85]! + patchedGroup;
+        word = Math.floor(word / 85);
+      }
+      expectDecodeError(text.slice(0, -5) + patchedGroup, /non-zero padding/);
+      return;
     }
+    throw new Error('no small fixture with a padded last word found');
   });
 
   test('a corrupted body that still parses fails the content checksum', () => {

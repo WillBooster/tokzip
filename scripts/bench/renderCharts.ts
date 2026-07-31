@@ -26,7 +26,6 @@ interface Theme {
   textMuted: string;
   grid: string;
   axis: string;
-  seriesFast: string;
   seriesSmall: string;
   seriesBrotli: string;
   seriesZstd: string;
@@ -49,7 +48,6 @@ const THEMES: Theme[] = [
     textMuted: '#898781',
     grid: '#e1e0d9',
     axis: '#c3c2b7',
-    seriesFast: '#2a78d6',
     seriesSmall: '#1baf7a',
     seriesBrotli: '#eda100',
     seriesZstd: '#4a3aa7',
@@ -63,7 +61,6 @@ const THEMES: Theme[] = [
     textMuted: '#898781',
     grid: '#2c2c2a',
     axis: '#383835',
-    seriesFast: '#3987e5',
     seriesSmall: '#199e70',
     seriesBrotli: '#c98500',
     seriesZstd: '#9085e9',

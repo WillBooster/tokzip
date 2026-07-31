@@ -15,7 +15,7 @@ import {
   RESERVED_FLAG_MASK,
   SMALL_WINDOW,
 } from './format.ts';
-import { dictIndexFor, parse } from './lz.ts';
+import { dictIndexIfNeeded, parse } from './lz.ts';
 import {
   packedRawLength,
   pushPackedRaw,
@@ -34,8 +34,9 @@ export interface CompressOptions {
   language?: string;
   /**
    * Output channel; default 'text'. 'text' emits a safe-ASCII frame (JSON- and
-   * template-literal-safe); 'binary' emits the same range-coded stream at 8 bits per byte —
-   * exactly the 25% radix-85 text tax smaller.
+   * template-literal-safe); 'binary' emits the range-coded stream at 8 bits per byte,
+   * saving the 25% radix-85 text tax on the body (each channel independently downgrades
+   * to stored, so whole-frame ratios vary slightly).
    */
   output?: 'text' | 'binary';
 }
@@ -77,7 +78,7 @@ export function compress(input: string | Uint8Array, options?: CompressOptions):
   // Fenced dictionary extension: labeled code fences extend the searchable dictionary space
   // with the block language's suffix (undefined when the input has no such fence).
   const segments = computeDictSegments(bytes, language, SMALL_WINDOW);
-  const dictIndex = dictIndexFor(language);
+  const dictIndex = dictIndexIfNeeded(language, bytes.length);
 
   const storedCost = binary ? bytes.length : packedRawLength(bytes.length);
   let shippedMode = MODE_STORED;

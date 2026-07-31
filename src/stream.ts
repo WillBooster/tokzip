@@ -3,7 +3,7 @@ import { pushByteVarint, pushCrc32Binary, readCrc32Binary } from './container.ts
 import { languageByName, requireLanguageById, type RegisteredLanguage } from './dictionary.ts';
 import { TokzipDecodeError } from './errors.ts';
 import { DEFAULT_MAX_OUTPUT_SIZE, MODE_SMALL, MODE_STORED, SMALL_WINDOW } from './format.ts';
-import { dictIndexFor, OPTIMAL_MAX_INPUT, parse } from './lz.ts';
+import { dictIndexIfNeeded, OPTIMAL_MAX_INPUT, parse } from './lz.ts';
 import { TextSink } from './radix64.ts';
 import { decodeSmallBodyBinary, encodeSmallBody, smallPricing } from './smallMode.ts';
 
@@ -241,7 +241,7 @@ class BlockEncoder {
       input.set(this.history);
       input.set(block, historyLength);
     }
-    const dictIndex = dictIndexFor(language);
+    const dictIndex = dictIndexIfNeeded(language, input.length);
 
     // Per-block frame selection mirrors the one-shot auto-downgrade: smallest body wins,
     // ties prefer the simpler stored encoding.

@@ -1,6 +1,6 @@
 import type { DictIndex, RegisteredLanguage } from './dictionary.ts';
 import { buildDictMatcher, computeMatchingStatistics, type DictMatcher } from './dictMatcher.ts';
-import { INITIAL_REPS, MATCH_LEN_CAP, MIN_LEN_EXPLICIT, MIN_LEN_REP } from './format.ts';
+import { INITIAL_REPS, MATCH_LEN_CAP, MIN_LEN_EXPLICIT, MIN_LEN_REP, SMALL_WINDOW } from './format.ts';
 import { LENGTH_SLOT_COUNT, maxSlotValue, slotOf } from './slots.ts';
 
 /** Literal run: a raw byte range of the input. */
@@ -177,31 +177,24 @@ export function dictMatcherFor(language: RegisteredLanguage): DictMatcher | unde
   return (language.dictMatcher ??= buildDictMatcher(language.dictionary));
 }
 
+/**
+ * The frame language's chain index, built only when this input's parse can actually walk
+ * it: the suffix-automaton matcher covers the frame dictionary whenever it is available and
+ * addressable, so eager chain building would spend ~16 bytes per dictionary byte (plus
+ * build time on first compress) that the parse never reads.
+ */
+export function dictIndexIfNeeded(language: RegisteredLanguage, inputLength: number): DictIndex | undefined {
+  const chainsNeeded =
+    inputLength > GREEDY_SAM_MAX_INPUT ||
+    language.dictionary.length > SMALL_WINDOW ||
+    dictMatcherFor(language) === undefined;
+  return chainsNeeded ? dictIndexFor(language) : undefined;
+}
+
 function matchLength(a: Uint8Array, ai: number, b: Uint8Array, bi: number, cap: number): number {
   let len = 0;
   while (len < cap && a[ai + len] === b[bi + len]) len++;
   return len;
-}
-
-/** Indexes position `i` in both the 4-byte- and 6-byte-hash chains (optimal parse). */
-function insertChains(
-  bytes: Uint8Array,
-  i: number,
-  n: number,
-  shift: number,
-  head: Int32Array,
-  prev: Int32Array,
-  head6: Int32Array,
-  prev6: Int32Array
-): void {
-  if (i + 4 > n) return;
-  const bucket = hash4(bytes, i, shift);
-  prev[i] = head[bucket]!;
-  head[bucket] = i;
-  if (i + 6 > n) return;
-  const bucket6 = hash6(bytes, i, shift);
-  prev6[i] = head6[bucket6]!;
-  head6[bucket6] = i;
 }
 
 /**
@@ -607,7 +600,7 @@ function parseOptimal(
         // dictionary matches essentially never win, but an equal-length one can (dictionary
         // tokens/offsets use their own context tables), and a strictly longer one often does.
         const dictFloor = bestExplicit > maxM ? bestExplicit : maxM;
-        if ((dictIndex || extIndex) && dictFloor <= cap) {
+        if ((dictMatcher || dictIndex || extIndex) && dictFloor <= cap) {
           const initialBest = dictFloor >= SUFFICIENT_LEN ? dictFloor - 1 : MIN_LEN_EXPLICIT - 1;
           let candCountD = dictMatcher
             ? collectSamCandidates(dictMatcher, msLen![i]!, msState![i]!, cap, initialBest)
@@ -698,6 +691,27 @@ function parseOptimal(
   }
   tokens.reverse();
   return tokens;
+}
+
+/** Indexes position `i` in both the 4-byte- and 6-byte-hash chains (optimal parse). */
+function insertChains(
+  bytes: Uint8Array,
+  i: number,
+  n: number,
+  shift: number,
+  head: Int32Array,
+  prev: Int32Array,
+  head6: Int32Array,
+  prev6: Int32Array
+): void {
+  if (i + 4 > n) return;
+  const bucket = hash4(bytes, i, shift);
+  prev[i] = head[bucket]!;
+  head[bucket] = i;
+  if (i + 6 > n) return;
+  const bucket6 = hash6(bytes, i, shift);
+  prev6[i] = head6[bucket6]!;
+  head6[bucket6] = i;
 }
 
 /**

@@ -58,12 +58,13 @@ Little-endian groups of 7 payload bits per byte, bit 7 = continue flag. Maximum 
 ### 1.5 Raw byte packing (stored bodies, text container)
 
 3 input bytes → 4 radix-64 chars (big-endian 6-bit groups); a 1- or 2-byte tail packs into
-2 or 3 chars whose unused low bits MUST be zero. `packedRawLength(n) = 4·floor(n/3) +
+2 or 3 chars. Encoders write zero in the tail chars' unused low bits; decoders ignore them
+(the content CRC still covers the decoded bytes). `packedRawLength(n) = 4·floor(n/3) +
 (0, 2, 3)[n mod 3]`.
 
 ### 1.6 CRC-32
 
-The IEEE 802.3 polynomial (as in gzip), over the frame's decompressed content prefixed by
+The IEEE 802.3 polynomial (as in gzip), over the frame's decompressed content followed by
 one type byte: 0x00 for string-typed frames, 0x01 for bytes-typed frames (so retyping
 byte-identical content fails the checksum). Text frames store it as 6 radix-64 chars,
 little-endian 6-bit groups, top 4 bits of the last group zero (non-zero is a structural
@@ -134,7 +135,11 @@ becomes 5 radix-85 chars (most significant digit first). A body length not divis
 and a 5-char group above 2^32 − 1 are structural errors. After the last token, the consumed
 byte count MUST be within 3 bytes of the padded length and every remaining byte MUST be
 zero ("non-zero padding"). Binary frames carry the raw bytes with no padding: the consumed
-count MUST equal the body length exactly.
+count MUST equal the body length exactly. Note that these checks pin the body _length_,
+not every bit: the range coder's five flush bytes admit multiple encodings of the same
+content (the decoder consumes them without constraining their exact values), so frame
+bytes are NOT a unique identity for the content — key dedup/idempotency on the content or
+its CRC, never on the frame bytes.
 
 ### 4.3 Token model
 
@@ -175,8 +180,10 @@ Lengths and offsets use the slot codec (§5): a 6-bit tree codes the slot (36 le
 40 offset slots; a decoded slot beyond its alphabet is "invalid symbol"), then the slot's
 extra bits follow as direct bits. Length value = `len − 2` (minimum match length 2;
 encoders only emit explicit matches of length ≥ 4). Encoders MUST split matches longer
-than 262,145 bytes (`maxSlotValue(36) + 2`). History distances and dictionary starts are
-below 2^20: the history window is 1 MB (`SMALL_WINDOW`).
+than 262,145 bytes (`maxSlotValue(36) + 2`). History distances are ≤ 2^20 (`dist = offset
+
+- 1`with offset < 2^20; the history window is 1 MB,`SMALL_WINDOW`) and dictionary starts
+  are < 2^20.
 
 Model layout (offsets in probability slots):
 

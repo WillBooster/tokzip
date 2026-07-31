@@ -32,6 +32,43 @@ import { bitPrice, decodeTree, encodeTree, RangeDecoder, RangeEncoder, treePrice
 import { bytesFromWords, decodeRadix85 } from './radix85.ts';
 import { extraBitsOf, extraValueOf, LENGTH_SLOT_COUNT, OFFSET_SLOT_COUNT, slotOf, valueOfSlot } from './slots.ts';
 
+// Scratch prefix buffer reused across calls (compress is synchronous).
+let smallPrefixScratch = new Float64Array(0);
+
+/** Builds the pricing model driving the shared LZ parser (see {@link smallTablesFor}). */
+export function smallPricing(bytes: Uint8Array, language: RegisteredLanguage): ParsePricing {
+  const tables = smallTablesFor(language.model);
+  const { litContext } = language.model;
+  const { litBits, parser } = tables;
+
+  if (smallPrefixScratch.length < bytes.length + 1) {
+    smallPrefixScratch = new Float64Array(Math.max(bytes.length + 1, smallPrefixScratch.length * 2, 4096));
+  }
+  const litCostPrefix = smallPrefixScratch;
+  let acc = 0;
+  let prev = 0;
+  for (let i = 0; i < bytes.length; i++) {
+    const byte = bytes[i]!;
+    acc += litBits[litContext[prev]! * 256 + byte]!;
+    litCostPrefix[i + 1] = acc;
+    prev = byte;
+  }
+
+  return {
+    litCostPrefix,
+    repCost: (repIndex, len) => tables.avgRepSlotBits[repIndex * LENGTH_SLOT_COUNT + slotOf(len - MIN_LEN_REP)]!,
+    historyCost: (dist, len) =>
+      tables.avgHistSlotBits[slotOf(len - MIN_LEN_REP)]! + parser.histOffsetSlotBits[slotOf(dist - 1)]!,
+    dictCost: (start, len) =>
+      tables.avgDictSlotBits[slotOf(len - MIN_LEN_REP)]! + parser.dictOffsetSlotBits[slotOf(start)]!,
+    lazy: true,
+    window: SMALL_WINDOW,
+    maxDictStart: SMALL_WINDOW,
+    optimal: parser,
+    dictMatcher: dictMatcherFor(language),
+  };
+}
+
 /**
  * Static bit-price tables derived from a language's priors, cached per language. The
  * optimal parse prices with the priors (the standard adaptive-coder approximation): exact
@@ -142,43 +179,6 @@ function smallTablesFor(model: LanguageModel): SmallTables {
   };
   smallTablesCache.set(model, cached);
   return cached;
-}
-
-// Scratch prefix buffer reused across calls (compress is synchronous).
-let smallPrefixScratch = new Float64Array(0);
-
-/** Builds the pricing model driving the shared LZ parser (see {@link smallTablesFor}). */
-export function smallPricing(bytes: Uint8Array, language: RegisteredLanguage): ParsePricing {
-  const tables = smallTablesFor(language.model);
-  const { litContext } = language.model;
-  const { litBits, parser } = tables;
-
-  if (smallPrefixScratch.length < bytes.length + 1) {
-    smallPrefixScratch = new Float64Array(Math.max(bytes.length + 1, smallPrefixScratch.length * 2, 4096));
-  }
-  const litCostPrefix = smallPrefixScratch;
-  let acc = 0;
-  let prev = 0;
-  for (let i = 0; i < bytes.length; i++) {
-    const byte = bytes[i]!;
-    acc += litBits[litContext[prev]! * 256 + byte]!;
-    litCostPrefix[i + 1] = acc;
-    prev = byte;
-  }
-
-  return {
-    litCostPrefix,
-    repCost: (repIndex, len) => tables.avgRepSlotBits[repIndex * LENGTH_SLOT_COUNT + slotOf(len - MIN_LEN_REP)]!,
-    historyCost: (dist, len) =>
-      tables.avgHistSlotBits[slotOf(len - MIN_LEN_REP)]! + parser.histOffsetSlotBits[slotOf(dist - 1)]!,
-    dictCost: (start, len) =>
-      tables.avgDictSlotBits[slotOf(len - MIN_LEN_REP)]! + parser.dictOffsetSlotBits[slotOf(start)]!,
-    lazy: true,
-    window: SMALL_WINDOW,
-    maxDictStart: SMALL_WINDOW,
-    optimal: parser,
-    dictMatcher: dictMatcherFor(language),
-  };
 }
 
 /**
