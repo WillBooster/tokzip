@@ -141,7 +141,7 @@ method on every document round-trips losslessly** — any mismatch fails the run
 speed pass on the text channel only).
 
 Current numbers live on the dashboard (the v2 format reset — one range-coded mode — and
-each dictionary retrain change all output sizes, so older pinned tables no
+each dictionary retrain can change compressed output sizes, so older pinned tables no
 longer apply). Two stable findings from the metric redesign: with the previous ~1 MB dictionaries
 the brotli-compressed dictionary transfer (~300 KB per language) never paid for itself
 against browser-native gzip on KB-scale sessions, and dictionary-free tokzip beats

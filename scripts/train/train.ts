@@ -8,7 +8,7 @@
  *   bun scripts/train/train.ts core            # wrapper dictionary + id-0 generic model
  *   bun scripts/train/train.ts typescript ...  # one or more language modules
  *   bun scripts/train/train.ts --all           # core + every language with corpus data
- *   --budget <bytes>                           # dictionary-suffix budget (4 KiB – 1 MiB, default 128 KiB)
+ *   --budget <bytes>                           # dictionary-suffix budget (4 KiB – 1 MiB, default 16 KiB)
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -53,7 +53,7 @@ const GENERATED_DIR = join(ROOT, 'src/generated');
 const LANGUAGES_DIR = join(ROOT, 'src/languages');
 // Default dictionary budget, chosen for the primary deployment (DB storage of code
 // submissions and LLM outputs, where the dictionary ships once with the application and
-// compresses inside request handlers). Ratio improves monotonically with budget, but so do
+// documents are compressed inside request handlers). Ratio improves monotonically with budget, but so do
 // the per-language costs paid at first compress: the suffix-automaton index build (~10 ms
 // at 16 KB vs ~63 ms at 128 KB) and its retained memory (~1 MB vs ~7 MB) — decisive on
 // short-lived isolates (Cloudflare Workers). 16 KB is the smallest budget that keeps the

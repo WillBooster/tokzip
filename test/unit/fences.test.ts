@@ -91,7 +91,7 @@ test('a block labeled with the frame language stays a plain unfenced frame', () 
 });
 
 test('CRLF fence lines resolve the label and round-trip', () => {
-  const doc = docWith('ts').replaceAll('\n', '\r\n');
+  const doc = docWith('ts', DICT_TS_CODE).replaceAll('\n', '\r\n');
   {
     const frame = compress(doc, { language: 'none' });
     expect(isFenced(frame)).toBe(true);
