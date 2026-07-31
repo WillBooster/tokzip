@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/prefer-math-trunc -- `>>> 0` coerces to unsigned 32-bit throughout the inlined range decoder; Math.trunc would keep the sign
 import type { LanguageModel, RegisteredLanguage } from './dictionary.ts';
 import { allocateDecodeBuffer, TokzipDecodeError } from './errors.ts';
 import { copyExtendedDictMatch, FenceTracker } from './fences.ts';
@@ -28,7 +29,16 @@ import {
   TOKEN_KIND_REP0,
 } from './format.ts';
 import { dictMatcherIfUsable, type ParsePricing, type SlotPricing, type Token } from './lz.ts';
-import { bitPrice, decodeTree, encodeTree, RangeDecoder, RangeEncoder, treePrice } from './rangeCoder.ts';
+import {
+  ADAPT_SHIFT,
+  bitPrice,
+  encodeTree,
+  PROB_BITS,
+  PROB_SCALE,
+  RangeEncoder,
+  TOP,
+  treePrice,
+} from './rangeCoder.ts';
 import { bytesFromWords, decodeRadix85 } from './radix85.ts';
 import { extraBitsOf, extraValueOf, LENGTH_SLOT_COUNT, OFFSET_SLOT_COUNT, slotOf, valueOfSlot } from './slots.ts';
 
@@ -308,6 +318,14 @@ export function decodeSmallBodyBinary(
  * bytes the channel may append (3 for radix-85 text frames, whose payload is padded to a
  * 32-bit word; 0 for binary frames): the decoder must consume every byte before the
  * padding, and the padding itself must be zero (canonical frames).
+ *
+ * The range decoder is inlined here as local variables instead of using {@link RangeDecoder}
+ * (which stays the reference implementation, property-tested against the encoder): V8 — the
+ * production runtime (Cloudflare Workers, Node, Chrome) — does not inline the class methods
+ * into this loop, and keeping `range`/`code`/`bpos` in locals with every bit decode expanded
+ * in place nearly doubles decode throughput there (~22 → ~41 MB/s on the bench corpus,
+ * Node 24). JSC (Bun, Safari) inlines the class methods fine and loses ~15% from the large
+ * function body instead — accepted, since Bun is only the development runtime.
  */
 function decodeSmallCore(
   body: Uint8Array,
@@ -329,7 +347,17 @@ function decodeSmallCore(
   }
   const { litContext, priors } = language.model;
   const state = new Uint16Array(priors);
-  const decoder = new RangeDecoder(body, pos, end);
+
+  let range = 0xFF_FF_FF_FF >>> 0;
+  let code = 0;
+  let bpos = pos;
+  // The first byte is always 0 (encoder cacheSize starts at 1 with cache 0); rejecting
+  // other values keeps frames canonical.
+  if (bpos >= end || body[bpos++] !== 0) throw new TokzipDecodeError('invalid range-coder header');
+  for (let i = 0; i < 4; i++) {
+    if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+    code = ((code << 8) | body[bpos++]!) >>> 0;
+  }
 
   const historyLength = history?.length ?? 0;
   const target = historyLength + outputSize;
@@ -345,49 +373,266 @@ function decodeSmallCore(
   let prevKind = TOKEN_KIND_LIT;
   let prevByte = historyLength > 0 ? history![historyLength - 1]! : 0;
 
-  const readSlotValue = (base: number): number => {
-    const slot = decodeTree(decoder, state, base, SLOT_TREE_BITS);
-    if (slot >= (base >= MODEL_OFF_TREE ? OFFSET_SLOT_COUNT : LENGTH_SLOT_COUNT)) {
-      throw new TokzipDecodeError('invalid symbol');
-    }
-    const extra = extraBitsOf(slot);
-    return valueOfSlot(slot, extra > 0 ? decoder.decodeDirect(extra) : 0);
-  };
+  // Working registers for the repeated inlined bit decodes below. Each `index = …` followed
+  // by the probability/bound/renormalization block is one textual copy of
+  // `RangeDecoder.decodeBit` — see the JSDoc above for why it is expanded by hand.
+  let index = 0;
+  let prob = 0;
+  let bound = 0;
+  let bit = 0;
 
   while (produced < target) {
-    if (decoder.decodeBit(state, MODEL_IS_MATCH + prevKind) === 0) {
+    // isMatch bit: 0 = literal, 1 = match.
+    index = MODEL_IS_MATCH + prevKind;
+    prob = state[index]!;
+    bound = (range >>> PROB_BITS) * prob;
+    // Unsigned compare: both sides are in [0, 2^32).
+    if (code >>> 0 < bound) {
+      range = bound >>> 0;
+      state[index] = prob + ((PROB_SCALE - prob) >> ADAPT_SHIFT);
+      bit = 0;
+    } else {
+      code = (code - bound) >>> 0;
+      range = (range - bound) >>> 0;
+      state[index] = prob - (prob >> ADAPT_SHIFT);
+      bit = 1;
+    }
+    // One renormalization step always suffices: probabilities are clamped to
+    // [PROB_MIN, PROB_MAX], so a decode keeps range ≥ (TOP >> PROB_BITS) × PROB_MIN > 2^16.
+    if (range < TOP) {
+      if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+      code = ((code << 8) | body[bpos++]!) >>> 0;
+      range = (range << 8) >>> 0;
+    }
+
+    if (bit === 0) {
       const base = MODEL_LITERAL + litContext[prevByte]! * LITERAL_BLOCK_SIZE;
-      let byte: number;
+      let node = 1;
       if (prevKind === TOKEN_KIND_LIT || rep0 > produced) {
-        byte = decodeTree(decoder, state, base, 8);
+        // Plain literal: an 8-bit tree walk — the single hottest spot in the whole decoder.
+        for (let i = 0; i < 8; i++) {
+          index = base + node - 1;
+          prob = state[index]!;
+          bound = (range >>> PROB_BITS) * prob;
+          if (code >>> 0 < bound) {
+            range = bound >>> 0;
+            state[index] = prob + ((PROB_SCALE - prob) >> ADAPT_SHIFT);
+            node = node << 1;
+          } else {
+            code = (code - bound) >>> 0;
+            range = (range - bound) >>> 0;
+            state[index] = prob - (prob >> ADAPT_SHIFT);
+            node = (node << 1) | 1;
+          }
+          if (range < TOP) {
+            if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+            code = ((code << 8) | body[bpos++]!) >>> 0;
+            range = (range << 8) >>> 0;
+          }
+        }
       } else {
         // Matched literal (mirrors the encoder): the byte at rep0 distance predicts each
         // bit until the first mismatch.
         const matchByte = out[produced - rep0]!;
-        let node = 1;
-        let matched = true;
+        let matched = 1;
         for (let shift = 7; shift >= 0; shift--) {
-          let bit: number;
-          if (matched) {
-            const matchBit = (matchByte >>> shift) & 1;
-            bit = decoder.decodeBit(state, base + (((1 + matchBit) << 8) | node) - 1);
-            if (matchBit !== bit) matched = false;
+          const matchBit = (matchByte >>> shift) & 1;
+          index = matched !== 0 ? base + (((1 + matchBit) << 8) | node) - 1 : base + node - 1;
+          prob = state[index]!;
+          bound = (range >>> PROB_BITS) * prob;
+          if (code >>> 0 < bound) {
+            range = bound >>> 0;
+            state[index] = prob + ((PROB_SCALE - prob) >> ADAPT_SHIFT);
+            bit = 0;
           } else {
-            bit = decoder.decodeBit(state, base + node - 1);
+            code = (code - bound) >>> 0;
+            range = (range - bound) >>> 0;
+            state[index] = prob - (prob >> ADAPT_SHIFT);
+            bit = 1;
           }
+          if (range < TOP) {
+            if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+            code = ((code << 8) | body[bpos++]!) >>> 0;
+            range = (range << 8) >>> 0;
+          }
+          if (matchBit !== bit) matched = 0;
           node = node * 2 + bit;
         }
-        byte = node - 256;
       }
+      const byte = node - 256;
       out[produced++] = byte;
       prevByte = byte;
       prevKind = TOKEN_KIND_LIT;
       continue;
     }
-    let length: number;
-    if (decoder.decodeBit(state, MODEL_IS_REP + prevKind) !== 0) {
-      const repIndex = decodeTree(decoder, state, MODEL_REP_TREE + prevKind * 3, 2);
-      length = readSlotValue(MODEL_LEN_TREE + LEN_GROUP_REP * 63) + MIN_LEN_REP;
+
+    // Match: resolve the token kind (rep / explicit history / dictionary), then read the
+    // length slot and — for explicit matches — the offset slot through the shared inlined
+    // slot readers below.
+    index = MODEL_IS_REP + prevKind;
+    prob = state[index]!;
+    bound = (range >>> PROB_BITS) * prob;
+    if (code >>> 0 < bound) {
+      range = bound >>> 0;
+      state[index] = prob + ((PROB_SCALE - prob) >> ADAPT_SHIFT);
+      bit = 0;
+    } else {
+      code = (code - bound) >>> 0;
+      range = (range - bound) >>> 0;
+      state[index] = prob - (prob >> ADAPT_SHIFT);
+      bit = 1;
+    }
+    if (range < TOP) {
+      if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+      code = ((code << 8) | body[bpos++]!) >>> 0;
+      range = (range << 8) >>> 0;
+    }
+
+    let repIndex = -1;
+    let lenTreeBase: number;
+    let offGroup = -1;
+    if (bit !== 0) {
+      let node = 1;
+      for (let i = 0; i < 2; i++) {
+        index = MODEL_REP_TREE + prevKind * 3 + node - 1;
+        prob = state[index]!;
+        bound = (range >>> PROB_BITS) * prob;
+        if (code >>> 0 < bound) {
+          range = bound >>> 0;
+          state[index] = prob + ((PROB_SCALE - prob) >> ADAPT_SHIFT);
+          node = node << 1;
+        } else {
+          code = (code - bound) >>> 0;
+          range = (range - bound) >>> 0;
+          state[index] = prob - (prob >> ADAPT_SHIFT);
+          node = (node << 1) | 1;
+        }
+        if (range < TOP) {
+          if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+          code = ((code << 8) | body[bpos++]!) >>> 0;
+          range = (range << 8) >>> 0;
+        }
+      }
+      repIndex = node - 4;
+      lenTreeBase = MODEL_LEN_TREE + LEN_GROUP_REP * 63;
+    } else {
+      index = MODEL_IS_DICT + prevKind;
+      prob = state[index]!;
+      bound = (range >>> PROB_BITS) * prob;
+      if (code >>> 0 < bound) {
+        range = bound >>> 0;
+        state[index] = prob + ((PROB_SCALE - prob) >> ADAPT_SHIFT);
+        bit = 0;
+      } else {
+        code = (code - bound) >>> 0;
+        range = (range - bound) >>> 0;
+        state[index] = prob - (prob >> ADAPT_SHIFT);
+        bit = 1;
+      }
+      if (range < TOP) {
+        if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+        code = ((code << 8) | body[bpos++]!) >>> 0;
+        range = (range << 8) >>> 0;
+      }
+      if (bit === 0) {
+        lenTreeBase = MODEL_LEN_TREE + LEN_GROUP_HISTORY * 63;
+        offGroup = OFF_GROUP_HISTORY;
+      } else {
+        lenTreeBase = MODEL_LEN_TREE + LEN_GROUP_DICT * 63;
+        offGroup = OFF_GROUP_DICT;
+      }
+    }
+
+    // Length slot: a SLOT_TREE_BITS tree walk plus raw extra bits.
+    let node = 1;
+    for (let i = 0; i < SLOT_TREE_BITS; i++) {
+      index = lenTreeBase + node - 1;
+      prob = state[index]!;
+      bound = (range >>> PROB_BITS) * prob;
+      if (code >>> 0 < bound) {
+        range = bound >>> 0;
+        state[index] = prob + ((PROB_SCALE - prob) >> ADAPT_SHIFT);
+        node = node << 1;
+      } else {
+        code = (code - bound) >>> 0;
+        range = (range - bound) >>> 0;
+        state[index] = prob - (prob >> ADAPT_SHIFT);
+        node = (node << 1) | 1;
+      }
+      if (range < TOP) {
+        if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+        code = ((code << 8) | body[bpos++]!) >>> 0;
+        range = (range << 8) >>> 0;
+      }
+    }
+    const lenSlot = node - (1 << SLOT_TREE_BITS);
+    if (lenSlot >= LENGTH_SLOT_COUNT) throw new TokzipDecodeError('invalid symbol');
+    let extra = extraBitsOf(lenSlot);
+    let extraValue = 0;
+    for (let i = 0; i < extra; i++) {
+      range = range >>> 1;
+      if (code >>> 0 >= range) {
+        code = (code - range) >>> 0;
+        extraValue = extraValue * 2 + 1;
+      } else {
+        extraValue = extraValue * 2;
+      }
+      if (range < TOP) {
+        if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+        code = ((code << 8) | body[bpos++]!) >>> 0;
+        range = (range << 8) >>> 0;
+      }
+    }
+    const length = valueOfSlot(lenSlot, extraValue) + MIN_LEN_REP;
+
+    // Offset slot (explicit history/dictionary matches only), same shape as the length slot.
+    let offValue = 0;
+    if (offGroup >= 0) {
+      const offTreeBase = MODEL_OFF_TREE + (offGroup * 4 + offLenBucketOf(length)) * 63;
+      node = 1;
+      for (let i = 0; i < SLOT_TREE_BITS; i++) {
+        index = offTreeBase + node - 1;
+        prob = state[index]!;
+        bound = (range >>> PROB_BITS) * prob;
+        if (code >>> 0 < bound) {
+          range = bound >>> 0;
+          state[index] = prob + ((PROB_SCALE - prob) >> ADAPT_SHIFT);
+          node = node << 1;
+        } else {
+          code = (code - bound) >>> 0;
+          range = (range - bound) >>> 0;
+          state[index] = prob - (prob >> ADAPT_SHIFT);
+          node = (node << 1) | 1;
+        }
+        if (range < TOP) {
+          if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+          code = ((code << 8) | body[bpos++]!) >>> 0;
+          range = (range << 8) >>> 0;
+        }
+      }
+      const offSlot = node - (1 << SLOT_TREE_BITS);
+      if (offSlot >= OFFSET_SLOT_COUNT) throw new TokzipDecodeError('invalid symbol');
+      extra = extraBitsOf(offSlot);
+      extraValue = 0;
+      for (let i = 0; i < extra; i++) {
+        range = range >>> 1;
+        if (code >>> 0 >= range) {
+          code = (code - range) >>> 0;
+          extraValue = extraValue * 2 + 1;
+        } else {
+          extraValue = extraValue * 2;
+        }
+        if (range < TOP) {
+          if (bpos >= end) throw new TokzipDecodeError('truncated range-coded body');
+          code = ((code << 8) | body[bpos++]!) >>> 0;
+          range = (range << 8) >>> 0;
+        }
+      }
+      offValue = valueOfSlot(offSlot, extraValue);
+    }
+
+    if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
+    if (repIndex >= 0) {
       let dist: number;
       if (repIndex === 0) dist = rep0;
       else if (repIndex === 1) {
@@ -406,40 +651,38 @@ function decodeSmallCore(
         rep1 = rep0;
         rep0 = dist;
       }
-      if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
       copyHistory(out, produced, dist, length);
-      produced += length;
       prevKind = TOKEN_KIND_REP0 + repIndex;
-    } else if (decoder.decodeBit(state, MODEL_IS_DICT + prevKind) === 0) {
-      length = readSlotValue(MODEL_LEN_TREE + LEN_GROUP_HISTORY * 63) + MIN_LEN_REP;
-      const dist = readSlotValue(MODEL_OFF_TREE + (OFF_GROUP_HISTORY * 4 + offLenBucketOf(length)) * 63) + 1;
+    } else if (offGroup === OFF_GROUP_HISTORY) {
+      const dist = offValue + 1;
       rep3 = rep2;
       rep2 = rep1;
       rep1 = rep0;
       rep0 = dist;
-      if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
       copyHistory(out, produced, dist, length);
-      produced += length;
       prevKind = TOKEN_KIND_HISTORY;
     } else {
-      length = readSlotValue(MODEL_LEN_TREE + LEN_GROUP_DICT * 63) + MIN_LEN_REP;
-      const start = readSlotValue(MODEL_OFF_TREE + (OFF_GROUP_DICT * 4 + offLenBucketOf(length)) * 63);
-      if (produced + length > target) throw new TokzipDecodeError('declared size exceeded');
+      const start = offValue;
       if (start + length <= dictionary.length) {
-        out.set(dictionary.subarray(start, start + length), produced);
+        if (length <= 16) {
+          // Avoid the per-match subarray allocation for the dominant short matches.
+          for (let i = 0; i < length; i++) out[produced + i] = dictionary[start + i]!;
+        } else {
+          out.set(dictionary.subarray(start, start + length), produced);
+        }
       } else if (tracker) {
         copyExtendedDictMatch(out, produced, start, length, language, tracker);
       } else {
         throw new TokzipDecodeError('dictionary match out of bounds');
       }
-      produced += length;
       prevKind = TOKEN_KIND_DICT;
     }
+    produced += length;
     prevByte = out[produced - 1]!;
   }
   // Canonical framing: the decoder must have consumed the whole payload up to the channel's
   // zero padding, and the padding itself must be zero.
-  const consumed = decoder.position;
+  const consumed = bpos;
   if (end - consumed > padAllowance) throw new TokzipDecodeError('trailing characters after payload');
   for (let i = consumed; i < end; i++) {
     if (body[i] !== 0) throw new TokzipDecodeError('non-zero padding bits');
@@ -451,11 +694,22 @@ function decodeSmallCore(
 
 function copyHistory(buffer: Uint8Array, at: number, dist: number, length: number): void {
   if (dist < 1 || dist > at) throw new TokzipDecodeError('history match out of bounds');
-  if (dist >= length) {
-    buffer.copyWithin(at, at - dist, at - dist + length);
-  } else {
-    // Overlap-copy: history matches may copy bytes produced by the same match.
-    const from = at - dist;
+  const from = at - dist;
+  if (length <= 16) {
+    // Short matches dominate; a plain forward byte loop beats copyWithin's call overhead
+    // and handles overlap (dist < length) correctly by construction.
     for (let i = 0; i < length; i++) buffer[at + i] = buffer[from + i]!;
+  } else if (dist >= length) {
+    buffer.copyWithin(at, from, from + length);
+  } else {
+    // Overlapping long match: extend the dist-periodic pattern by doubling. Each step's
+    // source [from, from + n) ends at or before the destination `at + copied`, so
+    // copyWithin's memmove semantics match the required forward-copy semantics.
+    let copied = 0;
+    while (copied < length) {
+      const n = Math.min(dist + copied, length - copied);
+      buffer.copyWithin(at + copied, from, from + n);
+      copied += n;
+    }
   }
 }

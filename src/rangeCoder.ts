@@ -12,12 +12,12 @@ import { TokzipDecodeError } from './errors.ts';
 export const PROB_BITS = 11;
 export const PROB_SCALE = 1 << PROB_BITS;
 /** Adaptation rate: the update moves 1/2^ADAPT_SHIFT of the distance to the extreme. */
-const ADAPT_SHIFT = 5;
+export const ADAPT_SHIFT = 5;
 /** Priors are clamped inside this margin so both symbols always stay codable. */
 export const PROB_MIN = 31;
 export const PROB_MAX = PROB_SCALE - PROB_MIN;
 
-const TOP = 1 << 24;
+export const TOP = 1 << 24;
 
 /** Exact-enough bit prices for the parser: PRICE_TABLE[p >> 4] ≈ -log2(p / PROB_SCALE). */
 const PRICE_TABLE = new Float64Array(PROB_SCALE >> 4);
