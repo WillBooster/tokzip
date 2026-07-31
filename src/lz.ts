@@ -269,7 +269,10 @@ const candLen = new Int32Array(2 * (OPTIMAL_DEPTH_SHORT + OPTIMAL_DEPTH));
 // Matching-statistics scratch for the suffix-automaton dictionary matcher.
 let msLenScratch = new Int32Array(0);
 let msStateScratch = new Int32Array(0);
-// Suffix-link chain states collected per position (below CUT_LEN, so bounded).
+// Pareto-parent chain states collected per position. The chain cannot overflow this stack
+// regardless of dictionary size or content: each paretoParent link strictly decreases the
+// occurrence's offset slot (see dictMatcher.ts), so the chain has at most OFFSET_SLOT_COUNT
+// (40) entries — well under CUT_LEN (128).
 const samStateStack = new Int32Array(CUT_LEN);
 
 function headFor(pool: Map<number, Int32Array>, bits: number): Int32Array {
