@@ -136,24 +136,22 @@ if (xz.status === 0) {
 
 /** Text-channel competitors: binary codecs behind unpadded base64url, plus lz-string. */
 export const competitors: Competitor[] = [
-  ...binaryCodecs.map(
-    (codec): Competitor => ({
-      name: `b64url(${codec.name})`,
-      // Unpadded base64url is the shortest standard URL-safe framing and is therefore a
-      // stronger baseline than the padded base64 previously used by this benchmark.
-      compress: (input) => {
-        const out = codec.compress(encoder.encode(input));
-        return out instanceof Promise
-          ? out.then((bytes) => Buffer.from(bytes).toString('base64url'))
-          : Buffer.from(out).toString('base64url');
-      },
-      decompress: (encoded) => {
-        const out = codec.decompress(Buffer.from(encoded, 'base64url'));
-        return out instanceof Promise ? out.then((bytes) => decoder.decode(bytes)) : decoder.decode(out);
-      },
-      speedExempt: codec.speedExempt,
-    })
-  ),
+  ...binaryCodecs.map((codec): Competitor => ({
+    name: `b64url(${codec.name})`,
+    // Unpadded base64url is the shortest standard URL-safe framing and is therefore a
+    // stronger baseline than the padded base64 previously used by this benchmark.
+    compress: (input) => {
+      const out = codec.compress(encoder.encode(input));
+      return out instanceof Promise
+        ? out.then((bytes) => Buffer.from(bytes).toString('base64url'))
+        : Buffer.from(out).toString('base64url');
+    },
+    decompress: (encoded) => {
+      const out = codec.decompress(Buffer.from(encoded, 'base64url'));
+      return out instanceof Promise ? out.then((bytes) => decoder.decode(bytes)) : decoder.decode(out);
+    },
+    speedExempt: codec.speedExempt,
+  })),
   {
     name: 'lz-string URI',
     compress: compressToEncodedURIComponent,
