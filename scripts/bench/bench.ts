@@ -134,25 +134,21 @@ const { binary: BINARY_CHANNEL } = parseChannel(process.argv.slice(2));
 const METHODS: BenchMethod[] = BINARY_CHANNEL
   ? [
       tokzipMethod('binary'),
-      ...binaryCompetitors.map(
-        (competitor): BenchMethod => ({
-          name: competitor.name,
-          compress: (doc) => competitor.compress(doc.content),
-          decompress: (encoded) => competitor.decompress(encoded as Uint8Array),
-          speedExempt: competitor.speedExempt,
-        })
-      ),
+      ...binaryCompetitors.map((competitor): BenchMethod => ({
+        name: competitor.name,
+        compress: (doc) => competitor.compress(doc.content),
+        decompress: (encoded) => competitor.decompress(encoded as Uint8Array),
+        speedExempt: competitor.speedExempt,
+      })),
     ]
   : [
       tokzipMethod('text'),
-      ...competitors.map(
-        (competitor): BenchMethod => ({
-          name: competitor.name,
-          compress: (doc) => competitor.compress(doc.content),
-          decompress: (encoded) => competitor.decompress(encoded as string),
-          speedExempt: competitor.speedExempt,
-        })
-      ),
+      ...competitors.map((competitor): BenchMethod => ({
+        name: competitor.name,
+        compress: (doc) => competitor.compress(doc.content),
+        decompress: (encoded) => competitor.decompress(encoded as string),
+        speedExempt: competitor.speedExempt,
+      })),
     ];
 const METHOD_NAMES = METHODS.map((method) => method.name);
 const REFERENCE_METHOD = BINARY_CHANNEL ? REFERENCE_METHOD_BINARY : REFERENCE_METHOD_TEXT;
