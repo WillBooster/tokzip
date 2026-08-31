@@ -266,15 +266,20 @@ fn apply_fence_hints(doc: &[u8], scores: &mut [[i32; LANGUAGE_COUNT]]) {
                 .position(|&b| b == b' ' || b == b'\t')
                 .unwrap_or(rest.len());
             let label_lang = fence_language(&rest[..label_end]);
-            // Close the open fence, if any. A line that also carries a language label opens a
-            // new fence in the same step, so back-to-back labeled blocks each keep their hint.
-            if let Some((lang, from)) = open.take() {
+            // Close the open fence, if any.
+            let closed = open.take();
+            if let Some((lang, from)) = closed {
                 for pos in from..line_start {
                     scores[pos / window][lang as usize] += 1;
                 }
             }
+            // A labeled line re-opens only when it hands off to a *different* language (so
+            // back-to-back `js`/`ts` blocks each keep their hint); a same-label labeled line
+            // (```js … ```js) is just a closing fence and must not re-open the hint.
             if let Some(lang) = label_lang {
-                open = Some((lang, line_end + 1));
+                if closed.map(|(closed_lang, _)| closed_lang) != Some(lang) {
+                    open = Some((lang, line_end + 1));
+                }
             }
         }
         line_start = line_end + 1;

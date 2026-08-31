@@ -26,10 +26,11 @@ pub const MAGIC_VERSION: u8 = 0xD0;
 const FLAG_BYTES: u8 = 0b01;
 const FLAG_STORED: u8 = 0b10;
 const FLAG_MULTI: u8 = 0b100;
-/// Upper bound on a coded frame's declared decompressed length (stored frames carry their
-/// content verbatim and need no cap). Sized for the intended at-rest payloads (prompts, LLM
-/// outputs, cache entries) and a 128 MiB Cloudflare Workers isolate; a document larger than
-/// this decompressed must be split by the caller.
+/// Upper bound on a coded frame's declared decompressed length, so a corrupt or forged header
+/// cannot drive a large allocation. Sized for the intended at-rest payloads (prompts, LLM
+/// outputs, cache entries) and a 128 MiB Cloudflare Workers isolate. Content larger than this
+/// cannot be represented as a coded frame: `compress` falls back to a stored frame (which has
+/// no cap and carries the content verbatim), so nothing is rejected — it just is not coded.
 const MAX_DECOMPRESSED_LEN: u64 = 64 * 1024 * 1024;
 /// Upper bound on how much a coded body may expand: the codec tops out near 7,000× on
 /// degenerate runs, so a declared length beyond this is a forged header and is rejected
@@ -159,8 +160,14 @@ fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     // smaller inputs; larger inputs are dominated by one real language anyway.
     const MULTI_CANDIDATE_MAX: usize = 64 * 1024;
     if content.len() <= MULTI_CANDIDATE_MAX {
+        let candidates = lang::candidate_languages(content);
         let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
-        for lang in lang::candidate_languages(content) {
+        // Search only when detection is uncertain — a multi-segment split, or a single language
+        // that is not the strongest dictionary match (the fence-hint-overwhelm case). A
+        // confident single-language detection is trusted, trading a few bytes on rare ties for
+        // not running extra parses on the common pure-single-language document.
+        let search = detected_single != candidates.first().copied();
+        for lang in candidates.into_iter().take_while(|_| search) {
             if Some(lang) == detected_single {
                 continue;
             }

@@ -39,11 +39,13 @@ export default {
     }
     if (route === 'decompress') {
       // Pre-compressed by /load (which the driver calls first) so this request times only
-      // decompression; the fallback keeps the route usable when hit directly.
+      // decompression. If the isolate differs from the one /load warmed, `cached` is false and
+      // the request also compressed once — the driver must discard that contaminated row.
+      const cached = FRAMES.has(sample);
       const frame = FRAMES.get(sample) ?? codec.compress(text);
       let ok = true;
       for (let i = 0; i < iterations; i++) ok &&= codec.decompress(frame) === text;
-      return new Response(`${sample}: ${ok ? 'round-trip ok' : 'MISMATCH'} x${iterations}`);
+      return new Response(`${sample}: ${ok ? 'round-trip ok' : 'MISMATCH'} cached=${cached} x${iterations}`);
     }
     return new Response('unknown route', { status: 404 });
   },
