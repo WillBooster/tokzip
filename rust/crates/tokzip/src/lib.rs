@@ -78,8 +78,7 @@ pub fn compress(content: &[u8], is_bytes: bool) -> Vec<u8> {
     let type_flag = if is_bytes { FLAG_BYTES } else { 0 };
     let crc = content_crc(content, is_bytes);
     if !content.is_empty() {
-        let segments = lang::segment(content);
-        let body = lz::encode_doc(&lang::primed, content, &segments);
+        let (segments, body) = best_segmentation(content);
         let mut frame = Vec::with_capacity(16 + segments.len() * 4 + body.len());
         frame.push(MAGIC_VERSION);
         frame.push(type_flag | if segments.len() > 1 { FLAG_MULTI } else { 0 });
@@ -145,6 +144,40 @@ fn content_crc(content: &[u8], is_bytes: bool) -> u32 {
     hasher.update(content);
     hasher.update(&[u8::from(is_bytes)]);
     hasher.finalize()
+}
+
+/// Codes `content` with the detected per-segment languages and, for smaller inputs, with each
+/// top candidate language as a single segment, returning whichever is smallest. This bounds the
+/// automatic detector from below by the best single-language coding it considers, so an
+/// interleaved prose+code document is never coded worse than treating it as one language.
+fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
+    let mut best_segments = lang::segment(content);
+    let mut best_body = lz::encode_doc(&lang::primed, content, &best_segments);
+    let candidates = lang::candidate_languages(content);
+    let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
+    // Fast path: when the detector settled on the single language the dictionaries match best,
+    // trust it — no alternative encode is worth trying, so pure single-language documents (the
+    // common case) pay nothing extra. Only when the detector diverged (a different single
+    // language, or a multi-segment split) are the candidates coded and the smallest kept.
+    // The extra encodes cost one full parse each, so they are limited to smaller inputs.
+    const MULTI_CANDIDATE_MAX: usize = 64 * 1024;
+    if detected_single != candidates.first().copied() && content.len() <= MULTI_CANDIDATE_MAX {
+        for lang in candidates {
+            if Some(lang) == detected_single {
+                continue;
+            }
+            let single = vec![Segment {
+                end: content.len(),
+                lang,
+            }];
+            let body = lz::encode_doc(&lang::primed, content, &single);
+            if body.len() < best_body.len() {
+                best_body = body;
+                best_segments = single;
+            }
+        }
+    }
+    (best_segments, best_body)
 }
 
 fn stored_frame_len(content_len: usize) -> usize {

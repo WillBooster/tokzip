@@ -193,6 +193,30 @@ pub fn segment(doc: &[u8]) -> Vec<Segment> {
     segments
 }
 
+/// Up to `MAX_CANDIDATES` languages whose dictionaries best match `doc` by 4-gram overlap
+/// alone (no fence hint, so prose-dominant documents rank their prose language first). The
+/// encoder codes the document once per candidate and keeps the smallest, so a document whose
+/// windowed segmentation is worse than a single language is never shipped that way.
+pub fn candidate_languages(doc: &[u8]) -> Vec<u8> {
+    if doc.len() < 4 {
+        return vec![LANG_TEXT];
+    }
+    let sets = gram_sets();
+    let mut scores = [0i32; LANGUAGE_COUNT];
+    for pos in 0..doc.len() - 3 {
+        let h = gram_hash(doc, pos);
+        for (lang, set) in sets.iter().enumerate() {
+            scores[lang] += set.contains(h) as i32;
+        }
+    }
+    let mut order: Vec<u8> = (0..LANGUAGE_COUNT as u8).collect();
+    order.sort_by_key(|&lang| std::cmp::Reverse(scores[lang as usize]));
+    order.truncate(MAX_CANDIDATES);
+    order
+}
+
+const MAX_CANDIDATES: usize = 3;
+
 fn best_single(doc: &[u8]) -> u8 {
     if doc.len() < 4 {
         return LANG_TEXT;
