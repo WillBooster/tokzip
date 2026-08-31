@@ -138,8 +138,10 @@ pub fn top_languages(scores: &[i32; LANGUAGE_COUNT]) -> Vec<u8> {
 /// Splits `doc` into language segments and returns the whole-document gram totals (pre-fence)
 /// the split was derived from, so the caller can rank candidate languages without re-scanning.
 pub fn analyze(doc: &[u8]) -> (Vec<Segment>, [i32; LANGUAGE_COUNT]) {
-    let totals = gram_scores(doc);
+    // Short documents have no windows, so they score in one pass; longer ones score per window
+    // below and the whole-document totals are the column sums of those rows (no second scan).
     if doc.len() < WINDOW * 2 {
+        let totals = gram_scores(doc);
         return (
             vec![Segment {
                 end: doc.len(),
@@ -156,6 +158,12 @@ pub fn analyze(doc: &[u8]) -> (Vec<Segment>, [i32; LANGUAGE_COUNT]) {
         let row = &mut scores[pos / WINDOW];
         for (lang, set) in sets.iter().enumerate() {
             row[lang] += set.contains(h) as i32;
+        }
+    }
+    let mut totals = [0i32; LANGUAGE_COUNT];
+    for row in &scores {
+        for (lang, &score) in row.iter().enumerate() {
+            totals[lang] += score;
         }
     }
     apply_fence_hints(doc, &mut scores);

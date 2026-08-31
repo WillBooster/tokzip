@@ -156,10 +156,11 @@ fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     let (mut best_segments, gram_scores) = lang::analyze(content);
     let mut best_body = lz::encode_doc(&lang::primed, content, &best_segments);
     let mut best_cost = best_body.len() + segment_table_len(&best_segments);
-    // The candidate search runs up to MAX_CANDIDATES extra full optimal parses, so it is
-    // limited to small inputs where that is a few milliseconds; larger inputs are dominated by
-    // one real language and rely on detection alone. (At 16 KiB, ~3 extra parses ≈ 3 ms.)
-    const MULTI_CANDIDATE_MAX: usize = 16 * 1024;
+    // The candidate search runs up to MAX_CANDIDATES extra full optimal parses, so it is limited
+    // to small inputs where that stays cheap (a candidate parse is ~0.35 ms at 4 KiB, so the
+    // search adds ~1 ms); larger inputs are dominated by one real language and rely on
+    // detection alone, which the fence handling keeps robust.
+    const MULTI_CANDIDATE_MAX: usize = 4 * 1024;
     if content.len() <= MULTI_CANDIDATE_MAX {
         let candidates = lang::top_languages(&gram_scores);
         let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
