@@ -146,23 +146,21 @@ fn content_crc(content: &[u8], is_bytes: bool) -> u32 {
     hasher.finalize()
 }
 
-/// Codes `content` with the detected per-segment languages and, for smaller inputs, with each
-/// top candidate language as a single segment, returning whichever is smallest. This bounds the
-/// automatic detector from below by the best single-language coding it considers, so an
-/// interleaved prose+code document is never coded worse than treating it as one language.
+/// Codes `content` with the detected per-segment languages and, for inputs small enough that
+/// the extra parses are cheap, also as each top candidate language as a single segment,
+/// returning whichever yields the smallest whole frame. Comparing full frame length (body plus
+/// the segment table, which differs between single- and multi-segment frames) keeps a
+/// multi-segment coding only when it actually ships smaller than every single language tried.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     let mut best_segments = lang::segment(content);
     let mut best_body = lz::encode_doc(&lang::primed, content, &best_segments);
-    let candidates = lang::candidate_languages(content);
-    let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
-    // Fast path: when the detector settled on the single language the dictionaries match best,
-    // trust it — no alternative encode is worth trying, so pure single-language documents (the
-    // common case) pay nothing extra. Only when the detector diverged (a different single
-    // language, or a multi-segment split) are the candidates coded and the smallest kept.
-    // The extra encodes cost one full parse each, so they are limited to smaller inputs.
+    let mut best_cost = best_body.len() + segment_table_len(&best_segments);
+    // The extra single-language encodes cost one full parse each, so they are limited to
+    // smaller inputs; larger inputs are dominated by one real language anyway.
     const MULTI_CANDIDATE_MAX: usize = 64 * 1024;
-    if detected_single != candidates.first().copied() && content.len() <= MULTI_CANDIDATE_MAX {
-        for lang in candidates {
+    if content.len() <= MULTI_CANDIDATE_MAX {
+        let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
+        for lang in lang::candidate_languages(content) {
             if Some(lang) == detected_single {
                 continue;
             }
@@ -171,13 +169,30 @@ fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
                 lang,
             }];
             let body = lz::encode_doc(&lang::primed, content, &single);
-            if body.len() < best_body.len() {
+            let cost = body.len() + segment_table_len(&single);
+            if cost < best_cost {
+                best_cost = cost;
                 best_body = body;
                 best_segments = single;
             }
         }
     }
     (best_segments, best_body)
+}
+
+/// Bytes the segment table occupies in a frame: one language byte for a single segment, else
+/// the segment-count varint plus a language byte and length varint per segment (see `compress`).
+fn segment_table_len(segments: &[Segment]) -> usize {
+    if segments.len() == 1 {
+        return 1;
+    }
+    let mut len = varint_len(segments.len() as u64);
+    let mut start = 0;
+    for segment in segments {
+        len += 1 + varint_len((segment.end - start) as u64);
+        start = segment.end;
+    }
+    len
 }
 
 fn stored_frame_len(content_len: usize) -> usize {

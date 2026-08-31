@@ -1299,8 +1299,10 @@ pub fn decode_doc(
         lang_models.put(seg.lang, models);
     }
     // Canonical bodies: the encoder trims trailing zero bytes, so every body byte must have
-    // been consumed — trailing bytes beyond what the coder read are a structural error.
-    if out.len() != out_len || rc.consumed() < body.len() {
+    // been consumed — trailing bytes beyond what the coder read are a structural error. The
+    // overrun flag is re-checked here in case the padding budget was crossed inside the final
+    // token, after the last loop-top check.
+    if out.len() != out_len || rc.consumed() < body.len() || rc.overran() {
         return Err(DecodeError::Corrupt);
     }
     Ok(out)

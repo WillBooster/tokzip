@@ -193,22 +193,30 @@ pub fn segment(doc: &[u8]) -> Vec<Segment> {
     segments
 }
 
+/// 4-gram overlap of `doc` against each language's dictionary (no fence hint). The shared
+/// scoring pass behind both single-language ranking and the windowed segmentation.
+fn gram_scores(doc: &[u8]) -> [i32; LANGUAGE_COUNT] {
+    let mut scores = [0i32; LANGUAGE_COUNT];
+    if doc.len() >= 4 {
+        let sets = gram_sets();
+        for pos in 0..doc.len() - 3 {
+            let h = gram_hash(doc, pos);
+            for (lang, set) in sets.iter().enumerate() {
+                scores[lang] += set.contains(h) as i32;
+            }
+        }
+    }
+    scores
+}
+
 /// Up to `MAX_CANDIDATES` languages whose dictionaries best match `doc` by 4-gram overlap
 /// alone (no fence hint, so prose-dominant documents rank their prose language first). The
-/// encoder codes the document once per candidate and keeps the smallest, so a document whose
-/// windowed segmentation is worse than a single language is never shipped that way.
+/// encoder codes the document as each and keeps the smallest frame.
 pub fn candidate_languages(doc: &[u8]) -> Vec<u8> {
     if doc.len() < 4 {
         return vec![LANG_TEXT];
     }
-    let sets = gram_sets();
-    let mut scores = [0i32; LANGUAGE_COUNT];
-    for pos in 0..doc.len() - 3 {
-        let h = gram_hash(doc, pos);
-        for (lang, set) in sets.iter().enumerate() {
-            scores[lang] += set.contains(h) as i32;
-        }
-    }
+    let scores = gram_scores(doc);
     let mut order: Vec<u8> = (0..LANGUAGE_COUNT as u8).collect();
     order.sort_by_key(|&lang| std::cmp::Reverse(scores[lang as usize]));
     order.truncate(MAX_CANDIDATES);
@@ -221,14 +229,7 @@ fn best_single(doc: &[u8]) -> u8 {
     if doc.len() < 4 {
         return LANG_TEXT;
     }
-    let sets = gram_sets();
-    let mut scores = [0i32; LANGUAGE_COUNT];
-    for pos in 0..doc.len() - 3 {
-        let h = gram_hash(doc, pos);
-        for (lang, set) in sets.iter().enumerate() {
-            scores[lang] += set.contains(h) as i32;
-        }
-    }
+    let mut scores = gram_scores(doc);
     let mut hinted = vec![[0i32; LANGUAGE_COUNT]; 1];
     apply_fence_hints(doc, &mut hinted);
     for lang in 0..LANGUAGE_COUNT {
