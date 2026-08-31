@@ -27,10 +27,9 @@ const FLAG_BYTES: u8 = 0b01;
 const FLAG_STORED: u8 = 0b10;
 const FLAG_MULTI: u8 = 0b100;
 /// Upper bound on a coded frame's declared decompressed length, so a corrupt or forged header
-/// cannot drive a large allocation. Sized for the intended at-rest payloads (prompts, LLM
-/// outputs, cache entries) and a 128 MiB Cloudflare Workers isolate. Content larger than this
-/// cannot be represented as a coded frame: `compress` falls back to a stored frame (which has
-/// no cap and carries the content verbatim), so nothing is rejected — it just is not coded.
+/// cannot drive a large allocation, and the ceiling above which `compress` skips coding (see
+/// there) and stores the content verbatim. Sized for the intended at-rest payloads (prompts,
+/// LLM outputs, cache entries) and a 128 MiB Cloudflare Workers isolate.
 const MAX_DECOMPRESSED_LEN: u64 = 64 * 1024 * 1024;
 /// Upper bound on how much a coded body may expand: the codec tops out near 7,000× on
 /// degenerate runs, so a declared length beyond this is a forged header and is rejected
@@ -78,7 +77,10 @@ impl std::error::Error for DecodeError {}
 pub fn compress(content: &[u8], is_bytes: bool) -> Vec<u8> {
     let type_flag = if is_bytes { FLAG_BYTES } else { 0 };
     let crc = content_crc(content, is_bytes);
-    if !content.is_empty() {
+    // Content above the coded-frame cap can only ship as a stored frame, so it skips coding
+    // entirely — the parser would otherwise allocate match-finder chains several times the
+    // input size before the self-check fell back to stored anyway.
+    if !content.is_empty() && content.len() as u64 <= MAX_DECOMPRESSED_LEN {
         let (segments, body) = best_segmentation(content);
         let mut frame = Vec::with_capacity(16 + segments.len() * 4 + body.len());
         frame.push(MAGIC_VERSION);
@@ -158,8 +160,9 @@ fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     let mut best_cost = best_body.len() + segment_table_len(&best_segments);
     // The candidate search runs up to MAX_CANDIDATES extra full optimal parses, so it is limited
     // to small inputs where that stays cheap (a candidate parse is ~0.35 ms at 4 KiB, so the
-    // search adds ~1 ms); larger inputs are dominated by one real language and rely on
-    // detection alone, which the fence handling keeps robust.
+    // search adds ~1 ms). Above this bound a multi-segment document may code a few tenths of a
+    // percent larger than the best single language, which is not worth several extra optimal
+    // parses on a larger input; only inputs up to here get the never-worse-than-single search.
     const MULTI_CANDIDATE_MAX: usize = 4 * 1024;
     if content.len() <= MULTI_CANDIDATE_MAX {
         let candidates = lang::top_languages(&gram_scores);
