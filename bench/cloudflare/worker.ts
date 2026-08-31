@@ -17,16 +17,23 @@ const SAMPLES: Record<string, string> = samples;
 /** Frames pre-compressed by /load so the /decompress route never times a compression. */
 const FRAMES = new Map<string, Uint8Array>();
 const MAX_ITERATIONS = 1000;
+/** False until the first request on this isolate has paid the module import + wasm instantiate. */
+let warm = false;
 
 export default {
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const [route, sample = ''] = url.pathname.split('/').filter(Boolean);
     if (route === undefined || route === 'noop') return new Response('ok');
+    // A request landing on a cold isolate pays the import + wasm instantiate below inside its
+    // own timing; `warm=false` tells the driver to discard that row (except the first /load,
+    // which is meant to be cold).
+    const wasWarm = warm;
     const codec = await import('../../src/index.ts');
+    warm = true;
     if (route === 'load') {
       for (const [name, text] of Object.entries(SAMPLES)) FRAMES.set(name, codec.compress(text));
-      return new Response(`loaded: ${FRAMES.size} samples`);
+      return new Response(`loaded: ${FRAMES.size} samples warm=${wasWarm}`);
     }
     const text = SAMPLES[sample];
     if (!text) return new Response('unknown sample', { status: 404 });
@@ -35,7 +42,7 @@ export default {
     if (route === 'compress') {
       let size = 0;
       for (let i = 0; i < iterations; i++) size = codec.compress(text).length;
-      return new Response(`${sample}: ${text.length} chars -> ${size} bytes x${iterations}`);
+      return new Response(`${sample}: ${text.length} chars -> ${size} bytes warm=${wasWarm} x${iterations}`);
     }
     if (route === 'decompress') {
       // Pre-compressed by /load (which the driver calls first) so this request times only
@@ -45,7 +52,9 @@ export default {
       const frame = FRAMES.get(sample) ?? codec.compress(text);
       let ok = true;
       for (let i = 0; i < iterations; i++) ok &&= codec.decompress(frame) === text;
-      return new Response(`${sample}: ${ok ? 'round-trip ok' : 'MISMATCH'} cached=${cached} x${iterations}`);
+      return new Response(
+        `${sample}: ${ok ? 'round-trip ok' : 'MISMATCH'} cached=${cached} warm=${wasWarm} x${iterations}`
+      );
     }
     return new Response('unknown route', { status: 404 });
   },

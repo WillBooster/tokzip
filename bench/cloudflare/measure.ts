@@ -54,10 +54,12 @@ interface Row {
 const rows: Row[] = [];
 const record = async (label: string, path: string): Promise<void> => {
   const { ttfb, body } = await hit(path);
-  // A /decompress request that missed the /load-warmed isolate also compressed once (see
-  // worker.ts); the row's CPU then includes that compression and must not be read as pure
-  // decompression, so it is flagged.
-  rows.push({ label, ttfb, contaminated: body.includes('cached=false') });
+  // Discard rows contaminated by a cold isolate: `cached=false` (a /decompress that missed the
+  // /load-warmed isolate compressed once) or `warm=false` (this request paid the module import
+  // + wasm instantiate). The first /load is meant to be cold, so it is never flagged.
+  const contaminated =
+    label !== '/load (first request)' && (body.includes('cached=false') || body.includes('warm=false'));
+  rows.push({ label, ttfb, contaminated });
 };
 await record('/noop', '/noop');
 await record('/load (first request)', '/load');
