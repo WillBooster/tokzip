@@ -7,7 +7,7 @@
 Lossless compressor for **prompts, LLM outputs, and source code** stored at rest — one
 function in, one function out, no options. The codec is Rust compiled to a single
 **wasm module (~450 KB, every dictionary included)** with a thin TypeScript wrapper; it runs
-on Cloudflare Workers, Bun, and Node.
+on Cloudflare Workers and Bun (and on Node via a bundler that handles `.wasm` imports).
 
 ```ts
 import { compress, decompress } from 'tokzip';

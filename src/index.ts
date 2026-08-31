@@ -2,9 +2,12 @@ import wasmModuleOrPath from '../wasm/tokzip.wasm';
 
 /** Thrown when a frame is truncated, corrupt, from another format version, or fails its CRC. */
 export class TokzipDecodeError extends Error {
-  constructor(readonly code: number) {
+  readonly code: number;
+
+  constructor(code: number) {
     super(`tokzip: ${DECODE_ERROR_MESSAGES[code] ?? `decode error ${code}`}`);
     this.name = 'TokzipDecodeError';
+    this.code = code;
   }
 }
 

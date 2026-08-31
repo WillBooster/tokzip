@@ -26,6 +26,15 @@ describe('malformed frames', () => {
     }
   });
 
+  test('a frame whose coded distance overflows 32-bit arithmetic is rejected, not a trap', () => {
+    // Crafted body coding `is_match=1, is_rep=0, is_dict=0, len=2, distance-1 = u32::MAX`:
+    // on the wasm32 build `distance as usize + 1` used to wrap to 0 and trap the module.
+    const forged = Uint8Array.from(
+      'd000020000000000b8a0572bfffc54be70'.match(/../g)!.map((byte) => Number.parseInt(byte, 16))
+    );
+    expect(() => decompress(forged)).toThrow(TokzipDecodeError);
+  });
+
   test('other format versions are rejected, never misdecoded', () => {
     const frame = compress(SAMPLE);
     const bumped = Uint8Array.from(frame);

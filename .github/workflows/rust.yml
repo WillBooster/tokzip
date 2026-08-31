@@ -3,11 +3,17 @@ on:
   pull_request:
     paths:
       - 'rust/**'
+      - 'dict/**'
+      - 'priors/**'
+      - 'wasm/**'
       - '.github/workflows/rust.yml'
   push:
     branches: [main]
     paths:
       - 'rust/**'
+      - 'dict/**'
+      - 'priors/**'
+      - 'wasm/**'
       - '.github/workflows/rust.yml'
 concurrency:
   group: rust-${{ github.workflow }}-${{ github.ref }}
@@ -22,10 +28,10 @@ jobs:
         working-directory: rust
     steps:
       - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-          targets: wasm32-unknown-unknown
+      # mise installs the toolchain mise.toml pins: the committed wasm is byte-compared
+      # below and rustc embeds version-specific bytes, so a floating toolchain would fail
+      # the comparison at every Rust release.
+      - uses: jdx/mise-action@v2
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust

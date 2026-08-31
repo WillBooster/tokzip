@@ -31,8 +31,8 @@ encoder's own decode check fails; empty content is always stored.
 
 The encoder splits the content into language segments (contiguous, covering the whole
 content). Single segment: one byte, the language id. Multi-segment (flag bit 2): a varint
-segment count, then per segment a language-id byte and a varint length; lengths are non-zero
-and sum to `size`.
+segment count (at most 2^20; decoders reject more), then per segment a language-id byte and a
+varint length; lengths are non-zero and sum to `size`.
 
 Language ids (format identity — the dictionaries and priors they name are part of the codec):
 

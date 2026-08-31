@@ -787,7 +787,8 @@ pub fn encode_doc_with_stats(
 /// or rep match after the boundary never addresses a byte that does not exist.
 fn clamp_reps(cs: &mut CoderState, pos: usize, dlen: usize) {
     for rep in &mut cs.reps {
-        if *rep as usize + 1 > pos + dlen {
+        // Width-independent: `*rep as usize + 1` would wrap at u32::MAX on 32-bit targets.
+        if u64::from(*rep) >= (pos + dlen) as u64 {
             *rep = 0;
         }
     }
@@ -1212,10 +1213,11 @@ pub fn decode_doc(
                 let block = LIT + lit_class[prev as usize] as usize * 256;
                 let mut m = 1usize;
                 if cs.prev_was_match() {
-                    let dist = cs.reps[0] as usize + 1;
-                    if dist > pos + dlen {
+                    // u64 compare: `as usize + 1` would wrap at u32::MAX on 32-bit targets.
+                    if u64::from(cs.reps[0]) >= (pos + dlen) as u64 {
                         return Err(DecodeError::Corrupt);
                     }
+                    let dist = cs.reps[0] as usize + 1;
                     let match_byte = u32::from(source_byte(&out, dict, pos, dist));
                     let mut i = 8u32;
                     while i > 0 {
@@ -1255,10 +1257,11 @@ pub fn decode_doc(
             } else {
                 if rc.decode_bit(probs, IS_REP_G0 + cs.state) == 0 {
                     if rc.decode_bit(probs, IS_REP0_LONG + cs.state) == 0 {
-                        let dist = cs.reps[0] as usize + 1;
-                        if dist > pos + dlen {
+                        // u64 compare: `as usize + 1` would wrap at u32::MAX on 32-bit targets.
+                        if u64::from(cs.reps[0]) >= (pos + dlen) as u64 {
                             return Err(DecodeError::Corrupt);
                         }
+                        let dist = cs.reps[0] as usize + 1;
                         let b = source_byte(&out, dict, pos, dist);
                         out.push(b);
                         cs.state = if cs.state < 7 { 9 } else { 11 };
@@ -1279,10 +1282,11 @@ pub fn decode_doc(
                 len = decode_len(&mut rc, probs, REP_LEN);
                 cs.state = state_after_rep(cs.state);
             }
-            let dist = cs.reps[0] as usize + 1;
-            if dist > pos + dlen || pos + len > seg.end {
+            // u64 compare: `as usize + 1` would wrap at u32::MAX on 32-bit targets.
+            if u64::from(cs.reps[0]) >= (pos + dlen) as u64 || pos + len > seg.end {
                 return Err(DecodeError::Corrupt);
             }
+            let dist = cs.reps[0] as usize + 1;
             for _ in 0..len {
                 let p = out.len();
                 let b = source_byte(&out, dict, p, dist);
