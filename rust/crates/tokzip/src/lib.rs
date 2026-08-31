@@ -149,28 +149,29 @@ fn content_crc(content: &[u8], is_bytes: bool) -> u32 {
     hasher.finalize()
 }
 
-/// Codes `content` with the detected per-segment languages and, for inputs small enough that
-/// the extra parses are cheap, also as each top candidate language as a single segment,
-/// returning whichever yields the smallest whole frame. Comparing full frame length (body plus
-/// the segment table, which differs between single- and multi-segment frames) keeps a
-/// multi-segment coding only when it actually ships smaller than every single language tried.
+/// Codes `content` with the detected per-segment languages and returns the smallest whole
+/// frame. For a small input whose detection is uncertain (see the gate below) it also codes
+/// the input as each top candidate language as a single segment and keeps the smallest,
+/// comparing full frame length (body plus the segment table, which differs between single- and
+/// multi-segment frames). A confident single-language detection, or an input above the bound,
+/// is coded as detected without trying alternatives.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     let (mut best_segments, gram_scores) = lang::analyze(content);
     let mut best_body = lz::encode_doc(&lang::primed, content, &best_segments);
     let mut best_cost = best_body.len() + segment_table_len(&best_segments);
     // The candidate search runs up to MAX_CANDIDATES extra full optimal parses, so it is limited
     // to small inputs where that stays cheap (a candidate parse is ~0.35 ms at 4 KiB, so the
-    // search adds ~1 ms). Above this bound a multi-segment document may code a few tenths of a
-    // percent larger than the best single language, which is not worth several extra optimal
-    // parses on a larger input; only inputs up to here get the never-worse-than-single search.
+    // search adds ~1 ms). Above this bound no candidate is tried at all, so a multi-segment
+    // document there may code a few tenths of a percent larger than the best single language.
     const MULTI_CANDIDATE_MAX: usize = 4 * 1024;
     if content.len() <= MULTI_CANDIDATE_MAX {
         let candidates = lang::top_languages(&gram_scores);
         let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
         // Search only when detection is uncertain — a multi-segment split, or a single language
         // that is not the strongest dictionary match (the fence-hint-overwhelm case). A
-        // confident single-language detection is trusted, trading a few bytes on rare ties for
-        // not running extra parses on the common pure-single-language document.
+        // confident single-language detection (its segment is the top gram candidate) is
+        // trusted as-is: it carries no never-worse-than-single guarantee, trading a few bytes on
+        // rare ties for not running extra parses on the common pure-single-language document.
         let search = detected_single != candidates.first().copied();
         for lang in candidates.into_iter().take_while(|_| search) {
             if Some(lang) == detected_single {
