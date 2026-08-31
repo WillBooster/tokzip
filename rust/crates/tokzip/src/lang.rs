@@ -236,21 +236,20 @@ fn apply_fence_hints(doc: &[u8], scores: &mut [[i32; LANGUAGE_COUNT]]) {
         let line = &doc[line_start..line_end];
         let trimmed = line.strip_suffix(b"\r").unwrap_or(line);
         if let Some(rest) = trimmed.strip_prefix(b"```") {
-            match open.take() {
-                Some((lang, from)) => {
-                    for pos in from..line_start {
-                        scores[pos / window][lang as usize] += 1;
-                    }
+            let label_end = rest
+                .iter()
+                .position(|&b| b == b' ' || b == b'\t')
+                .unwrap_or(rest.len());
+            let label_lang = fence_language(&rest[..label_end]);
+            // Close the open fence, if any. A line that also carries a language label opens a
+            // new fence in the same step, so back-to-back labeled blocks each keep their hint.
+            if let Some((lang, from)) = open.take() {
+                for pos in from..line_start {
+                    scores[pos / window][lang as usize] += 1;
                 }
-                None => {
-                    let label_end = rest
-                        .iter()
-                        .position(|&b| b == b' ' || b == b'\t')
-                        .unwrap_or(rest.len());
-                    if let Some(lang) = fence_language(&rest[..label_end]) {
-                        open = Some((lang, line_end + 1));
-                    }
-                }
+            }
+            if let Some(lang) = label_lang {
+                open = Some((lang, line_end + 1));
             }
         }
         line_start = line_end + 1;

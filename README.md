@@ -22,7 +22,8 @@ segment by segment** — a Japanese prompt, a Markdown answer with an HTML block
 trained dictionary and model priors. Embedded languages: `text`, `en-US`, `ja-JP`, `html`,
 `css`, `javascript`, `typescript`; anything else falls back to the closest one.
 
-- **Codec**: LZ77 over the document plus the segment's dictionary, price-optimal parse,
+- **Codec**: LZ77 over the document plus the segment's dictionary, price-based parse (a
+  bounded shortest-path over 4 KB chunks, not a global optimum),
   adaptive binary range coder (LZMA-style symbol layout) whose models start from trained
   per-language priors — short documents get the benefit of the statistics immediately, long
   documents adapt to themselves. Matches into the dictionary are coded as absolute

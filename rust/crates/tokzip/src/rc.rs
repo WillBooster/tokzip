@@ -2,6 +2,12 @@
 //! Probabilities live in the caller's flat model array and are addressed by index, so the
 //! encoder can optionally count the bits coded at each node (used by the priors trainer).
 
+/// The decoder synthesizes zero bytes past the body end (so a body whose final pad byte the
+/// coder consumes still decodes); the encoder trims at most this many trailing zero bytes and
+/// the decoder rejects a frame that needs more synthetic bytes than this, bounding the work a
+/// short forged body can drive.
+pub const PAD_BUDGET: usize = 4096;
+
 pub const PROB_BITS: u32 = 11;
 pub const PROB_INIT: u16 = 1 << (PROB_BITS - 1);
 const ADAPT_SHIFT: u32 = 5;
@@ -92,8 +98,12 @@ impl Encoder {
         let mut out = self.out;
         debug_assert_eq!(out.first(), Some(&0));
         out.remove(0);
-        while out.last() == Some(&0) {
+        // Trim trailing zeros the decoder can re-synthesize, but never more than PAD_BUDGET,
+        // so the decoder never needs more than PAD_BUDGET synthetic bytes for a valid frame.
+        let mut trimmed = 0;
+        while trimmed < PAD_BUDGET && out.last() == Some(&0) {
             out.pop();
+            trimmed += 1;
         }
         out
     }
@@ -118,6 +128,10 @@ pub struct Decoder<'a> {
     range: u32,
     buf: &'a [u8],
     pos: usize,
+    /// Zero bytes read past the body end; once it exceeds `PAD_BUDGET`, `overran` latches and
+    /// the frame is `Corrupt` — no valid frame needs more than `PAD_BUDGET` synthetic bytes.
+    synthetic: usize,
+    overran: bool,
 }
 
 impl<'a> Decoder<'a> {
@@ -127,6 +141,8 @@ impl<'a> Decoder<'a> {
             range: u32::MAX,
             buf,
             pos: 0,
+            synthetic: 0,
+            overran: false,
         };
         for _ in 0..4 {
             d.code = (d.code << 8) | u32::from(d.next_byte());
@@ -198,11 +214,24 @@ impl<'a> Decoder<'a> {
         self.pos
     }
 
+    /// True once the decoder has read more zero-padding bytes past the body than `PAD_BUDGET`;
+    /// the caller must reject such a frame instead of letting it fabricate unbounded output.
+    pub fn overran(&self) -> bool {
+        self.overran
+    }
+
     #[inline]
     fn next_byte(&mut self) -> u8 {
         // Corrupt/truncated input decodes to garbage that the frame CRC rejects; feeding zeros
-        // past the end keeps the hot path branch-light.
-        let b = self.buf.get(self.pos).copied().unwrap_or(0);
+        // past the end keeps the hot path branch-light. Synthetic zeros are budgeted (see
+        // `overran`) so a short forged body cannot drive unbounded output.
+        let b = if self.pos < self.buf.len() {
+            self.buf[self.pos]
+        } else {
+            self.synthetic += 1;
+            self.overran |= self.synthetic > PAD_BUDGET;
+            0
+        };
         self.pos += 1;
         b
     }

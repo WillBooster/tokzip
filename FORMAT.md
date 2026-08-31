@@ -17,8 +17,8 @@ frame := 0xD0 flags sizeVarint crc32 body
 - `flags`: bit 0 = content type (0 = UTF-8 string, 1 = bytes); bit 1 = stored; bit 2 =
   multi-segment (never together with stored). Other bits are a structural error.
 - `sizeVarint`: decompressed length in bytes. For coded frames decoders reject a length above
-  256 MiB or above 8192 × the body length (the codec never expands that far) before
-  allocating anything.
+  64 MiB or above 8192 × the body length before allocating anything, and reject a frame whose
+  coded body needs more than a fixed synthetic-padding budget past its end while decoding.
 - `crc32`: IEEE CRC-32 of the decompressed content followed by one type byte (0x00 string,
   0x01 bytes), so a retyped frame fails the check; decoders verify it before returning.
 - `body`: stored → the content itself (exactly `size` bytes). Otherwise a segment table then

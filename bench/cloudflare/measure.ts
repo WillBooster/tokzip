@@ -12,7 +12,18 @@ const wrangler = process.argv[3] ?? 'wrangler';
 const base = `https://${name}.willbooster.workers.dev`;
 const ITERATIONS: Record<string, number> = { 'ja-prompt-1k': 200, 'ts-source-4k': 50, 'mixed-answer-20k': 10 };
 
+let done = false;
 const tail = spawn(wrangler, ['tail', name, '--format', 'json'], { stdio: ['ignore', 'pipe', 'inherit'] });
+tail.on('error', (error) => {
+  console.error(`failed to start \`${wrangler} tail\`: ${error.message}`);
+  process.exit(1);
+});
+tail.on('exit', (code) => {
+  if (!done) {
+    console.error(`\`${wrangler} tail\` exited early with code ${code}`);
+    process.exit(1);
+  }
+});
 const events: { url: string; cpuMs: number }[] = [];
 // `wrangler tail --format json` prints one pretty-printed object per event; objects are
 // reassembled from lines (stream chunks are not line-aligned) and parsed at each top-level `}`.
@@ -29,8 +40,10 @@ await Bun.sleep(4000);
 async function hit(path: string): Promise<number> {
   const started = performance.now();
   const response = await fetch(`${base}${path}`);
+  // Time to first byte: measured when headers arrive, before the body is drained.
+  const ttfb = performance.now() - started;
   await response.text();
-  return performance.now() - started;
+  return ttfb;
 }
 
 const rows: [string, number][] = [
@@ -43,6 +56,7 @@ for (const [sample, iterations] of Object.entries(ITERATIONS)) {
   rows.push([`/decompress/${sample} x${iterations}`, await hit(`/decompress/${sample}?iters=${iterations}`)]);
 }
 await Bun.sleep(3000);
+done = true;
 tail.kill();
 console.log(
   `${name}: ${'request'.padEnd(36)} ${'ttfb ms'.padStart(9)} ${'cpu ms'.padStart(9)} ${'cpu ms/iter'.padStart(12)}`

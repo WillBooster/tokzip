@@ -27,8 +27,10 @@ const FLAG_BYTES: u8 = 0b01;
 const FLAG_STORED: u8 = 0b10;
 const FLAG_MULTI: u8 = 0b100;
 /// Upper bound on a coded frame's declared decompressed length (stored frames carry their
-/// content verbatim and need no cap).
-const MAX_DECOMPRESSED_LEN: u64 = 256 * 1024 * 1024;
+/// content verbatim and need no cap). Sized for the intended at-rest payloads (prompts, LLM
+/// outputs, cache entries) and a 128 MiB Cloudflare Workers isolate; a document larger than
+/// this decompressed must be split by the caller.
+const MAX_DECOMPRESSED_LEN: u64 = 64 * 1024 * 1024;
 /// Upper bound on how much a coded body may expand: the codec tops out near 7,000× on
 /// degenerate runs, so a declared length beyond this is a forged header and is rejected
 /// before any output is allocated (a corrupt varint cannot force a large allocation).
@@ -117,6 +119,9 @@ pub fn compress(content: &[u8], is_bytes: bool) -> Vec<u8> {
 /// the public API detects the language).
 #[doc(hidden)]
 pub fn frame_len_with_language(content: &[u8], lang: usize) -> usize {
+    if lang >= lang::LANGUAGE_COUNT {
+        return usize::MAX;
+    }
     let segments = [Segment {
         end: content.len(),
         lang: lang as u8,

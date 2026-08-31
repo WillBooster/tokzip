@@ -1202,6 +1202,9 @@ pub fn decode_doc(
         let mut models = lang_models.take(seg.lang);
         let lit_class = models.lit_class;
         while out.len() < seg.end {
+            if rc.overran() {
+                return Err(DecodeError::Corrupt);
+            }
             let pos = out.len();
             let probs = &mut models.probs;
             if rc.decode_bit(probs, IS_MATCH + cs.state) == 0 {
