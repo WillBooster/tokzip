@@ -52,7 +52,6 @@ pub const LANGUAGES: [(&str, &[u8], &[u8]); 7] = [
     ),
 ];
 pub const LANGUAGE_COUNT: usize = LANGUAGES.len();
-const LANG_TEXT: u8 = 0;
 const LANG_HTML: u8 = 3;
 const LANG_CSS: u8 = 4;
 const LANG_JAVASCRIPT: u8 = 5;
@@ -124,11 +123,30 @@ fn gram_sets() -> &'static [GramSet] {
 
 /// Splits `doc` into language segments (contiguous, covering the whole document).
 pub fn segment(doc: &[u8]) -> Vec<Segment> {
+    analyze(doc).0
+}
+
+/// Language ids ranked by dictionary 4-gram overlap (no fence hint), best first, up to
+/// `MAX_CANDIDATES`, from pre-computed whole-document `scores`.
+pub fn top_languages(scores: &[i32; LANGUAGE_COUNT]) -> Vec<u8> {
+    let mut order: Vec<u8> = (0..LANGUAGE_COUNT as u8).collect();
+    order.sort_by_key(|&lang| std::cmp::Reverse(scores[lang as usize]));
+    order.truncate(MAX_CANDIDATES);
+    order
+}
+
+/// Splits `doc` into language segments and returns the whole-document gram totals (pre-fence)
+/// the split was derived from, so the caller can rank candidate languages without re-scanning.
+pub fn analyze(doc: &[u8]) -> (Vec<Segment>, [i32; LANGUAGE_COUNT]) {
+    let totals = gram_scores(doc);
     if doc.len() < WINDOW * 2 {
-        return vec![Segment {
-            end: doc.len(),
-            lang: best_single(doc),
-        }];
+        return (
+            vec![Segment {
+                end: doc.len(),
+                lang: best_single_from(doc, totals),
+            }],
+            totals,
+        );
     }
     let sets = gram_sets();
     let windows = doc.len().div_ceil(WINDOW);
@@ -190,7 +208,7 @@ pub fn segment(doc: &[u8]) -> Vec<Segment> {
             _ => segments.push(Segment { end, lang: label }),
         }
     }
-    segments
+    (segments, totals)
 }
 
 /// 4-gram overlap of `doc` against each language's dictionary (no fence hint). The shared
@@ -209,27 +227,10 @@ fn gram_scores(doc: &[u8]) -> [i32; LANGUAGE_COUNT] {
     scores
 }
 
-/// Up to `MAX_CANDIDATES` languages whose dictionaries best match `doc` by 4-gram overlap
-/// alone (no fence hint, so prose-dominant documents rank their prose language first). The
-/// encoder codes the document as each and keeps the smallest frame.
-pub fn candidate_languages(doc: &[u8]) -> Vec<u8> {
-    if doc.len() < 4 {
-        return vec![LANG_TEXT];
-    }
-    let scores = gram_scores(doc);
-    let mut order: Vec<u8> = (0..LANGUAGE_COUNT as u8).collect();
-    order.sort_by_key(|&lang| std::cmp::Reverse(scores[lang as usize]));
-    order.truncate(MAX_CANDIDATES);
-    order
-}
-
 const MAX_CANDIDATES: usize = 3;
 
-fn best_single(doc: &[u8]) -> u8 {
-    if doc.len() < 4 {
-        return LANG_TEXT;
-    }
-    let mut scores = gram_scores(doc);
+/// Argmax language of `doc` from pre-computed gram `scores` plus fence hints (short-doc path).
+fn best_single_from(doc: &[u8], mut scores: [i32; LANGUAGE_COUNT]) -> u8 {
     let mut hinted = vec![[0i32; LANGUAGE_COUNT]; 1];
     apply_fence_hints(doc, &mut hinted);
     for lang in 0..LANGUAGE_COUNT {

@@ -153,14 +153,15 @@ fn content_crc(content: &[u8], is_bytes: bool) -> u32 {
 /// the segment table, which differs between single- and multi-segment frames) keeps a
 /// multi-segment coding only when it actually ships smaller than every single language tried.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
-    let mut best_segments = lang::segment(content);
+    let (mut best_segments, gram_scores) = lang::analyze(content);
     let mut best_body = lz::encode_doc(&lang::primed, content, &best_segments);
     let mut best_cost = best_body.len() + segment_table_len(&best_segments);
-    // The extra single-language encodes cost one full parse each, so they are limited to
-    // smaller inputs; larger inputs are dominated by one real language anyway.
-    const MULTI_CANDIDATE_MAX: usize = 64 * 1024;
+    // The candidate search runs up to MAX_CANDIDATES extra full optimal parses, so it is
+    // limited to small inputs where that is a few milliseconds; larger inputs are dominated by
+    // one real language and rely on detection alone. (At 16 KiB, ~3 extra parses ≈ 3 ms.)
+    const MULTI_CANDIDATE_MAX: usize = 16 * 1024;
     if content.len() <= MULTI_CANDIDATE_MAX {
-        let candidates = lang::candidate_languages(content);
+        let candidates = lang::top_languages(&gram_scores);
         let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
         // Search only when detection is uncertain — a multi-segment split, or a single language
         // that is not the strongest dictionary match (the fence-hint-overwhelm case). A
