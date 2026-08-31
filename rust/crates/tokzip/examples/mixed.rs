@@ -57,16 +57,16 @@ fn main() {
         let mut oracle_frames = 0usize;
         for (bytes, lang) in parts {
             doc.extend_from_slice(bytes);
-            oracle_frames += tokzip::compress_with_language(bytes, lang).len();
+            oracle_frames += tokzip::frame_len_with_language(bytes, lang);
         }
         let mut doc2 = doc.clone();
         doc2.extend_from_slice(&html[i]);
-        oracle_frames += tokzip::compress_with_language(&html[i], 3).len();
+        oracle_frames += tokzip::frame_len_with_language(&html[i], 3);
         raw += doc2.len();
         auto += tokzip::compress(&doc2, false).len();
         oracle += oracle_frames;
         single += (0..7)
-            .map(|lang| tokzip::compress_with_language(&doc2, lang).len())
+            .map(|lang| tokzip::frame_len_with_language(&doc2, lang))
             .min()
             .unwrap();
     }

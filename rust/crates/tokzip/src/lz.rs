@@ -13,6 +13,7 @@
 
 use crate::rc::{Decoder, Encoder, PROB_INIT};
 use crate::DecodeError;
+use std::sync::OnceLock;
 
 pub const MATCH_MAX: usize = 273;
 const NUM_STATES: usize = 12;
@@ -62,7 +63,7 @@ const DICT_OFF: usize = HIST_DIST + DIST_MODEL_SIZE;
 /// Plain literal trees, 256 nodes per literal class.
 const LIT: usize = DICT_OFF + DIST_MODEL_SIZE;
 /// Matched-literal trees (first literals after a match, predicted by the byte at rep0), 512
-/// nodes shared by all classes: `(1 + match_bit) << 8 | node`.
+/// nodes shared by all classes: `match_bit << 8 | node`.
 const LIT_MATCHED: usize = LIT + LIT_CLASSES * 256;
 pub const MODEL_SIZE: usize = LIT_MATCHED + 512;
 
@@ -297,7 +298,7 @@ struct DistPrices {
     align: [u32; 1 << ALIGN_BITS],
 }
 
-const FULL_DIST: usize = 1 << ((END_POS_MODEL as usize >> 1) - 1);
+const FULL_DIST: usize = 1 << (END_POS_MODEL as usize >> 1);
 
 impl DistPrices {
     fn new(models: &Models, group: usize) -> Self {
@@ -506,10 +507,12 @@ impl Chains {
     }
 }
 
-/// A language dictionary with its chains and primed model state. Built once per language.
+/// A language dictionary with its primed model state and, for the encoder, its match-finder
+/// chains. Built once per language; the chains are built on first encode only, so a
+/// decompress-only process never pays for them.
 pub struct Primed {
     pub bytes: Vec<u8>,
-    chains: Chains,
+    chains: OnceLock<Chains>,
     pub models: Models,
 }
 
@@ -519,13 +522,9 @@ impl Primed {
     /// starting point).
     pub fn new(bytes: Vec<u8>, priors: Option<&[u8]>, lit_class: [u8; 256]) -> Self {
         if let Some(priors) = priors {
-            let mut chains = Chains::new(bytes.len());
-            for pos in 0..bytes.len() {
-                chains.insert(&bytes, pos);
-            }
             return Self {
                 bytes,
-                chains,
+                chains: OnceLock::new(),
                 models: Models::from_priors(priors),
             };
         }
@@ -533,7 +532,7 @@ impl Primed {
         let mut state = CoderState::new();
         let empty = Primed {
             bytes: Vec::new(),
-            chains: Chains::new(0),
+            chains: OnceLock::from(Chains::new(0)),
             models: Models::new(lit_class),
         };
         let mut mf = MatchFinder {
@@ -542,7 +541,10 @@ impl Primed {
                 dict: &[],
             },
             chains: Chains::new(bytes.len()),
-            dict: &empty,
+            dict: DictRef {
+                bytes: &empty.bytes,
+                chains: empty.chains.get().unwrap(),
+            },
         };
         // Output is discarded: only the adapted models and the chains matter.
         let mut rc = Encoder::new();
@@ -556,19 +558,36 @@ impl Primed {
             bytes.len(),
             &mut inserted,
         );
-        let chains = mf.chains;
+        let chains = OnceLock::from(mf.chains);
         Self {
             bytes,
             chains,
             models,
         }
     }
+
+    fn chains(&self) -> &Chains {
+        self.chains.get_or_init(|| {
+            let mut chains = Chains::new(self.bytes.len());
+            for pos in 0..self.bytes.len() {
+                chains.insert(&self.bytes, pos);
+            }
+            chains
+        })
+    }
+}
+
+/// The active dictionary as the match finder sees it: its bytes and its chains.
+#[derive(Clone, Copy)]
+struct DictRef<'a> {
+    bytes: &'a [u8],
+    chains: &'a Chains,
 }
 
 struct MatchFinder<'a> {
     win: Window<'a>,
     chains: Chains,
-    dict: &'a Primed,
+    dict: DictRef<'a>,
 }
 
 impl MatchFinder<'_> {
@@ -728,13 +747,17 @@ pub fn encode_doc_with_stats(
     let mut start = 0usize;
     for seg in segments {
         let dict = lookup(seg.lang);
+        clamp_reps(&mut cs, start, dict.bytes.len());
         let mut mf = MatchFinder {
             win: Window {
                 doc,
                 dict: &dict.bytes,
             },
             chains,
-            dict,
+            dict: DictRef {
+                bytes: &dict.bytes,
+                chains: dict.chains(),
+            },
         };
         let mut models = lang_models.take(seg.lang);
         run_encode_optimal(
@@ -757,6 +780,17 @@ pub fn encode_doc_with_stats(
     }
     let stats = rc.stats.take();
     (rc.finish(), stats)
+}
+
+/// Normative at every segment start: rep distances the new segment's window cannot reach
+/// (the previous segment's dictionary was longer) reset to distance 1, so a matched literal
+/// or rep match after the boundary never addresses a byte that does not exist.
+fn clamp_reps(cs: &mut CoderState, pos: usize, dlen: usize) {
+    for rep in &mut cs.reps {
+        if *rep as usize + 1 > pos + dlen {
+            *rep = 0;
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -1151,7 +1185,9 @@ pub fn decode_doc(
     out_len: usize,
     segments: &[Segment],
 ) -> Result<Vec<u8>, DecodeError> {
-    let mut out: Vec<u8> = Vec::with_capacity(out_len);
+    // The caller bounds `out_len` by the body size; the reservation is bounded tighter still so
+    // a forged header cannot cost a large allocation before the CRC rejects it.
+    let mut out: Vec<u8> = Vec::with_capacity(out_len.min(body.len() * 64 + 4096));
     let mut rc = Decoder::new(body);
     let mut cs = CoderState::new();
     let mut lang_models = LangModels::new(lookup);
@@ -1161,6 +1197,7 @@ pub fn decode_doc(
         }
         let dict: &[u8] = &lookup(seg.lang).bytes;
         let dlen = dict.len();
+        clamp_reps(&mut cs, out.len(), dlen);
         let mut models = lang_models.take(seg.lang);
         let lit_class = models.lit_class;
         while out.len() < seg.end {

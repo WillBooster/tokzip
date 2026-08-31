@@ -12,7 +12,7 @@ on Cloudflare Workers, Bun, and Node.
 ```ts
 import { compress, decompress } from 'tokzip';
 
-const frame = compress(text); // Uint8Array
+const frame = compress(text); // Uint8Array; strings must be well-formed UTF-16 (no lone surrogates)
 const restored = decompress(frame); // === text (string in → string out, bytes in → bytes out)
 ```
 
@@ -32,10 +32,11 @@ trained dictionary and model priors. Embedded languages: `text`, `en-US`, `ja-JP
   Viterbi pass with a switch penalty turns the scores into segments. Cost: a few table
   lookups per byte. On mixed prose + code documents this codes ~2 pp smaller than the best
   single language.
-- **Storage-grade**: every frame carries a CRC-32 of its content, `compress` decodes its own
+- **Storage-grade**: every frame carries a CRC-32 of its content and type, `compress` decodes its own
   output and compares it to the input before returning (falling back to a stored frame
   otherwise), and corrupt or truncated frames throw a typed `TokzipDecodeError` — never
-  silently wrong output. Incompressible input never expands beyond a 7-byte header.
+  silently wrong output. Incompressible input never expands beyond the stored-frame header
+  (7–10 bytes, depending on the length varint).
 - **Format v0 (pre-release)**: the format changes freely with no compatibility for earlier
   frames until it is fixed as v1; decoders reject other versions. See [FORMAT.md](FORMAT.md).
 

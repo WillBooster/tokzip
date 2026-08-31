@@ -5,6 +5,7 @@
  *   bun bench/cloudflare/measure.ts <worker-name> [<wrangler command>]
  */
 import { spawn } from 'node:child_process';
+import { createInterface } from 'node:readline';
 
 const name = process.argv[2] ?? 'tokzip-bench-wasm';
 const wrangler = process.argv[3] ?? 'wrangler';
@@ -13,13 +14,15 @@ const ITERATIONS: Record<string, number> = { 'ja-prompt-1k': 200, 'ts-source-4k'
 
 const tail = spawn(wrangler, ['tail', name, '--format', 'json'], { stdio: ['ignore', 'pipe', 'inherit'] });
 const events: { url: string; cpuMs: number }[] = [];
-tail.stdout.setEncoding('utf8');
-tail.stdout.on('data', (chunk: string) => {
-  for (const line of chunk.split('\n')) {
-    if (!line.startsWith('{')) continue;
-    const event = JSON.parse(line) as { event?: { request?: { url?: string } }; cpuTime?: number };
-    events.push({ url: event.event?.request?.url ?? '?', cpuMs: event.cpuTime ?? Number.NaN });
-  }
+// `wrangler tail --format json` prints one pretty-printed object per event; objects are
+// reassembled from lines (stream chunks are not line-aligned) and parsed at each top-level `}`.
+let pending = '';
+createInterface({ input: tail.stdout }).on('line', (line) => {
+  pending += line;
+  if (line !== '}') return;
+  const event = JSON.parse(pending) as { event?: { request?: { url?: string } }; cpuTime?: number };
+  events.push({ url: event.event?.request?.url ?? '?', cpuMs: event.cpuTime ?? Number.NaN });
+  pending = '';
 });
 await Bun.sleep(4000);
 

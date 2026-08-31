@@ -28,13 +28,13 @@ export default {
     const text = SAMPLES[sample];
     if (!text) return new Response('unknown sample', { status: 404 });
     const iterations = Number(url.searchParams.get('iters') ?? '1');
-    const frame = codec.compress(text);
     if (route === 'compress') {
       let size = 0;
       for (let i = 0; i < iterations; i++) size = codec.compress(text).length;
       return new Response(`${sample}: ${text.length} chars -> ${size} bytes x${iterations}`);
     }
     if (route === 'decompress') {
+      const frame = codec.compress(text);
       let ok = true;
       for (let i = 0; i < iterations; i++) ok &&= codec.decompress(frame) === text;
       return new Response(`${sample}: ${ok ? 'round-trip ok' : 'MISMATCH'} x${iterations}`);

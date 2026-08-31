@@ -32,9 +32,17 @@ const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 const wasm = new WebAssembly.Instance(loadModule()).exports as unknown as Exports;
 
-/** Compresses a string (stored as UTF-8) or raw bytes into a self-describing binary frame. */
+/**
+ * Compresses a string (stored as UTF-8; must be well-formed UTF-16) or raw bytes into a
+ * self-describing binary frame.
+ */
 export function compress(input: string | Uint8Array): Uint8Array {
   const isString = typeof input === 'string';
+  // A lone surrogate cannot round-trip through UTF-8 (TextEncoder would substitute U+FFFD),
+  // so it is refused rather than silently altered.
+  if (isString && !input.isWellFormed()) {
+    throw new RangeError('tokzip: string contains a lone surrogate and cannot be stored losslessly');
+  }
   const bytes = isString ? textEncoder.encode(input) : input;
   return withInput(bytes, (ptr) => {
     wasm.tokzip_compress(ptr, bytes.length, isString ? 0 : 1);

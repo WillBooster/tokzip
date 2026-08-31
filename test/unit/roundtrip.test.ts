@@ -39,6 +39,10 @@ describe('compress/decompress', () => {
     }
   });
 
+  test('refuses strings with lone surrogates instead of altering them', () => {
+    expect(() => compress('a\uD83C')).toThrow(RangeError);
+  });
+
   test('round-trips bytes and preserves the string/bytes distinction', () => {
     const bytes = new Uint8Array(1000).map((_, i) => (i * 7919) & 0xFF);
     const restored = decompress(compress(bytes));

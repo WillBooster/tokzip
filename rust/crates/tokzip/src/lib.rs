@@ -7,7 +7,7 @@
 //!   [1]    flags: bit 0 = content is bytes (0 = UTF-8 string), bit 1 = stored,
 //!          bit 2 = multi-segment
 //!   varint decompressed length
-//!   [4]    CRC-32 (little-endian) of the decompressed content
+//!   CRC-32 (little-endian) of the decompressed content followed by the type flag byte
 //!   stored: the content. Single segment: u8 language, then the range-coded body.
 //!   Multi-segment: varint segment count, (u8 language, varint length)*, then the body.
 //!
@@ -26,9 +26,13 @@ pub const MAGIC_VERSION: u8 = 0xD0;
 const FLAG_BYTES: u8 = 0b01;
 const FLAG_STORED: u8 = 0b10;
 const FLAG_MULTI: u8 = 0b100;
-/// Upper bound on a frame's declared decompressed length: caps the output allocation for
-/// untrusted frames so a corrupt varint cannot force an OOM.
+/// Upper bound on a coded frame's declared decompressed length (stored frames carry their
+/// content verbatim and need no cap).
 const MAX_DECOMPRESSED_LEN: u64 = 256 * 1024 * 1024;
+/// Upper bound on how much a coded body may expand: the codec tops out near 7,000× on
+/// degenerate runs, so a declared length beyond this is a forged header and is rejected
+/// before any output is allocated (a corrupt varint cannot force a large allocation).
+const MAX_EXPANSION: usize = 8192;
 const MAX_SEGMENTS: u64 = 1 << 20;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -70,7 +74,7 @@ impl std::error::Error for DecodeError {}
 /// passed raw bytes (true) or a UTF-8 string (false); `decompress` reports it back.
 pub fn compress(content: &[u8], is_bytes: bool) -> Vec<u8> {
     let type_flag = if is_bytes { FLAG_BYTES } else { 0 };
-    let crc = crc32fast::hash(content);
+    let crc = content_crc(content, is_bytes);
     if !content.is_empty() {
         let segments = lang::segment(content);
         let body = lz::encode_doc(&lang::primed, content, &segments);
@@ -109,15 +113,16 @@ pub fn compress(content: &[u8], is_bytes: bool) -> Vec<u8> {
     frame
 }
 
-/// Compresses with a single forced language (benchmark/diagnostic use; the public API detects).
+/// Frame length the content would have when coded as one segment of `lang` (diagnostic use;
+/// the public API detects the language).
 #[doc(hidden)]
-pub fn compress_with_language(content: &[u8], lang: usize) -> Vec<u8> {
+pub fn frame_len_with_language(content: &[u8], lang: usize) -> usize {
     let segments = [Segment {
         end: content.len(),
         lang: lang as u8,
     }];
     let body = lz::encode_doc(&lang::primed, content, &segments);
-    vec![0; body.len() + 2 + varint_len(content.len() as u64) + 4 + 1]
+    body.len() + 2 + varint_len(content.len() as u64) + 4 + 1
 }
 
 /// Detected segments as `(end, language id)` pairs (diagnostic use).
@@ -127,6 +132,14 @@ pub fn segments(content: &[u8]) -> Vec<(usize, u8)> {
         .into_iter()
         .map(|s| (s.end, s.lang))
         .collect()
+}
+
+/// CRC-32 over the content followed by its type flag, so a frame cannot be silently retyped.
+fn content_crc(content: &[u8], is_bytes: bool) -> u32 {
+    let mut hasher = crc32fast::Hasher::new();
+    hasher.update(content);
+    hasher.update(&[u8::from(is_bytes)]);
+    hasher.finalize()
 }
 
 fn stored_frame_len(content_len: usize) -> usize {
@@ -154,30 +167,31 @@ pub fn decompress(frame: &[u8]) -> Result<(Vec<u8>, bool), DecodeError> {
     }
     let is_bytes = flags & FLAG_BYTES != 0;
     let (out_len, rest) = read_varint(&frame[2..])?;
-    if out_len > MAX_DECOMPRESSED_LEN {
-        return Err(DecodeError::Corrupt);
-    }
     if rest.len() < 4 {
         return Err(DecodeError::Truncated);
     }
     let expected_crc = u32::from_le_bytes([rest[0], rest[1], rest[2], rest[3]]);
     let body = &rest[4..];
-    let out_len = out_len as usize;
     if flags & FLAG_STORED != 0 {
-        if body.len() < out_len {
+        // Compared as u64: a huge declared length must not wrap when narrowed to usize.
+        if (body.len() as u64) < out_len {
             return Err(DecodeError::Truncated);
         }
-        if body.len() > out_len {
+        if body.len() as u64 > out_len {
             return Err(DecodeError::Corrupt);
         }
-        if crc32fast::hash(body) != expected_crc {
+        if content_crc(body, is_bytes) != expected_crc {
             return Err(DecodeError::ChecksumMismatch);
         }
         return Ok((body.to_vec(), is_bytes));
     }
-    if out_len == 0 {
+    if out_len == 0
+        || out_len > MAX_DECOMPRESSED_LEN
+        || out_len > body.len().saturating_mul(MAX_EXPANSION) as u64
+    {
         return Err(DecodeError::Corrupt);
     }
+    let out_len = out_len as usize;
     let (segment_count, mut rest) = if flags & FLAG_MULTI != 0 {
         read_varint(body)?
     } else {
@@ -218,7 +232,7 @@ pub fn decompress(frame: &[u8]) -> Result<(Vec<u8>, bool), DecodeError> {
         return Err(DecodeError::Corrupt);
     }
     let content = lz::decode_doc(&lang::primed, rest, out_len, &segments)?;
-    if crc32fast::hash(&content) != expected_crc {
+    if content_crc(&content, is_bytes) != expected_crc {
         return Err(DecodeError::ChecksumMismatch);
     }
     Ok((content, is_bytes))

@@ -20,7 +20,7 @@ fn main() {
     {
         println!(
             "  forced {name:<11} {}",
-            tokzip::compress_with_language(&doc, lang).len()
+            tokzip::frame_len_with_language(&doc, lang)
         );
     }
     for seg in tokzip::segments(&doc) {

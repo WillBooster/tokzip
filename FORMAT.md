@@ -16,8 +16,11 @@ frame := 0xD0 flags sizeVarint crc32 body
 - `0xD0`: magic `1101` in the high nibble, version 0 in the low nibble.
 - `flags`: bit 0 = content type (0 = UTF-8 string, 1 = bytes); bit 1 = stored; bit 2 =
   multi-segment (never together with stored). Other bits are a structural error.
-- `sizeVarint`: decompressed length in bytes (decoders cap it at 256 MiB).
-- `crc32`: IEEE CRC-32 of the decompressed content; decoders verify it before returning.
+- `sizeVarint`: decompressed length in bytes. For coded frames decoders reject a length above
+  256 MiB or above 8192 × the body length (the codec never expands that far) before
+  allocating anything.
+- `crc32`: IEEE CRC-32 of the decompressed content followed by one type byte (0x00 string,
+  0x01 bytes), so a retyped frame fails the check; decoders verify it before returning.
 - `body`: stored → the content itself (exactly `size` bytes). Otherwise a segment table then
   the range-coded stream (§3).
 
@@ -62,8 +65,9 @@ the always-zero first output byte and trims trailing zero bytes; the decoder fee
 the end of the body and rejects a body that has bytes it never read.
 
 Coder state shared across segments: the 12-state LZMA state machine and the four most recent
-distances (`reps`, stored as distance − 1, initially 0). Each segment swaps in its language's
-adaptive models; a language's models persist across all of its segments in one frame.
+distances (`reps`, stored as distance − 1, initially 0). At every segment start, a rep whose
+distance exceeds `p + D` of the new segment resets to 0 (distance 1). Each segment swaps in its
+language's adaptive models; a language's models persist across all of its segments in one frame.
 
 Token grammar per position (bits are coded with the model node named in brackets; `s` is the
 state):

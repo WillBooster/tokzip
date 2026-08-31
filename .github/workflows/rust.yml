@@ -25,9 +25,14 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
       - run: cargo fmt --check
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo test --locked --release
+      - name: Verify the committed wasm module matches the sources
+        run: |
+          cargo build --locked --release --target wasm32-unknown-unknown -p tokzip-wasm
+          cmp target/wasm32-unknown-unknown/release/tokzip_wasm.wasm ../wasm/tokzip.wasm
