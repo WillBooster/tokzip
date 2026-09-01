@@ -91,8 +91,10 @@ describe('compress/decompress', () => {
   });
 
   test('codes content above one 4 MiB block instead of storing it', () => {
-    const huge = MIXED_ANSWER.repeat(5000); // ~4.5 MiB, spanning two blocks
+    const huge = MIXED_ANSWER.repeat(7000); // ~4.6 MiB, spanning two blocks
+    expect(Buffer.byteLength(huge)).toBeGreaterThan(4 * 1024 * 1024);
     const frame = compress(huge);
+    expect(frame[1]! & 0b1000).toBe(0b1000); // blocked flag
     expect(frame.length * 10).toBeLessThan(Buffer.byteLength(huge));
     expect(decompress(frame)).toBe(huge);
   });
