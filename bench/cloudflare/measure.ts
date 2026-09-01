@@ -31,11 +31,12 @@ let pending = '';
 createInterface({ input: tail.stdout }).on('line', (line) => {
   pending += line;
   if (line !== '}') return;
-  // Only optional fields are read, with defaults: an unexpected event shape yields a row without
-  // a match (rejected below), so no schema validation is needed.
-  const event = JSON.parse(pending) as { event?: { request?: { url?: string } }; cpuTime?: number };
-  events.push({ url: event.event?.request?.url ?? '?', cpuMs: event.cpuTime ?? Number.NaN });
+  // Two optional fields are read; an event without a numeric `cpuTime` is dropped, so a request
+  // it belonged to ends up without a match and is rejected below rather than printed as NaN.
+  const event = JSON.parse(pending) as { event?: { request?: { url?: string } }; cpuTime?: unknown };
   pending = '';
+  if (typeof event.cpuTime !== 'number') return;
+  events.push({ url: event.event?.request?.url ?? '?', cpuMs: event.cpuTime });
 });
 await Bun.sleep(4000);
 

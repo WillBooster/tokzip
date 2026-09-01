@@ -170,7 +170,9 @@ fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     // multi-segment documents of 5-30 KB coded 1-4% larger as detected than as the best single
     // language (an 18 KB answer whose ```html fence pins a long `<script>` to the html
     // dictionary: 5,145 vs 4,977 bytes as `text`), and the winner was the top gram candidate.
-    // Beyond 64 KiB the parse would double compression time for a gain measured only below it.
+    // The gain does not stop at 64 KiB (a 90 KB document of that shape still codes ~2.7% larger
+    // than its best single language), but above it the extra parse costs more CPU (~15 ms at
+    // 90 KB, ~70 ms at 1 MiB, doubling compression time) than a few percent is worth here.
     const FULL_SEARCH_MAX: usize = 4 * 1024;
     const SINGLE_CANDIDATE_MAX: usize = 64 * 1024;
     {
