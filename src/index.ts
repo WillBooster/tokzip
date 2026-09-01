@@ -1,6 +1,7 @@
 // This file is the package entry, so a consumer's type-check compiles it under the consumer's
 // own `lib`/`types`: the references below supply what it needs (the `.wasm` module declaration
 // and ES2024's `String.prototype.isWellFormed`) instead of relying on this repository's tsconfig.
+// oxlint-disable-next-line typescript/triple-slash-reference -- an import cannot hand consumers the ambient `*.wasm` module declaration
 /// <reference path="./wasm.d.ts" />
 /// <reference lib="es2024.string" />
 import wasmModuleOrPath from '../wasm/tokzip.wasm';

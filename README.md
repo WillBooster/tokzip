@@ -33,12 +33,12 @@ trained dictionary and model priors. Embedded languages: `text`, `en-US`, `ja-JP
   Viterbi pass with a switch penalty turns the scores into segments. Cost: a few table
   lookups per byte. On mixed prose + code documents this codes ~2 pp smaller than the best
   single language.
-- **Storage-grade**: every frame carries a CRC-32 of its content and type, `compress` decodes its own
-  output and compares it to the input before returning (falling back to a stored frame
-  otherwise), and a corrupt or truncated frame either throws a typed `TokzipDecodeError` or
+- **Storage-grade**: every frame carries a CRC-32 of its content and type, `compress` decodes every
+  coded frame it builds and compares the result to the input before returning it (falling back
+  to a stored frame — the content itself — otherwise), and a corrupt or truncated frame either throws a typed `TokzipDecodeError` or
   (when the range coder's trailing slack absorbs the damage) decodes to the exact original —
   never silently wrong output. Incompressible input never expands beyond the stored-frame
-  header (7–10 bytes, depending on the length varint). Content above 4 MiB is stored verbatim
+  header (6 bytes plus the length varint). Content above 4 MiB is stored verbatim
   rather than coded (coding holds several copies of the input in memory), so chunk larger
   payloads before compressing them.
 - **Format v0 (pre-release)**: the format changes freely with no compatibility for earlier

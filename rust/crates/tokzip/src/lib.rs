@@ -11,8 +11,9 @@
 //!   stored: the content. Single segment: u8 language, then the range-coded body.
 //!   Multi-segment: varint segment count, (u8 language, varint length)*, then the body.
 //!
-//! `compress` verifies that its own output decodes back to the input before returning it and
-//! falls back to a stored frame otherwise, so a persisted frame is provably recoverable.
+//! `compress` verifies that a coded frame decodes back to the input before returning it and
+//! falls back to a stored frame (the content itself) otherwise, so a persisted frame is
+//! provably recoverable.
 
 mod lang;
 mod lz;

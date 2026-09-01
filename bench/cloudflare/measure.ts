@@ -59,18 +59,19 @@ interface Row {
   contaminated: boolean;
 }
 const rows: Row[] = [];
+/** The first /load pays the module import + wasm instantiate and then compresses every sample. */
+const COLD_LOAD = '/load (cold: import + compress all samples)';
 const record = async (label: string, path: string): Promise<void> => {
   const { ttfb, body } = await hit(path);
   // Discard rows contaminated by a cold isolate: `cached=false` (a /decompress that missed the
   // /load-warmed isolate compressed once) or `warm=false` (this request paid the module import
   // + wasm instantiate). The first /load is meant to be cold, so it is never flagged.
-  const contaminated =
-    label !== '/load (first request)' && (body.includes('cached=false') || body.includes('warm=false'));
+  const contaminated = label !== COLD_LOAD && (body.includes('cached=false') || body.includes('warm=false'));
   rows.push({ label, ttfb, contaminated });
 };
 await record('/noop', '/noop');
-await record('/load (first request)', '/load');
-await record('/load (warm)', '/load');
+await record(COLD_LOAD, '/load');
+await record('/load (warm: compress all samples)', '/load');
 for (const [sample, iterations] of Object.entries(ITERATIONS)) {
   await record(`/compress/${sample} x${iterations}`, `/compress/${sample}?iters=${iterations}`);
   await record(`/decompress/${sample} x${iterations}`, `/decompress/${sample}?iters=${iterations}`);
