@@ -5,7 +5,7 @@
 [![wbfy](https://img.shields.io/badge/wbfy-19.2.1-1e90ff.svg)](https://github.com/WillBooster/shared/tree/main/packages/wbfy)
 
 Lossless compressor for **prompts, LLM outputs, and source code** stored at rest — one
-function in, one function out, no options. The codec is Rust compiled to a single
+function in, one function out, no compression options (only an optional decode length limit). The codec is Rust compiled to a single
 **wasm module (~450 KB, every dictionary included)** with a thin TypeScript wrapper; it runs
 on Cloudflare Workers and Bun (and on Node via a bundler that handles `.wasm` imports).
 
