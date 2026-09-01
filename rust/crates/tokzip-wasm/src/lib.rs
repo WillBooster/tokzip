@@ -9,19 +9,27 @@ thread_local! {
     static OUT: RefCell<Vec<u8>> = const { RefCell::new(Vec::new()) };
 }
 
+/// Allocates `len` bytes (at least one) for the JS side to fill; released by `tokzip_free`.
 #[no_mangle]
 pub extern "C" fn tokzip_alloc(len: usize) -> *mut u8 {
-    let mut buf = Vec::<u8>::with_capacity(len.max(1));
-    let ptr = buf.as_mut_ptr();
-    std::mem::forget(buf);
+    let layout = input_layout(len);
+    // SAFETY: the layout has a nonzero size.
+    let ptr = unsafe { std::alloc::alloc(layout) };
+    if ptr.is_null() {
+        std::alloc::handle_alloc_error(layout);
+    }
     ptr
 }
 
 /// # Safety
-/// `ptr` must come from `tokzip_alloc(len)` and not have been freed.
+/// `ptr` must come from `tokzip_alloc(len)` with the same `len` and not have been freed.
 #[no_mangle]
 pub unsafe extern "C" fn tokzip_free(ptr: *mut u8, len: usize) {
-    drop(Vec::from_raw_parts(ptr, 0, len.max(1)));
+    std::alloc::dealloc(ptr, input_layout(len));
+}
+
+fn input_layout(len: usize) -> std::alloc::Layout {
+    std::alloc::Layout::from_size_align(len.max(1), 1).expect("input length overflows a layout")
 }
 
 /// # Safety
