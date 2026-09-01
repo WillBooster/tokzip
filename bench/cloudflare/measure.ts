@@ -105,7 +105,7 @@ for (const { label, ttfb, contaminated } of rows) {
   const event = events.find((e) => e.url.includes(path) && !e.url.includes('#used'));
   if (!event) throw new Error(`no \`wrangler tail\` event for ${label}; the CPU column would be a guess`);
   event.url += '#used';
-  const iterations = Number(/x(\d+)/.exec(label)?.[1] ?? 1);
+  const iterations = Number(/ x(\d+)$/.exec(label)?.[1] ?? 1);
   const cpu = event.cpuMs;
   const note = contaminated ? '  DISCARD (cold isolate: includes one compress)' : '';
   console.log(
