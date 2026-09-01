@@ -10,7 +10,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import { dirname, join } from 'node:path';
 import { brotliCompressSync, constants as zlibConstants, gzipSync } from 'node:zlib';
 import { compress, decompress } from '../../src/index.ts';
-import { corpusDirs, type ManifestEntry } from '../corpus.ts';
+import { corpusDirs, manifestEntrySchema } from '../corpus.ts';
 
 interface Doc {
   language: string;
@@ -140,7 +140,7 @@ function loadBenchDocs(): Doc[] {
       if (!existsSync(manifestPath)) continue;
       for (const line of readFileSync(manifestPath, 'utf8').split('\n')) {
         if (!line.trim()) continue;
-        const entry = JSON.parse(line) as ManifestEntry;
+        const entry = manifestEntrySchema.parse(JSON.parse(line));
         if (entry.split !== 'bench') continue;
         const content = readFileSync(join(dir, entry.file), 'utf8');
         const bytes = Buffer.byteLength(content);

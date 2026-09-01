@@ -1,17 +1,14 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { z } from 'zod';
 
-export interface ManifestEntry {
-  file: string;
-  lang: string;
-  origin: 'human' | 'llm';
-  source: string;
-  license: string;
-  sizeBucket: string;
-  trainable: boolean;
-  split?: 'train' | 'bench';
-}
+/** One line of a corpus `manifest.jsonl`; only the fields training and benchmarks read. */
+export const manifestEntrySchema = z.object({
+  file: z.string(),
+  split: z.enum(['train', 'bench']).optional(),
+  trainable: z.boolean().optional(),
+});
 
 const defaultCorpusDir = resolve(import.meta.dir, '../../tokzip-corpus/corpus');
 

@@ -240,7 +240,7 @@ const MAX_CANDIDATES: usize = 3;
 
 /// Argmax language of `doc` from pre-computed gram `scores` plus fence hints (short-doc path).
 fn best_single_from(doc: &[u8], mut scores: [i32; LANGUAGE_COUNT]) -> u8 {
-    let mut hinted = vec![[0i32; LANGUAGE_COUNT]; 1];
+    let mut hinted = [[0i32; LANGUAGE_COUNT]; 1];
     apply_fence_hints(doc, &mut hinted);
     for lang in 0..LANGUAGE_COUNT {
         scores[lang] += hinted[0][lang];

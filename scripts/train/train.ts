@@ -9,7 +9,7 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { CORPUS_DIR } from '../corpus.ts';
+import { CORPUS_DIR, manifestEntrySchema } from '../corpus.ts';
 import { trainDictionary } from './trainDictionary.ts';
 import { buildWrapperDictionary } from './wrapperContent.ts';
 
@@ -61,7 +61,7 @@ function loadTrainDocs(language: string): string[] {
   const docs: string[] = [];
   for (const line of readFileSync(manifestPath, 'utf8').split('\n')) {
     if (!line.trim()) continue;
-    const entry = JSON.parse(line) as { file: string; split?: string; trainable?: boolean };
+    const entry = manifestEntrySchema.parse(JSON.parse(line));
     if (entry.split !== 'train' || entry.trainable === false) continue;
     const path = join(dir, entry.file);
     if (existsSync(path)) docs.push(readFileSync(path, 'utf8'));
