@@ -155,11 +155,11 @@ fn content_crc(content: &[u8], is_bytes: bool) -> u32 {
 }
 
 /// Codes `content` with the detected per-segment languages and returns the smallest whole
-/// frame. For a small input whose detection is uncertain (see the gate below) it also codes
-/// the input as each top candidate language as a single segment and keeps the smallest,
-/// comparing full frame length (body plus the segment table, which differs between single- and
-/// multi-segment frames). A confident single-language detection is coded as detected without
-/// trying alternatives.
+/// frame. When detection is uncertain (see the gate below) it also codes the input as a single
+/// segment of each top candidate language — all of them up to 4 KiB, only the strongest gram
+/// match above — and keeps the smallest, comparing full frame length (body plus the segment
+/// table, which differs between single- and multi-segment frames). A confident single-language
+/// detection is coded as detected without trying alternatives.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     let (mut best_segments, gram_scores) = lang::analyze(content);
     let mut best_body = lz::encode_doc(&lang::primed, content, &best_segments);
