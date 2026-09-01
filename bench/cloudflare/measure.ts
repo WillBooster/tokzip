@@ -83,8 +83,9 @@ const deadline = Date.now() + 15_000;
 while (events.length < rows.length && Date.now() < deadline) await Bun.sleep(200);
 done = true;
 tail.kill();
+const labelWidth = Math.max(...rows.map((row) => row.label.length));
 console.log(
-  `${name}: ${'request'.padEnd(36)} ${'ttfb ms'.padStart(9)} ${'cpu ms'.padStart(9)} ${'cpu ms/iter'.padStart(12)}`
+  `${name}: ${'request'.padEnd(labelWidth)} ${'ttfb ms'.padStart(9)} ${'cpu ms'.padStart(9)} ${'cpu ms/iter'.padStart(12)}`
 );
 for (const { label, ttfb, contaminated } of rows) {
   const path = label.split(' ')[0]!;
@@ -95,6 +96,6 @@ for (const { label, ttfb, contaminated } of rows) {
   const cpu = event.cpuMs;
   const note = contaminated ? '  DISCARD (cold isolate: includes one compress)' : '';
   console.log(
-    `  ${label.padEnd(36)} ${ttfb.toFixed(0).padStart(9)} ${cpu.toFixed(1).padStart(9)} ${(cpu / iterations).toFixed(3).padStart(12)}${note}`
+    `  ${label.padEnd(labelWidth)} ${ttfb.toFixed(0).padStart(9)} ${cpu.toFixed(1).padStart(9)} ${(cpu / iterations).toFixed(3).padStart(12)}${note}`
   );
 }
