@@ -7,9 +7,9 @@
 //! `lang.rs`) swap the active dictionary and the language's adaptive models at token
 //! boundaries; the document history, the coder state, and the rep distances are shared.
 //!
-//! Each language's models start *primed*: the dictionary is compressed against itself once
-//! and the resulting probabilities seed every document, so short documents start from
-//! statistics learned on the dictionary rather than from flat models.
+//! Each language's models start *primed* from its trained priors (`priors/<language>.bin`,
+//! see `train.rs`), so short documents start from corpus statistics rather than from flat
+//! models. Compressing the dictionary against itself is only the trainer's starting state.
 
 use crate::rc::{Decoder, Encoder, PROB_INIT};
 use crate::DecodeError;

@@ -1,6 +1,8 @@
-// Referenced explicitly: this file is the package entry, so a consumer's type-check compiles it
-// without this repository's tsconfig `include` that would otherwise pull the declaration in.
+// This file is the package entry, so a consumer's type-check compiles it under the consumer's
+// own `lib`/`types`: the references below supply what it needs (the `.wasm` module declaration
+// and ES2024's `String.prototype.isWellFormed`) instead of relying on this repository's tsconfig.
 /// <reference path="./wasm.d.ts" />
+/// <reference lib="es2024.string" />
 import wasmModuleOrPath from '../wasm/tokzip.wasm';
 
 /** Thrown when a frame is truncated, corrupt, from another format version, or fails its CRC. */
@@ -90,8 +92,10 @@ function loadModule(): WebAssembly.Module {
   if (typeof wasmModuleOrPath !== 'string') return wasmModuleOrPath;
   // Bun resolves a .wasm import to its file path; Cloudflare Workers and bundlers hand over a
   // compiled module instead (they forbid compiling wasm from bytes at runtime).
-  const fs = (process as { getBuiltinModule?: (name: string) => unknown }).getBuiltinModule?.('node:fs') as
-    | { readFileSync(path: string): Uint8Array }
+  // Looked up on `globalThis` so neither the type-check nor the runtime needs a `process` global.
+  const process = (globalThis as { process?: { getBuiltinModule?: (name: string) => unknown } }).process;
+  const fs = process?.getBuiltinModule?.('node:fs') as
+    | { readFileSync(path: string): Uint8Array<ArrayBuffer> }
     | undefined;
   if (!fs) throw new Error('tokzip: cannot load tokzip.wasm in this runtime');
   return new WebAssembly.Module(fs.readFileSync(wasmModuleOrPath));

@@ -75,7 +75,9 @@ for (const [sample, iterations] of Object.entries(ITERATIONS)) {
   await record(`/compress/${sample} x${iterations}`, `/compress/${sample}?iters=${iterations}`);
   await record(`/decompress/${sample} x${iterations}`, `/decompress/${sample}?iters=${iterations}`);
 }
-await Bun.sleep(3000);
+// Tail events trail their responses; wait (bounded) for one per request instead of a fixed delay.
+const deadline = Date.now() + 15_000;
+while (events.length < rows.length && Date.now() < deadline) await Bun.sleep(200);
 done = true;
 tail.kill();
 console.log(
@@ -84,9 +86,10 @@ console.log(
 for (const { label, ttfb, contaminated } of rows) {
   const path = label.split(' ')[0]!;
   const event = events.find((e) => e.url.includes(path) && !e.url.includes('#used'));
-  if (event) event.url += '#used';
+  if (!event) throw new Error(`no \`wrangler tail\` event for ${label}; the CPU column would be a guess`);
+  event.url += '#used';
   const iterations = Number(/x(\d+)/.exec(label)?.[1] ?? 1);
-  const cpu = event?.cpuMs ?? Number.NaN;
+  const cpu = event.cpuMs;
   const note = contaminated ? '  DISCARD (cold isolate: includes one compress)' : '';
   console.log(
     `  ${label.padEnd(36)} ${ttfb.toFixed(0).padStart(9)} ${cpu.toFixed(1).padStart(9)} ${(cpu / iterations).toFixed(3).padStart(12)}${note}`

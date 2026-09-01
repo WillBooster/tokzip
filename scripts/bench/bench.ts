@@ -30,10 +30,11 @@ interface Totals {
   packed: Record<string, number>;
 }
 
+/** Disjoint size bands (each document lands in the first band whose limit it satisfies). */
 const BUCKETS: [number, string][] = [
   [1024, '≤1K'],
-  [4096, '≤4K'],
-  [16_384, '≤16K'],
+  [4096, '1–4K'],
+  [16_384, '4–16K'],
   [Number.POSITIVE_INFINITY, '>16K'],
 ];
 
@@ -67,6 +68,9 @@ function main(): void {
   const speed = args.includes('--speed');
   const jsonIndex = args.indexOf('--json');
   const jsonPath = jsonIndex === -1 ? undefined : args[jsonIndex + 1];
+  if (jsonIndex !== -1 && (jsonPath === undefined || jsonPath.startsWith('--'))) {
+    throw new Error('usage: bun run bench [--speed] [--json <file>]');
+  }
 
   const docs = loadBenchDocs();
   if (docs.length === 0) throw new Error('no bench documents found (check the corpus checkout)');

@@ -43,8 +43,8 @@ fn main() {
         assert_eq!(&restored, content);
         let bucket = match content.len() {
             0..=1024 => "bucket <=1K",
-            1025..=4096 => "bucket <=4K",
-            4097..=16384 => "bucket <=16K",
+            1025..=4096 => "bucket 1-4K",
+            4097..=16384 => "bucket 4-16K",
             _ => "bucket >16K",
         };
         total_raw += content.len();
