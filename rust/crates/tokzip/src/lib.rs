@@ -157,23 +157,27 @@ fn content_crc(content: &[u8], is_bytes: bool) -> u32 {
 /// Codes `content` with the detected per-segment languages and returns the smallest whole
 /// frame. When detection is uncertain (see the gate below) it also codes the input as a single
 /// segment of each top candidate language — all of them up to 4 KiB, only the strongest gram
-/// match above — and keeps the smallest, comparing full frame length (body plus the segment
+/// match up to 64 KiB, none above — and keeps the smallest, comparing full frame length (body plus the segment
 /// table, which differs between single- and multi-segment frames). A confident single-language
 /// detection is coded as detected without trying alternatives.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     let (mut best_segments, gram_scores) = lang::analyze(content);
     let mut best_body = lz::encode_doc(&lang::primed, content, &best_segments);
     let mut best_cost = best_body.len() + segment_table_len(&best_segments);
-    // Every candidate costs a full extra optimal parse (~0.35 ms at 4 KiB, ~2.8 ms at 18 KiB), so
-    // up to 4 KiB all top candidates are tried and above it only the strongest gram match is.
-    // That one parse matters: on multi-segment documents above 4 KiB the detected split coded
-    // 1-4% larger than the best single language (an 18 KB LLM answer whose ```html fence pins a
-    // long `<script>` to the html dictionary: 5,145 vs 4,977 bytes as `text`), and the winner
-    // was the top gram candidate.
+    // Every candidate costs a full extra optimal parse (~0.35 ms at 4 KiB, ~2.8 ms at 18 KiB,
+    // ~70 ms at 1 MiB), so up to 4 KiB all top candidates are tried, up to 64 KiB only the
+    // strongest gram match, and above that none. The single parse matters at LLM-answer sizes:
+    // multi-segment documents of 5-30 KB coded 1-4% larger as detected than as the best single
+    // language (an 18 KB answer whose ```html fence pins a long `<script>` to the html
+    // dictionary: 5,145 vs 4,977 bytes as `text`), and the winner was the top gram candidate.
+    // Beyond 64 KiB the parse would double compression time for a gain measured only below it.
     const FULL_SEARCH_MAX: usize = 4 * 1024;
+    const SINGLE_CANDIDATE_MAX: usize = 64 * 1024;
     {
         let mut candidates = lang::top_languages(&gram_scores);
-        if content.len() > FULL_SEARCH_MAX {
+        if content.len() > SINGLE_CANDIDATE_MAX {
+            candidates.clear();
+        } else if content.len() > FULL_SEARCH_MAX {
             candidates.truncate(1);
         }
         let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
