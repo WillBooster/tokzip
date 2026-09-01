@@ -5,8 +5,10 @@ import { z } from 'zod';
 
 /**
  * One line of a corpus `manifest.jsonl`; only the fields training and benchmarks read. `split`
- * and `trainable` are filters, so an unrecognized value reads as absent and the entry is
- * skipped — the same selection the Rust priors trainer applies — instead of aborting the run.
+ * and `trainable` are filters, so an unrecognized value reads as absent instead of aborting the
+ * run: an unrecognized `split` matches neither selection and the entry is skipped, while an
+ * unrecognized `trainable` is not `false` and the entry stays trainable — the same selection
+ * the Rust priors trainer applies.
  */
 export const manifestEntrySchema = z.object({
   file: z.string(),
