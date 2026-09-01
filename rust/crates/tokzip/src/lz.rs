@@ -1188,11 +1188,11 @@ pub fn decode_doc(
     out: &mut Vec<u8>,
 ) -> Result<(), DecodeError> {
     // Appends exactly `out_len` bytes to `out`; positions below are relative to `base`, and
-    // tokens never reach below it. The caller bounds `out_len` by the body size; the reservation
-    // is bounded tighter still so a forged header cannot cost a large allocation before the CRC
-    // rejects it, and an allocation the memory cannot satisfy fails instead of aborting.
+    // tokens never reach below it. The whole output is reserved up front (the caller bounds
+    // `out_len` to one block and to the body's expansion limit), so no later push allocates: an
+    // output the memory cannot hold fails here instead of aborting the module.
     let base = out.len();
-    out.try_reserve_exact(out_len.min(body.len() * 64 + 4096))
+    out.try_reserve_exact(out_len)
         .map_err(|_| DecodeError::TooLarge)?;
     let mut rc = Decoder::new(body);
     let mut cs = CoderState::new();

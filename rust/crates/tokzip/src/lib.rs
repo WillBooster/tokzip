@@ -33,8 +33,8 @@ const FLAG_MULTI: u8 = 0b100;
 const FLAG_BLOCKED: u8 = 0b1000;
 /// Content longer than this is coded as independent blocks of this size, which bounds the
 /// coder's working set whatever the document length: coding keeps a 4-byte match-chain entry
-/// per block byte plus the self-check's decoded copy of the block, and decoding builds one block
-/// before appending it to the output — measured in Bun, coding a 4 MiB block adds ~24 MB of wasm
+/// per block byte plus the self-check's decoded copy of the block, and decoding appends each
+/// block straight into the output — measured in Bun, coding a 4 MiB block adds ~24 MB of wasm
 /// memory (which never shrinks), leaving a 128 MiB Cloudflare Workers isolate room for the
 /// caller. Splitting only loses matches across block boundaries, negligible next to the
 /// dictionaries and the local context.
@@ -168,8 +168,11 @@ fn coded_block(block: &[u8], probe: bool) -> Option<(u8, Vec<u8>)> {
         return None;
     }
     let (multi, payload) = coded_payload(block);
+    // The expansion bound is the one decoder rule construction alone does not satisfy, so the
+    // encoder asserts it too: a frame `compress` returns is decodable by construction and check.
     let mut decoded = Vec::new();
     let recoverable = payload.len() < block.len()
+        && block.len() <= payload.len().saturating_mul(MAX_EXPANSION)
         && decode_block(multi != 0, &payload, block.len(), &mut decoded).is_ok()
         && decoded == block;
     recoverable.then_some((multi, payload))
@@ -347,7 +350,12 @@ pub fn decompress(frame: &[u8], max_len: usize) -> Result<(Vec<u8>, bool), Decod
         if content_crc(body, is_bytes) != expected_crc {
             return Err(DecodeError::ChecksumMismatch);
         }
-        return Ok((body.to_vec(), is_bytes));
+        let mut content = Vec::new();
+        content
+            .try_reserve_exact(body.len())
+            .map_err(|_| DecodeError::TooLarge)?;
+        content.extend_from_slice(body);
+        return Ok((content, is_bytes));
     }
     if out_len == 0 || out_len > body.len().saturating_mul(MAX_EXPANSION) as u64 {
         return Err(DecodeError::Corrupt);
