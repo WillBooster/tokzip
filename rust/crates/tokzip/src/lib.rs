@@ -5,15 +5,18 @@
 //! Frame layout (format v0 — pre-release, changes freely without compatibility):
 //!   [0]    magic/version 0xD0 (high nibble 0b1101, low nibble = version 0)
 //!   [1]    flags: bit 0 = content is bytes (0 = UTF-8 string), bit 1 = stored,
-//!          bit 2 = multi-segment
+//!          bit 2 = multi-segment, bit 3 = blocked
 //!   varint decompressed length
 //!   CRC-32 (little-endian) of the decompressed content followed by the type flag byte
 //!   stored: the content. Single segment: u8 language, then the range-coded body.
 //!   Multi-segment: varint segment count, (u8 language, varint length)*, then the body.
+//!   Blocked (content above `BLOCK_LEN`): per block a flags byte (stored or multi-segment), a
+//!   varint payload length, and the payload — the block's content when stored, otherwise its
+//!   segment table and body laid out as above and coded independently of the other blocks.
 //!
-//! `compress` verifies that a coded frame decodes back to the input before returning it and
-//! falls back to a stored frame (the content itself) otherwise, so a persisted frame is
-//! provably recoverable.
+//! `compress` verifies that every coded block decodes back to its input before returning the
+//! frame and falls back to storing the block (or the whole content) otherwise, so a persisted
+//! frame is provably recoverable.
 
 mod lang;
 mod lz;
@@ -24,18 +27,19 @@ pub mod train;
 use lz::Segment;
 
 pub const MAGIC_VERSION: u8 = 0xD0;
-const FLAG_BYTES: u8 = 0b01;
+const FLAG_BYTES: u8 = 0b1;
 const FLAG_STORED: u8 = 0b10;
 const FLAG_MULTI: u8 = 0b100;
-/// Upper bound on a coded frame's declared decompressed length, so a corrupt or forged header
-/// cannot drive a large allocation, and the ceiling above which `compress` skips coding (see
-/// there) and stores the content verbatim. Both paths cost a multiple of the content: coding
-/// keeps the input copy, a 4-byte match-chain entry per input byte, the body, and the
-/// self-check's decoded copy live at once, and decoding hands the caller a copy of the output
-/// (plus a decoded string) on top of the wasm-side buffer — measured in Bun, a 4 MiB document
-/// adds ~60 MB to the process. Sized for the intended at-rest payloads (prompts, LLM outputs,
-/// cache entries) to leave a 128 MiB Cloudflare Workers isolate room for the caller.
-const MAX_DECOMPRESSED_LEN: u64 = 4 * 1024 * 1024;
+const FLAG_BLOCKED: u8 = 0b1000;
+/// Content longer than this is coded as independent blocks of this size, which bounds the
+/// coder's working set whatever the document length: coding keeps a 4-byte match-chain entry
+/// per block byte plus the self-check's decoded copy of the block, and decoding builds one block
+/// before appending it to the output — measured in Bun, coding a 4 MiB block adds ~24 MB of wasm
+/// memory (which never shrinks), leaving a 128 MiB Cloudflare Workers isolate room for the
+/// caller. It also caps what a corrupt or forged header can make the decoder allocate at once.
+/// Splitting only loses matches across block boundaries, negligible next to the dictionaries
+/// and the local context.
+const BLOCK_LEN: usize = 4 * 1024 * 1024;
 /// Upper bound on how much a coded body may expand: the codec tops out near 7,000× on
 /// degenerate runs, so a declared length beyond this is a forged header and is rejected
 /// before any output is allocated (a corrupt varint cannot force a large allocation).
@@ -82,36 +86,8 @@ impl std::error::Error for DecodeError {}
 pub fn compress(content: &[u8], is_bytes: bool) -> Vec<u8> {
     let type_flag = if is_bytes { FLAG_BYTES } else { 0 };
     let crc = content_crc(content, is_bytes);
-    // Content above the coded-frame cap can only ship as a stored frame, so it skips coding
-    // entirely — the parser would otherwise allocate match-finder chains several times the
-    // input size before the self-check fell back to stored anyway.
-    if !content.is_empty() && content.len() as u64 <= MAX_DECOMPRESSED_LEN {
-        let (segments, body) = best_segmentation(content);
-        let mut frame = Vec::with_capacity(16 + segments.len() * 4 + body.len());
-        frame.push(MAGIC_VERSION);
-        frame.push(type_flag | if segments.len() > 1 { FLAG_MULTI } else { 0 });
-        push_varint(&mut frame, content.len() as u64);
-        frame.extend_from_slice(&crc.to_le_bytes());
-        if segments.len() == 1 {
-            frame.push(segments[0].lang);
-        } else {
-            push_varint(&mut frame, segments.len() as u64);
-            let mut start = 0usize;
-            for seg in &segments {
-                frame.push(seg.lang);
-                push_varint(&mut frame, (seg.end - start) as u64);
-                start = seg.end;
-            }
-        }
-        frame.extend_from_slice(&body);
-        let stored_len = stored_frame_len(content.len());
-        if frame.len() < stored_len
-            && decompress(&frame)
-                .map(|(out, b)| out == content && b == is_bytes)
-                .unwrap_or(false)
-        {
-            return frame;
-        }
+    if let Some(frame) = coded_frame(content, type_flag, crc) {
+        return frame;
     }
     let mut frame = Vec::with_capacity(stored_frame_len(content.len()));
     frame.push(MAGIC_VERSION);
@@ -122,8 +98,68 @@ pub fn compress(content: &[u8], is_bytes: bool) -> Vec<u8> {
     frame
 }
 
-/// Frame length the content would have when coded as one segment of `lang` (diagnostic use;
-/// the public API detects the language).
+/// The coded frame for `content`, or `None` when it would not be strictly smaller than the
+/// stored frame. A block that does not shrink or fails its decode check is stored inside a
+/// blocked frame; single-block content falls back to a stored frame instead.
+fn coded_frame(content: &[u8], type_flag: u8, crc: u32) -> Option<Vec<u8>> {
+    if content.is_empty() {
+        return None;
+    }
+    let stored_len = stored_frame_len(content.len());
+    let mut frame = vec![MAGIC_VERSION, type_flag];
+    push_varint(&mut frame, content.len() as u64);
+    frame.extend_from_slice(&crc.to_le_bytes());
+    if content.len() <= BLOCK_LEN {
+        let (multi, payload) = coded_block(content)?;
+        frame[1] |= multi;
+        frame.extend_from_slice(&payload);
+    } else {
+        frame[1] |= FLAG_BLOCKED;
+        for block in content.chunks(BLOCK_LEN) {
+            match coded_block(block) {
+                Some((multi, payload)) => {
+                    frame.push(multi);
+                    push_varint(&mut frame, payload.len() as u64);
+                    frame.extend_from_slice(&payload);
+                }
+                None => {
+                    frame.push(FLAG_STORED);
+                    push_varint(&mut frame, block.len() as u64);
+                    frame.extend_from_slice(block);
+                }
+            }
+            if frame.len() >= stored_len {
+                return None;
+            }
+        }
+    }
+    (frame.len() < stored_len).then_some(frame)
+}
+
+/// Codes one block — its segment table followed by the range-coded body — and returns the
+/// payload with its multi-segment flag, or `None` when the payload is not strictly smaller
+/// than the block or does not decode back to it.
+fn coded_block(block: &[u8]) -> Option<(u8, Vec<u8>)> {
+    let (segments, body) = best_segmentation(block);
+    let mut payload = Vec::with_capacity(segment_table_len(&segments) + body.len());
+    let multi = if segments.len() > 1 { FLAG_MULTI } else { 0 };
+    if segments.len() == 1 {
+        payload.push(segments[0].lang);
+    } else {
+        push_varint(&mut payload, segments.len() as u64);
+        let mut start = 0usize;
+        for seg in &segments {
+            payload.push(seg.lang);
+            push_varint(&mut payload, (seg.end - start) as u64);
+            start = seg.end;
+        }
+    }
+    payload.extend_from_slice(&body);
+    let recoverable = payload.len() < block.len()
+        && decode_block(multi != 0, &payload, block.len()).is_ok_and(|out| out == block);
+    recoverable.then_some((multi, payload))
+}
+
 #[doc(hidden)]
 pub fn frame_len_with_language(content: &[u8], lang: usize) -> usize {
     if lang >= lang::LANGUAGE_COUNT {
@@ -212,6 +248,8 @@ fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
 
 /// Bytes the segment table occupies in a frame: one language byte for a single segment, else
 /// the segment-count varint plus a language byte and length varint per segment (see `compress`).
+/// Bytes the segment table occupies in a frame: one language byte for a single segment, else
+/// the segment-count varint plus a language byte and length varint per segment (see `compress`).
 fn segment_table_len(segments: &[Segment]) -> usize {
     if segments.len() == 1 {
         return 1;
@@ -243,8 +281,9 @@ pub fn decompress(frame: &[u8]) -> Result<(Vec<u8>, bool), DecodeError> {
         });
     }
     let flags = frame[1];
-    if flags & !(FLAG_BYTES | FLAG_STORED | FLAG_MULTI) != 0
-        || flags & (FLAG_STORED | FLAG_MULTI) == FLAG_STORED | FLAG_MULTI
+    if flags & !(FLAG_BYTES | FLAG_STORED | FLAG_MULTI | FLAG_BLOCKED) != 0
+        || (flags & FLAG_STORED != 0 && flags & (FLAG_MULTI | FLAG_BLOCKED) != 0)
+        || flags & (FLAG_MULTI | FLAG_BLOCKED) == FLAG_MULTI | FLAG_BLOCKED
     {
         return Err(DecodeError::Corrupt);
     }
@@ -268,57 +307,103 @@ pub fn decompress(frame: &[u8]) -> Result<(Vec<u8>, bool), DecodeError> {
         }
         return Ok((body.to_vec(), is_bytes));
     }
-    if out_len == 0
-        || out_len > MAX_DECOMPRESSED_LEN
-        || out_len > body.len().saturating_mul(MAX_EXPANSION) as u64
-    {
+    if out_len == 0 || out_len > body.len().saturating_mul(MAX_EXPANSION) as u64 {
         return Err(DecodeError::Corrupt);
     }
     let out_len = out_len as usize;
-    let (segment_count, mut rest) = if flags & FLAG_MULTI != 0 {
-        read_varint(body)?
+    let content = if flags & FLAG_BLOCKED != 0 {
+        decode_blocks(body, out_len)?
+    } else if out_len > BLOCK_LEN {
+        return Err(DecodeError::Corrupt);
     } else {
-        (1, body)
+        decode_block(flags & FLAG_MULTI != 0, body, out_len)?
+    };
+    if content_crc(&content, is_bytes) != expected_crc {
+        return Err(DecodeError::ChecksumMismatch);
+    }
+    Ok((content, is_bytes))
+}
+
+/// Decodes the blocks of a blocked frame body into `out_len` bytes.
+fn decode_blocks(mut body: &[u8], out_len: usize) -> Result<Vec<u8>, DecodeError> {
+    // Content that fits one block has the single-block layout; here it is a structural error.
+    if out_len <= BLOCK_LEN {
+        return Err(DecodeError::Corrupt);
+    }
+    // Grown block by block, so a forged length costs no allocation beyond the blocks that decode.
+    let mut content = Vec::new();
+    while content.len() < out_len {
+        let block_len = BLOCK_LEN.min(out_len - content.len());
+        let (&flags, rest) = body.split_first().ok_or(DecodeError::Truncated)?;
+        if flags & !(FLAG_STORED | FLAG_MULTI) != 0
+            || flags & (FLAG_STORED | FLAG_MULTI) == FLAG_STORED | FLAG_MULTI
+        {
+            return Err(DecodeError::Corrupt);
+        }
+        let (payload_len, rest) = read_varint(rest)?;
+        if payload_len > rest.len() as u64 {
+            return Err(DecodeError::Truncated);
+        }
+        let (payload, rest) = rest.split_at(payload_len as usize);
+        content.reserve_exact(block_len);
+        if flags & FLAG_STORED != 0 {
+            if payload.len() != block_len {
+                return Err(DecodeError::Corrupt);
+            }
+            content.extend_from_slice(payload);
+        } else {
+            content.extend_from_slice(&decode_block(flags & FLAG_MULTI != 0, payload, block_len)?);
+        }
+        body = rest;
+    }
+    if !body.is_empty() {
+        return Err(DecodeError::Corrupt);
+    }
+    Ok(content)
+}
+
+/// Decodes one block's payload — its segment table followed by the range-coded body — into
+/// `block_len` bytes.
+fn decode_block(multi: bool, payload: &[u8], block_len: usize) -> Result<Vec<u8>, DecodeError> {
+    let (segment_count, mut rest) = if multi {
+        read_varint(payload)?
+    } else {
+        (1, payload)
     };
     if segment_count == 0 || segment_count > MAX_SEGMENTS {
         return Err(DecodeError::Corrupt);
     }
     let mut segments = Vec::with_capacity(segment_count.min(64) as usize);
     let mut end = 0usize;
-    if flags & FLAG_MULTI == 0 {
+    if !multi {
         let (&lang, after) = rest.split_first().ok_or(DecodeError::Truncated)?;
         if usize::from(lang) >= lang::LANGUAGE_COUNT {
             return Err(DecodeError::Corrupt);
         }
-        segments.push(Segment { end: out_len, lang });
-        end = out_len;
+        segments.push(Segment {
+            end: block_len,
+            lang,
+        });
+        end = block_len;
         rest = after;
     }
-    for _ in 0..if flags & FLAG_MULTI != 0 {
-        segment_count
-    } else {
-        0
-    } {
+    for _ in 0..if multi { segment_count } else { 0 } {
         let (&lang, after) = rest.split_first().ok_or(DecodeError::Truncated)?;
         if usize::from(lang) >= lang::LANGUAGE_COUNT {
             return Err(DecodeError::Corrupt);
         }
         let (len, after) = read_varint(after)?;
-        if len == 0 || len > (out_len - end) as u64 {
+        if len == 0 || len > (block_len - end) as u64 {
             return Err(DecodeError::Corrupt);
         }
         end += len as usize;
         segments.push(Segment { end, lang });
         rest = after;
     }
-    if end != out_len {
+    if end != block_len {
         return Err(DecodeError::Corrupt);
     }
-    let content = lz::decode_doc(&lang::primed, rest, out_len, &segments)?;
-    if content_crc(&content, is_bytes) != expected_crc {
-        return Err(DecodeError::ChecksumMismatch);
-    }
-    Ok((content, is_bytes))
+    lz::decode_doc(&lang::primed, rest, block_len, &segments)
 }
 
 fn varint_len(mut v: u64) -> usize {
@@ -399,20 +484,52 @@ mod tests {
         );
     }
 
-    #[test]
-    fn incompressible_input_is_stored() {
+    fn noise(len: usize) -> Vec<u8> {
         let mut x = 0x2545_F491u32;
-        let noise: Vec<u8> = (0..300)
+        (0..len)
             .map(|_| {
                 x ^= x << 13;
                 x ^= x >> 17;
                 x ^= x << 5;
                 (x >> 24) as u8
             })
-            .collect();
+            .collect()
+    }
+
+    #[test]
+    fn incompressible_input_is_stored() {
+        let noise = noise(300);
         let frame = round_trip(&noise, true);
         assert_eq!(frame.len(), stored_frame_len(noise.len()));
         assert_eq!(frame[1] & FLAG_STORED, FLAG_STORED);
+    }
+
+    #[test]
+    fn content_above_a_block_is_coded_per_block() {
+        // A compressible block, an incompressible one (stored inside the frame), and a short
+        // compressible tail block.
+        let text = "const answer = 42; // the answer\nゲームの仕様を以下に示します。\n"
+            .repeat(BLOCK_LEN / 60);
+        let mut content = text.as_bytes()[..BLOCK_LEN].to_vec();
+        content.extend_from_slice(&noise(BLOCK_LEN));
+        content.extend_from_slice(&text.as_bytes()[..1000]);
+        let frame = round_trip(&content, true);
+        assert_eq!(frame[1], FLAG_BYTES | FLAG_BLOCKED);
+        // The stored block costs its own length; both coded blocks shrink to almost nothing.
+        assert!(frame.len() < BLOCK_LEN + 20_000, "{}", frame.len());
+        // The last block's declared payload length must match its bytes.
+        assert_eq!(
+            decompress(&frame[..frame.len() - 1]),
+            Err(DecodeError::Truncated)
+        );
+        let mut extra = frame.clone();
+        extra.push(0);
+        assert_eq!(decompress(&extra), Err(DecodeError::Corrupt));
+        // A blocked flag on content that fits one block is a structural error.
+        let small = compress(&content[..1000], true);
+        let mut flagged = small.clone();
+        flagged[1] |= FLAG_BLOCKED;
+        assert_eq!(decompress(&flagged), Err(DecodeError::Corrupt));
     }
 
     #[test]

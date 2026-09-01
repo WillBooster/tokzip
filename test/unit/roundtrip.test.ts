@@ -76,4 +76,11 @@ describe('compress/decompress', () => {
     const large = MIXED_ANSWER.repeat(200); // ~180 KB
     expect(decompress(compress(large))).toBe(large);
   });
+
+  test('codes content above one 4 MiB block instead of storing it', () => {
+    const huge = MIXED_ANSWER.repeat(5000); // ~4.5 MiB, spanning two blocks
+    const frame = compress(huge);
+    expect(frame.length * 10).toBeLessThan(Buffer.byteLength(huge));
+    expect(decompress(frame)).toBe(huge);
+  });
 });

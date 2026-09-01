@@ -38,9 +38,9 @@ trained dictionary and model priors. Embedded languages: `text`, `en-US`, `ja-JP
   to a stored frame — the content itself — otherwise), and a corrupt or truncated frame either throws a typed `TokzipDecodeError` or
   (when the range coder's trailing slack absorbs the damage) decodes to the exact original —
   never silently wrong output. Incompressible input never expands beyond the stored-frame
-  header (6 bytes plus the length varint). Content above 4 MiB is stored verbatim
-  rather than coded (coding holds several copies of the input in memory), so chunk larger
-  payloads before compressing them.
+  header (6 bytes plus the length varint). Content above 4 MiB is coded as
+  independent 4 MiB blocks, so the coder's working set (several copies of a block) stays
+  bounded whatever the document size; only the input and output scale with it.
 - **Format v0 (pre-release)**: the format changes freely with no compatibility for earlier
   frames until it is fixed as v1; decoders reject other versions. See [FORMAT.md](FORMAT.md).
 

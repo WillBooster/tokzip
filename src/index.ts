@@ -28,6 +28,7 @@ const DECODE_ERROR_MESSAGES: Record<number, string> = {
 interface Exports {
   memory: WebAssembly.Memory;
   tokzip_alloc(len: number): number;
+  tokzip_realloc(ptr: number, oldLen: number, newLen: number): number;
   tokzip_free(ptr: number, len: number): void;
   tokzip_compress(ptr: number, len: number, isBytes: number): void;
   tokzip_decompress(ptr: number, len: number): number;
@@ -52,17 +53,16 @@ export function compress(input: string | Uint8Array): Uint8Array {
   if (isString && !input.isWellFormed()) {
     throw new RangeError('tokzip: string contains a lone surrogate and cannot be stored losslessly');
   }
-  const bytes = isString ? textEncoder.encode(input) : input;
-  return withInput(bytes, (ptr) => {
-    wasm.tokzip_compress(ptr, bytes.length, isString ? 0 : 1);
+  return withInput(input, (ptr, len) => {
+    wasm.tokzip_compress(ptr, len, isString ? 0 : 1);
     return takeOutput();
   });
 }
 
 /** Decompresses a frame; returns a string or bytes according to what was compressed. */
 export function decompress(frame: Uint8Array): string | Uint8Array {
-  return withInput(frame, (ptr) => {
-    const code = wasm.tokzip_decompress(ptr, frame.length);
+  return withInput(frame, (ptr, len) => {
+    const code = wasm.tokzip_decompress(ptr, len);
     if (code !== 0) throw new TokzipDecodeError(code);
     const out = takeOutput();
     if (wasm.tokzip_out_is_bytes() !== 0) return out;
@@ -74,13 +74,38 @@ export function decompress(frame: Uint8Array): string | Uint8Array {
   });
 }
 
-function withInput<T>(bytes: Uint8Array, run: (ptr: number) => T): T {
-  const ptr = wasm.tokzip_alloc(bytes.length);
+/**
+ * Places `input` in wasm memory for the duration of `run`. A string is encoded as UTF-8 straight
+ * into the module's buffer, so no intermediate copy of a large document is held on the JS heap.
+ */
+function withInput<T>(input: string | Uint8Array, run: (ptr: number, len: number) => T): T {
+  // One byte per UTF-16 unit is exact for ASCII; multi-byte characters grow the buffer below.
+  let capacity = input.length;
+  let ptr = wasm.tokzip_alloc(capacity);
   try {
-    new Uint8Array(wasm.memory.buffer, ptr, bytes.length).set(bytes);
-    return run(ptr);
+    let len = input.length;
+    if (typeof input === 'string') {
+      len = 0;
+      // Views are re-created after every allocation: growing wasm memory detaches old buffers.
+      for (let read = 0; read < input.length;) {
+        const rest = read === 0 ? input : input.slice(read);
+        const view = new Uint8Array(wasm.memory.buffer, ptr + len, capacity - len);
+        const result = textEncoder.encodeInto(rest, view);
+        read += result.read;
+        len += result.written;
+        if (read < input.length) {
+          // A UTF-16 unit encodes to at most 3 bytes (a surrogate pair to 4 for its 2 units).
+          const next = Math.min(capacity * 2, len + (input.length - read) * 3);
+          ptr = wasm.tokzip_realloc(ptr, capacity, next);
+          capacity = next;
+        }
+      }
+    } else {
+      new Uint8Array(wasm.memory.buffer, ptr, len).set(input);
+    }
+    return run(ptr, len);
   } finally {
-    wasm.tokzip_free(ptr, bytes.length);
+    wasm.tokzip_free(ptr, capacity);
   }
 }
 
