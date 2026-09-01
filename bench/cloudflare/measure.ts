@@ -6,6 +6,7 @@
  */
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
+import { z } from 'zod';
 
 const name = process.argv[2] ?? 'tokzip-bench-wasm';
 const wrangler = process.argv[3] ?? 'wrangler';
@@ -28,20 +29,25 @@ const events: { url: string; cpuMs: number }[] = [];
 // `wrangler tail --format json` prints one object per event (pretty-printed today). Lines are
 // accumulated from a top-level `{` (column 0; banner text before it is discarded) and parsed as
 // soon as they form a complete object, so one-object-per-line output works as well.
+// An event without a numeric `cpuTime` is dropped, so a request it belonged to ends up without a
+// match and is rejected below rather than printed as NaN.
+const tailEventSchema = z.object({
+  event: z.object({ request: z.object({ url: z.string().optional() }).optional() }).optional(),
+  cpuTime: z.number(),
+});
 let pending = '';
 createInterface({ input: tail.stdout }).on('line', (line) => {
   pending = line.startsWith('{') ? line : pending + line;
-  let event: { event?: { request?: { url?: string } }; cpuTime?: unknown };
+  let parsed: unknown;
   try {
-    event = JSON.parse(pending);
+    parsed = JSON.parse(pending);
   } catch {
     return; // not a complete object yet
   }
   pending = '';
-  // Two optional fields are read; an event without a numeric `cpuTime` is dropped, so a request
-  // it belonged to ends up without a match and is rejected below rather than printed as NaN.
-  if (typeof event.cpuTime !== 'number') return;
-  events.push({ url: event.event?.request?.url ?? '?', cpuMs: event.cpuTime });
+  const result = tailEventSchema.safeParse(parsed);
+  if (!result.success) return;
+  events.push({ url: result.data.event?.request?.url ?? '?', cpuMs: result.data.cpuTime });
 });
 await Bun.sleep(4000);
 
