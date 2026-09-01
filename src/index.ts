@@ -1,3 +1,6 @@
+// Referenced explicitly: this file is the package entry, so a consumer's type-check compiles it
+// without this repository's tsconfig `include` that would otherwise pull the declaration in.
+/// <reference path="./wasm.d.ts" />
 import wasmModuleOrPath from '../wasm/tokzip.wasm';
 
 /** Thrown when a frame is truncated, corrupt, from another format version, or fails its CRC. */
@@ -23,7 +26,7 @@ interface Exports {
   memory: WebAssembly.Memory;
   tokzip_alloc(len: number): number;
   tokzip_free(ptr: number, len: number): void;
-  tokzip_compress(ptr: number, len: number, isBytes: number): number;
+  tokzip_compress(ptr: number, len: number, isBytes: number): void;
   tokzip_decompress(ptr: number, len: number): number;
   tokzip_out_is_bytes(): number;
   tokzip_out_ptr(): number;

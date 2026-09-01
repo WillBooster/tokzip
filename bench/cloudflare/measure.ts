@@ -83,7 +83,7 @@ console.log(
 );
 for (const { label, ttfb, contaminated } of rows) {
   const path = label.split(' ')[0]!;
-  const event = events.find((e) => e.url.includes(path.replace(/ .*/, '')) && !e.url.includes('#used'));
+  const event = events.find((e) => e.url.includes(path) && !e.url.includes('#used'));
   if (event) event.url += '#used';
   const iterations = Number(/x(\d+)/.exec(label)?.[1] ?? 1);
   const cpu = event?.cpuMs ?? Number.NaN;

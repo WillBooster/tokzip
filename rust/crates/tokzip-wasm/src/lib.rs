@@ -27,12 +27,10 @@ pub unsafe extern "C" fn tokzip_free(ptr: *mut u8, len: usize) {
 /// # Safety
 /// `ptr..ptr+len` must be readable.
 #[no_mangle]
-pub unsafe extern "C" fn tokzip_compress(ptr: *const u8, len: usize, is_bytes: u32) -> usize {
+pub unsafe extern "C" fn tokzip_compress(ptr: *const u8, len: usize, is_bytes: u32) {
     let input = std::slice::from_raw_parts(ptr, len);
     let frame = tokzip::compress(input, is_bytes != 0);
-    let out_len = frame.len();
     OUT.with(|out| *out.borrow_mut() = frame);
-    out_len
 }
 
 /// Returns 0 on success (content in the output buffer, type flag via `tokzip_out_is_bytes`),

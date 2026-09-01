@@ -44,7 +44,6 @@ const zstdCompressSync = zlib.zstdCompressSync as
   | undefined;
 
 const METHODS: Method[] = [
-  { name: 'tokzip', compress: (content) => compress(content) },
   {
     name: 'brotli -11',
     compress: (content) => brotliCompressSync(content, { params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 11 } }),
@@ -82,8 +81,6 @@ function main(): void {
   let compressMs = 0;
   let decompressMs = 0;
   for (const doc of docs) {
-    const sizes: Record<string, number> = {};
-    for (const method of METHODS) sizes[method.name] = method.compress(doc.content).length;
     const started = performance.now();
     const frame = compress(doc.content);
     const compressed = performance.now();
@@ -91,12 +88,14 @@ function main(): void {
     decompressMs += performance.now() - compressed;
     compressMs += compressed - started;
     if (restored !== doc.content) throw new Error(`tokzip round-trip mismatch on a ${doc.language} document`);
+    const sizes: Record<string, number> = { tokzip: frame.length };
+    for (const method of METHODS) sizes[method.name] = method.compress(doc.content).length;
     add(`language ${doc.language}`, doc, sizes);
     add(`bucket ${doc.bucket}`, doc, sizes);
     add('all', doc, sizes);
   }
 
-  const names = METHODS.map((method) => method.name);
+  const names = ['tokzip', ...METHODS.map((method) => method.name)];
   console.log(
     ['group'.padEnd(22), 'docs'.padStart(6), 'bytes'.padStart(10), ...names.map((n) => n.padStart(11))].join(' ')
   );

@@ -77,5 +77,6 @@ Layout: `rust/crates/tokzip` (codec: `lz.rs` parse + coder, `lang.rs` dictionari
 detection, `train.rs` priors trainer), `rust/crates/tokzip-wasm` (C-ABI exports),
 `src/index.ts` (wrapper), `dict/` and `priors/` (trained assets embedded into the wasm),
 `scripts/train` (dictionary trainer), `scripts/bench` (corpus benchmark),
-`bench/cloudflare` (Workers benchmark: `wrangler deploy --config bench/cloudflare/wrangler.jsonc`,
-then `bun bench/cloudflare/measure.ts`).
+`bench/cloudflare` (Workers benchmark; needs a `wrangler` on `PATH`, which this repository does
+not declare: `wrangler deploy --config bench/cloudflare/wrangler.jsonc`, then
+`bun bench/cloudflare/measure.ts`).

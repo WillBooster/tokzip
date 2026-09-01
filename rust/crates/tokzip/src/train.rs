@@ -37,32 +37,21 @@ fn corpus_docs<'a>(
     let manifest = std::fs::read_to_string(dir.join("manifest.jsonl")).expect("manifest");
     manifest
         .lines()
-        .filter(move |line| {
-            manifest_value(line, "split") == Some(split)
-                && !(skip_untrainable && manifest_value(line, "trainable") == Some("false"))
-        })
-        .map(|line| {
-            manifest_value(line, "file")
-                .expect("manifest entry without file")
-                .to_string()
+        .filter(|line| !line.trim().is_empty())
+        .filter_map(|line| {
+            let entry: serde_json::Value = serde_json::from_str(line).expect("manifest entry");
+            let selected = entry["split"].as_str() == Some(split)
+                && !(skip_untrainable && entry["trainable"].as_bool() == Some(false));
+            selected.then(|| {
+                entry["file"]
+                    .as_str()
+                    .expect("manifest entry without file")
+                    .to_string()
+            })
         })
         .collect::<Vec<_>>()
         .into_iter()
         .map(move |file| std::fs::read(dir.join(file)).expect("doc"))
-}
-
-/// Value of top-level `key` in one flat manifest.jsonl object, tolerant of spacing and key
-/// order: a string's content (manifest strings carry no escapes) or a bare literal's text.
-fn manifest_value<'a>(line: &'a str, key: &str) -> Option<&'a str> {
-    let quoted = format!("\"{key}\"");
-    let rest = line[line.find(&quoted)? + quoted.len()..]
-        .trim_start()
-        .strip_prefix(':')?
-        .trim_start();
-    match rest.strip_prefix('"') {
-        Some(string) => string.split('"').next(),
-        None => rest.split([',', '}']).next().map(str::trim),
-    }
 }
 
 /// Trains the literal class table and priors for language `lang` from `docs` (each compressed

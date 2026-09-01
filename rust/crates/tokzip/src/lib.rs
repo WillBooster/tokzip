@@ -157,19 +157,24 @@ fn content_crc(content: &[u8], is_bytes: bool) -> u32 {
 /// frame. For a small input whose detection is uncertain (see the gate below) it also codes
 /// the input as each top candidate language as a single segment and keeps the smallest,
 /// comparing full frame length (body plus the segment table, which differs between single- and
-/// multi-segment frames). A confident single-language detection, or an input above the bound,
-/// is coded as detected without trying alternatives.
+/// multi-segment frames). A confident single-language detection is coded as detected without
+/// trying alternatives.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     let (mut best_segments, gram_scores) = lang::analyze(content);
     let mut best_body = lz::encode_doc(&lang::primed, content, &best_segments);
     let mut best_cost = best_body.len() + segment_table_len(&best_segments);
-    // The candidate search runs up to MAX_CANDIDATES extra full optimal parses, so it is limited
-    // to small inputs where that stays cheap (a candidate parse is ~0.35 ms at 4 KiB, so the
-    // search adds ~1 ms). Above this bound no candidate is tried at all, so a multi-segment
-    // document there may code a few tenths of a percent larger than the best single language.
-    const MULTI_CANDIDATE_MAX: usize = 4 * 1024;
-    if content.len() <= MULTI_CANDIDATE_MAX {
-        let candidates = lang::top_languages(&gram_scores);
+    // Every candidate costs a full extra optimal parse (~0.35 ms at 4 KiB, ~2.8 ms at 18 KiB), so
+    // up to 4 KiB all top candidates are tried and above it only the strongest gram match is.
+    // That one parse matters: on multi-segment documents above 4 KiB the detected split coded
+    // 1-4% larger than the best single language (an 18 KB LLM answer whose ```html fence pins a
+    // long `<script>` to the html dictionary: 5,145 vs 4,977 bytes as `text`), and the winner
+    // was the top gram candidate.
+    const FULL_SEARCH_MAX: usize = 4 * 1024;
+    {
+        let mut candidates = lang::top_languages(&gram_scores);
+        if content.len() > FULL_SEARCH_MAX {
+            candidates.truncate(1);
+        }
         let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
         // Search only when detection is uncertain — a multi-segment split, or a single language
         // that is not the strongest dictionary match (the fence-hint-overwhelm case). A
