@@ -1,0 +1,63 @@
+/**
+ * Cloudflare Workers benchmark for the wasm build. Workers freeze the clock during CPU work,
+ * so this worker only does the work; times come from `wrangler tail --format json` (per-request
+ * `cpuTime`) and from the client's time-to-first-byte.
+ *
+ *   /noop                       nothing (baseline)
+ *   /load                       import the module and pre-compress every sample
+ *   /compress/<sample>?iters=N  compress the sample N times
+ *   /decompress/<sample>?iters=N
+ *
+ *   wrangler deploy --config bench/cloudflare/wrangler.jsonc
+ *   bun bench/cloudflare/measure.ts
+ */
+import samples from './samples.json';
+
+// A committed JSON module: the compiler checks its inferred shape against this annotation, so
+// there is no runtime input to validate.
+const SAMPLES: Record<string, string> = samples;
+/** Frames pre-compressed by /load so the /decompress route never times a compression. */
+const FRAMES = new Map<string, Uint8Array>();
+const MAX_ITERATIONS = 1000;
+/** False until the first request on this isolate has paid the module import + wasm instantiate. */
+let warm = false;
+
+export default {
+  async fetch(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+    const [route, sample = ''] = url.pathname.split('/').filter(Boolean);
+    if (route === undefined || route === 'noop') return new Response('ok');
+    // A request landing on a cold isolate pays the import + wasm instantiate below inside its
+    // own timing; `warm=false` tells the driver to discard that row (except the first /load,
+    // which is meant to be cold).
+    const wasWarm = warm;
+    const codec = await import('../../src/index.ts');
+    warm = true;
+    if (route === 'load') {
+      for (const [name, text] of Object.entries(SAMPLES)) FRAMES.set(name, codec.compress(text));
+      return new Response(`loaded: ${FRAMES.size} samples warm=${wasWarm}`);
+    }
+    const text = SAMPLES[sample];
+    if (!text) return new Response('unknown sample', { status: 404 });
+    // Untrusted, so clamped: an unbounded iteration count would run until the CPU limit.
+    const iterations = Math.min(Math.max(1, Math.trunc(Number(url.searchParams.get('iters')) || 1)), MAX_ITERATIONS);
+    if (route === 'compress') {
+      let size = 0;
+      for (let i = 0; i < iterations; i++) size = codec.compress(text).length;
+      return new Response(`${sample}: ${text.length} chars -> ${size} bytes warm=${wasWarm} x${iterations}`);
+    }
+    if (route === 'decompress') {
+      // Pre-compressed by /load (which the driver calls first) so this request times only
+      // decompression. If the isolate differs from the one /load warmed, `cached` is false and
+      // the request also compressed once — the driver must discard that contaminated row.
+      const cached = FRAMES.has(sample);
+      const frame = FRAMES.get(sample) ?? codec.compress(text);
+      let ok = true;
+      for (let i = 0; i < iterations && ok; i++) ok = codec.decompress(frame) === text;
+      return new Response(
+        `${sample}: ${ok ? 'round-trip ok' : 'MISMATCH'} cached=${cached} warm=${wasWarm} x${iterations}`
+      );
+    }
+    return new Response('unknown route', { status: 404 });
+  },
+};

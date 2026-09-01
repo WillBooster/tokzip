@@ -3,11 +3,19 @@ on:
   pull_request:
     paths:
       - 'rust/**'
+      - 'dict/**'
+      - 'priors/**'
+      - 'wasm/**'
+      - 'mise.toml'
       - '.github/workflows/rust.yml'
   push:
     branches: [main]
     paths:
       - 'rust/**'
+      - 'dict/**'
+      - 'priors/**'
+      - 'wasm/**'
+      - 'mise.toml'
       - '.github/workflows/rust.yml'
 concurrency:
   group: rust-${{ github.workflow }}-${{ github.ref }}
@@ -22,12 +30,17 @@ jobs:
         working-directory: rust
     steps:
       - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
+      # mise installs the toolchain mise.toml pins: the committed wasm is byte-compared
+      # below and rustc embeds version-specific bytes, so a floating toolchain would fail
+      # the comparison at every Rust release.
+      - uses: jdx/mise-action@v2
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
       - run: cargo fmt --check
-      - run: cargo clippy --locked --all-targets -- -D warnings
-      - run: cargo test --locked --release
+      - run: cargo clippy --locked --all-targets --all-features -- -D warnings
+      - run: cargo test --locked --release --all-features
+      - name: Verify the committed wasm module matches the sources
+        run: |
+          cargo build --locked --release --target wasm32-unknown-unknown -p tokzip-wasm
+          cmp target/wasm32-unknown-unknown/release/tokzip_wasm.wasm ../wasm/tokzip.wasm

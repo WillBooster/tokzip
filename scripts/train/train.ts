@@ -1,626 +1,72 @@
 /**
- * Offline trainer: builds per-language dictionaries, literal context classes, and the
- * initial probabilities (priors) for every adaptive range-coder model by running the real
- * codec pipeline over the train split of the corpus (from `TOKZIP_CORPUS_DIR` or the
- * sibling tokzip-corpus checkout), then emits generated modules under src/generated/.
+ * Offline trainer: builds the shared wrapper dictionary and every language's dictionary suffix
+ * from the corpus train split (`dict/*.bin`), then runs the Rust priors trainer, which derives
+ * each language's literal context classes and initial model probabilities (`priors/*.bin`).
+ * Both outputs are embedded into the wasm module by the Rust build.
  *
- * Usage:
- *   bun scripts/train/train.ts core            # wrapper dictionary + id-0 generic model
- *   bun scripts/train/train.ts typescript ...  # one or more language modules
- *   bun scripts/train/train.ts --all           # core + every language with corpus data
- *   --budget <bytes>                           # dictionary-suffix budget (4 KiB – 1 MiB, default 16 KiB)
+ *   bun scripts/train/train.ts
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { LanguageModel, RegisteredLanguage } from '../../src/dictionary.ts';
-import {
-  LEN_GROUP_DICT,
-  LEN_GROUP_HISTORY,
-  LEN_GROUP_REP,
-  LIT_CLASS_MAX,
-  LITERAL_BLOCK_SIZE,
-  MIN_LEN_REP,
-  MODEL_IS_DICT,
-  MODEL_IS_MATCH,
-  MODEL_IS_REP,
-  MODEL_LEN_TREE,
-  MODEL_LITERAL,
-  MODEL_OFF_TREE,
-  MODEL_REP_TREE,
-  modelSizeFor,
-  OFF_GROUP_DICT,
-  OFF_GROUP_HISTORY,
-  offLenBucketOf,
-  SLOT_TREE_BITS,
-  TOKEN_KIND_COUNT,
-  TOKEN_KIND_DICT,
-  TOKEN_KIND_HISTORY,
-  TOKEN_KIND_LIT,
-  TOKEN_KIND_REP0,
-} from '../../src/format.ts';
-import { LANGUAGE_IDS } from '../../src/languageIds.ts';
-import { dictIndexIfNeeded, parse } from '../../src/lz.ts';
-import { toBase64, toBase64U16 } from '../../src/moduleData.ts';
-import { PROB_MAX, PROB_MIN, PROB_SCALE } from '../../src/rangeCoder.ts';
-import { smallPricing } from '../../src/smallMode.ts';
-import { LENGTH_SLOT_COUNT, OFFSET_SLOT_COUNT, slotOf } from '../../src/slots.ts';
-import { CORPUS_DIR } from '../corpus.ts';
+import { CORPUS_DIR, manifestEntrySchema } from '../corpus.ts';
 import { trainDictionary } from './trainDictionary.ts';
 import { buildWrapperDictionary } from './wrapperContent.ts';
 
+/** Embedded languages, in id order (must match `LANGUAGES` in rust/crates/tokzip/src/lang.rs). */
+const LANGUAGES = ['text', 'en-US', 'ja-JP', 'html', 'css', 'javascript', 'typescript'];
+
+/**
+ * Dictionary-suffix budget per language. Ratio improves with budget, but every language ships
+ * in the wasm module and its chains are built at first use, so the budget is bounded by the
+ * module size target (≤ 500 KB) and load time rather than by ratio alone.
+ */
+const DICTIONARY_BUDGET_BYTES = 40 * 1024;
+
 const ROOT = join(import.meta.dir, '../..');
-const GENERATED_DIR = join(ROOT, 'src/generated');
-const LANGUAGES_DIR = join(ROOT, 'src/languages');
-// Default dictionary budget, chosen for the primary deployment (DB storage of code
-// submissions and LLM outputs, where the dictionary ships once with the application and
-// documents are compressed inside request handlers). Ratio improves monotonically with budget, but so do
-// the per-language costs paid at first compress: the suffix-automaton index build (~10 ms
-// at 16 KB vs ~63 ms at 128 KB) and its retained memory (~1 MB vs ~7 MB) — decisive on
-// short-lived isolates (Cloudflare Workers). 16 KB is the smallest budget that keeps the
-// text channel ahead of brotli -q11 in every language and size bucket (losing ~1.2 pp of
-// overall ratio vs 128 KB); deployments that prioritize ratio can retrain larger via
-// --budget. The hard cap keeps wrapper + suffix below the 1 MB offset bound.
-const DEFAULT_DICTIONARY_BUDGET_BYTES = 16 * 1024;
-const MIN_DICTIONARY_BUDGET_BYTES = 4096;
-const MAX_DICTIONARY_BUDGET_BYTES = 1024 * 1024 - 8192;
-/** Bound on per-language statistics input; keeps a full training run tractable. */
-const MAX_STATS_BYTES = 32 * 1024 * 1024;
-
-const SLOT_TREE_LEAVES = 1 << SLOT_TREE_BITS;
-
-const textEncoder = new TextEncoder();
-
-let dictionaryBudgetBytes = DEFAULT_DICTIONARY_BUDGET_BYTES;
+const DICT_DIR = join(ROOT, 'dict');
 
 function main(): void {
-  const args = process.argv.slice(2);
-  const budgetIndex = args.indexOf('--budget');
-  if (budgetIndex !== -1) {
-    const value = Number(args[budgetIndex + 1]);
-    // The floor keeps generated modules usable: fence conformance tests draw their fence
-    // content from the dictionary bytes and the trainer's segment lengths assume room for
-    // real code fragments — a degenerate budget would emit a module that breaks both.
-    if (!Number.isSafeInteger(value) || value < MIN_DICTIONARY_BUDGET_BYTES || value > MAX_DICTIONARY_BUDGET_BYTES) {
-      console.error(
-        `error: --budget must be a byte count in [${MIN_DICTIONARY_BUDGET_BYTES}, ${MAX_DICTIONARY_BUDGET_BYTES}]`
-      );
-      process.exit(1);
-    }
-    dictionaryBudgetBytes = value;
-    args.splice(budgetIndex, 2);
-  }
-  const targets = args.includes('--all')
-    ? ['core', ...Object.keys(LANGUAGE_IDS).filter((name) => name !== 'none' && hasCorpus(name))]
-    : args;
-  if (targets.length === 0) {
-    console.error('usage: bun scripts/train/train.ts [--all] [core] [<language> ...]');
-    process.exit(1);
-  }
-  mkdirSync(GENERATED_DIR, { recursive: true });
-  mkdirSync(LANGUAGES_DIR, { recursive: true });
-  for (const target of targets) {
-    if (target === 'core') trainCore();
-    else trainLanguageModule(target);
-  }
-  updateBarrel();
-}
-
-/** Regenerates src/languages/index.ts to import every trained module (self-registration). */
-function updateBarrel(): void {
-  const modules = readdirSync(LANGUAGES_DIR)
-    .filter((name) => name.endsWith('.ts') && name !== 'index.ts')
-    .toSorted();
-  const imports = modules.map((name) => `import './${name}';`).join('\n');
-  const body = modules.length > 0 ? `${imports}\n` : 'export {};\n';
-  writeFileSync(
-    join(LANGUAGES_DIR, 'index.ts'),
-    `// Generated by scripts/train/train.ts — do not edit by hand.
-// Barrel importing every trained language module (each self-registers on import).
-${body}`
-  );
-}
-
-function trainCore(): void {
+  mkdirSync(DICT_DIR, { recursive: true });
   const wrapper = buildWrapperDictionary();
-  // Generic id-0 model trains on the plain-text corpus when available, else on a built-in sample.
-  const textDocs = loadTrainDocs('text');
-  const docs = textDocs.length > 0 ? textDocs : [FALLBACK_SAMPLE];
-  const model = trainStatistics(docs, wrapper, new Uint8Array(0));
-  const source = `${GENERATED_HEADER}import type { LanguageModuleData } from '../dictionary.ts';
-import { fromBase64, fromBase64U16 } from '../moduleData.ts';
-
-/** Shared wrapper dictionary (markdown/JSON scaffolding + generic prose), offset 0 in every language. */
-export const wrapperDictionary: Uint8Array = fromBase64('${toBase64(wrapper)}');
-
-/** The dictionary-less \`none\` path: id 0, wrapper dictionary only, generic model. */
-export const id0Module: LanguageModuleData = {
-  id: 0,
-  name: 'none',
-  dictionarySuffix: new Uint8Array(0),
-${modelFields(model)}};
-`;
-  writeFileSync(join(GENERATED_DIR, 'core.ts'), source);
-  console.log(`core: wrapper ${wrapper.length} B, model trained on ${docs.length} doc(s)`);
-}
-
-function trainLanguageModule(name: string): void {
-  const id = LANGUAGE_IDS[name];
-  if (id === undefined || id === 0) throw new Error(`unknown language: ${name}`);
-  const docs = loadTrainDocs(name);
-  if (docs.length === 0) throw new Error(`no train-split corpus for ${name} under ${CORPUS_DIR}/${name}`);
-  const wrapper = buildWrapperDictionary();
+  writeFileSync(join(DICT_DIR, 'wrapper.bin'), wrapper);
+  console.log(`wrapper: ${wrapper.length} B`);
   const wrapperText = new TextDecoder().decode(wrapper);
-  const suffix = trainDictionary(docs, dictionaryBudgetBytes, wrapperText);
-  const model = trainStatistics(docs, wrapper, suffix);
-
-  const exportName = `${identifierFor(name)}Module`;
-  const generated = `${GENERATED_HEADER}import type { LanguageModuleData } from '../dictionary.ts';
-import { fromBase64, fromBase64U16 } from '../moduleData.ts';
-
-export const ${exportName}: LanguageModuleData = {
-  id: ${id},
-  name: '${name}',
-  dictionarySuffix: fromBase64('${toBase64(suffix)}'),
-${modelFields(model)}};
-`;
-  writeFileSync(join(GENERATED_DIR, `${identifierFor(name)}.ts`), generated);
-  const registration = `import { ${exportName} } from '../generated/${identifierFor(name)}.ts';
-import { registerLanguageModule } from '../moduleRegistry.ts';
-
-// Self-registers on import; the model is validated at registration.
-registerLanguageModule(${exportName});
-
-export { ${exportName} };
-`;
-  writeFileSync(join(LANGUAGES_DIR, `${identifierFor(name)}.ts`), registration);
-  console.log(`${name}: dictionary ${suffix.length} B, trained on ${docs.length} doc(s)`);
-}
-
-/** Joint symbol frequencies collected from one parse pass, split into two folds for validation. */
-interface StreamStatistics {
-  /** Literal frequencies by previous-byte context, per fold: `[fold][ctx * 256 + byte]`. */
-  literal: [Float64Array, Float64Array];
-  /**
-   * Literal-model bit-node events by previous-byte context, exactly as the encoder walks
-   * them (plain and matched subtrees): `[ctx * LITERAL_BLOCK_SIZE + nodeIndex]`.
-   */
-  litNodeZero: Float64Array;
-  litNodeOne: Float64Array;
-  /** Coding-event kind frequencies by previous-kind context: `[prevKind * TOKEN_KIND_COUNT + kind]`. */
-  kind: Float64Array;
-  /** Rep-index frequencies by previous-kind context: `[prevKind * 4 + repIndex]`. */
-  rep: Float64Array;
-  /** Length-slot frequencies by length group: `[group * LENGTH_SLOT_COUNT + slot]`. */
-  length: Float64Array;
-  /** Offset-slot frequencies by group and length bucket: `[(group * 4 + bucket) * OFFSET_SLOT_COUNT + slot]`. */
-  offset: Float64Array;
+  for (const language of LANGUAGES) {
+    const docs = loadTrainDocs(language);
+    if (docs.length === 0) throw new Error(`no train-split corpus for ${language} under ${CORPUS_DIR}/${language}`);
+    const suffix = trainDictionary(docs, DICTIONARY_BUDGET_BYTES, wrapperText);
+    writeFileSync(join(DICT_DIR, `${language}.bin`), suffix);
+    console.log(`${language}: dictionary ${suffix.length} B from ${docs.length} docs`);
+  }
+  const priors = spawnSync(
+    'cargo',
+    ['run', '--release', '--features', 'train', '--bin', 'train-priors', '--', CORPUS_DIR],
+    {
+      cwd: join(ROOT, 'rust'),
+      stdio: 'inherit',
+    }
+  );
+  if (priors.status !== 0) throw new Error('priors training failed');
 }
 
 /**
- * Runs the real parser over the corpus with bootstrap priors, tallies the exact coding-event
- * frequencies the range coder's models see, and rebuilds the priors from them; later rounds
- * re-parse with the trained priors so prices and statistics converge. Literal contexts (the
- * previous byte) are greedily merged into classes chosen by two-fold cross-validation.
+ * Training reads only the public corpus: generated dictionaries embed literal fragments of
+ * their training documents and are committed to this public repository.
  */
-function trainStatistics(docs: string[], wrapper: Uint8Array, suffix: Uint8Array): LanguageModel {
-  const dictionary = new Uint8Array(wrapper.length + suffix.length);
-  dictionary.set(wrapper, 0);
-  dictionary.set(suffix, wrapper.length);
-
-  let model = flatModel();
-  let dictIndexHolder: RegisteredLanguage | undefined;
-  for (let round = 0; round < 3; round++) {
-    const language = makeLanguage(dictionary, model);
-    if (dictIndexHolder) {
-      language.dictIndex = dictIndexHolder.dictIndex;
-      language.dictMatcher = dictIndexHolder.dictMatcher;
-    }
-    dictIndexHolder = language;
-    const stats = collectStatistics(docs, dictionary, language);
-    const { litContext, litClassCount } = chooseLiteralClasses(stats.literal);
-    model = buildModel(stats, litContext, litClassCount);
-  }
-  return model;
-}
-
-function collectStatistics(docs: string[], dictionary: Uint8Array, language: RegisteredLanguage): StreamStatistics {
-  const stats: StreamStatistics = {
-    literal: [new Float64Array(256 * 256), new Float64Array(256 * 256)],
-    litNodeZero: new Float64Array(256 * LITERAL_BLOCK_SIZE),
-    litNodeOne: new Float64Array(256 * LITERAL_BLOCK_SIZE),
-    kind: new Float64Array(TOKEN_KIND_COUNT * TOKEN_KIND_COUNT),
-    rep: new Float64Array(TOKEN_KIND_COUNT * 4),
-    length: new Float64Array(3 * LENGTH_SLOT_COUNT),
-    offset: new Float64Array(2 * 4 * OFFSET_SLOT_COUNT),
-  };
-  let statsBytes = 0;
-  for (const [docIndex, doc] of docs.entries()) {
-    if (statsBytes >= MAX_STATS_BYTES) break;
-    const bytes = textEncoder.encode(doc);
-    statsBytes += bytes.length;
-    const literalFold = stats.literal[docIndex % 2]!;
-    const tokens = parse(bytes, dictionary, dictIndexIfNeeded(language, bytes.length), smallPricing(bytes, language));
-    let prevKind = TOKEN_KIND_LIT;
-    // rep0 replay (identical to the codec's) so matched-literal events see rep0.
-    let rep0 = 1;
-    for (const token of tokens) {
-      if (token.type === 'lit') {
-        for (let i = token.start; i < token.end; i++) {
-          stats.kind[prevKind * TOKEN_KIND_COUNT + TOKEN_KIND_LIT]!++;
-          const prevByte = i > 0 ? bytes[i - 1]! : 0;
-          const byte = bytes[i]!;
-          literalFold[prevByte * 256 + byte]!++;
-          // Tally the exact bit-node walk the encoder performs (plain or matched).
-          const nodeBase = prevByte * LITERAL_BLOCK_SIZE;
-          if (prevKind === TOKEN_KIND_LIT || rep0 > i) {
-            let node = 1;
-            for (let shift = 7; shift >= 0; shift--) {
-              const bit = (byte >>> shift) & 1;
-              if (bit === 0) stats.litNodeZero[nodeBase + node - 1]!++;
-              else stats.litNodeOne[nodeBase + node - 1]!++;
-              node = node * 2 + bit;
-            }
-          } else {
-            const matchByte = bytes[i - rep0]!;
-            let node = 1;
-            let matched = true;
-            for (let shift = 7; shift >= 0; shift--) {
-              const bit = (byte >>> shift) & 1;
-              let index: number;
-              if (matched) {
-                const matchBit = (matchByte >>> shift) & 1;
-                index = (((1 + matchBit) << 8) | node) - 1;
-                if (matchBit !== bit) matched = false;
-              } else {
-                index = node - 1;
-              }
-              if (bit === 0) stats.litNodeZero[nodeBase + index]!++;
-              else stats.litNodeOne[nodeBase + index]!++;
-              node = node * 2 + bit;
-            }
-          }
-          prevKind = TOKEN_KIND_LIT;
-        }
-      } else if (token.type === 'history') {
-        if (token.rep >= 0) {
-          stats.kind[prevKind * TOKEN_KIND_COUNT + TOKEN_KIND_REP0 + token.rep]!++;
-          stats.rep[prevKind * 4 + token.rep]!++;
-          stats.length[LEN_GROUP_REP * LENGTH_SLOT_COUNT + slotOf(token.len - MIN_LEN_REP)]!++;
-          prevKind = TOKEN_KIND_REP0 + token.rep;
-          rep0 = token.dist;
-        } else {
-          stats.kind[prevKind * TOKEN_KIND_COUNT + TOKEN_KIND_HISTORY]!++;
-          stats.length[LEN_GROUP_HISTORY * LENGTH_SLOT_COUNT + slotOf(token.len - MIN_LEN_REP)]!++;
-          stats.offset[
-            (OFF_GROUP_HISTORY * 4 + offLenBucketOf(token.len)) * OFFSET_SLOT_COUNT + slotOf(token.dist - 1)
-          ]!++;
-          prevKind = TOKEN_KIND_HISTORY;
-          rep0 = token.dist;
-        }
-      } else {
-        stats.kind[prevKind * TOKEN_KIND_COUNT + TOKEN_KIND_DICT]!++;
-        stats.length[LEN_GROUP_DICT * LENGTH_SLOT_COUNT + slotOf(token.len - MIN_LEN_REP)]!++;
-        stats.offset[(OFF_GROUP_DICT * 4 + offLenBucketOf(token.len)) * OFFSET_SLOT_COUNT + slotOf(token.start)]!++;
-        prevKind = TOKEN_KIND_DICT;
-      }
-    }
-  }
-  return stats;
-}
-
-/** Clamped 11-bit prior for P(bit = 0) from zero/one frequencies (+0.4 smoothing). */
-function probOf(zero: number, one: number): number {
-  const p = (zero + 0.4) / (zero + one + 0.8);
-  return Math.min(PROB_MAX, Math.max(PROB_MIN, Math.round(p * PROB_SCALE)));
-}
-
-/**
- * Fills the bit-tree nodes at `base` (1-based heap layout over `2^bits` leaves) with
- * priors derived from the leaves' frequencies.
- */
-function fillTreePriors(priors: Uint16Array, base: number, bits: number, leafFreqs: ArrayLike<number>): void {
-  const leaves = 1 << bits;
-  // sums[node] over the internal-plus-leaf heap: leaves occupy [leaves, 2 * leaves).
-  const sums = new Float64Array(2 * leaves);
-  for (let i = 0; i < leaves; i++) sums[leaves + i] = i < leafFreqs.length ? leafFreqs[i]! : 0;
-  for (let node = leaves - 1; node >= 1; node--) sums[node] = sums[2 * node]! + sums[2 * node + 1]!;
-  for (let node = 1; node < leaves; node++) {
-    priors[base + node - 1] = probOf(sums[2 * node]!, sums[2 * node + 1]!);
-  }
-}
-
-function buildModel(stats: StreamStatistics, litContext: Uint8Array, litClassCount: number): LanguageModel {
-  const priors = new Uint16Array(modelSizeFor(litClassCount)).fill(PROB_SCALE >> 1);
-  for (let ctx = 0; ctx < TOKEN_KIND_COUNT; ctx++) {
-    const row = ctx * TOKEN_KIND_COUNT;
-    const lit = stats.kind[row + TOKEN_KIND_LIT]!;
-    const hist = stats.kind[row + TOKEN_KIND_HISTORY]!;
-    const dict = stats.kind[row + TOKEN_KIND_DICT]!;
-    let rep = 0;
-    for (let r = 0; r < 4; r++) rep += stats.kind[row + TOKEN_KIND_REP0 + r]!;
-    priors[MODEL_IS_MATCH + ctx] = probOf(lit, hist + dict + rep);
-    priors[MODEL_IS_REP + ctx] = probOf(hist + dict, rep);
-    priors[MODEL_IS_DICT + ctx] = probOf(hist, dict);
-    const r0 = stats.rep[ctx * 4]!;
-    const r1 = stats.rep[ctx * 4 + 1]!;
-    const r2 = stats.rep[ctx * 4 + 2]!;
-    const r3 = stats.rep[ctx * 4 + 3]!;
-    priors[MODEL_REP_TREE + ctx * 3] = probOf(r0 + r1, r2 + r3);
-    priors[MODEL_REP_TREE + ctx * 3 + 1] = probOf(r0, r1);
-    priors[MODEL_REP_TREE + ctx * 3 + 2] = probOf(r2, r3);
-  }
-  for (let group = 0; group < 3; group++) {
-    fillTreePriors(
-      priors,
-      MODEL_LEN_TREE + group * (SLOT_TREE_LEAVES - 1),
-      SLOT_TREE_BITS,
-      stats.length.subarray(group * LENGTH_SLOT_COUNT, (group + 1) * LENGTH_SLOT_COUNT)
-    );
-  }
-  for (let group = 0; group < 2; group++) {
-    for (let bucket = 0; bucket < 4; bucket++) {
-      const at = group * 4 + bucket;
-      fillTreePriors(
-        priors,
-        MODEL_OFF_TREE + at * (SLOT_TREE_LEAVES - 1),
-        SLOT_TREE_BITS,
-        stats.offset.subarray(at * OFFSET_SLOT_COUNT, (at + 1) * OFFSET_SLOT_COUNT)
-      );
-    }
-  }
-  // Literal priors come from the tallied bit-node events, merged per class; sparsely
-  // visited matched nodes fall back to the plain node covering the same tree position.
-  const mergedZero = mergeByClass(stats.litNodeZero, litContext, litClassCount, LITERAL_BLOCK_SIZE);
-  const mergedOne = mergeByClass(stats.litNodeOne, litContext, litClassCount, LITERAL_BLOCK_SIZE);
-  for (let cls = 0; cls < litClassCount; cls++) {
-    const base = MODEL_LITERAL + cls * LITERAL_BLOCK_SIZE;
-    const nodeBase = cls * LITERAL_BLOCK_SIZE;
-    for (let index = 0; index < 255; index++) {
-      priors[base + index] = probOf(mergedZero[nodeBase + index]!, mergedOne[nodeBase + index]!);
-    }
-    for (let index = 255; index < LITERAL_BLOCK_SIZE; index++) {
-      // Matched-subtree slot for tree node `node` (slots where node would be 0 are unused).
-      const node = (index + 1) & 255;
-      if (node === 0) continue;
-      const zero = mergedZero[nodeBase + index]!;
-      const one = mergedOne[nodeBase + index]!;
-      priors[base + index] = zero + one >= 8 ? probOf(zero, one) : priors[base + node - 1]!;
-    }
-  }
-  return { litContext, litClassCount, priors };
-}
-
-/** Cluster of merged literal contexts (see {@link chooseLiteralClasses}). */
-interface Cluster {
-  freq: Float64Array;
-  members: number[];
-  entropyBits: number;
-}
-
-/**
- * Greedy agglomerative context merging: contexts (previous-byte values) whose conditional
- * literal distributions are closest (smallest joint-entropy increase) merge first. Candidate
- * class counts are scored by two-fold cross-validation (fold-0-fit distributions applied to
- * fold-1 frequencies and vice versa), so extra classes must pay for their own overfit.
- */
-function chooseLiteralClasses(folds: [Float64Array, Float64Array]): {
-  litContext: Uint8Array;
-  litClassCount: number;
-} {
-  // Cross-validation needs both folds populated (single-document training fills only one);
-  // with an empty fold every partition scores identically, so extra classes carry no
-  // evidence — fall back to one class instead of letting the tie pick the largest count.
-  const foldTotals = folds.map((fold) => fold.reduce((sum, x) => sum + x, 0));
-  if (foldTotals[0] === 0 || foldTotals[1] === 0) {
-    return { litContext: new Uint8Array(256), litClassCount: 1 };
-  }
-  const full = new Float64Array(256 * 256);
-  for (let i = 0; i < full.length; i++) full[i] = folds[0][i]! + folds[1][i]!;
-  let total = 0;
-  for (const x of full) total += x;
-
-  // Active clusters: frequent contexts start alone; rare ones share one bucket.
-  const clusters: Cluster[] = [];
-  const rare: number[] = [];
-  for (let ctx = 0; ctx < 256; ctx++) {
-    const freq = full.subarray(ctx * 256, ctx * 256 + 256);
-    let count = 0;
-    for (const x of freq) count += x;
-    if (count >= total * 0.0005) {
-      clusters.push({ freq: Float64Array.from(freq), members: [ctx], entropyBits: entropyBits(freq) });
-    } else rare.push(ctx);
-  }
-  if (rare.length > 0 || clusters.length === 0) {
-    const freq = new Float64Array(256);
-    for (const ctx of rare) {
-      for (let byte = 0; byte < 256; byte++) freq[byte]! += full[ctx * 256 + byte]!;
-    }
-    clusters.push({ freq, members: rare, entropyBits: entropyBits(freq) });
-  }
-
-  // Merge down to LIT_CLASS_MAX, snapshotting each candidate class count on the way.
-  const candidates = new Map<number, Uint8Array>();
-  const snapshot = (): Uint8Array => {
-    const classOf = new Uint8Array(256);
-    for (const [cls, cluster] of clusters.entries()) for (const ctx of cluster.members) classOf[ctx] = cls;
-    return classOf;
-  };
-  const candidateCounts = new Set([LIT_CLASS_MAX, 32, 16, 8, 4, 1]);
-  const merged = new Float64Array(256);
-  while (clusters.length > 1) {
-    if (candidateCounts.has(clusters.length)) candidates.set(clusters.length, snapshot());
-    let bestI = 0;
-    let bestJ = 1;
-    let bestDelta = Number.POSITIVE_INFINITY;
-    for (let i = 0; i < clusters.length; i++) {
-      for (let j = i + 1; j < clusters.length; j++) {
-        for (let byte = 0; byte < 256; byte++) merged[byte] = clusters[i]!.freq[byte]! + clusters[j]!.freq[byte]!;
-        const delta = entropyBits(merged) - clusters[i]!.entropyBits - clusters[j]!.entropyBits;
-        if (delta < bestDelta) {
-          bestDelta = delta;
-          bestI = i;
-          bestJ = j;
-        }
-      }
-    }
-    const a = clusters[bestI]!;
-    const b = clusters[bestJ]!;
-    for (let byte = 0; byte < 256; byte++) a.freq[byte]! += b.freq[byte]!;
-    a.members.push(...b.members);
-    a.entropyBits = entropyBits(a.freq);
-    clusters.splice(bestJ, 1);
-  }
-  candidates.set(1, snapshot());
-
-  // Cross-validated cost of each candidate: distributions from one fold, symbol counts from the other.
-  let bestCount = 1;
-  let bestBits = Number.POSITIVE_INFINITY;
-  for (const [count, classOf] of candidates) {
-    let bits = 0;
-    for (const [foldIndex, trainFold] of folds.entries()) {
-      const evalFold = folds[1 - foldIndex]!;
-      const trainMerged = mergeByClass(trainFold, classOf, count, 256);
-      const evalMerged = mergeByClass(evalFold, classOf, count, 256);
-      for (let cls = 0; cls < count; cls++) {
-        bits += crossEntropyBits(
-          trainMerged.subarray(cls * 256, (cls + 1) * 256),
-          evalMerged.subarray(cls * 256, (cls + 1) * 256)
-        );
-      }
-    }
-    if (bits < bestBits) {
-      bestBits = bits;
-      bestCount = count;
-    }
-  }
-  return { litContext: candidates.get(bestCount)!, litClassCount: bestCount };
-}
-
-/** Sums joint `[ctx][symbol]` frequencies into `[classOf(ctx)][symbol]` frequencies. */
-function mergeByClass(
-  joint: Float64Array,
-  classOf: Uint8Array,
-  classCount: number,
-  alphabetSize: number
-): Float64Array {
-  const merged = new Float64Array(classCount * alphabetSize);
-  const contextCount = joint.length / alphabetSize;
-  for (let ctx = 0; ctx < contextCount; ctx++) {
-    const target = classOf[ctx]! * alphabetSize;
-    for (let symbol = 0; symbol < alphabetSize; symbol++) {
-      merged[target + symbol]! += joint[ctx * alphabetSize + symbol]!;
-    }
-  }
-  return merged;
-}
-
-/** Total bits (frequency-weighted self-information) of one conditional distribution. */
-function entropyBits(freq: Float64Array): number {
-  let sum = 0;
-  for (const x of freq) sum += x;
-  if (sum === 0) return 0;
-  let bits = 0;
-  for (const x of freq) if (x > 0) bits -= x * Math.log2(x / sum);
-  return bits;
-}
-
-/** Bits to code `evalFreq` under a (smoothed) distribution fit to `trainFreq`. */
-function crossEntropyBits(trainFreq: Float64Array, evalFreq: Float64Array): number {
-  let trainSum = 0;
-  for (const x of trainFreq) trainSum += x;
-  const denominator = trainSum + trainFreq.length * 0.4;
-  let bits = 0;
-  for (let symbol = 0; symbol < trainFreq.length; symbol++) {
-    const count = evalFreq[symbol]!;
-    if (count > 0) bits -= count * Math.log2((trainFreq[symbol]! + 0.4) / denominator);
-  }
-  return bits;
-}
-
-function makeLanguage(dictionary: Uint8Array, model: LanguageModel): RegisteredLanguage {
-  return {
-    id: -1,
-    name: 'training',
-    dictionary,
-    wrapperLength: 0,
-    model,
-    dictIndex: undefined,
-    dictMatcher: undefined,
-  };
-}
-
-function flatModel(): LanguageModel {
-  return {
-    litContext: new Uint8Array(256),
-    litClassCount: 1,
-    priors: new Uint16Array(modelSizeFor(1)).fill(PROB_SCALE >> 1),
-  };
-}
-
-function modelFields(model: LanguageModel): string {
-  return `  model: {
-    litContext: fromBase64('${toBase64(model.litContext)}'),
-    litClassCount: ${model.litClassCount},
-    priors: fromBase64U16('${toBase64U16(model.priors)}'),
-  },
-`;
-}
-
-function identifierFor(name: string): string {
-  // 'en-US' → 'enUs' (strict camelCase, matching the repo's filename convention).
-  return name.replaceAll(/-(\w+)/g, (_, part: string) => part[0]!.toUpperCase() + part.slice(1).toLowerCase());
-}
-
-function hasCorpus(name: string): boolean {
-  return existsSync(join(CORPUS_DIR, name));
-}
-
-/**
- * Train-split docs only, allow-listed from the manifest: a sample trains only when it is
- * explicitly marked `split: "train"` and trainable. Stray files without manifest rows (or a
- * corpus that has not been through split.ts yet) contribute nothing — failing toward an empty
- * train set is safer than silently training on unlabeled or license-restricted data.
- */
-function loadTrainDocs(name: string): string[] {
-  // Training reads only the public corpus, never corpusDirs(): generated dictionaries embed
-  // literal fragments of their training documents and are committed to this public
-  // repository, so the auto-detected private corpus must stay benchmark-only.
-  const dir = join(CORPUS_DIR, name);
+function loadTrainDocs(language: string): string[] {
+  const dir = join(CORPUS_DIR, language);
   const manifestPath = join(dir, 'manifest.jsonl');
   if (!existsSync(manifestPath)) return [];
   const docs: string[] = [];
   for (const line of readFileSync(manifestPath, 'utf8').split('\n')) {
     if (!line.trim()) continue;
-    const entry = JSON.parse(line) as { file: string; split?: string; trainable?: boolean };
+    const entry = manifestEntrySchema.parse(JSON.parse(line));
     if (entry.split !== 'train' || entry.trainable === false) continue;
     const path = join(dir, entry.file);
     if (existsSync(path)) docs.push(readFileSync(path, 'utf8'));
   }
   return docs;
 }
-
-const GENERATED_HEADER = `// Generated by scripts/train/train.ts — do not edit by hand.
-// oxlint-disable -- generated file
-`;
-
-const FALLBACK_SAMPLE = `# tokzip generic sample
-This built-in sample trains the id-0 model when no plain-text corpus has been fetched.
-It mixes short English prose with typical code and JSON payloads, because the id-0 path
-must degrade gracefully on anything: chat messages, markdown documents, configuration
-files, and source snippets. The quick brown fox jumps over the lazy dog. She sells sea
-shells by the sea shore, and the shells she sells are surely seashells.
-
-\`\`\`typescript
-export function greet(name: string): string {
-  return \`Hello, \${name}!\`;
-}
-for (let i = 0; i < 10; i++) console.log(greet(String(i)));
-\`\`\`
-
-{"name":"example","version":"1.0.0","dependencies":{"left-pad":"^1.3.0"},"private":true}
-
-However, the training corpus should be fetched with scripts/corpus/fetchOss.ts for real
-use; these few paragraphs only make the bootstrap tables sane rather than representative.
-`;
 
 main();

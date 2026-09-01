@@ -8,9 +8,17 @@
   "license": "UNLICENSED",
   "author": "WillBooster Inc.",
   "type": "module",
-  "module": "index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "module": "src/index.ts",
+  "files": [
+    "src",
+    "wasm"
+  ],
   "scripts": {
     "bench": "bun scripts/bench/bench.ts",
+    "build": "cargo build --release --target wasm32-unknown-unknown --manifest-path rust/Cargo.toml -p tokzip-wasm && cp rust/target/wasm32-unknown-unknown/release/tokzip_wasm.wasm wasm/tokzip.wasm",
     "cleanup": "bun wb lint --fix --format",
     "format": "bun wb lint --format",
     "lint": "bun wb lint",
@@ -18,6 +26,7 @@
     "prepare": "(bun lefthook install || true) && (test ! -f .lefthook/normalize-bun-lockfile.sh || bash .lefthook/normalize-bun-lockfile.sh)",
     "test": "bun wb test",
     "test/ci": "bun wb test-on-ci",
+    "train": "bun scripts/train/train.ts",
     "typecheck": "bun wb typecheck",
     "verify": "bun wb verify",
     "verify-full": "bun wb verify --full"
@@ -29,11 +38,11 @@
     "@willbooster/oxlint-config": "1.4.8",
     "@willbooster/wb": "22.0.1",
     "lefthook": "2.1.10",
-    "lz-string": "1.5.0",
     "oxfmt": "0.63.0",
     "oxlint": "1.78.0",
     "oxlint-tsgolint": "7.0.2001",
-    "sort-package-json": "4.0.0"
+    "sort-package-json": "4.0.0",
+    "zod": "4.4.3"
   },
   "peerDependencies": {
     "typescript": "7.0.2"
