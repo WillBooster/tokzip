@@ -52,22 +52,6 @@ createInterface({ input: tail.stdout }).on('line', (line) => {
 });
 await Bun.sleep(4000);
 
-async function hit(path: string): Promise<{ ttfb: number; body: string }> {
-  const started = performance.now();
-  const response = await fetch(`${base}${path}`);
-  // Time to first byte: measured when headers arrive, before the body is drained.
-  const ttfb = performance.now() - started;
-  const body = await response.text();
-  // `fetch` resolves on 4xx/5xx, and the /decompress route reports a failed round-trip in its
-  // body, so both are rejected here — a broken deployment must not print as a bench row.
-  if (!response.ok || body.includes('MISMATCH')) {
-    done = true;
-    tail.kill();
-    throw new Error(`${path}: HTTP ${response.status} ${body}`);
-  }
-  return { ttfb, body };
-}
-
 interface Row {
   label: string;
   ttfb: number;
@@ -84,6 +68,22 @@ const record = async (label: string, path: string): Promise<void> => {
   const contaminated = label !== COLD_LOAD && (body.includes('cached=false') || body.includes('warm=false'));
   rows.push({ label, ttfb, contaminated });
 };
+async function hit(path: string): Promise<{ ttfb: number; body: string }> {
+  const started = performance.now();
+  const response = await fetch(`${base}${path}`);
+  // Time to first byte: measured when headers arrive, before the body is drained.
+  const ttfb = performance.now() - started;
+  const body = await response.text();
+  // `fetch` resolves on 4xx/5xx, and the /decompress route reports a failed round-trip in its
+  // body, so both are rejected here — a broken deployment must not print as a bench row.
+  if (!response.ok || body.includes('MISMATCH')) {
+    done = true;
+    tail.kill();
+    throw new Error(`${path}: HTTP ${response.status} ${body}`);
+  }
+  return { ttfb, body };
+}
+
 await record('/noop', '/noop');
 await record(COLD_LOAD, '/load');
 await record('/load (warm: compress all samples)', '/load');
