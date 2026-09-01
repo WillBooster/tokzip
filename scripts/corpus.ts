@@ -3,11 +3,17 @@ import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { z } from 'zod';
 
-/** One line of a corpus `manifest.jsonl`; only the fields training and benchmarks read. */
+/**
+ * One line of a corpus `manifest.jsonl`; only the fields training and benchmarks read. `split`
+ * and `trainable` are filters, so an unrecognized value reads as absent and the entry is
+ * skipped — the same selection the Rust priors trainer applies — instead of aborting the run.
+ */
 export const manifestEntrySchema = z.object({
   file: z.string(),
-  split: z.enum(['train', 'bench']).optional(),
-  trainable: z.boolean().optional(),
+  // oxlint-disable-next-line unicorn/prefer-top-level-await -- zod's .catch() is a schema fallback, not a promise chain
+  split: z.string().optional().catch(undefined),
+  // oxlint-disable-next-line unicorn/prefer-top-level-await -- zod's .catch() is a schema fallback, not a promise chain
+  trainable: z.boolean().optional().catch(undefined),
 });
 
 const defaultCorpusDir = resolve(import.meta.dir, '../../tokzip-corpus/corpus');
