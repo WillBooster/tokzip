@@ -15,25 +15,47 @@ frame := 0xD0 flags sizeVarint crc32 body
 
 - `0xD0`: magic `1101` in the high nibble, version 0 in the low nibble.
 - `flags`: bit 0 = content type (0 = UTF-8 string, 1 = bytes); bit 1 = stored; bit 2 =
-  multi-segment (never together with stored). Other bits are a structural error.
+  multi-segment; bit 3 = blocked. Stored excludes bits 2 and 3, which also exclude each other;
+  other bits are a structural error.
 - `sizeVarint`: decompressed length in bytes. For coded frames decoders reject a length above
-  4 MiB or above 8192 × the body length before allocating anything, and reject a frame whose
-  coded body needs more than a fixed synthetic-padding budget past its end while decoding.
+  8192 × the body length before allocating anything — and, unless the frame is blocked, above
+  4 MiB — and reject a frame whose coded body needs more than a fixed synthetic-padding budget
+  past its end while decoding.
 - `crc32`: IEEE CRC-32 of the decompressed content followed by one type byte (0x00 string,
   0x01 bytes), so a retyped frame fails the check; decoders verify it before returning.
-- `body`: stored → the content itself (exactly `size` bytes). Otherwise a segment table then
-  the range-coded stream (§3).
+- `body`: stored → the content itself (exactly `size` bytes). Blocked → the block sequence
+  (§1). Otherwise a segment table (§2) then the range-coded stream (§4).
 
 Stored frames are the encoder's fallback whenever coding would not be strictly smaller or the
-encoder's own decode check fails; empty content and content above the 4 MiB coded-frame cap
-are always stored.
+encoder's own decode check fails; empty content is always stored.
 
-## 1. Segments
+## 1. Blocks
 
-The encoder splits the content into language segments (contiguous, covering the whole
+Content above 4 MiB is coded as consecutive blocks of 4 MiB (the last one shorter), so the
+coder's working set is bounded by the block size; a blocked frame whose `size` fits one block
+is a structural error. Each block is coded independently: its own language segments and
+models, and tokens never reach into an earlier block.
+
+```
+block := blockFlags payloadLenVarint payload
+```
+
+- `blockFlags`: bit 1 = stored; bit 2 = multi-segment (never together; other bits are a
+  structural error).
+- `payload`: stored → the block's content (exactly the block length). Otherwise the block's
+  segment table (§2) then its range-coded stream (§4), laid out exactly as a single-block body.
+
+The encoder stores a block whose coded payload would not be strictly smaller or fails its
+decode check — and, without coding the rest, a block longer than 256 KiB whose first 256 KiB
+does not shrink when coded on its own — and falls back to a stored frame when the blocked frame
+as a whole would not be smaller. Trailing bytes after the last block are a structural error.
+
+## 2. Segments
+
+The encoder splits the content (or each block) into language segments (contiguous, covering the whole
 content). Single segment: one byte, the language id. Multi-segment (flag bit 2): a varint
 segment count (at most 2^20; decoders reject more), then per segment a language-id byte and a
-varint length; lengths are non-zero and sum to `size`.
+varint length; lengths are non-zero and sum to `size` (the block length in a blocked frame).
 
 Language ids (format identity — the dictionaries and priors they name are part of the codec):
 
@@ -48,9 +70,9 @@ Language ids (format identity — the dictionaries and priors they name are part
 | 6   | typescript |
 
 Each language's dictionary is the shared wrapper (`dict/wrapper.bin`) followed by its trained
-suffix (`dict/<language>.bin`); its models start from `priors/<language>.bin` (§4).
+suffix (`dict/<language>.bin`); its models start from `priors/<language>.bin` (§5).
 
-## 2. Window
+## 3. Window
 
 Tokens address a source by distance `d ≥ 1` from the current position `p`: `d ≤ p` reaches
 into the already-decoded content, larger distances continue into the active segment's
@@ -58,23 +80,24 @@ dictionary as if it preceded the content (`dict[D − (d − p)]`, `D` = diction
 copy runs forward one byte at a time, so it may overlap its own output and may cross from the
 dictionary into the content. Tokens never cross a segment boundary.
 
-## 3. Coded stream
+## 4. Coded stream
 
 One LZMA-style adaptive binary range coder (32-bit range, 11-bit probabilities, adaptation
-shift 5, renormalization at 2^24) codes the whole body across all segments. The encoder drops
+shift 5, renormalization at 2^24) codes the whole body (one block's payload in a blocked
+frame) across all of its segments. The encoder drops
 the always-zero first output byte and trims trailing zero bytes; the decoder feeds zeros past
 the end of the body and rejects a body that has bytes it never read.
 
 Coder state shared across segments: the 12-state LZMA state machine and the four most recent
 distances (`reps`, stored as distance − 1, initially 0). At every segment start, a rep whose
 distance exceeds `p + D` of the new segment resets to 0 (distance 1). Each segment swaps in its
-language's adaptive models; a language's models persist across all of its segments in one frame.
+language's adaptive models; a language's models persist across all of its segments in one block.
 
 Token grammar per position (bits are coded with the model node named in brackets; `s` is the
 state):
 
 - `[is_match s] = 0` → **literal**: 8 bits MSB-first through the literal tree of the previous
-  byte's class (§4). After a match (`s ≥ 7`) the first bits are coded through the shared
+  byte's class (§5). After a match (`s ≥ 7`) the first bits are coded through the shared
   matched-literal trees, predicted by the byte at `reps[0] + 1`, until the first mismatch.
 - `[is_match s] = 1`, `[is_rep s] = 0` → **explicit match**:
   - `[is_dict s] = 0`: length (`LEN` model) then distance − 1 (`HIST_DIST` model).
@@ -90,7 +113,7 @@ Lengths: `choice` bit → 3-bit tree (2–9), `choice2` bit → 3-bit tree (10�
 slots ≥ 4 the LZMA footer bits — reverse bit trees for slots < 14 (`spec_pos`), direct bits plus
 a 4-bit reverse `align` tree beyond.
 
-## 4. Models and priors
+## 5. Models and priors
 
 All probabilities of a language live in one flat array (layout in `lz.rs`: `is_match`,
 `is_rep`, `is_rep_g0`, `is_rep_g1`, `is_rep_g2`, `is_rep0_long`, `is_dict` × 12 states;

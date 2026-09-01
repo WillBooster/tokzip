@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { compress, decompress } from '../../src/index.ts';
+import { compress, decompress, TokzipDecodeError } from '../../src/index.ts';
 
 const JAPANESE_PROMPT = `以下の要件を満たすブロック崩しゲームを作成してください。
 - キャンバスサイズは 800x600 とし、背景は暗い青にしてください。
@@ -32,7 +32,20 @@ draw();
 
 describe('compress/decompress', () => {
   test('round-trips strings, including empty and non-ASCII content', () => {
-    for (const input of ['', 'a', 'hello', JAPANESE_PROMPT, MIXED_ANSWER, '﻿bom prefixed', '🎮'.repeat(100)]) {
+    // Astral characters at odd byte offsets: the UTF-8 length must be computed exactly.
+    const inputs = [
+      '',
+      'a',
+      'hello',
+      JAPANESE_PROMPT,
+      MIXED_ANSWER,
+      '﻿bom prefixed',
+      '🎮'.repeat(100),
+      'あ𝄞',
+      '🎮あ',
+      'a🎮',
+    ];
+    for (const input of inputs) {
       const frame = compress(input);
       expect(frame).toBeInstanceOf(Uint8Array);
       expect(decompress(frame)).toBe(input);
@@ -75,5 +88,21 @@ describe('compress/decompress', () => {
   test('handles inputs spanning many parse chunks', () => {
     const large = MIXED_ANSWER.repeat(200); // ~180 KB
     expect(decompress(compress(large))).toBe(large);
+  });
+
+  test('codes content above one 4 MiB block instead of storing it', () => {
+    const huge = MIXED_ANSWER.repeat(7000); // ~6.7 MiB, spanning two blocks
+    expect(Buffer.byteLength(huge)).toBeGreaterThan(4 * 1024 * 1024);
+    const frame = compress(huge);
+    expect(frame[1]! & 0b1000).toBe(0b1000); // blocked flag
+    expect(frame.length * 10).toBeLessThan(Buffer.byteLength(huge));
+    expect(decompress(frame)).toBe(huge);
+  });
+
+  test('rejects frames declaring more content than maxLength', () => {
+    const frame = compress(MIXED_ANSWER);
+    expect(() => decompress(frame, { maxLength: 10 })).toThrow(TokzipDecodeError);
+    expect(() => decompress(frame, { maxLength: -1 })).toThrow(RangeError);
+    expect(decompress(frame, { maxLength: Buffer.byteLength(MIXED_ANSWER) })).toBe(MIXED_ANSWER);
   });
 });

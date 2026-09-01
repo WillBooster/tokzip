@@ -1185,31 +1185,37 @@ pub fn decode_doc(
     body: &[u8],
     out_len: usize,
     segments: &[Segment],
-) -> Result<Vec<u8>, DecodeError> {
-    // The caller bounds `out_len` by the body size; the reservation is bounded tighter still so
-    // a forged header cannot cost a large allocation before the CRC rejects it.
-    let mut out: Vec<u8> = Vec::with_capacity(out_len.min(body.len() * 64 + 4096));
+    out: &mut Vec<u8>,
+) -> Result<(), DecodeError> {
+    // Appends exactly `out_len` bytes to `out`; positions below are relative to `base`, and
+    // tokens never reach below it. The whole output is reserved up front (the caller bounds
+    // `out_len` to one block, `BLOCK_LEN`; a frame's total output is separately bounded by its
+    // body's expansion limit), so no later push allocates: an output the memory cannot hold
+    // fails here instead of aborting the module.
+    let base = out.len();
+    out.try_reserve_exact(out_len)
+        .map_err(|_| DecodeError::TooLarge)?;
     let mut rc = Decoder::new(body);
     let mut cs = CoderState::new();
     let mut lang_models = LangModels::new(lookup);
     for seg in segments {
-        if seg.end > out_len || seg.end < out.len() {
+        if seg.end > out_len || seg.end < out.len() - base {
             return Err(DecodeError::Corrupt);
         }
         let dict: &[u8] = &lookup(seg.lang).bytes;
         let dlen = dict.len();
-        clamp_reps(&mut cs, out.len(), dlen);
+        clamp_reps(&mut cs, out.len() - base, dlen);
         let mut models = lang_models.take(seg.lang);
         let lit_class = models.lit_class;
-        while out.len() < seg.end {
+        while out.len() - base < seg.end {
             if rc.overran() {
                 return Err(DecodeError::Corrupt);
             }
-            let pos = out.len();
+            let pos = out.len() - base;
             let probs = &mut models.probs;
             if rc.decode_bit(probs, IS_MATCH + cs.state) == 0 {
                 let prev = if pos > 0 {
-                    out[pos - 1]
+                    out[base + pos - 1]
                 } else {
                     dict.last().copied().unwrap_or(0)
                 };
@@ -1221,7 +1227,7 @@ pub fn decode_doc(
                         return Err(DecodeError::Corrupt);
                     }
                     let dist = cs.reps[0] as usize + 1;
-                    let match_byte = u32::from(source_byte(&out, dict, pos, dist));
+                    let match_byte = u32::from(source_byte(&out[base..], dict, pos, dist));
                     let mut i = 8u32;
                     while i > 0 {
                         i -= 1;
@@ -1265,7 +1271,7 @@ pub fn decode_doc(
                             return Err(DecodeError::Corrupt);
                         }
                         let dist = cs.reps[0] as usize + 1;
-                        let b = source_byte(&out, dict, pos, dist);
+                        let b = source_byte(&out[base..], dict, pos, dist);
                         out.push(b);
                         cs.state = if cs.state < 7 { 9 } else { 11 };
                         continue;
@@ -1291,8 +1297,8 @@ pub fn decode_doc(
             }
             let dist = cs.reps[0] as usize + 1;
             for _ in 0..len {
-                let p = out.len();
-                let b = source_byte(&out, dict, p, dist);
+                let p = out.len() - base;
+                let b = source_byte(&out[base..], dict, p, dist);
                 out.push(b);
             }
         }
@@ -1302,10 +1308,10 @@ pub fn decode_doc(
     // been consumed — trailing bytes beyond what the coder read are a structural error. The
     // overrun flag is re-checked here in case the padding budget was crossed inside the final
     // token, after the last loop-top check.
-    if out.len() != out_len || rc.consumed() < body.len() || rc.overran() {
+    if out.len() - base != out_len || rc.consumed() < body.len() || rc.overran() {
         return Err(DecodeError::Corrupt);
     }
-    Ok(out)
+    Ok(())
 }
 
 #[inline]
@@ -1324,7 +1330,8 @@ mod tests {
     fn round_trip(primed: &[&'static Primed], doc: &[u8], segments: &[Segment]) {
         let lookup = |lang: u8| primed[lang as usize];
         let body = encode_doc(&lookup, doc, segments);
-        let restored = decode_doc(&lookup, &body, doc.len(), segments).expect("decode");
+        let mut restored = Vec::new();
+        decode_doc(&lookup, &body, doc.len(), segments, &mut restored).expect("decode");
         assert_eq!(restored, doc, "round-trip mismatch (doc len {})", doc.len());
     }
 

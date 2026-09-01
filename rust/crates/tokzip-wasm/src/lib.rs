@@ -44,15 +44,15 @@ pub unsafe extern "C" fn tokzip_compress(ptr: *const u8, len: usize, is_bytes: u
 }
 
 /// Returns 0 on success (content in the output buffer, type flag via `tokzip_out_is_bytes`),
-/// or a nonzero `DecodeError` code.
+/// or a nonzero `DecodeError` code; a frame declaring more than `max_len` bytes is rejected.
 ///
 /// # Safety
 /// `ptr` must come from `tokzip_alloc(len)` (so it is non-null even when `len` is 0) with
 /// `ptr..ptr+len` initialized.
 #[no_mangle]
-pub unsafe extern "C" fn tokzip_decompress(ptr: *const u8, len: usize) -> u32 {
+pub unsafe extern "C" fn tokzip_decompress(ptr: *const u8, len: usize, max_len: usize) -> u32 {
     let frame = std::slice::from_raw_parts(ptr, len);
-    match tokzip::decompress(frame) {
+    match tokzip::decompress(frame, max_len) {
         Ok((content, is_bytes)) => {
             OUT.with(|out| *out.borrow_mut() = content);
             IS_BYTES.with(|b| b.set(is_bytes));
