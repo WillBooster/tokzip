@@ -38,8 +38,8 @@ jobs:
         with:
           workspaces: rust
       - run: cargo fmt --check
-      - run: cargo clippy --locked --all-targets -- -D warnings
-      - run: cargo test --locked --release
+      - run: cargo clippy --locked --all-targets --all-features -- -D warnings
+      - run: cargo test --locked --release --all-features
       - name: Verify the committed wasm module matches the sources
         run: |
           cargo build --locked --release --target wasm32-unknown-unknown -p tokzip-wasm

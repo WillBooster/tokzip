@@ -150,16 +150,9 @@ pub fn analyze(doc: &[u8]) -> (Vec<Segment>, [i32; LANGUAGE_COUNT]) {
             totals,
         );
     }
-    let sets = gram_sets();
     let windows = doc.len().div_ceil(WINDOW);
     let mut scores = vec![[0i32; LANGUAGE_COUNT]; windows];
-    for pos in 0..doc.len() - 3 {
-        let h = gram_hash(doc, pos);
-        let row = &mut scores[pos / WINDOW];
-        for (lang, set) in sets.iter().enumerate() {
-            row[lang] += set.contains(h) as i32;
-        }
-    }
+    add_gram_hits(doc, &mut scores, |pos| pos / WINDOW);
     let mut totals = [0i32; LANGUAGE_COUNT];
     for row in &scores {
         for (lang, &score) in row.iter().enumerate() {
@@ -219,20 +212,28 @@ pub fn analyze(doc: &[u8]) -> (Vec<Segment>, [i32; LANGUAGE_COUNT]) {
     (segments, totals)
 }
 
-/// 4-gram overlap of `doc` against each language's dictionary (no fence hint). The shared
-/// scoring pass behind both single-language ranking and the windowed segmentation.
+/// Whole-document 4-gram overlap of `doc` against each language's dictionary (no fence hint),
+/// for documents too short to have windows.
 fn gram_scores(doc: &[u8]) -> [i32; LANGUAGE_COUNT] {
-    let mut scores = [0i32; LANGUAGE_COUNT];
-    if doc.len() >= 4 {
-        let sets = gram_sets();
-        for pos in 0..doc.len() - 3 {
-            let h = gram_hash(doc, pos);
-            for (lang, set) in sets.iter().enumerate() {
-                scores[lang] += set.contains(h) as i32;
-            }
+    let mut scores = [[0i32; LANGUAGE_COUNT]];
+    add_gram_hits(doc, &mut scores, |_| 0);
+    scores[0]
+}
+
+/// The one gram-scoring pass: for every 4-gram position of `doc`, counts a hit for each
+/// language whose dictionary contains that gram, in the row `row_of(position)` selects.
+fn add_gram_hits(doc: &[u8], rows: &mut [[i32; LANGUAGE_COUNT]], row_of: impl Fn(usize) -> usize) {
+    if doc.len() < 4 {
+        return;
+    }
+    let sets = gram_sets();
+    for pos in 0..doc.len() - 3 {
+        let h = gram_hash(doc, pos);
+        let row = &mut rows[row_of(pos)];
+        for (lang, set) in sets.iter().enumerate() {
+            row[lang] += set.contains(h) as i32;
         }
     }
-    scores
 }
 
 const MAX_CANDIDATES: usize = 3;

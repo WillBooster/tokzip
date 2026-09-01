@@ -35,9 +35,10 @@ trained dictionary and model priors. Embedded languages: `text`, `en-US`, `ja-JP
   single language.
 - **Storage-grade**: every frame carries a CRC-32 of its content and type, `compress` decodes its own
   output and compares it to the input before returning (falling back to a stored frame
-  otherwise), and corrupt or truncated frames throw a typed `TokzipDecodeError` — never
-  silently wrong output. Incompressible input never expands beyond the stored-frame header
-  (7–10 bytes, depending on the length varint).
+  otherwise), and a corrupt or truncated frame either throws a typed `TokzipDecodeError` or
+  (when the range coder's trailing slack absorbs the damage) decodes to the exact original —
+  never silently wrong output. Incompressible input never expands beyond the stored-frame
+  header (7–10 bytes, depending on the length varint).
 - **Format v0 (pre-release)**: the format changes freely with no compatibility for earlier
   frames until it is fixed as v1; decoders reject other versions. See [FORMAT.md](FORMAT.md).
 

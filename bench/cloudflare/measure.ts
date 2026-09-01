@@ -43,6 +43,13 @@ async function hit(path: string): Promise<{ ttfb: number; body: string }> {
   // Time to first byte: measured when headers arrive, before the body is drained.
   const ttfb = performance.now() - started;
   const body = await response.text();
+  // `fetch` resolves on 4xx/5xx, and the /decompress route reports a failed round-trip in its
+  // body, so both are rejected here — a broken deployment must not print as a bench row.
+  if (!response.ok || body.includes('MISMATCH')) {
+    done = true;
+    tail.kill();
+    throw new Error(`${path}: HTTP ${response.status} ${body}`);
+  }
   return { ttfb, body };
 }
 

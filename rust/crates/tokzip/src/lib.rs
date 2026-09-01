@@ -28,9 +28,13 @@ const FLAG_STORED: u8 = 0b10;
 const FLAG_MULTI: u8 = 0b100;
 /// Upper bound on a coded frame's declared decompressed length, so a corrupt or forged header
 /// cannot drive a large allocation, and the ceiling above which `compress` skips coding (see
-/// there) and stores the content verbatim. Sized for the intended at-rest payloads (prompts,
-/// LLM outputs, cache entries) and a 128 MiB Cloudflare Workers isolate.
-const MAX_DECOMPRESSED_LEN: u64 = 64 * 1024 * 1024;
+/// there) and stores the content verbatim. Both paths cost a multiple of the content: coding
+/// keeps the input copy, a 4-byte match-chain entry per input byte, the body, and the
+/// self-check's decoded copy live at once, and decoding hands the caller a copy of the output
+/// (plus a decoded string) on top of the wasm-side buffer — measured in Bun, a 4 MiB document
+/// adds ~60 MB to the process. Sized for the intended at-rest payloads (prompts, LLM outputs,
+/// cache entries) to leave a 128 MiB Cloudflare Workers isolate room for the caller.
+const MAX_DECOMPRESSED_LEN: u64 = 4 * 1024 * 1024;
 /// Upper bound on how much a coded body may expand: the codec tops out near 7,000× on
 /// degenerate runs, so a declared length beyond this is a forged header and is rejected
 /// before any output is allocated (a corrupt varint cannot force a large allocation).
@@ -328,6 +332,10 @@ fn push_varint(out: &mut Vec<u8>, mut v: u64) {
 fn read_varint(buf: &[u8]) -> Result<(u64, &[u8]), DecodeError> {
     let mut v = 0u64;
     for (i, &byte) in buf.iter().enumerate().take(10) {
+        // The tenth group holds only bit 63; anything above it would be shifted out silently.
+        if i == 9 && byte > 1 {
+            return Err(DecodeError::Corrupt);
+        }
         v |= u64::from(byte & 0x7F) << (7 * i);
         if byte & 0x80 == 0 {
             // Canonical form: a multi-byte varint never ends in a zero group.
@@ -407,6 +415,13 @@ mod tests {
         assert_eq!(decompress(&bad), Err(DecodeError::UnsupportedVersion));
         bad[0] = 0x42;
         assert_eq!(decompress(&bad), Err(DecodeError::BadMagic));
+        // A stored empty frame whose length varint encodes 2^64 must not wrap to 0 and decode.
+        let empty = compress(b"", false);
+        let mut overflowing = vec![MAGIC_VERSION, FLAG_STORED];
+        overflowing.extend_from_slice(&[0x80; 9]);
+        overflowing.push(0x02);
+        overflowing.extend_from_slice(&empty[3..]);
+        assert_eq!(decompress(&overflowing), Err(DecodeError::Corrupt));
         for i in 1..frame.len() {
             let mut mutated = frame.clone();
             mutated[i] ^= 0x55;
