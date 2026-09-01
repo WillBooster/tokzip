@@ -13,6 +13,8 @@
  */
 import samples from './samples.json';
 
+// A committed JSON module: the compiler checks its inferred shape against this annotation, so
+// there is no runtime input to validate.
 const SAMPLES: Record<string, string> = samples;
 /** Frames pre-compressed by /load so the /decompress route never times a compression. */
 const FRAMES = new Map<string, Uint8Array>();

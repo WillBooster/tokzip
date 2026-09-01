@@ -31,6 +31,8 @@ let pending = '';
 createInterface({ input: tail.stdout }).on('line', (line) => {
   pending += line;
   if (line !== '}') return;
+  // Only optional fields are read, with defaults: an unexpected event shape yields a row without
+  // a match (rejected below), so no schema validation is needed.
   const event = JSON.parse(pending) as { event?: { request?: { url?: string } }; cpuTime?: number };
   events.push({ url: event.event?.request?.url ?? '?', cpuMs: event.cpuTime ?? Number.NaN });
   pending = '';
