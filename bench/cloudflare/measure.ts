@@ -36,6 +36,7 @@ const tailEventSchema = z.object({
   cpuTime: z.number(),
 });
 let pending = '';
+// `tail.stdout` is a pipe by the stdio tuple above (typed non-null), so no null check is needed.
 createInterface({ input: tail.stdout }).on('line', (line) => {
   pending = line.startsWith('{') ? line : pending + line;
   let parsed: unknown;

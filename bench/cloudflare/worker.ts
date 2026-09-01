@@ -53,7 +53,7 @@ export default {
       const cached = FRAMES.has(sample);
       const frame = FRAMES.get(sample) ?? codec.compress(text);
       let ok = true;
-      for (let i = 0; i < iterations; i++) ok &&= codec.decompress(frame) === text;
+      for (let i = 0; i < iterations && ok; i++) ok = codec.decompress(frame) === text;
       return new Response(
         `${sample}: ${ok ? 'round-trip ok' : 'MISMATCH'} cached=${cached} warm=${wasWarm} x${iterations}`
       );
