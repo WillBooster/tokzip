@@ -1,7 +1,7 @@
 //! Native corpus harness for codec iteration: ratio per language / size bucket and
 //! throughput over the bench split of the sibling tokzip-corpus checkout.
 //!
-//!   cargo run --release --example corpus [-- <corpus dir>]
+//!   cargo run --release --features train --example corpus [-- <corpus dir>]
 
 use std::path::{Path, PathBuf};
 use std::time::Instant;
@@ -31,23 +31,7 @@ fn main() {
     let mut decomp_time = 0f64;
     let mut docs = Vec::new();
     for lang in LANGS {
-        let manifest =
-            std::fs::read_to_string(corpus.join(lang).join("manifest.jsonl")).expect("manifest");
-        for line in manifest
-            .lines()
-            .filter(|l| l.contains("\"split\":\"bench\"") || l.contains("\"split\": \"bench\""))
-        {
-            let file = line
-                .split("\"file\":")
-                .nth(1)
-                .unwrap()
-                .split('"')
-                .nth(1)
-                .unwrap()
-                .to_string();
-            let content = std::fs::read(corpus.join(lang).join(&file)).expect("doc");
-            docs.push((lang, content));
-        }
+        docs.extend(tokzip::train::bench_docs(&corpus, lang).map(|content| (lang, content)));
     }
     for (lang, content) in &docs {
         let t = Instant::now();

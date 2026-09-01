@@ -5,6 +5,7 @@
 
 use crate::lz::{encode_doc_with_stats, Primed, Segment, LIT_CLASSES, MODEL_SIZE};
 use crate::rc::PROB_BITS;
+use std::path::Path;
 
 /// Language names, in id order.
 pub fn languages() -> Vec<&'static str> {
@@ -12,6 +13,56 @@ pub fn languages() -> Vec<&'static str> {
         .iter()
         .map(|(name, _, _)| *name)
         .collect()
+}
+
+/// Documents of `lang`'s train split from a tokzip-corpus checkout, in manifest order, skipping
+/// entries marked `"trainable": false` — the same selection as `loadTrainDocs` in
+/// scripts/train/train.ts, which trains the dictionaries.
+pub fn train_docs<'a>(corpus: &'a Path, lang: &str) -> impl Iterator<Item = Vec<u8>> + 'a {
+    corpus_docs(corpus, lang, "train", true)
+}
+
+/// Documents of `lang`'s bench split from a tokzip-corpus checkout, in manifest order.
+pub fn bench_docs<'a>(corpus: &'a Path, lang: &str) -> impl Iterator<Item = Vec<u8>> + 'a {
+    corpus_docs(corpus, lang, "bench", false)
+}
+
+fn corpus_docs<'a>(
+    corpus: &'a Path,
+    lang: &str,
+    split: &'a str,
+    skip_untrainable: bool,
+) -> impl Iterator<Item = Vec<u8>> + 'a {
+    let dir = corpus.join(lang);
+    let manifest = std::fs::read_to_string(dir.join("manifest.jsonl")).expect("manifest");
+    manifest
+        .lines()
+        .filter(move |line| {
+            manifest_value(line, "split") == Some(split)
+                && !(skip_untrainable && manifest_value(line, "trainable") == Some("false"))
+        })
+        .map(|line| {
+            manifest_value(line, "file")
+                .expect("manifest entry without file")
+                .to_string()
+        })
+        .collect::<Vec<_>>()
+        .into_iter()
+        .map(move |file| std::fs::read(dir.join(file)).expect("doc"))
+}
+
+/// Value of top-level `key` in one flat manifest.jsonl object, tolerant of spacing and key
+/// order: a string's content (manifest strings carry no escapes) or a bare literal's text.
+fn manifest_value<'a>(line: &'a str, key: &str) -> Option<&'a str> {
+    let quoted = format!("\"{key}\"");
+    let rest = line[line.find(&quoted)? + quoted.len()..]
+        .trim_start()
+        .strip_prefix(':')?
+        .trim_start();
+    match rest.strip_prefix('"') {
+        Some(string) => string.split('"').next(),
+        None => rest.split([',', '}']).next().map(str::trim),
+    }
 }
 
 /// Trains the literal class table and priors for language `lang` from `docs` (each compressed

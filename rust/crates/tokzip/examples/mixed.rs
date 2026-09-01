@@ -1,28 +1,13 @@
 //! Mixed-language documents (prose + fenced code + HTML, assembled from corpus bench docs):
 //! automatic segmentation vs. an oracle that codes each part with its own language.
 //!
-//!   cargo run --release --example mixed [-- <corpus dir>]
+//!   cargo run --release --features train --example mixed [-- <corpus dir>]
 
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 fn bench_docs(corpus: &Path, lang: &str, max: usize) -> Vec<Vec<u8>> {
-    let manifest =
-        std::fs::read_to_string(corpus.join(lang).join("manifest.jsonl")).expect("manifest");
-    manifest
-        .lines()
-        .filter(|l| l.contains("\"split\":\"bench\"") || l.contains("\"split\": \"bench\""))
-        .map(|line| {
-            let file = line
-                .split("\"file\":")
-                .nth(1)
-                .unwrap()
-                .split('"')
-                .nth(1)
-                .unwrap()
-                .to_string();
-            std::fs::read(corpus.join(lang).join(&file)).expect("doc")
-        })
+    tokzip::train::bench_docs(corpus, lang)
         .filter(|d| d.len() >= 300 && d.len() <= 6000)
         .take(max)
         .collect()

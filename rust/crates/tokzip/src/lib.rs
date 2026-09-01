@@ -176,21 +176,22 @@ fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
         // confident single-language detection (its segment is the top gram candidate) is
         // trusted as-is: it carries no never-worse-than-single guarantee, trading a few bytes on
         // rare ties for not running extra parses on the common pure-single-language document.
-        let search = detected_single != candidates.first().copied();
-        for lang in candidates.into_iter().take_while(|_| search) {
-            if Some(lang) == detected_single {
-                continue;
-            }
-            let single = vec![Segment {
-                end: content.len(),
-                lang,
-            }];
-            let body = lz::encode_doc(&lang::primed, content, &single);
-            let cost = body.len() + segment_table_len(&single);
-            if cost < best_cost {
-                best_cost = cost;
-                best_body = body;
-                best_segments = single;
+        if detected_single != candidates.first().copied() {
+            for lang in candidates {
+                if Some(lang) == detected_single {
+                    continue;
+                }
+                let single = vec![Segment {
+                    end: content.len(),
+                    lang,
+                }];
+                let body = lz::encode_doc(&lang::primed, content, &single);
+                let cost = body.len() + segment_table_len(&single);
+                if cost < best_cost {
+                    best_cost = cost;
+                    best_body = body;
+                    best_segments = single;
+                }
             }
         }
     }

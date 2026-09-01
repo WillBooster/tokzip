@@ -25,7 +25,8 @@ frame := 0xD0 flags sizeVarint crc32 body
   the range-coded stream (§3).
 
 Stored frames are the encoder's fallback whenever coding would not be strictly smaller or the
-encoder's own decode check fails; empty content is always stored.
+encoder's own decode check fails; empty content and content above the 4 MiB coded-frame cap
+are always stored.
 
 ## 1. Segments
 

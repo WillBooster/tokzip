@@ -14,28 +14,12 @@ fn main() {
         .map(PathBuf::from)
         .unwrap_or_else(|| root.join("../tokzip-corpus/corpus"));
     for (lang, name) in tokzip::train::languages().into_iter().enumerate() {
-        let manifest =
-            std::fs::read_to_string(corpus.join(name).join("manifest.jsonl")).expect("manifest");
         let mut docs = Vec::new();
         let mut total = 0usize;
-        let is_train = |l: &&str| {
-            (l.contains("\"split\":\"train\"") || l.contains("\"split\": \"train\""))
-                && !l.contains("\"trainable\":false")
-                && !l.contains("\"trainable\": false")
-        };
-        for line in manifest.lines().filter(is_train) {
+        for content in tokzip::train::train_docs(&corpus, name) {
             if total >= MAX_TRAIN_BYTES {
                 break;
             }
-            let file = line
-                .split("\"file\":")
-                .nth(1)
-                .unwrap()
-                .split('"')
-                .nth(1)
-                .unwrap()
-                .to_string();
-            let content = std::fs::read(corpus.join(name).join(&file)).expect("doc");
             total += content.len();
             docs.push(content);
         }
