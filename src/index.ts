@@ -26,7 +26,7 @@ const DECODE_ERROR_MESSAGES: Record<number, string> = {
   3: 'unsupported format version',
   4: 'content checksum mismatch',
   5: 'corrupt compressed body',
-  6: 'content longer than maxLength',
+  6: 'content too large for maxLength or memory',
 };
 
 export interface DecompressOptions {
@@ -34,7 +34,8 @@ export interface DecompressOptions {
    * Upper bound on the decompressed length in bytes; a frame declaring more is rejected before
    * anything is allocated. Unlimited by default — set it when decompressing frames from an
    * untrusted source, since a small frame of repetitive content can legitimately expand
-   * thousands of times.
+   * thousands of times (without a limit, a frame the memory cannot hold still fails with this
+   * error rather than trapping).
    */
   maxLength?: number;
 }
@@ -74,6 +75,8 @@ export function compress(input: string | Uint8Array): Uint8Array {
 
 /** Decompresses a frame; returns a string or bytes according to what was compressed. */
 export function decompress(frame: Uint8Array, { maxLength = Infinity }: DecompressOptions = {}): string | Uint8Array {
+  // A negative limit would wrap to a huge unsigned length at the wasm boundary (NaN fails too).
+  if (!(maxLength >= 0)) throw new RangeError(`tokzip: maxLength must be a non-negative number, got ${maxLength}`);
   // wasm32 lengths are 32-bit; anything above cannot be a frame's length anyway.
   const maxLen = Math.min(maxLength, 0xFF_FF_FF_FF);
   return withInput(frame, (ptr, len) => {

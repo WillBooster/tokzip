@@ -100,6 +100,7 @@ describe('compress/decompress', () => {
   test('rejects frames declaring more content than maxLength', () => {
     const frame = compress(MIXED_ANSWER);
     expect(() => decompress(frame, { maxLength: 10 })).toThrow(TokzipDecodeError);
+    expect(() => decompress(frame, { maxLength: -1 })).toThrow(RangeError);
     expect(decompress(frame, { maxLength: Buffer.byteLength(MIXED_ANSWER) })).toBe(MIXED_ANSWER);
   });
 });

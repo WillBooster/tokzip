@@ -40,10 +40,10 @@ trained dictionary and model priors. Embedded languages: `text`, `en-US`, `ja-JP
   corrupt or truncated frame either throws a typed `TokzipDecodeError` or (when the range
   coder's trailing slack absorbs the damage) decodes to the exact original — never silently
   wrong output. Incompressible input never expands beyond the stored-frame header (6 bytes
-  plus the length varint), and a block whose first 256 KiB does not shrink is stored without
-  coding the rest. Content above 4 MiB is coded as independent 4 MiB blocks, so the coder's
+  plus the length varint). Content above 4 MiB is coded as independent 4 MiB blocks (a block
+  whose first 256 KiB does not shrink is stored without coding the rest), so the coder's
   working set (several copies of a block) stays bounded whatever the document size; only the
-  input and output scale with it. The format bounds a frame's expansion only relative to its
+  input and the output (held twice while the frame is assembled) scale with it. The format bounds a frame's expansion only relative to its
   size (a small frame of repetitive content legitimately expands thousands of times), so pass
   `maxLength` when decompressing frames from an untrusted source.
 - **Format v0 (pre-release)**: the format changes freely with no compatibility for earlier

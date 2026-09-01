@@ -46,8 +46,9 @@ block := blockFlags payloadLenVarint payload
   segment table (§2) then its range-coded stream (§4), laid out exactly as a single-block body.
 
 The encoder stores a block whose coded payload would not be strictly smaller or fails its
-decode check, and falls back to a stored frame when the blocked frame as a whole would not be
-smaller. Trailing bytes after the last block are a structural error.
+decode check — and, without coding the rest, a block longer than 256 KiB whose first 256 KiB
+does not shrink when coded on its own — and falls back to a stored frame when the blocked frame
+as a whole would not be smaller. Trailing bytes after the last block are a structural error.
 
 ## 2. Segments
 
