@@ -33,7 +33,8 @@ fn input_layout(len: usize) -> std::alloc::Layout {
 }
 
 /// # Safety
-/// `ptr..ptr+len` must be readable.
+/// `ptr` must come from `tokzip_alloc(len)` (so it is non-null even when `len` is 0) with
+/// `ptr..ptr+len` initialized.
 #[no_mangle]
 pub unsafe extern "C" fn tokzip_compress(ptr: *const u8, len: usize, is_bytes: u32) {
     let input = std::slice::from_raw_parts(ptr, len);
@@ -45,7 +46,8 @@ pub unsafe extern "C" fn tokzip_compress(ptr: *const u8, len: usize, is_bytes: u
 /// or a nonzero `DecodeError` code.
 ///
 /// # Safety
-/// `ptr..ptr+len` must be readable.
+/// `ptr` must come from `tokzip_alloc(len)` (so it is non-null even when `len` is 0) with
+/// `ptr..ptr+len` initialized.
 #[no_mangle]
 pub unsafe extern "C" fn tokzip_decompress(ptr: *const u8, len: usize) -> u32 {
     let frame = std::slice::from_raw_parts(ptr, len);
