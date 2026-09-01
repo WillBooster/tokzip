@@ -25,16 +25,21 @@ tail.on('exit', (code) => {
   }
 });
 const events: { url: string; cpuMs: number }[] = [];
-// `wrangler tail --format json` prints one pretty-printed object per event; objects are
-// reassembled from lines (stream chunks are not line-aligned) and parsed at each top-level `}`.
+// `wrangler tail --format json` prints one object per event (pretty-printed today). Lines are
+// accumulated from a top-level `{` (column 0; banner text before it is discarded) and parsed as
+// soon as they form a complete object, so one-object-per-line output works as well.
 let pending = '';
 createInterface({ input: tail.stdout }).on('line', (line) => {
-  pending += line;
-  if (line !== '}') return;
+  pending = line.startsWith('{') ? line : pending + line;
+  let event: { event?: { request?: { url?: string } }; cpuTime?: unknown };
+  try {
+    event = JSON.parse(pending);
+  } catch {
+    return; // not a complete object yet
+  }
+  pending = '';
   // Two optional fields are read; an event without a numeric `cpuTime` is dropped, so a request
   // it belonged to ends up without a match and is rejected below rather than printed as NaN.
-  const event = JSON.parse(pending) as { event?: { request?: { url?: string } }; cpuTime?: unknown };
-  pending = '';
   if (typeof event.cpuTime !== 'number') return;
   events.push({ url: event.event?.request?.url ?? '?', cpuMs: event.cpuTime });
 });

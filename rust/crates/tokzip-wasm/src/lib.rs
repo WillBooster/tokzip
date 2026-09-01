@@ -7,6 +7,7 @@ use std::cell::RefCell;
 
 thread_local! {
     static OUT: RefCell<Vec<u8>> = const { RefCell::new(Vec::new()) };
+    static IS_BYTES: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
 /// Allocates `len` bytes (at least one) for the JS side to fill; released by `tokzip_free`.
@@ -59,10 +60,6 @@ pub unsafe extern "C" fn tokzip_decompress(ptr: *const u8, len: usize) -> u32 {
         }
         Err(error) => error.code(),
     }
-}
-
-thread_local! {
-    static IS_BYTES: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
 #[no_mangle]
