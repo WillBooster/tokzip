@@ -14,6 +14,7 @@ import { compress, decompress } from 'tokzip';
 
 const frame = compress(text); // Uint8Array; strings must be well-formed UTF-16 (no lone surrogates)
 const restored = decompress(frame); // === text (string in → string out, bytes in → bytes out)
+decompress(untrustedFrame, { maxLength: 8 * 1024 * 1024 }); // throws instead of expanding further
 ```
 
 There is nothing to configure: the encoder **detects the language of the input itself,
@@ -33,14 +34,18 @@ trained dictionary and model priors. Embedded languages: `text`, `en-US`, `ja-JP
   Viterbi pass with a switch penalty turns the scores into segments. Cost: a few table
   lookups per byte. On mixed prose + code documents this codes ~2 pp smaller than the best
   single language.
-- **Storage-grade**: every frame carries a CRC-32 of its content and type, `compress` decodes every
-  coded frame it builds and compares the result to the input before returning it (falling back
-  to a stored frame — the content itself — otherwise), and a corrupt or truncated frame either throws a typed `TokzipDecodeError` or
-  (when the range coder's trailing slack absorbs the damage) decodes to the exact original —
-  never silently wrong output. Incompressible input never expands beyond the stored-frame
-  header (6 bytes plus the length varint). Content above 4 MiB is coded as
-  independent 4 MiB blocks, so the coder's working set (several copies of a block) stays
-  bounded whatever the document size; only the input and output scale with it.
+- **Storage-grade**: every frame carries a CRC-32 of its content and type, `compress` decodes
+  every coded block it builds and compares the result to the input before accepting it
+  (storing the content — or, in a multi-block frame, that block — verbatim otherwise), and a
+  corrupt or truncated frame either throws a typed `TokzipDecodeError` or (when the range
+  coder's trailing slack absorbs the damage) decodes to the exact original — never silently
+  wrong output. Incompressible input never expands beyond the stored-frame header (6 bytes
+  plus the length varint), and a block whose first 256 KiB does not shrink is stored without
+  coding the rest. Content above 4 MiB is coded as independent 4 MiB blocks, so the coder's
+  working set (several copies of a block) stays bounded whatever the document size; only the
+  input and output scale with it. The format bounds a frame's expansion only relative to its
+  size (a small frame of repetitive content legitimately expands thousands of times), so pass
+  `maxLength` when decompressing frames from an untrusted source.
 - **Format v0 (pre-release)**: the format changes freely with no compatibility for earlier
   frames until it is fixed as v1; decoders reject other versions. See [FORMAT.md](FORMAT.md).
 

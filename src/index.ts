@@ -6,7 +6,10 @@
 /// <reference lib="es2024.string" />
 import wasmModuleOrPath from '../wasm/tokzip.wasm';
 
-/** Thrown when a frame is truncated, corrupt, from another format version, or fails its CRC. */
+/**
+ * Thrown when a frame is truncated, corrupt, from another format version, fails its CRC, or
+ * declares more content than `maxLength` allows.
+ */
 export class TokzipDecodeError extends Error {
   readonly code: number;
 
@@ -23,15 +26,25 @@ const DECODE_ERROR_MESSAGES: Record<number, string> = {
   3: 'unsupported format version',
   4: 'content checksum mismatch',
   5: 'corrupt compressed body',
+  6: 'content longer than maxLength',
 };
+
+export interface DecompressOptions {
+  /**
+   * Upper bound on the decompressed length in bytes; a frame declaring more is rejected before
+   * anything is allocated. Unlimited by default — set it when decompressing frames from an
+   * untrusted source, since a small frame of repetitive content can legitimately expand
+   * thousands of times.
+   */
+  maxLength?: number;
+}
 
 interface Exports {
   memory: WebAssembly.Memory;
   tokzip_alloc(len: number): number;
-  tokzip_realloc(ptr: number, oldLen: number, newLen: number): number;
   tokzip_free(ptr: number, len: number): void;
   tokzip_compress(ptr: number, len: number, isBytes: number): void;
-  tokzip_decompress(ptr: number, len: number): number;
+  tokzip_decompress(ptr: number, len: number, maxLen: number): number;
   tokzip_out_is_bytes(): number;
   tokzip_out_ptr(): number;
   tokzip_out_len(): number;
@@ -60,9 +73,11 @@ export function compress(input: string | Uint8Array): Uint8Array {
 }
 
 /** Decompresses a frame; returns a string or bytes according to what was compressed. */
-export function decompress(frame: Uint8Array): string | Uint8Array {
+export function decompress(frame: Uint8Array, { maxLength = Infinity }: DecompressOptions = {}): string | Uint8Array {
+  // wasm32 lengths are 32-bit; anything above cannot be a frame's length anyway.
+  const maxLen = Math.min(maxLength, 0xFF_FF_FF_FF);
   return withInput(frame, (ptr, len) => {
-    const code = wasm.tokzip_decompress(ptr, len);
+    const code = wasm.tokzip_decompress(ptr, len, maxLen);
     if (code !== 0) throw new TokzipDecodeError(code);
     const out = takeOutput();
     if (wasm.tokzip_out_is_bytes() !== 0) return out;
@@ -76,37 +91,39 @@ export function decompress(frame: Uint8Array): string | Uint8Array {
 
 /**
  * Places `input` in wasm memory for the duration of `run`. A string is encoded as UTF-8 straight
- * into the module's buffer, so no intermediate copy of a large document is held on the JS heap.
+ * into an exactly sized module buffer, so no intermediate copy of a large document is held on
+ * the JS heap. (Exact sizing also matters for correctness: Bun 1.3 `encodeInto` writes U+FFFD
+ * for a 4-byte character when only 3 bytes of room remain instead of stopping before it, so
+ * the buffer is never filled in several passes.)
  */
 function withInput<T>(input: string | Uint8Array, run: (ptr: number, len: number) => T): T {
-  // One byte per UTF-16 unit is exact for ASCII; multi-byte characters grow the buffer below.
-  let capacity = input.length;
-  let ptr = wasm.tokzip_alloc(capacity);
+  const len = typeof input === 'string' ? utf8Length(input) : input.length;
+  const ptr = wasm.tokzip_alloc(len);
   try {
-    let len = input.length;
-    if (typeof input === 'string') {
-      len = 0;
-      // Views are re-created after every allocation: growing wasm memory detaches old buffers.
-      for (let read = 0; read < input.length;) {
-        const rest = read === 0 ? input : input.slice(read);
-        const view = new Uint8Array(wasm.memory.buffer, ptr + len, capacity - len);
-        const result = textEncoder.encodeInto(rest, view);
-        read += result.read;
-        len += result.written;
-        if (read < input.length) {
-          // A UTF-16 unit encodes to at most 3 bytes (a surrogate pair to 4 for its 2 units).
-          const next = Math.min(capacity * 2, len + (input.length - read) * 3);
-          ptr = wasm.tokzip_realloc(ptr, capacity, next);
-          capacity = next;
-        }
-      }
-    } else {
-      new Uint8Array(wasm.memory.buffer, ptr, len).set(input);
-    }
+    const view = new Uint8Array(wasm.memory.buffer, ptr, len);
+    if (typeof input === 'string') textEncoder.encodeInto(input, view);
+    else view.set(input);
     return run(ptr, len);
   } finally {
-    wasm.tokzip_free(ptr, capacity);
+    wasm.tokzip_free(ptr, len);
   }
+}
+
+/** UTF-8 length of a well-formed string. */
+function utf8Length(text: string): number {
+  let length = 0;
+  for (let i = 0; i < text.length; i++) {
+    const codePoint = text.codePointAt(i) ?? 0;
+    if (codePoint < 0x80) length += 1;
+    else if (codePoint < 0x8_00) length += 2;
+    else if (codePoint < 0x1_00_00) length += 3;
+    else {
+      // A supplementary code point occupies two UTF-16 units.
+      length += 4;
+      i++;
+    }
+  }
+  return length;
 }
 
 /** Copies the module-owned output buffer out of wasm memory (it is reused by the next call). */

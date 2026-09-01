@@ -22,26 +22,8 @@ pub extern "C" fn tokzip_alloc(len: usize) -> *mut u8 {
     ptr
 }
 
-/// Resizes a buffer from `tokzip_alloc(old_len)` to `new_len` bytes, keeping its contents (the
-/// JS side encodes a string straight into wasm memory and grows the buffer as multi-byte
-/// characters need more room than one byte per UTF-16 unit).
-///
 /// # Safety
-/// `ptr` must come from `tokzip_alloc(old_len)` (or a previous `tokzip_realloc` to `old_len`)
-/// and not have been freed; the returned pointer replaces it.
-#[no_mangle]
-pub unsafe extern "C" fn tokzip_realloc(ptr: *mut u8, old_len: usize, new_len: usize) -> *mut u8 {
-    let layout = input_layout(new_len);
-    let ptr = std::alloc::realloc(ptr, input_layout(old_len), layout.size());
-    if ptr.is_null() {
-        std::alloc::handle_alloc_error(layout);
-    }
-    ptr
-}
-
-/// # Safety
-/// `ptr` must come from `tokzip_alloc(len)` or `tokzip_realloc(.., len)` with the same `len` and
-/// not have been freed.
+/// `ptr` must come from `tokzip_alloc(len)` with the same `len` and not have been freed.
 #[no_mangle]
 pub unsafe extern "C" fn tokzip_free(ptr: *mut u8, len: usize) {
     std::alloc::dealloc(ptr, input_layout(len));
@@ -62,15 +44,15 @@ pub unsafe extern "C" fn tokzip_compress(ptr: *const u8, len: usize, is_bytes: u
 }
 
 /// Returns 0 on success (content in the output buffer, type flag via `tokzip_out_is_bytes`),
-/// or a nonzero `DecodeError` code.
+/// or a nonzero `DecodeError` code; a frame declaring more than `max_len` bytes is rejected.
 ///
 /// # Safety
 /// `ptr` must come from `tokzip_alloc(len)` (so it is non-null even when `len` is 0) with
 /// `ptr..ptr+len` initialized.
 #[no_mangle]
-pub unsafe extern "C" fn tokzip_decompress(ptr: *const u8, len: usize) -> u32 {
+pub unsafe extern "C" fn tokzip_decompress(ptr: *const u8, len: usize, max_len: usize) -> u32 {
     let frame = std::slice::from_raw_parts(ptr, len);
-    match tokzip::decompress(frame) {
+    match tokzip::decompress(frame, max_len) {
         Ok((content, is_bytes)) => {
             OUT.with(|out| *out.borrow_mut() = content);
             IS_BYTES.with(|b| b.set(is_bytes));

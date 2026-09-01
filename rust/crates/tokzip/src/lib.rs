@@ -36,13 +36,19 @@ const FLAG_BLOCKED: u8 = 0b1000;
 /// per block byte plus the self-check's decoded copy of the block, and decoding builds one block
 /// before appending it to the output — measured in Bun, coding a 4 MiB block adds ~24 MB of wasm
 /// memory (which never shrinks), leaving a 128 MiB Cloudflare Workers isolate room for the
-/// caller. It also caps what a corrupt or forged header can make the decoder allocate at once.
-/// Splitting only loses matches across block boundaries, negligible next to the dictionaries
-/// and the local context.
+/// caller. Splitting only loses matches across block boundaries, negligible next to the
+/// dictionaries and the local context.
 const BLOCK_LEN: usize = 4 * 1024 * 1024;
+/// Blocks longer than this are probed first: when this much of a block's start does not shrink
+/// when coded on its own, the block is stored without coding the rest. Incompressible content
+/// (already-compressed or encrypted blobs) would otherwise pay the full parse (~0.4 s/MiB) only
+/// to be stored; content that does shrink pays the probe as a few percent of extra work.
+const PROBE_LEN: usize = 256 * 1024;
 /// Upper bound on how much a coded body may expand: the codec tops out near 7,000× on
 /// degenerate runs, so a declared length beyond this is a forged header and is rejected
-/// before any output is allocated (a corrupt varint cannot force a large allocation).
+/// before any output is allocated. It is the only bound the format itself puts on the output
+/// of a blocked frame (a valid frame of highly repetitive content legitimately reaches it), so
+/// callers decoding untrusted frames pass `decompress` a length limit.
 const MAX_EXPANSION: usize = 8192;
 const MAX_SEGMENTS: u64 = 1 << 20;
 
@@ -53,6 +59,8 @@ pub enum DecodeError {
     UnsupportedVersion,
     ChecksumMismatch,
     Corrupt,
+    /// The declared content length exceeds the caller's limit.
+    TooLarge,
 }
 
 impl DecodeError {
@@ -63,6 +71,7 @@ impl DecodeError {
             Self::UnsupportedVersion => 3,
             Self::ChecksumMismatch => 4,
             Self::Corrupt => 5,
+            Self::TooLarge => 6,
         }
     }
 }
@@ -75,6 +84,7 @@ impl std::fmt::Display for DecodeError {
             Self::UnsupportedVersion => write!(f, "unsupported format version"),
             Self::ChecksumMismatch => write!(f, "content checksum mismatch"),
             Self::Corrupt => write!(f, "corrupt compressed body"),
+            Self::TooLarge => write!(f, "content longer than the length limit"),
         }
     }
 }
@@ -105,7 +115,6 @@ fn coded_frame(content: &[u8], type_flag: u8, crc: u32) -> Option<Vec<u8>> {
     if content.is_empty() {
         return None;
     }
-    let stored_len = stored_frame_len(content.len());
     let mut frame = vec![MAGIC_VERSION, type_flag];
     push_varint(&mut frame, content.len() as u64);
     frame.extend_from_slice(&crc.to_le_bytes());
@@ -113,33 +122,54 @@ fn coded_frame(content: &[u8], type_flag: u8, crc: u32) -> Option<Vec<u8>> {
         let (multi, payload) = coded_block(content)?;
         frame[1] |= multi;
         frame.extend_from_slice(&payload);
-    } else {
-        frame[1] |= FLAG_BLOCKED;
-        for block in content.chunks(BLOCK_LEN) {
-            match coded_block(block) {
-                Some((multi, payload)) => {
-                    frame.push(multi);
-                    push_varint(&mut frame, payload.len() as u64);
-                    frame.extend_from_slice(&payload);
-                }
-                None => {
-                    frame.push(FLAG_STORED);
-                    push_varint(&mut frame, block.len() as u64);
-                    frame.extend_from_slice(block);
-                }
-            }
-            if frame.len() >= stored_len {
-                return None;
-            }
-        }
+        return Some(frame);
     }
-    (frame.len() < stored_len).then_some(frame)
+    // Every block is coded before any is written out: a block that stays stored is only a
+    // slice of the input until the blocked frame is known to beat the stored frame, so a
+    // losing candidate never holds a second copy of the content.
+    let blocks: Vec<_> = content
+        .chunks(BLOCK_LEN)
+        .map(|block| (block, coded_block(block)))
+        .collect();
+    let frame_len = frame.len()
+        + blocks
+            .iter()
+            .map(|(block, coded)| {
+                let payload_len = coded.as_ref().map_or(block.len(), |(_, p)| p.len());
+                1 + varint_len(payload_len as u64) + payload_len
+            })
+            .sum::<usize>();
+    if frame_len >= stored_frame_len(content.len()) {
+        return None;
+    }
+    frame[1] |= FLAG_BLOCKED;
+    frame.reserve_exact(frame_len - frame.len());
+    for (block, coded) in blocks {
+        let (flags, payload) = match &coded {
+            Some((multi, payload)) => (*multi, payload.as_slice()),
+            None => (FLAG_STORED, block),
+        };
+        frame.push(flags);
+        push_varint(&mut frame, payload.len() as u64);
+        frame.extend_from_slice(payload);
+    }
+    Some(frame)
 }
 
-/// Codes one block — its segment table followed by the range-coded body — and returns the
-/// payload with its multi-segment flag, or `None` when the payload is not strictly smaller
-/// than the block or does not decode back to it.
+/// Codes one block and returns its payload with its multi-segment flag, or `None` when the
+/// block is to be stored: its first `PROBE_LEN` bytes do not shrink on their own, or the whole
+/// payload is not strictly smaller than the block or does not decode back to it.
 fn coded_block(block: &[u8]) -> Option<(u8, Vec<u8>)> {
+    if block.len() > PROBE_LEN && coded_payload(&block[..PROBE_LEN]).is_none() {
+        return None;
+    }
+    coded_payload(block)
+}
+
+/// The segment table followed by the range-coded body of `block`, with the multi-segment flag,
+/// or `None` when that payload is not strictly smaller than the block or does not decode back
+/// to it.
+fn coded_payload(block: &[u8]) -> Option<(u8, Vec<u8>)> {
     let (segments, body) = best_segmentation(block);
     let mut payload = Vec::with_capacity(segment_table_len(&segments) + body.len());
     let multi = if segments.len() > 1 { FLAG_MULTI } else { 0 };
@@ -160,6 +190,8 @@ fn coded_block(block: &[u8]) -> Option<(u8, Vec<u8>)> {
     recoverable.then_some((multi, payload))
 }
 
+/// Frame length the content would have when coded as one segment of `lang` (diagnostic use;
+/// the public API detects the language).
 #[doc(hidden)]
 pub fn frame_len_with_language(content: &[u8], lang: usize) -> usize {
     if lang >= lang::LANGUAGE_COUNT {
@@ -246,10 +278,9 @@ fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     (best_segments, best_body)
 }
 
-/// Bytes the segment table occupies in a frame: one language byte for a single segment, else
-/// the segment-count varint plus a language byte and length varint per segment (see `compress`).
-/// Bytes the segment table occupies in a frame: one language byte for a single segment, else
-/// the segment-count varint plus a language byte and length varint per segment (see `compress`).
+/// Bytes the segment table occupies in a payload: one language byte for a single segment, else
+/// the segment-count varint plus a language byte and length varint per segment (see
+/// `coded_payload`).
 fn segment_table_len(segments: &[Segment]) -> usize {
     if segments.len() == 1 {
         return 1;
@@ -269,7 +300,10 @@ fn stored_frame_len(content_len: usize) -> usize {
 
 /// Decompresses a frame produced by [`compress`], verifying the content CRC-32. Returns the
 /// content and whether it was compressed from raw bytes (true) or a UTF-8 string (false).
-pub fn decompress(frame: &[u8]) -> Result<(Vec<u8>, bool), DecodeError> {
+/// A frame declaring more than `max_len` bytes of content is rejected before anything is
+/// allocated: the format bounds the output only relative to the frame length
+/// (`MAX_EXPANSION`), so this is the caller's guard against decompression bombs.
+pub fn decompress(frame: &[u8], max_len: usize) -> Result<(Vec<u8>, bool), DecodeError> {
     if frame.len() < 7 {
         return Err(DecodeError::Truncated);
     }
@@ -294,6 +328,9 @@ pub fn decompress(frame: &[u8]) -> Result<(Vec<u8>, bool), DecodeError> {
     }
     let expected_crc = u32::from_le_bytes([rest[0], rest[1], rest[2], rest[3]]);
     let body = &rest[4..];
+    if out_len > max_len as u64 {
+        return Err(DecodeError::TooLarge);
+    }
     if flags & FLAG_STORED != 0 {
         // Compared as u64: a huge declared length must not wrap when narrowed to usize.
         if (body.len() as u64) < out_len {
@@ -330,10 +367,12 @@ fn decode_blocks(mut body: &[u8], out_len: usize) -> Result<Vec<u8>, DecodeError
     if out_len <= BLOCK_LEN {
         return Err(DecodeError::Corrupt);
     }
-    // Grown block by block, so a forged length costs no allocation beyond the blocks that decode.
+    // Grown geometrically but never past `out_len`, so appending stays linear while a frame
+    // whose blocks stop decoding has cost at most twice the output it actually produced.
     let mut content = Vec::new();
     while content.len() < out_len {
         let block_len = BLOCK_LEN.min(out_len - content.len());
+        content.reserve_exact((out_len - content.len()).min(content.len().max(block_len)));
         let (&flags, rest) = body.split_first().ok_or(DecodeError::Truncated)?;
         if flags & !(FLAG_STORED | FLAG_MULTI) != 0
             || flags & (FLAG_STORED | FLAG_MULTI) == FLAG_STORED | FLAG_MULTI
@@ -345,7 +384,6 @@ fn decode_blocks(mut body: &[u8], out_len: usize) -> Result<Vec<u8>, DecodeError
             return Err(DecodeError::Truncated);
         }
         let (payload, rest) = rest.split_at(payload_len as usize);
-        content.reserve_exact(block_len);
         if flags & FLAG_STORED != 0 {
             if payload.len() != block_len {
                 return Err(DecodeError::Corrupt);
@@ -456,7 +494,7 @@ mod tests {
 
     fn round_trip(content: &[u8], is_bytes: bool) -> Vec<u8> {
         let frame = compress(content, is_bytes);
-        let (restored, restored_bytes) = decompress(&frame).expect("decode");
+        let (restored, restored_bytes) = decompress(&frame, usize::MAX).expect("decode");
         assert_eq!(restored, content);
         assert_eq!(restored_bytes, is_bytes);
         frame
@@ -519,17 +557,22 @@ mod tests {
         assert!(frame.len() < BLOCK_LEN + 20_000, "{}", frame.len());
         // The last block's declared payload length must match its bytes.
         assert_eq!(
-            decompress(&frame[..frame.len() - 1]),
+            decompress(&frame[..frame.len() - 1], usize::MAX),
             Err(DecodeError::Truncated)
         );
         let mut extra = frame.clone();
         extra.push(0);
-        assert_eq!(decompress(&extra), Err(DecodeError::Corrupt));
+        assert_eq!(decompress(&extra, usize::MAX), Err(DecodeError::Corrupt));
         // A blocked flag on content that fits one block is a structural error.
         let small = compress(&content[..1000], true);
         let mut flagged = small.clone();
         flagged[1] |= FLAG_BLOCKED;
-        assert_eq!(decompress(&flagged), Err(DecodeError::Corrupt));
+        assert_eq!(decompress(&flagged, usize::MAX), Err(DecodeError::Corrupt));
+        // The length limit is checked before any block is decoded.
+        assert_eq!(
+            decompress(&frame, content.len() - 1),
+            Err(DecodeError::TooLarge)
+        );
     }
 
     #[test]
@@ -538,27 +581,33 @@ mod tests {
             "hello hello hello hello hello world".repeat(4).as_bytes(),
             false,
         );
-        assert_eq!(decompress(&[]), Err(DecodeError::Truncated));
-        assert!(decompress(&frame[..frame.len() / 2]).is_err());
+        assert_eq!(decompress(&[], usize::MAX), Err(DecodeError::Truncated));
+        assert!(decompress(&frame[..frame.len() / 2], usize::MAX).is_err());
         let mut bad = frame.clone();
         bad[0] = 0xD1;
-        assert_eq!(decompress(&bad), Err(DecodeError::UnsupportedVersion));
+        assert_eq!(
+            decompress(&bad, usize::MAX),
+            Err(DecodeError::UnsupportedVersion)
+        );
         bad[0] = 0x42;
-        assert_eq!(decompress(&bad), Err(DecodeError::BadMagic));
+        assert_eq!(decompress(&bad, usize::MAX), Err(DecodeError::BadMagic));
         // A stored empty frame whose length varint encodes 2^64 must not wrap to 0 and decode.
         let empty = compress(b"", false);
         let mut overflowing = vec![MAGIC_VERSION, FLAG_STORED];
         overflowing.extend_from_slice(&[0x80; 9]);
         overflowing.push(0x02);
         overflowing.extend_from_slice(&empty[3..]);
-        assert_eq!(decompress(&overflowing), Err(DecodeError::Corrupt));
+        assert_eq!(
+            decompress(&overflowing, usize::MAX),
+            Err(DecodeError::Corrupt)
+        );
         for i in 1..frame.len() {
             let mut mutated = frame.clone();
             mutated[i] ^= 0x55;
-            if let Ok((out, _)) = decompress(&mutated) {
+            if let Ok((out, _)) = decompress(&mutated, usize::MAX) {
                 assert_eq!(
                     out,
-                    decompress(&frame).unwrap().0,
+                    decompress(&frame, usize::MAX).unwrap().0,
                     "mutation at {i} decoded to different content"
                 );
             }
