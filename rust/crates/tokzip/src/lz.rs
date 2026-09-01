@@ -1189,8 +1189,9 @@ pub fn decode_doc(
 ) -> Result<(), DecodeError> {
     // Appends exactly `out_len` bytes to `out`; positions below are relative to `base`, and
     // tokens never reach below it. The whole output is reserved up front (the caller bounds
-    // `out_len` to one block and to the body's expansion limit), so no later push allocates: an
-    // output the memory cannot hold fails here instead of aborting the module.
+    // `out_len` to one block, `BLOCK_LEN`; a frame's total output is separately bounded by its
+    // body's expansion limit), so no later push allocates: an output the memory cannot hold
+    // fails here instead of aborting the module.
     let base = out.len();
     out.try_reserve_exact(out_len)
         .map_err(|_| DecodeError::TooLarge)?;

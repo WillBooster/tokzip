@@ -43,8 +43,9 @@ const BLOCK_LEN: usize = 4 * 1024 * 1024;
 /// does not shrink when coded on its own, the block is stored without coding the rest.
 /// Incompressible content (already-compressed or encrypted blobs) would otherwise pay the full
 /// parse (~0.4 s/MiB) only to be stored. Only blocked frames probe, so content up to `BLOCK_LEN`
-/// is coded exactly as before and the probe costs a blocked frame at most ~6% (one probe per
-/// 4 MiB block; a short final block is probed only past this length).
+/// is coded exactly as before and the probe costs a blocked frame ~6% per full 4 MiB block —
+/// up to roughly twice that for a frame whose final block is little longer than the probe (a
+/// final block up to this length is not probed).
 const PROBE_LEN: usize = 256 * 1024;
 /// Upper bound on how much a coded body may expand: the codec tops out near 7,000× on
 /// degenerate runs, so a declared length beyond this is a forged header and is rejected
