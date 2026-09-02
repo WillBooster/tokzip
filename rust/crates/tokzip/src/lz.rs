@@ -337,7 +337,7 @@ impl Models {
 /// Distance prices frozen for one parse chunk: full prices for values below `FULL_DIST`
 /// (slots with specialized trees) and slot + align prices beyond, per length state.
 struct DistPrices {
-    full: Vec<[u32; FULL_DIST]>, // [len_state][value]
+    full: [[u32; FULL_DIST]; NUM_LEN_TO_POS], // [len_state][value]
     slot: [[u32; 64]; NUM_LEN_TO_POS],
     align: [u32; 1 << ALIGN_BITS],
 }
@@ -355,7 +355,7 @@ impl DistPrices {
         }
         // The footer bits of a value below `FULL_DIST` are priced independently of the length
         // state, so each value's footer price is computed once and added to every slot row.
-        let mut full = vec![[0u32; FULL_DIST]; NUM_LEN_TO_POS];
+        let mut full = [[0u32; FULL_DIST]; NUM_LEN_TO_POS];
         for value in 0..FULL_DIST as u32 {
             let sl = dist_slot(value);
             let mut footer_price = 0;
