@@ -39,8 +39,8 @@ const EMPTY: i32 = -1;
 // Probability models (one flat array; the layout is format identity)
 // ---------------------------------------------------------------------------
 
-/// Literal context classes of the previous byte (`lit_class`) and of the byte before it
-/// (`lit_class2`); a literal is coded through the tree of the pair.
+/// Literal context classes of the previous byte (`lit_classes.0`) and of the byte before it
+/// (`lit_classes.1`); a literal is coded through the tree of the pair.
 pub const LIT_CLASSES: usize = 128;
 pub const LIT_CLASSES2: usize = 4;
 const IS_MATCH: usize = 0;
