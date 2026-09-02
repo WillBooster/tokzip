@@ -64,17 +64,30 @@ describe('compress/decompress', () => {
   });
 
   test('never expands incompressible input beyond the stored frame', () => {
-    let noise = '';
     let x = 0x25_45_F4_91;
-    for (let i = 0; i < 4096; i++) {
-      x ^= x << 13;
-      x ^= x >>> 17;
-      x ^= x << 5;
-      // Random code points across the Basic Multilingual Plane, avoiding surrogates.
-      noise += String.fromCodePoint(0x21 + ((x >>> 8) % 0xD7_00));
+    const randomText = (length: number): string => {
+      let text = '';
+      for (let i = 0; i < length; i++) {
+        x ^= x << 13;
+        x ^= x >>> 17;
+        x ^= x << 5;
+        text += String.fromCodePoint(0x21 + ((x >>> 0) % 94));
+      }
+      return text;
+    };
+    // Short random text cannot be coded smaller than it is stored: the frame is the stored
+    // layout (header bits 0b11) and costs exactly the 6-byte header.
+    for (let i = 0; i < 20; i++) {
+      const noise = randomText(64);
+      const frame = compress(noise);
+      expect(frame[0]! & 0b11).toBe(0b11);
+      expect(frame.length).toBe(Buffer.byteLength(noise) + 6);
+      expect(decompress(frame)).toBe(noise);
     }
-    expect(compress(noise).length).toBeLessThanOrEqual(Buffer.byteLength(noise) + 7);
-    expect(decompress(compress(noise))).toBe(noise);
+    // Longer random text is coded (its byte structure is compressible), never expanded.
+    const long = randomText(4096);
+    expect(compress(long).length).toBeLessThanOrEqual(Buffer.byteLength(long) + 7);
+    expect(decompress(compress(long))).toBe(long);
   });
 
   test('handles inputs spanning many parse chunks', () => {
