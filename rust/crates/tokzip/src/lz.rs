@@ -68,6 +68,8 @@ pub const LIT: usize = DICT_OFF + DIST_MODEL_SIZE;
 /// nodes shared by all classes: `match_bit << 8 | node`.
 const LIT_MATCHED: usize = LIT + LIT_CLASSES * LIT_CLASSES2 * 256;
 pub const MODEL_SIZE: usize = LIT_MATCHED + 512;
+// The priors packer walks everything from `LIT` on as 256-node trees (`pack.rs`).
+const _: () = assert!((MODEL_SIZE - LIT).is_multiple_of(256));
 
 #[inline]
 fn dist_group(base: usize) -> (usize, usize, usize) {
@@ -106,21 +108,24 @@ impl Models {
     }
 
     /// Restores a packed model (`pack.rs`): the class tables and the nodes before the literal
-    /// trees verbatim, then each literal tree as flag bits followed by the values of the nodes
-    /// whose subtree is not all `PRIORS_DEFAULT`.
+    /// trees verbatim, then each 256-node tree (plain literal trees, then the two matched-literal
+    /// trees) as flag bits followed by the values of the nodes whose subtree is not all
+    /// `PRIORS_DEFAULT`.
     pub fn from_priors(packed: &[u8]) -> Self {
         let mut raw = packed[..512 + LIT].to_vec();
         raw.resize(PRIORS_SIZE, PRIORS_DEFAULT);
         let mut rest = &packed[512 + LIT..];
+        let mut nodes = [0u8; 256];
         for tree in raw[512 + LIT..].as_chunks_mut::<256>().0 {
-            // The values start after the tree's flag bits, whose count a first walk over the
-            // flags alone establishes.
-            let (mut flag_count, mut value_count) = (0, 0);
-            unpack_tree(tree, 1, rest, &mut flag_count, &[], &mut value_count);
+            // The walk reads only the flags; the values, which start after the tree's flag
+            // bits, are copied to the recorded nodes once their count is known.
+            let (mut flag_count, mut node_count) = (0, 0);
+            walk_packed_tree(1, rest, &mut flag_count, &mut nodes, &mut node_count);
             let values = &rest[flag_count.div_ceil(8)..];
-            let (mut flag_count, mut value_count) = (0, 0);
-            unpack_tree(tree, 1, rest, &mut flag_count, values, &mut value_count);
-            rest = &values[value_count..];
+            for (&node, &value) in nodes[..node_count].iter().zip(values) {
+                tree[node as usize] = value;
+            }
+            rest = &values[node_count..];
         }
         assert!(rest.is_empty(), "packed priors size mismatch");
         Self::from_raw_priors(&raw)
@@ -152,29 +157,25 @@ impl Models {
     }
 }
 
-/// Depth-first unpack of one packed literal tree (see `Models::from_priors`): reads the node's
-/// flag bit and, when set, its value (skipped while `values` is empty, which only counts the
-/// flags) before walking its children.
-fn unpack_tree(
-    tree: &mut [u8],
+/// Depth-first walk over one packed tree's flag bits (see `Models::from_priors`): records the
+/// nodes whose flag is set, in the order their values follow, and walks their children.
+fn walk_packed_tree(
     node: usize,
     flags: &[u8],
     flag_count: &mut usize,
-    values: &[u8],
-    value_count: &mut usize,
+    nodes: &mut [u8; 256],
+    node_count: &mut usize,
 ) {
     let bit = (flags[*flag_count / 8] >> (*flag_count % 8)) & 1;
     *flag_count += 1;
     if bit == 0 {
         return;
     }
-    if let Some(&value) = values.get(*value_count) {
-        tree[node] = value;
-    }
-    *value_count += 1;
+    nodes[*node_count] = node as u8;
+    *node_count += 1;
     if node < 128 {
-        unpack_tree(tree, 2 * node, flags, flag_count, values, value_count);
-        unpack_tree(tree, 2 * node + 1, flags, flag_count, values, value_count);
+        walk_packed_tree(2 * node, flags, flag_count, nodes, node_count);
+        walk_packed_tree(2 * node + 1, flags, flag_count, nodes, node_count);
     }
 }
 
@@ -714,7 +715,8 @@ impl MatchFinder<'_> {
     }
 
     /// Useful matches at `pos` as `(len, dist)` with strictly increasing lengths; each carries
-    /// the nearest distance found for that length.
+    /// the first distance found for that length: the nearest one among history matches, the
+    /// lowest (cheapest, farthest) dictionary offset among dictionary matches.
     fn find_pairs(&self, pos: usize, max_len: usize, pairs: &mut Vec<(u32, u32)>) {
         pairs.clear();
         let doc = self.win.doc;

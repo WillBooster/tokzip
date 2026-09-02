@@ -1,5 +1,5 @@
 //! LEB128 varints (7 payload bits per byte, bit 7 = continue, canonical: a multi-byte varint
-//! never ends in a zero byte), shared with the asset packer (`build.rs` compiles this file too).
+//! never ends in a zero byte).
 
 use crate::DecodeError;
 

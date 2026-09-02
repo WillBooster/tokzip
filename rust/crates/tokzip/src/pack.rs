@@ -2,14 +2,14 @@
 //! the library only unpacks, in `Models::from_priors`).
 //!
 //! Trained priors leave most literal-tree nodes untrained (contexts the training documents never
-//! reached), and an untrained node's whole subtree is untrained too, so each 256-node literal
-//! tree is stored as a depth-first walk: one flag bit per visited node — 1: the node's value
-//! follows in the value stream and its children are walked; 0: the node and its subtree stay at
-//! `PRIORS_DEFAULT` and are skipped. Every other node is stored verbatim.
+//! reached), and an untrained node's whole subtree is untrained too, so every 256-node tree from
+//! `LIT` on — the plain literal trees, then the two matched-literal trees — is stored as a
+//! depth-first walk: one flag bit per visited node — 1: the node's value follows in the value
+//! stream and its children are walked; 0: the node and its subtree stay at `PRIORS_DEFAULT` and
+//! are skipped. The nodes before `LIT` are stored verbatim.
 //!
-//! Packed layout: the two class tables (512 bytes), the values of the nodes before the literal
-//! trees, then per literal tree its flag bits (packed LSB-first, padded to a byte) followed by
-//! its values.
+//! Packed layout: the two class tables (512 bytes), the values of the nodes before `LIT`, then
+//! per tree its flag bits (packed LSB-first, padded to a byte) followed by its values.
 
 use crate::lz::{LIT, PRIORS_DEFAULT, PRIORS_SIZE};
 

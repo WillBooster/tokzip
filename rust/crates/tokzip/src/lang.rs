@@ -325,6 +325,36 @@ fn fence_language(label: &[u8]) -> Option<u8> {
 mod tests {
     use super::*;
 
+    /// The packed priors the build embeds must restore exactly the trained values: the packer
+    /// and the unpacker are symmetric, so a lossy pack would still round-trip frames and show
+    /// up only as a worse ratio.
+    #[test]
+    fn packed_priors_restore_the_raw_priors() {
+        macro_rules! raw_priors {
+            ($name:literal) => {
+                (
+                    $name,
+                    include_bytes!(concat!("../../../../priors/", $name, ".bin")),
+                )
+            };
+        }
+        let raw = [
+            raw_priors!("text"),
+            raw_priors!("en-US"),
+            raw_priors!("ja-JP"),
+            raw_priors!("html"),
+            raw_priors!("css"),
+            raw_priors!("javascript"),
+            raw_priors!("typescript"),
+        ];
+        for ((name, _, packed), (raw_name, raw)) in LANGUAGES.iter().zip(raw) {
+            assert_eq!(*name, raw_name);
+            let (unpacked, expected) = (Models::from_priors(packed), Models::from_raw_priors(raw));
+            assert_eq!(unpacked.lit_classes, expected.lit_classes, "{name}");
+            assert_eq!(unpacked.probs, expected.probs, "{name}");
+        }
+    }
+
     #[test]
     fn detects_fenced_code_inside_prose() {
         let mut doc = "以下の要件を満たすブロック崩しゲームを作成してください。パドルは左右矢印キーで移動します。\n".repeat(3);

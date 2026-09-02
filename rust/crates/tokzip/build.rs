@@ -13,9 +13,6 @@ mod pack;
 #[allow(dead_code)]
 #[path = "src/rc.rs"]
 mod rc;
-#[allow(dead_code)]
-#[path = "src/varint.rs"]
-mod varint;
 
 pub use error::DecodeError;
 use std::path::{Path, PathBuf};
@@ -23,13 +20,7 @@ use std::path::{Path, PathBuf};
 fn main() {
     let priors_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../priors");
     let out = PathBuf::from(std::env::var("OUT_DIR").expect("OUT_DIR"));
-    for file in [
-        "src/error.rs",
-        "src/lz.rs",
-        "src/pack.rs",
-        "src/rc.rs",
-        "src/varint.rs",
-    ] {
+    for file in ["src/error.rs", "src/lz.rs", "src/pack.rs", "src/rc.rs"] {
         println!("cargo:rerun-if-changed={file}");
     }
     println!("cargo:rerun-if-changed={}", priors_dir.display());
