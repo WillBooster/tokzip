@@ -36,7 +36,9 @@ fn main() {
             .iter()
             .take_while(|doc| {
                 let within = total < MAX_PRIORS_TRAIN_BYTES;
-                total += doc.len();
+                if within {
+                    total += doc.len();
+                }
                 within
             })
             .cloned()

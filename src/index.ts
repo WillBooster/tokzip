@@ -99,8 +99,9 @@ export function decompress(frame: Uint8Array, { maxLength = Infinity }: Decompre
 function withInput<T>(input: string | Uint8Array, run: (ptr: number, len: number) => T): T {
   const len = typeof input === 'string' ? utf8Length(input) : input.length;
   let trapped = false;
-  const ptr = wasm.tokzip_alloc(len);
+  let ptr: number | undefined;
   try {
+    ptr = wasm.tokzip_alloc(len);
     const view = new Uint8Array(wasm.memory.buffer, ptr, len);
     if (typeof input === 'string') textEncoder.encodeInto(input, view);
     else view.set(input);
@@ -112,7 +113,7 @@ function withInput<T>(input: string | Uint8Array, run: (ptr: number, len: number
     }
     throw error;
   } finally {
-    if (!trapped) wasm.tokzip_free(ptr, len);
+    if (!trapped && ptr !== undefined) wasm.tokzip_free(ptr, len);
   }
 }
 

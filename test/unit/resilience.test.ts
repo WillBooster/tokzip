@@ -27,9 +27,11 @@ describe('malformed frames', () => {
   });
 
   test('a forged coded body is rejected, not a trap', () => {
-    // A valid header (single segment, 2 bytes, zero CRC) over a body of arbitrary bytes.
+    // A valid header (single segment, 2 bytes, zero CRC, language 0) over a body crafted to
+    // code a match whose distance overflows 32-bit arithmetic: on the wasm32 build
+    // `distance as usize + 1` used to wrap to 0 and trap the module.
     const forged = Uint8Array.from(
-      'd00200000000b8a0572bfffc54be70'.match(/../g)!.map((byte) => Number.parseInt(byte, 16))
+      'd0020000000000b8a0572bfffc54be70'.match(/../g)!.map((byte) => Number.parseInt(byte, 16))
     );
     expect(() => decompress(forged)).toThrow(TokzipDecodeError);
   });

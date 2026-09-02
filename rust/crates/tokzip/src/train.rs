@@ -90,8 +90,9 @@ pub fn train_dictionary(docs: &[Vec<u8>], budget: usize, wrapper: &[u8]) -> Vec<
     let mut fit: Vec<u8> = Vec::new();
     for (i, doc) in bounded.iter().enumerate() {
         if i % 10 == 0 && validation_bytes < MAX_VALIDATION_BYTES {
-            validation.push(doc.to_vec());
-            validation_bytes += doc.len();
+            let take = doc.len().min(MAX_VALIDATION_BYTES - validation_bytes);
+            validation.push(doc[..take].to_vec());
+            validation_bytes += take;
         } else {
             fit.extend_from_slice(doc);
         }
@@ -118,7 +119,7 @@ pub fn train_dictionary(docs: &[Vec<u8>], budget: usize, wrapper: &[u8]) -> Vec<
 /// and the segments are laid out best first, so the most valuable fragments have the lowest
 /// dictionary offsets, until `budget` is filled.
 fn cover(data: &[u8], budget: usize, k: usize) -> Vec<u8> {
-    if data.len() < k {
+    if data.len() < k.max(DMER) {
         return data.to_vec();
     }
     let dmers = data.len() - DMER + 1;
@@ -127,7 +128,7 @@ fn cover(data: &[u8], budget: usize, k: usize) -> Vec<u8> {
         freqs[dmer_hash(data, pos)] += 1;
     }
     // Twice the budget's worth of segments are ranked so the best fill the budget.
-    let epochs = (2 * budget / k).max(1).min(dmers / k);
+    let epochs = (2 * budget / k).clamp(1, (dmers / k).max(1));
     let epoch_size = dmers / epochs;
     let per_segment = k - DMER + 1;
     let mut segments: Vec<(u64, &[u8])> = Vec::new();
@@ -183,8 +184,8 @@ fn dmer_hash(data: &[u8], pos: usize) -> usize {
 /// Total coded body size of `docs`, each as one segment against `dict` with the models the
 /// trainer starts from (no priors), so candidate dictionaries compare on the codec's own cost.
 fn coded_size(dict: Vec<u8>, lit_classes: LitClasses, docs: &[Vec<u8>]) -> usize {
-    let primed: &'static Primed = Box::leak(Box::new(Primed::new(dict, None, lit_classes)));
-    let lookup = |_: u8| primed;
+    let primed = Primed::new(dict, None, lit_classes);
+    let lookup = |_: u8| &primed;
     docs.iter()
         .filter(|doc| !doc.is_empty())
         .map(|doc| {
@@ -207,8 +208,8 @@ pub fn train_priors(dict: Vec<u8>, docs: &[Vec<u8>], init: Option<&[u8]>) -> Vec
         Some(priors) => Models::from_priors(priors).lit_classes,
         None => train_lit_classes(docs),
     };
-    let primed: &'static Primed = Box::leak(Box::new(Primed::new(dict, init, lit_classes)));
-    let lookup = |_: u8| primed;
+    let primed = Primed::new(dict, init, lit_classes);
+    let lookup = |_: u8| &primed;
     let mut stats = vec![0u32; 2 * MODEL_SIZE];
     for doc in docs {
         if doc.is_empty() {

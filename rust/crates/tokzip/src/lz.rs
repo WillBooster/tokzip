@@ -722,13 +722,13 @@ pub struct Segment {
 
 /// Per-document language state: each language's models are cloned from the primed state on
 /// first use and keep adapting across that language's segments.
-struct LangModels<'a> {
-    lookup: &'a dyn Fn(u8) -> &'static Primed,
+struct LangModels<'a, 'p> {
+    lookup: &'a dyn Fn(u8) -> &'p Primed,
     models: Vec<Option<Models>>,
 }
 
-impl<'a> LangModels<'a> {
-    fn new(lookup: &'a dyn Fn(u8) -> &'static Primed) -> Self {
+impl<'a, 'p> LangModels<'a, 'p> {
+    fn new(lookup: &'a dyn Fn(u8) -> &'p Primed) -> Self {
         Self {
             lookup,
             models: vec![None; 256],
@@ -750,8 +750,8 @@ impl<'a> LangModels<'a> {
 // Encoder
 // ---------------------------------------------------------------------------
 
-pub fn encode_doc(
-    lookup: &dyn Fn(u8) -> &'static Primed,
+pub fn encode_doc<'p>(
+    lookup: &dyn Fn(u8) -> &'p Primed,
     doc: &[u8],
     segments: &[Segment],
 ) -> Vec<u8> {
@@ -759,8 +759,8 @@ pub fn encode_doc(
 }
 
 /// [`encode_doc`] that can also count the bits coded at every model node (trainer support).
-pub fn encode_doc_with_stats(
-    lookup: &dyn Fn(u8) -> &'static Primed,
+pub fn encode_doc_with_stats<'p>(
+    lookup: &dyn Fn(u8) -> &'p Primed,
     doc: &[u8],
     segments: &[Segment],
     stats: Option<Vec<u32>>,
@@ -1207,8 +1207,8 @@ fn emit_rep(rc: &mut Encoder, models: &mut Models, cs: &mut CoderState, idx: usi
 // Decoder
 // ---------------------------------------------------------------------------
 
-pub fn decode_doc(
-    lookup: &dyn Fn(u8) -> &'static Primed,
+pub fn decode_doc<'p>(
+    lookup: &dyn Fn(u8) -> &'p Primed,
     body: &[u8],
     out_len: usize,
     segments: &[Segment],

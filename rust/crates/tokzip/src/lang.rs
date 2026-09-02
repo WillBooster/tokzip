@@ -229,13 +229,12 @@ pub fn analyze(doc: &[u8]) -> (Vec<Segment>, [i32; LANGUAGE_COUNT]) {
 
 /// The line start within `low..=high` closest to `at` (`at` itself when none).
 fn nearest_line_start(doc: &[u8], at: usize, low: usize, high: usize) -> usize {
-    let mut best = at;
-    for pos in low..=high {
-        if pos <= doc.len() && doc[pos - 1] == b'\n' && pos.abs_diff(at) < best.abs_diff(at) {
-            if best == at && at > 0 && doc[at - 1] == b'\n' {
-                return at;
-            }
+    let (mut best, mut best_dist) = (at, usize::MAX);
+    for pos in low..=high.min(doc.len()) {
+        let dist = pos.abs_diff(at);
+        if pos > 0 && doc[pos - 1] == b'\n' && dist < best_dist {
             best = pos;
+            best_dist = dist;
         }
     }
     best
@@ -363,6 +362,21 @@ mod tests {
         assert!(langs.contains(&LANG_JAVASCRIPT), "{segments:?}");
         assert_eq!(segments.last().unwrap().end, doc.len());
         assert!(segments.windows(2).all(|w| w[0].end < w[1].end));
+    }
+
+    #[test]
+    fn segment_boundaries_land_on_line_starts() {
+        let ja = "ゲームの仕様を以下に示します。\n".repeat(20);
+        let js = "const ctx = canvas.getContext('2d');\n".repeat(20);
+        let doc = format!("{ja}{js}");
+        let segments = segment(doc.as_bytes());
+        assert!(segments.len() >= 2, "{segments:?}");
+        for boundary in &segments[..segments.len() - 1] {
+            assert_eq!(doc.as_bytes()[boundary.end - 1], b'\n', "{segments:?}");
+        }
+        assert_eq!(nearest_line_start(b"abc\ndefghij\nklm", 6, 1, 14), 4);
+        assert_eq!(nearest_line_start(b"abc\ndefghij\nklm", 4, 1, 14), 4);
+        assert_eq!(nearest_line_start(b"abcdefghijklm", 6, 1, 12), 6);
     }
 
     #[test]
