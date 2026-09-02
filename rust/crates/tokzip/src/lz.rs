@@ -39,8 +39,10 @@ const EMPTY: i32 = -1;
 // Probability models (one flat array; the layout is format identity)
 // ---------------------------------------------------------------------------
 
-/// Literal context class of the previous byte (see `lit_class`).
-pub const LIT_CLASSES: usize = 32;
+/// Literal context classes of the previous byte (`lit_classes.0`) and of the byte before it
+/// (`lit_classes.1`); a literal is coded through the tree of the pair.
+pub const LIT_CLASSES: usize = 128;
+pub const LIT_CLASSES2: usize = 4;
 const IS_MATCH: usize = 0;
 const IS_REP: usize = IS_MATCH + NUM_STATES;
 const IS_REP_G0: usize = IS_REP + NUM_STATES;
@@ -60,11 +62,11 @@ const HIST_DIST: usize = DICT_LEN + LEN_MODEL_SIZE;
 /// `HIST_DIST` but separately modeled: the same dictionary fragment costs the same wherever
 /// it is referenced, so the trained priors capture the dictionary's value ordering.
 const DICT_OFF: usize = HIST_DIST + DIST_MODEL_SIZE;
-/// Plain literal trees, 256 nodes per literal class.
+/// Plain literal trees, 256 nodes per (class, class2) context pair.
 const LIT: usize = DICT_OFF + DIST_MODEL_SIZE;
 /// Matched-literal trees (first literals after a match, predicted by the byte at rep0), 512
 /// nodes shared by all classes: `match_bit << 8 | node`.
-const LIT_MATCHED: usize = LIT + LIT_CLASSES * 256;
+const LIT_MATCHED: usize = LIT + LIT_CLASSES * LIT_CLASSES2 * 256;
 pub const MODEL_SIZE: usize = LIT_MATCHED + 512;
 
 #[inline]
@@ -76,36 +78,42 @@ fn dist_group(base: usize) -> (usize, usize, usize) {
     )
 }
 
-/// Serialized model: the literal class table followed by the quantized probabilities.
-pub const PRIORS_SIZE: usize = 256 + MODEL_SIZE;
+/// Serialized model: both literal class tables followed by the quantized probabilities.
+pub const PRIORS_SIZE: usize = 512 + MODEL_SIZE;
+
+/// The two literal class tables: previous-byte value → class (values < `LIT_CLASSES`) and
+/// second-previous-byte value → class (values < `LIT_CLASSES2`).
+pub type LitClasses = ([u8; 256], [u8; 256]);
 
 #[derive(Clone)]
 pub struct Models {
-    /// Literal context class per previous-byte value (values < `LIT_CLASSES`).
-    pub lit_class: [u8; 256],
+    pub lit_classes: LitClasses,
     pub probs: Vec<u16>,
 }
 
 impl Models {
-    pub fn new(lit_class: [u8; 256]) -> Self {
+    pub fn new(lit_classes: LitClasses) -> Self {
         Self {
-            lit_class,
+            lit_classes,
             probs: vec![PROB_INIT; MODEL_SIZE],
         }
     }
 
-    /// Restores trained priors: 256 class bytes, then each 11-bit probability quantized to 8 bits.
+    /// Restores trained priors: the two 256-byte class tables, then each 11-bit probability
+    /// quantized to 8 bits.
     pub fn from_priors(priors: &[u8]) -> Self {
         assert_eq!(priors.len(), PRIORS_SIZE, "priors size mismatch");
-        let mut lit_class = [0u8; 256];
-        lit_class.copy_from_slice(&priors[..256]);
+        let mut lit_classes = ([0u8; 256], [0u8; 256]);
+        lit_classes.0.copy_from_slice(&priors[..256]);
+        lit_classes.1.copy_from_slice(&priors[256..512]);
         assert!(
-            lit_class.iter().all(|&c| (c as usize) < LIT_CLASSES),
+            lit_classes.0.iter().all(|&c| (c as usize) < LIT_CLASSES)
+                && lit_classes.1.iter().all(|&c| (c as usize) < LIT_CLASSES2),
             "invalid literal class"
         );
         Self {
-            lit_class,
-            probs: priors[256..]
+            lit_classes,
+            probs: priors[512..]
                 .iter()
                 .map(|&q| (u16::from(q) << 3) | 4)
                 .collect(),
@@ -113,9 +121,16 @@ impl Models {
     }
 
     #[inline]
-    fn lit_block(&self, prev: u8) -> usize {
-        LIT + self.lit_class[prev as usize] as usize * 256
+    fn lit_block(&self, prev: (u8, u8)) -> usize {
+        lit_block(&self.lit_classes, prev)
     }
+}
+
+/// Start of the literal tree for the context `(previous byte, the byte before it)`.
+#[inline]
+fn lit_block(classes: &LitClasses, prev: (u8, u8)) -> usize {
+    LIT + (classes.0[prev.0 as usize] as usize * LIT_CLASSES2 + classes.1[prev.1 as usize] as usize)
+        * 256
 }
 
 fn encode_len(rc: &mut Encoder, probs: &mut [u16], base: usize, len: usize) {
@@ -221,7 +236,7 @@ fn price_tree_reverse(probs: &[u16], base: usize, bits: u32, symbol: u32) -> u32
 impl Models {
     /// Price of the literal at `pos` (excluding the `is_match` decision bit).
     fn price_literal(&self, win: &Window, pos: usize, state: usize, reps: &[u32; 4]) -> u32 {
-        let block = self.lit_block(win.prev_byte(pos));
+        let block = self.lit_block(win.prev_bytes(pos));
         let probs = &self.probs;
         let symbol = u32::from(win.doc[pos]);
         let mut price = 0;
@@ -409,15 +424,11 @@ impl Window<'_> {
         }
     }
 
+    /// The two bytes before `pos` (nearest first), continuing into the dictionary; 0 where
+    /// neither exists.
     #[inline]
-    fn prev_byte(&self, pos: usize) -> u8 {
-        if pos > 0 {
-            self.doc[pos - 1]
-        } else if let Some(&b) = self.dict.last() {
-            b
-        } else {
-            0
-        }
+    fn prev_bytes(&self, pos: usize) -> (u8, u8) {
+        prev_bytes(self.doc, self.dict, pos)
     }
 
     /// Length of the match at `pos` against the source `dist` back, capped at `max`.
@@ -438,6 +449,22 @@ impl Window<'_> {
         }
         l
     }
+}
+
+/// The two bytes before `pos` of `doc` (nearest first), continuing into `dict` as if it
+/// preceded the document; 0 where neither holds a byte.
+#[inline]
+fn prev_bytes(doc: &[u8], dict: &[u8], pos: usize) -> (u8, u8) {
+    let at = |dist: usize| {
+        if dist <= pos {
+            doc[pos - dist]
+        } else if dist - pos <= dict.len() {
+            dict[dict.len() - (dist - pos)]
+        } else {
+            0
+        }
+    };
+    (at(1), at(2))
 }
 
 /// Length of the common prefix of `a` and `b`, eight bytes at a time.
@@ -520,7 +547,7 @@ impl Primed {
     /// Builds the dictionary's chains and its initial models: trained `priors` when given,
     /// otherwise the state left by compressing the dictionary against itself (the trainer's
     /// starting point).
-    pub fn new(bytes: Vec<u8>, priors: Option<&[u8]>, lit_class: [u8; 256]) -> Self {
+    pub fn new(bytes: Vec<u8>, priors: Option<&[u8]>, lit_classes: LitClasses) -> Self {
         if let Some(priors) = priors {
             return Self {
                 bytes,
@@ -528,12 +555,12 @@ impl Primed {
                 models: Models::from_priors(priors),
             };
         }
-        let mut models = Models::new(lit_class);
+        let mut models = Models::new(lit_classes);
         let mut state = CoderState::new();
         let empty = Primed {
             bytes: Vec::new(),
             chains: OnceLock::from(Chains::new(0)),
-            models: Models::new(lit_class),
+            models: Models::new(lit_classes),
         };
         let mut mf = MatchFinder {
             win: Window {
@@ -695,13 +722,13 @@ pub struct Segment {
 
 /// Per-document language state: each language's models are cloned from the primed state on
 /// first use and keep adapting across that language's segments.
-struct LangModels<'a> {
-    lookup: &'a dyn Fn(u8) -> &'static Primed,
+struct LangModels<'a, 'p> {
+    lookup: &'a dyn Fn(u8) -> &'p Primed,
     models: Vec<Option<Models>>,
 }
 
-impl<'a> LangModels<'a> {
-    fn new(lookup: &'a dyn Fn(u8) -> &'static Primed) -> Self {
+impl<'a, 'p> LangModels<'a, 'p> {
+    fn new(lookup: &'a dyn Fn(u8) -> &'p Primed) -> Self {
         Self {
             lookup,
             models: vec![None; 256],
@@ -723,8 +750,8 @@ impl<'a> LangModels<'a> {
 // Encoder
 // ---------------------------------------------------------------------------
 
-pub fn encode_doc(
-    lookup: &dyn Fn(u8) -> &'static Primed,
+pub fn encode_doc<'p>(
+    lookup: &dyn Fn(u8) -> &'p Primed,
     doc: &[u8],
     segments: &[Segment],
 ) -> Vec<u8> {
@@ -732,8 +759,8 @@ pub fn encode_doc(
 }
 
 /// [`encode_doc`] that can also count the bits coded at every model node (trainer support).
-pub fn encode_doc_with_stats(
-    lookup: &dyn Fn(u8) -> &'static Primed,
+pub fn encode_doc_with_stats<'p>(
+    lookup: &dyn Fn(u8) -> &'p Primed,
     doc: &[u8],
     segments: &[Segment],
     stats: Option<Vec<u32>>,
@@ -1058,7 +1085,7 @@ fn emit_literal(
     pos: usize,
 ) {
     rc.encode_bit(&mut models.probs, IS_MATCH + cs.state, 0);
-    let block = models.lit_block(win.prev_byte(pos));
+    let block = models.lit_block(win.prev_bytes(pos));
     let probs = &mut models.probs;
     let symbol = u32::from(win.doc[pos]);
     let mut m = 1usize;
@@ -1180,8 +1207,8 @@ fn emit_rep(rc: &mut Encoder, models: &mut Models, cs: &mut CoderState, idx: usi
 // Decoder
 // ---------------------------------------------------------------------------
 
-pub fn decode_doc(
-    lookup: &dyn Fn(u8) -> &'static Primed,
+pub fn decode_doc<'p>(
+    lookup: &dyn Fn(u8) -> &'p Primed,
     body: &[u8],
     out_len: usize,
     segments: &[Segment],
@@ -1206,7 +1233,7 @@ pub fn decode_doc(
         let dlen = dict.len();
         clamp_reps(&mut cs, out.len() - base, dlen);
         let mut models = lang_models.take(seg.lang);
-        let lit_class = models.lit_class;
+        let lit_classes = models.lit_classes;
         while out.len() - base < seg.end {
             if rc.overran() {
                 return Err(DecodeError::Corrupt);
@@ -1214,12 +1241,7 @@ pub fn decode_doc(
             let pos = out.len() - base;
             let probs = &mut models.probs;
             if rc.decode_bit(probs, IS_MATCH + cs.state) == 0 {
-                let prev = if pos > 0 {
-                    out[base + pos - 1]
-                } else {
-                    dict.last().copied().unwrap_or(0)
-                };
-                let block = LIT + lit_class[prev as usize] as usize * 256;
+                let block = lit_block(&lit_classes, prev_bytes(&out[base..], dict, pos));
                 let mut m = 1usize;
                 if cs.prev_was_match() {
                     // u64 compare: `as usize + 1` would wrap at u32::MAX on 32-bit targets.
@@ -1336,7 +1358,7 @@ mod tests {
     }
 
     fn leak(bytes: Vec<u8>) -> &'static Primed {
-        Box::leak(Box::new(Primed::new(bytes, None, [0; 256])))
+        Box::leak(Box::new(Primed::new(bytes, None, ([0; 256], [0; 256]))))
     }
 
     fn single(len: usize, lang: u8) -> Vec<Segment> {

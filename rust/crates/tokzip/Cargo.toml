@@ -12,14 +12,14 @@ serde_json = { version = "1", optional = true }
 train = ["dep:serde_json"]
 
 [[bin]]
-name = "train-priors"
+name = "train"
 required-features = ["train"]
 
 # The corpus harnesses read a tokzip-corpus checkout through the `train` module's manifest reader.
 [[example]]
-name = "corpus"
+name = "mixed"
 required-features = ["train"]
 
 [[example]]
-name = "mixed"
+name = "eval"
 required-features = ["train"]

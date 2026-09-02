@@ -62,8 +62,13 @@ static PRIMED: [OnceLock<Primed>; LANGUAGE_COUNT] = [const { OnceLock::new() }; 
 /// The language's dictionary (wrapper + suffix) with chains and trained priors, built on first
 /// use and cached for the process.
 pub fn primed(lang: u8) -> &'static Primed {
-    PRIMED[lang as usize]
-        .get_or_init(|| Primed::new(dictionary(lang), Some(LANGUAGES[lang as usize].2), [0; 256]))
+    PRIMED[lang as usize].get_or_init(|| {
+        Primed::new(
+            dictionary(lang),
+            Some(LANGUAGES[lang as usize].2),
+            ([0; 256], [0; 256]),
+        )
+    })
 }
 
 /// The full dictionary bytes of a language: the shared wrapper followed by its suffix.
@@ -198,7 +203,7 @@ pub fn analyze(doc: &[u8]) -> (Vec<Segment>, [i32; LANGUAGE_COUNT]) {
         labels[w] = lang as u8;
         lang = back[w][lang] as usize;
     }
-    let mut segments = Vec::new();
+    let mut segments: Vec<Segment> = Vec::new();
     for (w, &label) in labels.iter().enumerate() {
         let end = ((w + 1) * WINDOW).min(doc.len());
         match segments.last_mut() {
@@ -209,7 +214,30 @@ pub fn analyze(doc: &[u8]) -> (Vec<Segment>, [i32; LANGUAGE_COUNT]) {
             _ => segments.push(Segment { end, lang: label }),
         }
     }
+    // Windows are language evidence, not boundaries: a switch lands on the nearest line start,
+    // where the language actually changes, instead of in the middle of a line.
+    for i in 0..segments.len().saturating_sub(1) {
+        let low = segments[i]
+            .end
+            .saturating_sub(WINDOW / 2)
+            .max(i.checked_sub(1).map_or(1, |p| segments[p].end + 1));
+        let high = (segments[i].end + WINDOW / 2).min(segments[i + 1].end - 1);
+        segments[i].end = nearest_line_start(doc, segments[i].end, low, high);
+    }
     (segments, totals)
+}
+
+/// The line start within `low..=high` closest to `at` (`at` itself when none).
+fn nearest_line_start(doc: &[u8], at: usize, low: usize, high: usize) -> usize {
+    let (mut best, mut best_dist) = (at, usize::MAX);
+    for pos in low..=high.min(doc.len()) {
+        let dist = pos.abs_diff(at);
+        if pos > 0 && doc[pos - 1] == b'\n' && dist < best_dist {
+            best = pos;
+            best_dist = dist;
+        }
+    }
+    best
 }
 
 /// Whole-document 4-gram overlap of `doc` against each language's dictionary (no fence hint),
@@ -334,6 +362,21 @@ mod tests {
         assert!(langs.contains(&LANG_JAVASCRIPT), "{segments:?}");
         assert_eq!(segments.last().unwrap().end, doc.len());
         assert!(segments.windows(2).all(|w| w[0].end < w[1].end));
+    }
+
+    #[test]
+    fn segment_boundaries_land_on_line_starts() {
+        let ja = "ゲームの仕様を以下に示します。\n".repeat(20);
+        let js = "const ctx = canvas.getContext('2d');\n".repeat(20);
+        let doc = format!("{ja}{js}");
+        let segments = segment(doc.as_bytes());
+        assert!(segments.len() >= 2, "{segments:?}");
+        for boundary in &segments[..segments.len() - 1] {
+            assert_eq!(doc.as_bytes()[boundary.end - 1], b'\n', "{segments:?}");
+        }
+        assert_eq!(nearest_line_start(b"abc\ndefghij\nklm", 6, 1, 14), 4);
+        assert_eq!(nearest_line_start(b"abc\ndefghij\nklm", 4, 1, 14), 4);
+        assert_eq!(nearest_line_start(b"abcdefghijklm", 6, 1, 12), 6);
     }
 
     #[test]

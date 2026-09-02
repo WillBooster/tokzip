@@ -10,21 +10,21 @@ never ends in a zero byte).
 ## Frame
 
 ```
-frame := 0xD0 flags sizeVarint crc32 body
+frame := header sizeVarint crc32 body
 ```
 
-- `0xD0`: magic `1101` in the high nibble, version 0 in the low nibble.
-- `flags`: bit 0 = content type (0 = UTF-8 string, 1 = bytes); bit 1 = stored; bit 2 =
-  multi-segment; bit 3 = blocked. Stored excludes bits 2 and 3, which also exclude each other;
-  other bits are a structural error.
+- `header`: one byte — magic `1101` in the high nibble, then two version bits (0; the value 3
+  is reserved for an extension byte that would follow), then two layout bits: 0 =
+  single-segment, 1 = multi-segment, 2 = blocked, 3 = stored.
 - `sizeVarint`: decompressed length in bytes. For coded frames decoders reject a length above
   8192 × the body length before allocating anything — and, unless the frame is blocked, above
   4 MiB — and reject a frame whose coded body needs more than a fixed synthetic-padding budget
   past its end while decoding.
-- `crc32`: IEEE CRC-32 of the decompressed content followed by one type byte (0x00 string,
-  0x01 bytes), so a retyped frame fails the check; decoders verify it before returning.
+- `crc32`: IEEE CRC-32 of the decompressed content; decoders verify it before returning.
 - `body`: stored → the content itself (exactly `size` bytes). Blocked → the block sequence
   (§1). Otherwise a segment table (§2) then the range-coded stream (§4).
+
+The content is a UTF-8 string; the format carries no content type.
 
 Stored frames are the encoder's fallback whenever coding would not be strictly smaller or the
 encoder's own decode check fails; empty content is always stored.
@@ -37,11 +37,11 @@ is a structural error. Each block is coded independently: its own language segme
 models, and tokens never reach into an earlier block.
 
 ```
-block := blockFlags payloadLenVarint payload
+block := blockLayout payloadLenVarint payload
 ```
 
-- `blockFlags`: bit 1 = stored; bit 2 = multi-segment (never together; other bits are a
-  structural error).
+- `blockLayout`: one byte with the frame header's layout values — 0 single-segment, 1
+  multi-segment, 3 stored (2 and anything above 3 are a structural error).
 - `payload`: stored → the block's content (exactly the block length). Otherwise the block's
   segment table (§2) then its range-coded stream (§4), laid out exactly as a single-block body.
 
@@ -53,7 +53,7 @@ as a whole would not be smaller. Trailing bytes after the last block are a struc
 ## 2. Segments
 
 The encoder splits the content (or each block) into language segments (contiguous, covering the whole
-content). Single segment: one byte, the language id. Multi-segment (flag bit 2): a varint
+content). Single segment: one byte, the language id. Multi-segment (layout 1): a varint
 segment count (at most 2^20; decoders reject more), then per segment a language-id byte and a
 varint length; lengths are non-zero and sum to `size` (the block length in a blocked frame).
 
@@ -96,8 +96,8 @@ language's adaptive models; a language's models persist across all of its segmen
 Token grammar per position (bits are coded with the model node named in brackets; `s` is the
 state):
 
-- `[is_match s] = 0` → **literal**: 8 bits MSB-first through the literal tree of the previous
-  byte's class (§5). After a match (`s ≥ 7`) the first bits are coded through the shared
+- `[is_match s] = 0` → **literal**: 8 bits MSB-first through the literal tree of the context
+  pair (class of the previous byte, class of the byte before it; §5). After a match (`s ≥ 7`) the first bits are coded through the shared
   matched-literal trees, predicted by the byte at `reps[0] + 1`, until the first mismatch.
 - `[is_match s] = 1`, `[is_rep s] = 0` → **explicit match**:
   - `[is_dict s] = 0`: length (`LEN` model) then distance − 1 (`HIST_DIST` model).
@@ -117,8 +117,11 @@ a 4-bit reverse `align` tree beyond.
 
 All probabilities of a language live in one flat array (layout in `lz.rs`: `is_match`,
 `is_rep`, `is_rep_g0`, `is_rep_g1`, `is_rep_g2`, `is_rep0_long`, `is_dict` × 12 states;
-`LEN`, `REP_LEN`, `DICT_LEN` × 274; `HIST_DIST`, `DICT_OFF` × 386; 32 literal classes × 256
-plain-tree nodes; 512 shared matched-literal nodes). `priors/<language>.bin` holds the
-256-entry previous-byte → class table followed by every node's initial probability quantized
-to 8 bits (`p11 = (q << 3) | 4`). Both are trained offline (`bun run train`) and are format
-identity: a retrain changes the coded stream.
+`LEN`, `REP_LEN`, `DICT_LEN` × 274; `HIST_DIST`, `DICT_OFF` × 386; 128 × 4 literal context
+pairs × 256 plain-tree nodes; 512 shared matched-literal nodes). The literal context of a
+position is the pair (class of the previous byte, class of the byte before it), each byte
+continuing into the dictionary before the content start and 0 where neither exists.
+`priors/<language>.bin` holds the 256-entry previous-byte → class table (values < 128), the
+256-entry second-previous-byte → class table (values < 4), then every node's initial
+probability quantized to 8 bits (`p11 = (q << 3) | 4`). All are trained offline
+(`bun run train`) and are format identity: a retrain changes the coded stream.

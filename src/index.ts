@@ -44,46 +44,42 @@ interface Exports {
   memory: WebAssembly.Memory;
   tokzip_alloc(len: number): number;
   tokzip_free(ptr: number, len: number): void;
-  tokzip_compress(ptr: number, len: number, isBytes: number): void;
+  tokzip_compress(ptr: number, len: number): void;
   tokzip_decompress(ptr: number, len: number, maxLen: number): number;
-  tokzip_out_is_bytes(): number;
   tokzip_out_ptr(): number;
   tokzip_out_len(): number;
 }
 
 const textEncoder = new TextEncoder();
-// Fatal decoding: a string frame whose content is not valid UTF-8 is corrupt, never U+FFFD.
+// Fatal decoding: a frame whose content is not valid UTF-8 is corrupt, never U+FFFD.
 const textDecoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
-const wasm = new WebAssembly.Instance(loadModule()).exports as unknown as Exports;
+const wasmModule = loadModule();
+/** The live instance; `undefined` after a trap until the next call instantiates a fresh one. */
+let wasm: Exports | undefined;
 
-/**
- * Compresses a string (stored as UTF-8; must be well-formed UTF-16) or raw bytes into a
- * self-describing binary frame.
- */
-export function compress(input: string | Uint8Array): Uint8Array {
-  const isString = typeof input === 'string';
+/** Compresses a string (stored as UTF-8; must be well-formed UTF-16) into a self-describing binary frame. */
+export function compress(text: string): Uint8Array {
   // A lone surrogate cannot round-trip through UTF-8 (TextEncoder would substitute U+FFFD),
   // so it is refused rather than silently altered.
-  if (isString && !input.isWellFormed()) {
+  if (!text.isWellFormed()) {
     throw new RangeError('tokzip: string contains a lone surrogate and cannot be stored losslessly');
   }
-  return withInput(input, (ptr, len) => {
-    wasm.tokzip_compress(ptr, len, isString ? 0 : 1);
-    return takeOutput();
+  return withInput(text, (exports, ptr, len) => {
+    exports.tokzip_compress(ptr, len);
+    return takeOutput(exports);
   });
 }
 
-/** Decompresses a frame; returns a string or bytes according to what was compressed. */
-export function decompress(frame: Uint8Array, { maxLength = Infinity }: DecompressOptions = {}): string | Uint8Array {
+/** Decompresses a frame produced by `compress` back to the original string. */
+export function decompress(frame: Uint8Array, { maxLength = Infinity }: DecompressOptions = {}): string {
   // A negative limit would wrap to a huge unsigned length at the wasm boundary (NaN fails too).
   if (!(maxLength >= 0)) throw new RangeError(`tokzip: maxLength must be a non-negative number, got ${maxLength}`);
   // wasm32 lengths are 32-bit; anything above cannot be a frame's length anyway.
   const maxLen = Math.min(maxLength, 0xFF_FF_FF_FF);
-  return withInput(frame, (ptr, len) => {
-    const code = wasm.tokzip_decompress(ptr, len, maxLen);
+  return withInput(frame, (exports, ptr, len) => {
+    const code = exports.tokzip_decompress(ptr, len, maxLen);
     if (code !== 0) throw new TokzipDecodeError(code);
-    const out = takeOutput();
-    if (wasm.tokzip_out_is_bytes() !== 0) return out;
+    const out = takeOutput(exports);
     try {
       return textDecoder.decode(out);
     } catch {
@@ -98,17 +94,29 @@ export function decompress(frame: Uint8Array, { maxLength = Infinity }: Decompre
  * the JS heap. (Exact sizing also matters for correctness: Bun 1.3 `encodeInto` writes U+FFFD
  * for a 4-byte character when only 3 bytes of room remain instead of stopping before it, so
  * the buffer is never filled in several passes.)
+ *
+ * A trap (the module ran out of memory) leaves the instance's heap in an unknown state, so the
+ * instance is dropped before the error propagates and the next call instantiates a fresh one.
  */
-function withInput<T>(input: string | Uint8Array, run: (ptr: number, len: number) => T): T {
+function withInput<T>(input: string | Uint8Array, run: (exports: Exports, ptr: number, len: number) => T): T {
+  const exports = (wasm ??= instantiate());
   const len = typeof input === 'string' ? utf8Length(input) : input.length;
-  const ptr = wasm.tokzip_alloc(len);
+  let trapped = false;
+  let ptr: number | undefined;
   try {
-    const view = new Uint8Array(wasm.memory.buffer, ptr, len);
+    ptr = exports.tokzip_alloc(len);
+    const view = new Uint8Array(exports.memory.buffer, ptr, len);
     if (typeof input === 'string') textEncoder.encodeInto(input, view);
     else view.set(input);
-    return run(ptr, len);
+    return run(exports, ptr, len);
+  } catch (error) {
+    if (error instanceof WebAssembly.RuntimeError) {
+      trapped = true;
+      wasm = undefined;
+    }
+    throw error;
   } finally {
-    wasm.tokzip_free(ptr, len);
+    if (!trapped && ptr !== undefined) exports.tokzip_free(ptr, len);
   }
 }
 
@@ -130,8 +138,12 @@ function utf8Length(text: string): number {
 }
 
 /** Copies the module-owned output buffer out of wasm memory (it is reused by the next call). */
-function takeOutput(): Uint8Array {
-  return new Uint8Array(wasm.memory.buffer, wasm.tokzip_out_ptr(), wasm.tokzip_out_len()).slice();
+function takeOutput(exports: Exports): Uint8Array {
+  return new Uint8Array(exports.memory.buffer, exports.tokzip_out_ptr(), exports.tokzip_out_len()).slice();
+}
+
+function instantiate(): Exports {
+  return new WebAssembly.Instance(wasmModule).exports as unknown as Exports;
 }
 
 function loadModule(): WebAssembly.Module {
