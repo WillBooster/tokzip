@@ -7,49 +7,33 @@
 //! a Viterbi pass with a switch penalty turns the window scores into segments. The decoder
 //! never detects anything — it reads the segment table from the frame.
 
-use crate::lz::{Primed, Segment};
+use crate::lz::{Models, Primed, Segment};
 use std::sync::OnceLock;
 
 const WRAPPER: &[u8] = include_bytes!("../../../../dict/wrapper.bin");
 
+/// A language's embedded assets: its trained dictionary suffix and its priors as packed by the
+/// build script (`build.rs`).
+macro_rules! assets {
+    ($name:literal) => {
+        (
+            $name,
+            include_bytes!(concat!("../../../../dict/", $name, ".bin")),
+            include_bytes!(concat!(env!("OUT_DIR"), "/", $name, ".priors")),
+        )
+    };
+}
+
 /// Language ids are frame-format identity (v0: any change is a format change). Each entry:
-/// name, trained dictionary suffix, trained model priors.
+/// name, trained dictionary suffix, packed model priors.
 pub const LANGUAGES: [(&str, &[u8], &[u8]); 7] = [
-    (
-        "text",
-        include_bytes!("../../../../dict/text.bin"),
-        include_bytes!("../../../../priors/text.bin"),
-    ),
-    (
-        "en-US",
-        include_bytes!("../../../../dict/en-US.bin"),
-        include_bytes!("../../../../priors/en-US.bin"),
-    ),
-    (
-        "ja-JP",
-        include_bytes!("../../../../dict/ja-JP.bin"),
-        include_bytes!("../../../../priors/ja-JP.bin"),
-    ),
-    (
-        "html",
-        include_bytes!("../../../../dict/html.bin"),
-        include_bytes!("../../../../priors/html.bin"),
-    ),
-    (
-        "css",
-        include_bytes!("../../../../dict/css.bin"),
-        include_bytes!("../../../../priors/css.bin"),
-    ),
-    (
-        "javascript",
-        include_bytes!("../../../../dict/javascript.bin"),
-        include_bytes!("../../../../priors/javascript.bin"),
-    ),
-    (
-        "typescript",
-        include_bytes!("../../../../dict/typescript.bin"),
-        include_bytes!("../../../../priors/typescript.bin"),
-    ),
+    assets!("text"),
+    assets!("en-US"),
+    assets!("ja-JP"),
+    assets!("html"),
+    assets!("css"),
+    assets!("javascript"),
+    assets!("typescript"),
 ];
 pub const LANGUAGE_COUNT: usize = LANGUAGES.len();
 const LANG_HTML: u8 = 3;
@@ -59,25 +43,16 @@ const LANG_TYPESCRIPT: u8 = 6;
 
 static PRIMED: [OnceLock<Primed>; LANGUAGE_COUNT] = [const { OnceLock::new() }; LANGUAGE_COUNT];
 
-/// The language's dictionary (wrapper + suffix) with chains and trained priors, built on first
-/// use and cached for the process.
+/// The language's dictionary (wrapper + suffix) with its trained priors, built on first use and
+/// cached for the process; the encoder's chains are built on first encode.
 pub fn primed(lang: u8) -> &'static Primed {
     PRIMED[lang as usize].get_or_init(|| {
-        Primed::new(
-            dictionary(lang),
-            Some(LANGUAGES[lang as usize].2),
-            ([0; 256], [0; 256]),
-        )
+        let (_, suffix, packed_priors) = LANGUAGES[lang as usize];
+        let mut bytes = Vec::with_capacity(WRAPPER.len() + suffix.len());
+        bytes.extend_from_slice(WRAPPER);
+        bytes.extend_from_slice(suffix);
+        Primed::new(bytes, Models::from_priors(packed_priors))
     })
-}
-
-/// The full dictionary bytes of a language: the shared wrapper followed by its suffix.
-pub fn dictionary(lang: u8) -> Vec<u8> {
-    let suffix = LANGUAGES[lang as usize].1;
-    let mut bytes = Vec::with_capacity(WRAPPER.len() + suffix.len());
-    bytes.extend_from_slice(WRAPPER);
-    bytes.extend_from_slice(suffix);
-    bytes
 }
 
 // ---------------------------------------------------------------------------

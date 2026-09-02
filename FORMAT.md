@@ -124,4 +124,6 @@ continuing into the dictionary before the content start and 0 where neither exis
 `priors/<language>.bin` holds the 256-entry previous-byte → class table (values < 128), the
 256-entry second-previous-byte → class table (values < 4), then every node's initial
 probability quantized to 8 bits (`p11 = (q << 3) | 4`). All are trained offline
-(`bun run train`) and are format identity: a retrain changes the coded stream.
+(`bun run train`) and are format identity: a retrain changes the coded stream. (The module
+embeds the priors in a packed form that skips untrained literal subtrees — a build-time
+representation of the same values, not part of the format; see `rust/crates/tokzip/build.rs`.)
