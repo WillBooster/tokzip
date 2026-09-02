@@ -78,8 +78,9 @@ export function decompress(frame: Uint8Array, { maxLength = Infinity }: Decompre
   return withInput(frame, (ptr, len) => {
     const code = wasm.tokzip_decompress(ptr, len, maxLen);
     if (code !== 0) throw new TokzipDecodeError(code);
+    const out = takeOutput();
     try {
-      return textDecoder.decode(takeOutput());
+      return textDecoder.decode(out);
     } catch {
       throw new TokzipDecodeError(5);
     }
