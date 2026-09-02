@@ -184,7 +184,7 @@ fn dmer_hash(data: &[u8], pos: usize) -> usize {
 /// Total coded body size of `docs`, each as one segment against `dict` with the models the
 /// trainer starts from (no priors), so candidate dictionaries compare on the codec's own cost.
 fn coded_size(dict: Vec<u8>, lit_classes: LitClasses, docs: &[Vec<u8>]) -> usize {
-    let primed = Primed::new(dict, None, lit_classes);
+    let primed = Primed::self_primed(dict, lit_classes);
     let lookup = |_: u8| &primed;
     docs.iter()
         .filter(|doc| !doc.is_empty())
@@ -202,13 +202,13 @@ fn coded_size(dict: Vec<u8>, lit_classes: LitClasses, docs: &[Vec<u8>]) -> usize
 /// from `docs` (each compressed as one segment). The models start from `init` priors when
 /// given — a second round parses the documents the way the shipped models will, so its counts
 /// match the tokens the encoder actually picks — and from the dictionary-primed state
-/// otherwise. Returns the serialized model (`PRIORS_SIZE` bytes).
+/// otherwise. Returns the raw serialized model (`PRIORS_SIZE` bytes).
 pub fn train_priors(dict: Vec<u8>, docs: &[Vec<u8>], init: Option<&[u8]>) -> Vec<u8> {
-    let lit_classes = match init {
-        Some(priors) => Models::from_priors(priors).lit_classes,
-        None => train_lit_classes(docs),
+    let primed = match init {
+        Some(priors) => Primed::new(dict, Models::from_raw_priors(priors)),
+        None => Primed::self_primed(dict, train_lit_classes(docs)),
     };
-    let primed = Primed::new(dict, init, lit_classes);
+    let lit_classes = primed.models.lit_classes;
     let lookup = |_: u8| &primed;
     let mut stats = vec![0u32; 2 * MODEL_SIZE];
     for doc in docs {

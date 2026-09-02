@@ -6,7 +6,7 @@
 
 Lossless compressor for **prompts, LLM outputs, and source code** stored at rest — one
 function in, one function out, no compression options (only an optional decode length limit). The codec is Rust compiled to a single
-**wasm module (~1.9 MB, every dictionary and model included; ~580 KB gzipped)** with a thin
+**wasm module (~1.2 MB, every dictionary and model included; ~540 KB gzipped)** with a thin
 TypeScript wrapper; it runs on Cloudflare Workers and Bun (and on Node via a bundler that
 handles `.wasm` imports).
 
@@ -64,14 +64,14 @@ plus the private production corpus when checked out beside it (3,514 documents, 
 
 | documents  | tokzip    | brotli -11 | zstd -19 | gzip -9 |
 | ---------- | --------- | ---------- | -------- | ------- |
-| all        | **23.4%** | 26.3%      | 31.1%    | 31.9%   |
-| ≤ 1 KB     | **33.8%** | 47.6%      | 60.2%    | 61.1%   |
-| 1–4 KB     | **27.9%** | 33.9%      | 42.1%    | 42.2%   |
-| 4–16 KB    | **23.5%** | 25.8%      | 30.4%    | 31.2%   |
-| > 16 KB    | **20.4%** | 21.6%      | 24.5%    | 25.6%   |
-| ja-JP      | **25.4%** | 35.6%      | 42.8%    | 43.3%   |
-| typescript | **14.9%** | 17.7%      | 19.8%    | 20.6%   |
-| html       | **19.4%** | 21.3%      | 25.4%    | 26.1%   |
+| all        | **23.3%** | 26.3%      | 31.1%    | 31.9%   |
+| ≤ 1 KB     | **33.4%** | 47.6%      | 60.2%    | 61.1%   |
+| 1–4 KB     | **27.7%** | 33.9%      | 42.1%    | 42.2%   |
+| 4–16 KB    | **23.4%** | 25.8%      | 30.4%    | 31.2%   |
+| > 16 KB    | **20.3%** | 21.6%      | 24.5%    | 25.6%   |
+| ja-JP      | **25.0%** | 35.6%      | 42.8%    | 43.3%   |
+| typescript | **14.8%** | 17.7%      | 19.8%    | 20.6%   |
+| html       | **19.3%** | 21.3%      | 25.4%    | 26.1%   |
 
 Run it yourself: `bun run bench` (add `--speed` for throughput and `--json <file>` for a
 machine-readable report). The harness verifies every tokzip frame round-trips losslessly.
@@ -90,7 +90,8 @@ bun run train         # retrain dict/*.bin and priors/*.bin from ../tokzip-corpu
 Layout: `rust/crates/tokzip` (codec: `lz.rs` parse + coder, `lang.rs` dictionaries +
 detection, `train.rs` dictionary + priors trainer), `rust/crates/tokzip-wasm` (C-ABI
 exports), `src/index.ts` (wrapper), `dict/` and `priors/` (trained assets embedded into the
-wasm), `scripts/train` (wrapper dictionary + trainer entry), `scripts/bench` (corpus benchmark),
+wasm; `build.rs` packs the priors, skipping their untrained literal subtrees),
+`scripts/train` (wrapper dictionary + trainer entry), `scripts/bench` (corpus benchmark),
 `bench/cloudflare` (Workers benchmark; needs a `wrangler` on `PATH`, which this repository does
 not declare: `wrangler deploy --config bench/cloudflare/wrangler.jsonc`, then
 `bun bench/cloudflare/measure.ts`).

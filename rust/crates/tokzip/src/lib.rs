@@ -18,13 +18,17 @@
 //! frame and falls back to storing the block (or the whole content) otherwise, so a persisted
 //! frame is provably recoverable.
 
+mod error;
 mod lang;
 mod lz;
 mod rc;
 #[cfg(feature = "train")]
 pub mod train;
+mod varint;
 
+pub use error::DecodeError;
 use lz::Segment;
+use varint::{push_varint, read_varint, varint_len};
 
 const MAGIC: u8 = 0xD0;
 const VERSION: u8 = 0;
@@ -59,45 +63,6 @@ const PROBE_LEN: usize = 256 * 1024;
 /// callers decoding untrusted frames pass `decompress` a length limit.
 const MAX_EXPANSION: usize = 8192;
 const MAX_SEGMENTS: u64 = 1 << 20;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DecodeError {
-    Truncated,
-    BadMagic,
-    UnsupportedVersion,
-    ChecksumMismatch,
-    Corrupt,
-    /// The declared content length exceeds the caller's limit, or the output cannot be allocated.
-    TooLarge,
-}
-
-impl DecodeError {
-    pub fn code(self) -> u32 {
-        match self {
-            Self::Truncated => 1,
-            Self::BadMagic => 2,
-            Self::UnsupportedVersion => 3,
-            Self::ChecksumMismatch => 4,
-            Self::Corrupt => 5,
-            Self::TooLarge => 6,
-        }
-    }
-}
-
-impl std::fmt::Display for DecodeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Truncated => write!(f, "frame truncated"),
-            Self::BadMagic => write!(f, "bad magic byte"),
-            Self::UnsupportedVersion => write!(f, "unsupported format version"),
-            Self::ChecksumMismatch => write!(f, "content checksum mismatch"),
-            Self::Corrupt => write!(f, "corrupt compressed body"),
-            Self::TooLarge => write!(f, "content too large for the length limit or memory"),
-        }
-    }
-}
-
-impl std::error::Error for DecodeError {}
 
 /// Compresses `content` into a self-describing frame.
 pub fn compress(content: &[u8]) -> Vec<u8> {
@@ -457,50 +422,6 @@ fn decode_block(
         return Err(DecodeError::Corrupt);
     }
     lz::decode_doc(&lang::primed, rest, block_len, &segments, out)
-}
-
-fn varint_len(mut v: u64) -> usize {
-    let mut n = 1;
-    while v >= 0x80 {
-        v >>= 7;
-        n += 1;
-    }
-    n
-}
-
-fn push_varint(out: &mut Vec<u8>, mut v: u64) {
-    loop {
-        let byte = (v & 0x7F) as u8;
-        v >>= 7;
-        if v == 0 {
-            out.push(byte);
-            break;
-        }
-        out.push(byte | 0x80);
-    }
-}
-
-fn read_varint(buf: &[u8]) -> Result<(u64, &[u8]), DecodeError> {
-    let mut v = 0u64;
-    for (i, &byte) in buf.iter().enumerate().take(10) {
-        // The tenth group holds only bit 63; anything above it would be shifted out silently.
-        if i == 9 && byte > 1 {
-            return Err(DecodeError::Corrupt);
-        }
-        v |= u64::from(byte & 0x7F) << (7 * i);
-        if byte & 0x80 == 0 {
-            // Canonical form: a multi-byte varint never ends in a zero group.
-            if i > 0 && byte == 0 {
-                return Err(DecodeError::Corrupt);
-            }
-            return Ok((v, &buf[i + 1..]));
-        }
-    }
-    Err(if buf.len() < 10 {
-        DecodeError::Truncated
-    } else {
-        DecodeError::Corrupt
-    })
 }
 
 #[cfg(test)]

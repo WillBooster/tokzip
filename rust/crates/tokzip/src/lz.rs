@@ -29,7 +29,7 @@ const HASH3_BITS: u32 = 15;
 // A length-3 match further away than this costs more than three modeled literals.
 const MAX_DIST_LEN3: usize = 1 << 14;
 const SEARCH_DEPTH: usize = 32;
-const DICT_SEARCH_DEPTH: usize = 32;
+const DICT_SEARCH_DEPTH: usize = 64;
 const NICE_LEN: usize = 64;
 /// The optimal parse relaxes every match length up to this bound plus the full length.
 const RELAX_LEN_CAP: usize = 16;
@@ -63,11 +63,13 @@ const HIST_DIST: usize = DICT_LEN + LEN_MODEL_SIZE;
 /// it is referenced, so the trained priors capture the dictionary's value ordering.
 const DICT_OFF: usize = HIST_DIST + DIST_MODEL_SIZE;
 /// Plain literal trees, 256 nodes per (class, class2) context pair.
-const LIT: usize = DICT_OFF + DIST_MODEL_SIZE;
+pub const LIT: usize = DICT_OFF + DIST_MODEL_SIZE;
 /// Matched-literal trees (first literals after a match, predicted by the byte at rep0), 512
 /// nodes shared by all classes: `match_bit << 8 | node`.
 const LIT_MATCHED: usize = LIT + LIT_CLASSES * LIT_CLASSES2 * 256;
 pub const MODEL_SIZE: usize = LIT_MATCHED + 512;
+// The priors packer walks everything from `LIT` on as 256-node trees (`pack.rs`).
+const _: () = assert!((MODEL_SIZE - LIT).is_multiple_of(256));
 
 #[inline]
 fn dist_group(base: usize) -> (usize, usize, usize) {
@@ -78,8 +80,12 @@ fn dist_group(base: usize) -> (usize, usize, usize) {
     )
 }
 
-/// Serialized model: both literal class tables followed by the quantized probabilities.
+/// Raw serialized model (the trainer's output, `priors/<language>.bin`): both literal class
+/// tables, then every node's initial probability quantized to 8 bits (`p11 = (q << 3) | 4`).
 pub const PRIORS_SIZE: usize = 512 + MODEL_SIZE;
+/// The quantized value of an untrained node (`PROB_INIT`); the packed form the module embeds
+/// skips untrained literal subtrees (see `pack.rs`).
+pub const PRIORS_DEFAULT: u8 = (PROB_INIT >> 3) as u8;
 
 /// The two literal class tables: previous-byte value → class (values < `LIT_CLASSES`) and
 /// second-previous-byte value → class (values < `LIT_CLASSES2`).
@@ -92,6 +98,8 @@ pub struct Models {
 }
 
 impl Models {
+    /// Flat models (every node at `PROB_INIT`), the trainer's starting point.
+    #[cfg(any(test, feature = "train"))]
     pub fn new(lit_classes: LitClasses) -> Self {
         Self {
             lit_classes,
@@ -99,9 +107,32 @@ impl Models {
         }
     }
 
-    /// Restores trained priors: the two 256-byte class tables, then each 11-bit probability
-    /// quantized to 8 bits.
-    pub fn from_priors(priors: &[u8]) -> Self {
+    /// Restores a packed model (`pack.rs`): the class tables and the nodes before the literal
+    /// trees verbatim, then each 256-node tree (plain literal trees, then the two matched-literal
+    /// trees) as flag bits followed by the values of the nodes whose subtree is not all
+    /// `PRIORS_DEFAULT`.
+    pub fn from_priors(packed: &[u8]) -> Self {
+        let mut raw = packed[..512 + LIT].to_vec();
+        raw.resize(PRIORS_SIZE, PRIORS_DEFAULT);
+        let mut rest = &packed[512 + LIT..];
+        let mut nodes = [0u8; 256];
+        for tree in raw[512 + LIT..].as_chunks_mut::<256>().0 {
+            // The walk reads only the flags; the values, which start after the tree's flag
+            // bits, are copied to the recorded nodes once their count is known.
+            let (mut flag_count, mut node_count) = (0, 0);
+            walk_packed_tree(1, rest, &mut flag_count, &mut nodes, &mut node_count);
+            let values = &rest[flag_count.div_ceil(8)..];
+            for (&node, &value) in nodes[..node_count].iter().zip(values) {
+                tree[node as usize] = value;
+            }
+            rest = &values[node_count..];
+        }
+        assert!(rest.is_empty(), "packed priors size mismatch");
+        Self::from_raw_priors(&raw)
+    }
+
+    /// Restores a raw serialized model.
+    pub fn from_raw_priors(priors: &[u8]) -> Self {
         assert_eq!(priors.len(), PRIORS_SIZE, "priors size mismatch");
         let mut lit_classes = ([0u8; 256], [0u8; 256]);
         lit_classes.0.copy_from_slice(&priors[..256]);
@@ -123,6 +154,28 @@ impl Models {
     #[inline]
     fn lit_block(&self, prev: (u8, u8)) -> usize {
         lit_block(&self.lit_classes, prev)
+    }
+}
+
+/// Depth-first walk over one packed tree's flag bits (see `Models::from_priors`): records the
+/// nodes whose flag is set, in the order their values follow, and walks their children.
+fn walk_packed_tree(
+    node: usize,
+    flags: &[u8],
+    flag_count: &mut usize,
+    nodes: &mut [u8; 256],
+    node_count: &mut usize,
+) {
+    let bit = (flags[*flag_count / 8] >> (*flag_count % 8)) & 1;
+    *flag_count += 1;
+    if bit == 0 {
+        return;
+    }
+    nodes[*node_count] = node as u8;
+    *node_count += 1;
+    if node < 128 {
+        walk_packed_tree(2 * node, flags, flag_count, nodes, node_count);
+        walk_packed_tree(2 * node + 1, flags, flag_count, nodes, node_count);
     }
 }
 
@@ -264,30 +317,6 @@ impl Models {
         price
     }
 
-    /// Price of a distance-like value (history `dist − 1` or dictionary offset) in `group`.
-    fn price_dist(&self, group: usize, len_state: usize, value: u32) -> u32 {
-        let (slot_base, spec_base, align_base) = dist_group(group);
-        let slot = dist_slot(value);
-        let mut price = price_tree(&self.probs, slot_base + len_state * 64, 6, slot);
-        if slot >= START_POS_MODEL {
-            let footer = (slot >> 1) - 1;
-            let base = (2 | (slot & 1)) << footer;
-            let reduced = value - base;
-            if slot < END_POS_MODEL {
-                price += price_tree_reverse(
-                    &self.probs,
-                    spec_base + (base - slot) as usize,
-                    footer,
-                    reduced,
-                );
-            } else {
-                price += (footer - ALIGN_BITS) << 4;
-                price += price_tree_reverse(&self.probs, align_base, ALIGN_BITS, reduced & 0xF);
-            }
-        }
-        price
-    }
-
     fn price_rep_choice(&self, state: usize, idx: usize) -> u32 {
         let p = &self.probs;
         if idx == 0 {
@@ -308,7 +337,7 @@ impl Models {
 /// Distance prices frozen for one parse chunk: full prices for values below `FULL_DIST`
 /// (slots with specialized trees) and slot + align prices beyond, per length state.
 struct DistPrices {
-    full: Vec<[u32; FULL_DIST]>, // [len_state][value]
+    full: [[u32; FULL_DIST]; NUM_LEN_TO_POS], // [len_state][value]
     slot: [[u32; 64]; NUM_LEN_TO_POS],
     align: [u32; 1 << ALIGN_BITS],
 }
@@ -317,15 +346,31 @@ const FULL_DIST: usize = 1 << (END_POS_MODEL as usize >> 1);
 
 impl DistPrices {
     fn new(models: &Models, group: usize) -> Self {
-        let (slot_base, _, align_base) = dist_group(group);
-        let mut full = vec![[0u32; FULL_DIST]; NUM_LEN_TO_POS];
+        let (slot_base, spec_base, align_base) = dist_group(group);
         let mut slot = [[0u32; 64]; NUM_LEN_TO_POS];
-        for ls in 0..NUM_LEN_TO_POS {
-            for (value, price) in full[ls].iter_mut().enumerate() {
-                *price = models.price_dist(group, ls, value as u32);
-            }
-            for (sl, price) in slot[ls].iter_mut().enumerate() {
+        for (ls, row) in slot.iter_mut().enumerate() {
+            for (sl, price) in row.iter_mut().enumerate() {
                 *price = price_tree(&models.probs, slot_base + ls * 64, 6, sl as u32);
+            }
+        }
+        // The footer bits of a value below `FULL_DIST` are priced independently of the length
+        // state, so each value's footer price is computed once and added to every slot row.
+        let mut full = [[0u32; FULL_DIST]; NUM_LEN_TO_POS];
+        for value in 0..FULL_DIST as u32 {
+            let sl = dist_slot(value);
+            let mut footer_price = 0;
+            if sl >= START_POS_MODEL {
+                let footer = (sl >> 1) - 1;
+                let base = (2 | (sl & 1)) << footer;
+                footer_price = price_tree_reverse(
+                    &models.probs,
+                    spec_base + (base - sl) as usize,
+                    footer,
+                    value - base,
+                );
+            }
+            for (ls, row) in full.iter_mut().enumerate() {
+                row[value as usize] = slot[ls][sl as usize] + footer_price;
             }
         }
         let mut align = [0u32; 1 << ALIGN_BITS];
@@ -499,7 +544,7 @@ fn hash3(bytes: &[u8], pos: usize) -> usize {
     (v.wrapping_mul(0x9E37_79B1) >> (32 - HASH3_BITS)) as usize
 }
 
-/// Hash chains over a byte sequence; built once per dictionary, incrementally per document.
+/// Hash chains over the document, built incrementally as the parse advances.
 pub struct Chains {
     bits: u32,
     head4: Vec<i32>,
@@ -507,12 +552,18 @@ pub struct Chains {
     prev4: Vec<i32>,
 }
 
+/// Hash-table width for a sequence of `len` bytes: at least twice its positions, bounded.
+fn hash4_bits(len: usize) -> u32 {
+    let mut bits = HASH4_MIN_BITS;
+    while bits < HASH4_MAX_BITS && (1usize << bits) < len * 2 {
+        bits += 1;
+    }
+    bits
+}
+
 impl Chains {
     fn new(len: usize) -> Self {
-        let mut bits = HASH4_MIN_BITS;
-        while bits < HASH4_MAX_BITS && (1usize << bits) < len * 2 {
-            bits += 1;
-        }
+        let bits = hash4_bits(len);
         Self {
             bits,
             head4: vec![EMPTY; 1 << bits],
@@ -534,34 +585,85 @@ impl Chains {
     }
 }
 
+/// Match candidates of a static dictionary: the positions of every 4-byte hash bucket, in
+/// ascending order, laid out back to back (`positions[offsets[h]..offsets[h + 1]]`), so a walk
+/// reads them sequentially — cheapest offsets first, which is also where the trainer puts the
+/// most valuable fragments — instead of chasing a chain through memory; plus the lowest
+/// position of every 3-byte hash.
+pub struct DictIndex {
+    bits: u32,
+    offsets: Vec<u32>,
+    positions: Vec<u32>,
+    head3: Vec<i32>,
+}
+
+impl DictIndex {
+    fn new(bytes: &[u8]) -> Self {
+        let bits = hash4_bits(bytes.len());
+        let count4 = bytes.len().saturating_sub(3);
+        // Counting sort by bucket: counts land two slots up so that, after the prefix sum,
+        // `offsets[h + 1]` is bucket `h`'s start and serves as its fill cursor, which ends up at
+        // the bucket's end — leaving `offsets[h]..offsets[h + 1]` as the final bucket bounds.
+        let mut offsets = vec![0u32; (1usize << bits) + 2];
+        for pos in 0..count4 {
+            offsets[hash4(bytes, pos, bits) + 2] += 1;
+        }
+        for h in 1..offsets.len() {
+            offsets[h] += offsets[h - 1];
+        }
+        let mut positions = vec![0u32; count4];
+        for pos in 0..count4 {
+            let cursor = &mut offsets[hash4(bytes, pos, bits) + 1];
+            positions[*cursor as usize] = pos as u32;
+            *cursor += 1;
+        }
+        offsets.pop();
+        let mut head3 = vec![EMPTY; 1 << HASH3_BITS];
+        for pos in (0..bytes.len().saturating_sub(2)).rev() {
+            head3[hash3(bytes, pos)] = pos as i32;
+        }
+        Self {
+            bits,
+            offsets,
+            positions,
+            head3,
+        }
+    }
+
+    /// The dictionary positions sharing the 4-byte hash of `doc[pos..]`, ascending.
+    #[inline]
+    fn bucket(&self, doc: &[u8], pos: usize) -> &[u32] {
+        let h = hash4(doc, pos, self.bits);
+        &self.positions[self.offsets[h] as usize..self.offsets[h + 1] as usize]
+    }
+}
+
 /// A language dictionary with its primed model state and, for the encoder, its match-finder
-/// chains. Built once per language; the chains are built on first encode only, so a
-/// decompress-only process never pays for them.
+/// index. Built once per language; the index is built on first encode only, so a
+/// decompress-only process never pays for it.
 pub struct Primed {
     pub bytes: Vec<u8>,
-    chains: OnceLock<Chains>,
+    index: OnceLock<DictIndex>,
     pub models: Models,
 }
 
 impl Primed {
-    /// Builds the dictionary's chains and its initial models: trained `priors` when given,
-    /// otherwise the state left by compressing the dictionary against itself (the trainer's
-    /// starting point).
-    pub fn new(bytes: Vec<u8>, priors: Option<&[u8]>, lit_classes: LitClasses) -> Self {
-        if let Some(priors) = priors {
-            return Self {
-                bytes,
-                chains: OnceLock::new(),
-                models: Models::from_priors(priors),
-            };
+    /// A dictionary with ready models (trained priors); the index is built on first encode.
+    pub fn new(bytes: Vec<u8>, models: Models) -> Self {
+        Self {
+            bytes,
+            index: OnceLock::new(),
+            models,
         }
+    }
+
+    /// The trainer's starting point: the models left by compressing the dictionary against
+    /// itself.
+    #[cfg(any(test, feature = "train"))]
+    pub fn self_primed(bytes: Vec<u8>, lit_classes: LitClasses) -> Self {
         let mut models = Models::new(lit_classes);
         let mut state = CoderState::new();
-        let empty = Primed {
-            bytes: Vec::new(),
-            chains: OnceLock::from(Chains::new(0)),
-            models: Models::new(lit_classes),
-        };
+        let empty = Primed::new(Vec::new(), Models::new(lit_classes));
         let mut mf = MatchFinder {
             win: Window {
                 doc: &bytes,
@@ -570,10 +672,10 @@ impl Primed {
             chains: Chains::new(bytes.len()),
             dict: DictRef {
                 bytes: &empty.bytes,
-                chains: empty.chains.get().unwrap(),
+                index: empty.index(),
             },
         };
-        // Output is discarded: only the adapted models and the chains matter.
+        // Output is discarded: only the adapted models matter.
         let mut rc = Encoder::new();
         let mut inserted = 0usize;
         run_encode_optimal(
@@ -585,30 +687,19 @@ impl Primed {
             bytes.len(),
             &mut inserted,
         );
-        let chains = OnceLock::from(mf.chains);
-        Self {
-            bytes,
-            chains,
-            models,
-        }
+        Self::new(bytes, models)
     }
 
-    fn chains(&self) -> &Chains {
-        self.chains.get_or_init(|| {
-            let mut chains = Chains::new(self.bytes.len());
-            for pos in 0..self.bytes.len() {
-                chains.insert(&self.bytes, pos);
-            }
-            chains
-        })
+    fn index(&self) -> &DictIndex {
+        self.index.get_or_init(|| DictIndex::new(&self.bytes))
     }
 }
 
-/// The active dictionary as the match finder sees it: its bytes and its chains.
+/// The active dictionary as the match finder sees it: its bytes and its index.
 #[derive(Clone, Copy)]
 struct DictRef<'a> {
     bytes: &'a [u8],
-    chains: &'a Chains,
+    index: &'a DictIndex,
 }
 
 struct MatchFinder<'a> {
@@ -624,7 +715,8 @@ impl MatchFinder<'_> {
     }
 
     /// Useful matches at `pos` as `(len, dist)` with strictly increasing lengths; each carries
-    /// the nearest distance found for that length.
+    /// the first distance found for that length: the nearest one among history matches, the
+    /// lowest (cheapest, farthest) dictionary offset among dictionary matches.
     fn find_pairs(&self, pos: usize, max_len: usize, pairs: &mut Vec<(u32, u32)>) {
         pairs.clear();
         let doc = self.win.doc;
@@ -636,7 +728,7 @@ impl MatchFinder<'_> {
             if cand >= 0 && pos - cand as usize <= MAX_DIST_LEN3 {
                 dist = pos - cand as usize;
             } else if dlen >= 3 {
-                let cand = self.dict.chains.head3[hash3(doc, pos)];
+                let cand = self.dict.index.head3[hash3(doc, pos)];
                 if cand >= 0 {
                     dist = pos + dlen - cand as usize;
                 }
@@ -676,11 +768,9 @@ impl MatchFinder<'_> {
             return;
         }
         let dict = &self.dict.bytes;
-        let mut cand = self.dict.chains.head4[hash4(doc, pos, self.dict.chains.bits)];
-        let mut budget = DICT_SEARCH_DEPTH;
-        while cand >= 0 && budget > 0 {
-            budget -= 1;
-            let c = cand as usize;
+        let bucket = self.dict.index.bucket(doc, pos);
+        for &c in &bucket[..bucket.len().min(DICT_SEARCH_DEPTH)] {
+            let c = c as usize;
             let dist = pos + dlen - c;
             let probe_ok = best_len == 0
                 || (pos + best_len < doc.len()
@@ -695,7 +785,6 @@ impl MatchFinder<'_> {
                     }
                 }
             }
-            cand = self.dict.chains.prev4[c];
         }
     }
 
@@ -728,10 +817,11 @@ struct LangModels<'a, 'p> {
 }
 
 impl<'a, 'p> LangModels<'a, 'p> {
-    fn new(lookup: &'a dyn Fn(u8) -> &'p Primed) -> Self {
+    fn new(lookup: &'a dyn Fn(u8) -> &'p Primed, segments: &[Segment]) -> Self {
+        let langs = segments.iter().map(|s| usize::from(s.lang) + 1).max();
         Self {
             lookup,
-            models: vec![None; 256],
+            models: vec![None; langs.unwrap_or(0)],
         }
     }
 
@@ -768,7 +858,7 @@ pub fn encode_doc_with_stats<'p>(
     let mut rc = Encoder::new();
     rc.stats = stats;
     let mut cs = CoderState::new();
-    let mut lang_models = LangModels::new(lookup);
+    let mut lang_models = LangModels::new(lookup, segments);
     let mut chains = Chains::new(doc.len());
     let mut inserted = 0usize;
     let mut start = 0usize;
@@ -783,7 +873,7 @@ pub fn encode_doc_with_stats<'p>(
             chains,
             dict: DictRef {
                 bytes: &dict.bytes,
-                chains: dict.chains(),
+                index: dict.index(),
             },
         };
         let mut models = lang_models.take(seg.lang);
@@ -1224,7 +1314,7 @@ pub fn decode_doc<'p>(
         .map_err(|_| DecodeError::TooLarge)?;
     let mut rc = Decoder::new(body);
     let mut cs = CoderState::new();
-    let mut lang_models = LangModels::new(lookup);
+    let mut lang_models = LangModels::new(lookup, segments);
     for seg in segments {
         if seg.end > out_len || seg.end < out.len() - base {
             return Err(DecodeError::Corrupt);
@@ -1358,7 +1448,7 @@ mod tests {
     }
 
     fn leak(bytes: Vec<u8>) -> &'static Primed {
-        Box::leak(Box::new(Primed::new(bytes, None, ([0; 256], [0; 256]))))
+        Box::leak(Box::new(Primed::self_primed(bytes, ([0; 256], [0; 256]))))
     }
 
     fn single(len: usize, lang: u8) -> Vec<Segment> {
