@@ -32,17 +32,15 @@ fn main() {
         let mut dict = wrapper.clone();
         dict.extend_from_slice(&suffix);
         let mut total = 0usize;
-        let priors_docs: Vec<Vec<u8>> = docs
-            .iter()
-            .take_while(|doc| {
-                let within = total < MAX_PRIORS_TRAIN_BYTES;
-                if within {
-                    total += doc.len();
-                }
-                within
-            })
-            .cloned()
-            .collect();
+        let mut priors_docs: Vec<Vec<u8>> = Vec::new();
+        for doc in &docs {
+            if total >= MAX_PRIORS_TRAIN_BYTES {
+                break;
+            }
+            let take = doc.len().min(MAX_PRIORS_TRAIN_BYTES - total);
+            priors_docs.push(doc[..take].to_vec());
+            total += take;
+        }
         let mut priors: Option<Vec<u8>> = None;
         for _ in 0..PRIORS_ROUNDS {
             priors = Some(tokzip::train::train_priors(

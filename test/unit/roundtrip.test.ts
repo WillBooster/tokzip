@@ -84,9 +84,9 @@ describe('compress/decompress', () => {
       expect(frame.length).toBe(Buffer.byteLength(noise) + 6);
       expect(decompress(frame)).toBe(noise);
     }
-    // Longer random text is coded (its byte structure is compressible), never expanded.
+    // Longer random text still fits the stored frame exactly (a 2-byte length varint), never more.
     const long = randomText(4096);
-    expect(compress(long).length).toBeLessThanOrEqual(Buffer.byteLength(long) + 7);
+    expect(compress(long).length).toBe(Buffer.byteLength(long) + 7);
     expect(decompress(compress(long))).toBe(long);
   });
 
