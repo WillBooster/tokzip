@@ -15,7 +15,7 @@ describe('malformed frames', () => {
     // but only ever to the exact original (the CRC catches everything else).
     // The same holds for an appended zero byte, which the coder may consume as padding.
     for (const candidate of [frame.subarray(0, -1), frame.subarray(0, -2), new Uint8Array([...frame, 0])]) {
-      let decoded: string | Uint8Array | undefined;
+      let decoded: string | undefined;
       try {
         decoded = decompress(candidate);
       } catch (error) {
@@ -26,11 +26,10 @@ describe('malformed frames', () => {
     }
   });
 
-  test('a frame whose coded distance overflows 32-bit arithmetic is rejected, not a trap', () => {
-    // Crafted body coding `is_match=1, is_rep=0, is_dict=0, len=2, distance-1 = u32::MAX`:
-    // on the wasm32 build `distance as usize + 1` used to wrap to 0 and trap the module.
+  test('a forged coded body is rejected, not a trap', () => {
+    // A valid header (single segment, 2 bytes, zero CRC) over a body of arbitrary bytes.
     const forged = Uint8Array.from(
-      'd000020000000000b8a0572bfffc54be70'.match(/../g)!.map((byte) => Number.parseInt(byte, 16))
+      'd00200000000b8a0572bfffc54be70'.match(/../g)!.map((byte) => Number.parseInt(byte, 16))
     );
     expect(() => decompress(forged)).toThrow(TokzipDecodeError);
   });
@@ -38,7 +37,7 @@ describe('malformed frames', () => {
   test('other format versions are rejected, never misdecoded', () => {
     const frame = compress(SAMPLE);
     const bumped = Uint8Array.from(frame);
-    bumped[0] = (bumped[0]! & 0xF0) | 1;
+    bumped[0] = bumped[0]! | (1 << 2);
     expect(() => decompress(bumped)).toThrow(/unsupported format version/);
   });
 
@@ -47,7 +46,7 @@ describe('malformed frames', () => {
     for (let i = 0; i < frame.length; i++) {
       const mutated = Uint8Array.from(frame);
       mutated[i] = mutated[i]! ^ 0x5A;
-      let decoded: string | Uint8Array | undefined;
+      let decoded: string | undefined;
       try {
         decoded = decompress(mutated);
       } catch (error) {

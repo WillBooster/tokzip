@@ -7,7 +7,6 @@ use std::cell::RefCell;
 
 thread_local! {
     static OUT: RefCell<Vec<u8>> = const { RefCell::new(Vec::new()) };
-    static IS_BYTES: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
 /// Allocates `len` bytes (at least one) for the JS side to fill; released by `tokzip_free`.
@@ -37,14 +36,14 @@ fn input_layout(len: usize) -> std::alloc::Layout {
 /// `ptr` must come from `tokzip_alloc(len)` (so it is non-null even when `len` is 0) with
 /// `ptr..ptr+len` initialized.
 #[no_mangle]
-pub unsafe extern "C" fn tokzip_compress(ptr: *const u8, len: usize, is_bytes: u32) {
+pub unsafe extern "C" fn tokzip_compress(ptr: *const u8, len: usize) {
     let input = std::slice::from_raw_parts(ptr, len);
-    let frame = tokzip::compress(input, is_bytes != 0);
+    let frame = tokzip::compress(input);
     OUT.with(|out| *out.borrow_mut() = frame);
 }
 
-/// Returns 0 on success (content in the output buffer, type flag via `tokzip_out_is_bytes`),
-/// or a nonzero `DecodeError` code; a frame declaring more than `max_len` bytes is rejected.
+/// Returns 0 on success (content in the output buffer) or a nonzero `DecodeError` code; a
+/// frame declaring more than `max_len` bytes is rejected.
 ///
 /// # Safety
 /// `ptr` must come from `tokzip_alloc(len)` (so it is non-null even when `len` is 0) with
@@ -53,18 +52,12 @@ pub unsafe extern "C" fn tokzip_compress(ptr: *const u8, len: usize, is_bytes: u
 pub unsafe extern "C" fn tokzip_decompress(ptr: *const u8, len: usize, max_len: usize) -> u32 {
     let frame = std::slice::from_raw_parts(ptr, len);
     match tokzip::decompress(frame, max_len) {
-        Ok((content, is_bytes)) => {
+        Ok(content) => {
             OUT.with(|out| *out.borrow_mut() = content);
-            IS_BYTES.with(|b| b.set(is_bytes));
             0
         }
         Err(error) => error.code(),
     }
-}
-
-#[no_mangle]
-pub extern "C" fn tokzip_out_is_bytes() -> u32 {
-    IS_BYTES.with(|b| b.get()) as u32
 }
 
 #[no_mangle]

@@ -56,15 +56,6 @@ describe('compress/decompress', () => {
     expect(() => compress('a\uD83C')).toThrow(RangeError);
   });
 
-  test('round-trips bytes and preserves the string/bytes distinction', () => {
-    const bytes = new Uint8Array(1000).map((_, i) => (i * 7919) & 0xFF);
-    const restored = decompress(compress(bytes));
-    expect(restored).toBeInstanceOf(Uint8Array);
-    expect(restored).toEqual(bytes);
-    const text = decompress(compress('plain text'));
-    expect(typeof text).toBe('string');
-  });
-
   test('compresses prompts and mixed LLM answers well below their size', () => {
     const prompt = compress(JAPANESE_PROMPT.repeat(3));
     expect(prompt.length * 2).toBeLessThan(Buffer.byteLength(JAPANESE_PROMPT.repeat(3)));
@@ -73,16 +64,17 @@ describe('compress/decompress', () => {
   });
 
   test('never expands incompressible input beyond the stored frame', () => {
-    const noise = new Uint8Array(4096);
+    let noise = '';
     let x = 0x25_45_F4_91;
-    for (let i = 0; i < noise.length; i++) {
+    for (let i = 0; i < 4096; i++) {
       x ^= x << 13;
       x ^= x >>> 17;
       x ^= x << 5;
-      noise[i] = x >>> 24;
+      // Random code points across the Basic Multilingual Plane, avoiding surrogates.
+      noise += String.fromCodePoint(0x21 + ((x >>> 8) % 0xD7_00));
     }
-    expect(compress(noise).length).toBeLessThanOrEqual(noise.length + 8);
-    expect(decompress(compress(noise))).toEqual(noise);
+    expect(compress(noise).length).toBeLessThanOrEqual(Buffer.byteLength(noise) + 7);
+    expect(decompress(compress(noise))).toBe(noise);
   });
 
   test('handles inputs spanning many parse chunks', () => {
@@ -94,7 +86,7 @@ describe('compress/decompress', () => {
     const huge = MIXED_ANSWER.repeat(7000); // ~6.7 MiB, spanning two blocks
     expect(Buffer.byteLength(huge)).toBeGreaterThan(4 * 1024 * 1024);
     const frame = compress(huge);
-    expect(frame[1]! & 0b1000).toBe(0b1000); // blocked flag
+    expect(frame[0]! & 0b11).toBe(0b10); // blocked layout
     expect(frame.length * 10).toBeLessThan(Buffer.byteLength(huge));
     expect(decompress(frame)).toBe(huge);
   });

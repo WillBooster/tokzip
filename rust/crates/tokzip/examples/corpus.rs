@@ -35,10 +35,10 @@ fn main() {
     }
     for (lang, content) in &docs {
         let t = Instant::now();
-        let frame = tokzip::compress(content, false);
+        let frame = tokzip::compress(content);
         comp_time += t.elapsed().as_secs_f64();
         let t = Instant::now();
-        let (restored, _) = tokzip::decompress(&frame, usize::MAX).expect("decode");
+        let restored = tokzip::decompress(&frame, usize::MAX).expect("decode");
         decomp_time += t.elapsed().as_secs_f64();
         assert_eq!(&restored, content);
         let bucket = match content.len() {

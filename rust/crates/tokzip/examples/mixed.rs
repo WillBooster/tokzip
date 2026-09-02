@@ -48,7 +48,7 @@ fn main() {
         doc2.extend_from_slice(&html[i]);
         oracle_frames += tokzip::frame_len_with_language(&html[i], 3);
         raw += doc2.len();
-        auto += tokzip::compress(&doc2, false).len();
+        auto += tokzip::compress(&doc2).len();
         oracle += oracle_frames;
         single += (0..7)
             .map(|lang| tokzip::frame_len_with_language(&doc2, lang))
@@ -78,7 +78,7 @@ fn main() {
         let t = Instant::now();
         let iters = (2_000_000 / size).max(3);
         for _ in 0..iters {
-            std::hint::black_box(tokzip::compress(doc, false));
+            std::hint::black_box(tokzip::compress(doc));
         }
         let per = t.elapsed().as_secs_f64() * 1000.0 / iters as f64;
         println!(

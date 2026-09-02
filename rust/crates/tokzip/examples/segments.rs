@@ -4,7 +4,7 @@
 fn main() {
     let path = std::env::args().nth(1).expect("file");
     let doc = std::fs::read(&path).expect("read");
-    let frame = tokzip::compress(&doc, false);
+    let frame = tokzip::compress(&doc);
     println!("{} bytes -> {} bytes (auto)", doc.len(), frame.len());
     for (lang, name) in [
         "text",
