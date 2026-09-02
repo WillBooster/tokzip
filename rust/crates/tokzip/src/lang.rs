@@ -330,26 +330,10 @@ mod tests {
     /// up only as a worse ratio.
     #[test]
     fn packed_priors_restore_the_raw_priors() {
-        macro_rules! raw_priors {
-            ($name:literal) => {
-                (
-                    $name,
-                    include_bytes!(concat!("../../../../priors/", $name, ".bin")),
-                )
-            };
-        }
-        let raw = [
-            raw_priors!("text"),
-            raw_priors!("en-US"),
-            raw_priors!("ja-JP"),
-            raw_priors!("html"),
-            raw_priors!("css"),
-            raw_priors!("javascript"),
-            raw_priors!("typescript"),
-        ];
-        for ((name, _, packed), (raw_name, raw)) in LANGUAGES.iter().zip(raw) {
-            assert_eq!(*name, raw_name);
-            let (unpacked, expected) = (Models::from_priors(packed), Models::from_raw_priors(raw));
+        let priors_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../priors");
+        for (name, _, packed) in &LANGUAGES {
+            let raw = std::fs::read(priors_dir.join(format!("{name}.bin"))).expect("raw priors");
+            let (unpacked, expected) = (Models::from_priors(packed), Models::from_raw_priors(&raw));
             assert_eq!(unpacked.lit_classes, expected.lit_classes, "{name}");
             assert_eq!(unpacked.probs, expected.probs, "{name}");
         }
