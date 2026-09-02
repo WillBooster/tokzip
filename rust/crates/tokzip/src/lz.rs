@@ -647,7 +647,7 @@ pub struct Primed {
 }
 
 impl Primed {
-    /// A dictionary with ready models (trained priors); the chains are built on first encode.
+    /// A dictionary with ready models (trained priors); the index is built on first encode.
     pub fn new(bytes: Vec<u8>, models: Models) -> Self {
         Self {
             bytes,

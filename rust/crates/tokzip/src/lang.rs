@@ -44,7 +44,7 @@ const LANG_TYPESCRIPT: u8 = 6;
 static PRIMED: [OnceLock<Primed>; LANGUAGE_COUNT] = [const { OnceLock::new() }; LANGUAGE_COUNT];
 
 /// The language's dictionary (wrapper + suffix) with its trained priors, built on first use and
-/// cached for the process; the encoder's chains are built on first encode.
+/// cached for the process; the encoder's match index is built on first encode.
 pub fn primed(lang: u8) -> &'static Primed {
     PRIMED[lang as usize].get_or_init(|| {
         let (_, suffix, packed_priors) = LANGUAGES[lang as usize];
