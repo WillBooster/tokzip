@@ -8,6 +8,9 @@
 #[path = "src/error.rs"]
 mod error;
 #[allow(dead_code)]
+#[path = "src/grams.rs"]
+mod grams;
+#[allow(dead_code)]
 #[path = "src/languages.rs"]
 mod languages;
 #[allow(dead_code)]
@@ -31,6 +34,7 @@ fn main() {
     let out = PathBuf::from(std::env::var("OUT_DIR").expect("OUT_DIR"));
     for file in [
         "src/error.rs",
+        "src/grams.rs",
         "src/languages.rs",
         "src/lz.rs",
         "src/pack.rs",
@@ -100,10 +104,13 @@ fn main() {
             pack::pack_dictionary(&suffix, &raws[i]),
         )
         .expect("write packed dictionary");
+        std::fs::write(out.join(format!("{name}.grams")), grams::gram_set(&suffix))
+            .expect("write gram set");
         assets.push_str(&format!(
-            "    Assets {{ packed_suffix: include_bytes!({:?}), priors: include_bytes!({:?}) }},\n",
+            "    Assets {{ packed_suffix: include_bytes!({:?}), priors: include_bytes!({:?}), grams: include_bytes!({:?}) }},\n",
             out.join(format!("{name}.dict")),
-            out.join(format!("{name}.priors"))
+            out.join(format!("{name}.priors")),
+            out.join(format!("{name}.grams"))
         ));
     }
     assets.push(']');

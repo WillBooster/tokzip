@@ -6,7 +6,7 @@
 
 Lossless compressor for **prompts, LLM outputs, and source code** stored at rest — one
 function in, one function out, no compression options (only an optional decode length limit).
-The codec is Rust compiled to a single **wasm module (~800 KB, all 21 dictionaries and models
+The codec is Rust compiled to a single **wasm module (~1.1 MB, all 21 dictionaries and models
 included)** with a thin TypeScript wrapper; it runs on Node, Bun, and Cloudflare Workers.
 
 ```ts
@@ -21,9 +21,9 @@ decompress(untrustedFrame, { maxLength: 8 * 1024 * 1024 }); // throws instead of
   as Next.js trace the `new URL(..., import.meta.url)` reference and carry the file along).
 - **Cloudflare Workers** resolve the `workerd` export condition (wrangler and the Cloudflare
   Vite plugin set it) to an entry that imports the `.wasm` as a module, which is the only way
-  Workers accept wasm. The first `compress` in an isolate spends tens of milliseconds of CPU
-  time decoding the language dictionaries; later calls do not, and `decompress` only decodes
-  the dictionaries a frame uses.
+  Workers accept wasm. The first call in an isolate builds the detection table and decodes
+  the dictionary of each language it uses (~10 ms of CPU time for the first `compress`, ~5 ms
+  for the first `decompress`, ~3 ms per further language); later calls do not.
 - `FORMAT_VERSION` is the version `compress` writes (store it beside frames if you ever want
   to know which codec generation produced them); `TokzipDecodeError` carries a numeric `code`.
 
@@ -91,9 +91,8 @@ compressed size as a percentage of the input:
 
 Throughput through the wasm build in Bun on an Apple M-series laptop: compression ~2.5 MB/s
 (the price-based parse is the cost; a 4 KB document takes ~1.5 ms), decompression ~90 MB/s.
-Cloudflare's free plan allows 10 ms of CPU per request: the first `compress` in an isolate
-(which decodes the dictionaries) and any document above ~20 KB need a paid plan or a place
-outside the request path.
+Cloudflare's free plan allows 10 ms of CPU per request, so a document above ~20 KB (or the
+first `compress` in an isolate, ~10 ms) needs a paid plan or a place outside the request path.
 
 Run it yourself: `bun run bench` (add `--speed` for throughput and `--json <file>` for a
 machine-readable report). The harness verifies every tokzip frame round-trips losslessly.
@@ -114,8 +113,8 @@ detection, `languages.rs` the language table, `train.rs` dictionary + priors tra
 `pack.rs` + `build.rs` asset packing), `rust/crates/tokzip-wasm` (C-ABI exports), `src/`
 (wrapper: `core.ts` over a compiled module, `index.ts` for Node and Bun, `workers.ts` for
 Cloudflare Workers), `dict/` and `priors/` (trained assets; the build embeds each dictionary
-coded by the codec itself and each model group's literal priors once, skipping their flat
-subtrees), `scripts/train` (wrapper dictionary + trainer entry), `scripts/bench` (corpus
+coded by the codec itself together with the bitset of its 4-grams for detection, and each
+model group's literal priors once, skipping their flat subtrees), `scripts/train` (wrapper dictionary + trainer entry), `scripts/bench` (corpus
 benchmark), `bench/cloudflare` (Workers benchmark; needs a `wrangler` on `PATH`, which this
 repository does not declare: `wrangler deploy --config bench/cloudflare/wrangler.jsonc`, then
 `bun bench/cloudflare/measure.ts`).

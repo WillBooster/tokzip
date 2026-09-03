@@ -12,8 +12,8 @@ const codec = createCodec(() => new WebAssembly.Module(readFileSync(new URL('../
 
 /**
  * Compresses a string (stored as UTF-8; must be well-formed UTF-16) into a self-describing
- * binary frame. The first call in a process decodes the language dictionaries (tens of
- * milliseconds); later calls do not.
+ * binary frame. The first call in a process builds the detection table and decodes the
+ * dictionaries it uses (~10 ms); later calls do not.
  */
 export function compress(text: string): Uint8Array {
   return codec.compress(text);
