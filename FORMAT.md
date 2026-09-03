@@ -146,7 +146,7 @@ probability quantized to 8 bits (`p11 = (q << 3) | 4`). All are trained offline
 (`bun run train`) and are format identity: a retrain changes the coded stream.
 
 The class tables and the literal trees (everything from the literal context pairs on) are
-shared by the languages of a model group — prose (`text`, `en-US`), japanese, chinese, code —
+shared by the languages of a model group — prose (`text`, `en-US`), Japanese, Chinese, code —
 and trained on the group's pooled literal statistics; a literal node whose trained value would
 have saved fewer than 4 bits on the training data stays at the flat probability 1/2. The nodes
 before the literal trees are per language.

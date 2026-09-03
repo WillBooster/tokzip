@@ -103,7 +103,7 @@ machine-readable report). The harness verifies every tokzip frame round-trips lo
 ```bash
 mise install          # bun, node, rust (+ wasm32-unknown-unknown)
 bun install
-bun run build         # rust → wasm/tokzip.wasm (committed; rebuild after codec changes), then dist/
+bun run build         # rust → wasm/tokzip.wasm (committed; rebuild after codec changes), then builds dist/
 bun test              # round-trip and resilience tests through the wasm build
 cargo test --release --manifest-path rust/Cargo.toml
 bun run train         # retrain dict/*.bin and priors/*.bin from ../tokzip-corpus (then build)
