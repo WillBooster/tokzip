@@ -82,23 +82,24 @@ const WINDOW: usize = 64;
 /// most `WINDOW` gram hits plus `WINDOW` of fence hint).
 const SWITCH_PENALTY: i32 = 48;
 
-struct GramSet {
-    bits: Vec<u64>,
+/// For every 4-gram hash, the set of languages whose dictionary contains a gram with that
+/// hash, as a bit per language id: one lookup scores a position for every language.
+struct GramTable {
+    masks: Vec<u32>,
 }
 
-impl GramSet {
-    fn new(bytes: &[u8]) -> Self {
-        let mut bits = vec![0u64; (1usize << GRAM_BITS) / 64];
-        for pos in 0..bytes.len().saturating_sub(3) {
-            let h = gram_hash(bytes, pos);
-            bits[h >> 6] |= 1u64 << (h & 63);
-        }
-        Self { bits }
-    }
+const _: () = assert!(LANGUAGE_COUNT <= 32);
 
-    #[inline]
-    fn contains(&self, h: usize) -> bool {
-        (self.bits[h >> 6] >> (h & 63)) & 1 != 0
+impl GramTable {
+    fn new() -> Self {
+        let mut masks = vec![0u32; 1 << GRAM_BITS];
+        for lang in 0..LANGUAGE_COUNT as u8 {
+            let bytes = suffix(lang);
+            for pos in 0..bytes.len().saturating_sub(3) {
+                masks[gram_hash(bytes, pos)] |= 1 << lang;
+            }
+        }
+        Self { masks }
     }
 }
 
@@ -108,13 +109,9 @@ fn gram_hash(bytes: &[u8], pos: usize) -> usize {
     (v.wrapping_mul(0x9E37_79B1) >> (32 - GRAM_BITS)) as usize
 }
 
-fn gram_sets() -> &'static [GramSet] {
-    static SETS: OnceLock<Vec<GramSet>> = OnceLock::new();
-    SETS.get_or_init(|| {
-        (0..LANGUAGE_COUNT as u8)
-            .map(|lang| GramSet::new(suffix(lang)))
-            .collect()
-    })
+fn gram_table() -> &'static GramTable {
+    static TABLE: OnceLock<GramTable> = OnceLock::new();
+    TABLE.get_or_init(GramTable::new)
 }
 
 /// Splits `doc` into language segments (contiguous, covering the whole document).
@@ -245,12 +242,13 @@ fn add_gram_hits(doc: &[u8], rows: &mut [[i32; LANGUAGE_COUNT]], row_of: impl Fn
     if doc.len() < 4 {
         return;
     }
-    let sets = gram_sets();
+    let table = gram_table();
     for pos in 0..doc.len() - 3 {
-        let h = gram_hash(doc, pos);
+        let mut mask = table.masks[gram_hash(doc, pos)];
         let row = &mut rows[row_of(pos)];
-        for (lang, set) in sets.iter().enumerate() {
-            row[lang] += set.contains(h) as i32;
+        while mask != 0 {
+            row[mask.trailing_zeros() as usize] += 1;
+            mask &= mask - 1;
         }
     }
 }

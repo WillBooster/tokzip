@@ -60,8 +60,11 @@ fn main() {
             raw.resize(lz::PRIORS_SIZE, lz::PRIORS_DEFAULT);
         }
         let suffix = std::fs::read(&dict_path).expect("dict");
-        std::fs::write(out.join(format!("{name}.priors")), pack::language_part(&raw))
-            .expect("write packed priors");
+        std::fs::write(
+            out.join(format!("{name}.priors")),
+            pack::language_part(&raw),
+        )
+        .expect("write packed priors");
         std::fs::write(
             out.join(format!("{name}.dict")),
             pack::pack_dictionary(&suffix, &raw),
@@ -87,7 +90,7 @@ fn main() {
             out.join(format!("{name}.priors"))
         ));
     }
-    assets.push_str("]");
+    assets.push(']');
     let mut groups = String::from("[\n");
     for group in Group::ALL {
         let part = literal_parts[group as usize]
@@ -97,7 +100,7 @@ fn main() {
         std::fs::write(&path, part).expect("write packed literal priors");
         groups.push_str(&format!("    include_bytes!({path:?}),\n"));
     }
-    groups.push_str("]");
+    groups.push(']');
     std::fs::write(
         out.join("assets.rs"),
         format!(

@@ -4,11 +4,11 @@
 //! node while compressing the language's training documents with its dictionary and turns the
 //! counts into the initial probabilities shipped in `priors/<language>.bin`.
 
+pub use crate::languages::Group;
 use crate::lz::{
     encode_doc_with_stats, LitClasses, Models, Primed, Segment, LIT, LIT_CLASSES, LIT_CLASSES2,
     MODEL_SIZE,
 };
-pub use crate::languages::Group;
 use crate::rc::{PROB_BITS, PROB_INIT};
 use std::path::Path;
 
@@ -385,23 +385,12 @@ fn cluster_contexts(counts: &[[u32; 256]], classes_count: usize) -> [u8; 256] {
     classes
 }
 
+/// Turns on the per-node cost accounting behind `cost_report` and `dist_report`.
+pub fn enable_cost_report() {
+    crate::lz::COST_ENABLED.store(true, std::sync::atomic::Ordering::Relaxed);
+}
+
 /// Bits coded per model group so far (see `lz::COST_REPORT`).
 pub fn cost_report() -> [f64; 10] {
     *crate::lz::COST_REPORT.lock().unwrap()
-}
-
-/// Distance statistics (see `lz::DIST_HIST`): history (matches, direct bits), dictionary
-/// (matches, direct bits), and the dictionary offset histogram entropy in bits per match.
-pub fn dist_report() -> (u64, u64, u64, u64, f64) {
-    let h = crate::lz::DIST_HIST.lock().unwrap();
-    let total: u64 = h[2].2.values().sum();
-    let entropy: f64 = h[2]
-        .2
-        .values()
-        .map(|&c| {
-            let p = c as f64 / total as f64;
-            -p * p.log2()
-        })
-        .sum::<f64>();
-    (h[0].0, h[0].1, h[1].0, h[1].1, entropy)
 }
