@@ -204,12 +204,12 @@ impl Models {
     }
 
     /// Restores a raw serialized model (the trainer's output form, `PRIORS_SIZE` bytes).
-    #[cfg(any(test, feature = "train"))]
+    #[cfg(feature = "train")]
     pub fn from_raw_priors(priors: &[u8]) -> Self {
         Self::try_from_raw_priors(priors).expect("raw priors match the model layout")
     }
 
-    #[cfg(any(test, feature = "train"))]
+    #[cfg(feature = "train")]
     fn try_from_raw_priors(priors: &[u8]) -> Option<Self> {
         if priors.len() != PRIORS_SIZE {
             return None;
