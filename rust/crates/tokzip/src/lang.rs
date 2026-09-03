@@ -94,8 +94,8 @@ fn unpack_dictionary(packed: &[u8], models: &Models, mut bytes: Vec<u8>) -> Vec<
         return bytes;
     }
     let (len, body) = read_varint(packed).expect("packed dictionary length");
-    // The buffer lives for the process, so it is sized exactly (wasm memory never shrinks).
-    bytes.reserve_exact(len as usize);
+    // `decode_doc` reserves exactly `len` more bytes, so the process-lifetime buffer holds no
+    // slack (wasm memory never shrinks).
     let empty = Primed::new(Vec::new(), models.clone());
     let segments = [Segment {
         end: len as usize,
