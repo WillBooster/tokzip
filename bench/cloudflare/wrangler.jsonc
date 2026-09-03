@@ -2,5 +2,7 @@
   "name": "tokzip-bench-wasm",
   "main": "worker.ts",
   "compatibility_date": "2026-07-01",
+  // The wrapper imports `node:buffer`.
+  "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
 }

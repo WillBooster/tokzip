@@ -1,16 +1,18 @@
 //! Embedded language dictionaries and automatic per-segment language detection.
 //!
 //! Every language's dictionary is the shared wrapper (Markdown/JSON scaffolding, generic
-//! prose) followed by its trained suffix. Detection needs no parser: one table maps every
-//! 4-gram hash to a bit mask of the languages whose suffix has it (at most 32 languages), the
+//! prose), then its model group's shared part (programming languages share one), then its
+//! trained suffix. Detection needs no parser: one table, computed by the build script, maps
+//! every 4-gram hash to a bit mask of the languages whose trained dictionary (shared part and
+//! suffix) has it (at most 24 languages), the
 //! document is scored per 64-byte window by how many positions hit each language (labeled
 //! code fences add a hint for their language), and a Viterbi pass with a switch penalty turns
 //! the window scores into segments. The decoder never detects anything — it reads the segment
 //! table from the frame.
 
-use crate::grams::{gram_hash, GRAM_BITS, GRAM_SET_BYTES};
-use crate::languages::LANGUAGES;
+use crate::grams::{gram_hash, gram_mask, GRAM_TABLE_BYTES};
 pub use crate::languages::LANGUAGE_COUNT;
+use crate::languages::{Group, LANGUAGES};
 use crate::lz::{decode_doc, Models, Primed, Segment};
 use crate::varint::read_varint;
 use std::sync::OnceLock;
@@ -23,13 +25,13 @@ struct Assets {
     packed_suffix: &'static [u8],
     /// The language's own model nodes; the literal part comes from `GROUP_PRIORS`.
     priors: &'static [u8],
-    /// The bitset of the 4-gram hashes of the suffix (`grams.rs`), so detection needs no
-    /// decoded dictionary.
-    grams: &'static [u8],
 }
 
-// `ASSETS` (per language, in id order) and `GROUP_PRIORS` (per `Group`, in `Group::ALL` order).
+// `ASSETS` (per language, in id order), `GROUP_PRIORS` and `GROUP_DICTS` (per `Group`, in
+// `Group::ALL` order; a group's shared dictionary part is empty for groups without one), and
+// `GRAM_TABLE` (`grams.rs`).
 include!(concat!(env!("OUT_DIR"), "/assets.rs"));
+const _: () = assert!(GRAM_TABLE.len() == GRAM_TABLE_BYTES);
 
 const LANG_HTML: u8 = 3;
 const LANG_CSS: u8 = 4;
@@ -49,27 +51,59 @@ const LANG_RUST: u8 = 17;
 const LANG_ZIG: u8 = 18;
 
 static PRIMED: [OnceLock<Primed>; LANGUAGE_COUNT] = [const { OnceLock::new() }; LANGUAGE_COUNT];
+static SHARED: [OnceLock<Vec<u8>>; Group::ALL.len()] =
+    [const { OnceLock::new() }; Group::ALL.len()];
 
-/// The language's dictionary (wrapper + suffix) with its trained priors, built on first use and
-/// cached for the process; the encoder's match index is built on first encode.
+/// The language's dictionary (wrapper + group part + suffix) with its trained priors, built on
+/// first use and cached for the process; the encoder's match index is built on first encode.
 pub fn primed(lang: u8) -> &'static Primed {
     PRIMED[lang as usize].get_or_init(|| {
         let (_, group) = LANGUAGES[lang as usize];
-        let assets = &ASSETS[lang as usize];
-        let models = Models::from_packed(assets.priors, GROUP_PRIORS[group as usize]);
-        let (len, body) = read_varint(assets.packed_suffix).expect("packed dictionary length");
-        let mut bytes = Vec::with_capacity(WRAPPER.len() + len as usize);
+        let models = language_models(lang);
+        let shared = SHARED[group as usize].get_or_init(|| {
+            let packed = GROUP_DICTS[group as usize];
+            if packed.is_empty() {
+                return Vec::new();
+            }
+            // Packed with the models of the group's first language (`build.rs`).
+            let first = LANGUAGES.iter().position(|(_, g)| *g == group).unwrap();
+            let models = if first == lang as usize {
+                models.clone()
+            } else {
+                language_models(first as u8)
+            };
+            unpack_dictionary(packed, &models, Vec::new())
+        });
+        let mut bytes = Vec::with_capacity(WRAPPER.len() + shared.len());
         bytes.extend_from_slice(WRAPPER);
-        // The suffix was coded with the language's models and no dictionary (`pack.rs`).
-        let empty = Primed::new(Vec::new(), models.clone());
-        let segments = [Segment {
-            end: len as usize,
-            lang: 0,
-        }];
-        decode_doc(&|_| &empty, body, len as usize, &segments, &mut bytes)
-            .expect("packed dictionary decodes");
+        bytes.extend_from_slice(shared);
+        let bytes = unpack_dictionary(ASSETS[lang as usize].packed_suffix, &models, bytes);
         Primed::new(bytes, models)
     })
+}
+
+fn language_models(lang: u8) -> Models {
+    let (_, group) = LANGUAGES[lang as usize];
+    Models::from_packed(ASSETS[lang as usize].priors, GROUP_PRIORS[group as usize])
+}
+
+/// Appends a dictionary part coded by the codec with `models` and no dictionary (`pack.rs`) to
+/// `bytes`; an empty `packed` is an empty part.
+fn unpack_dictionary(packed: &[u8], models: &Models, mut bytes: Vec<u8>) -> Vec<u8> {
+    if packed.is_empty() {
+        return bytes;
+    }
+    let (len, body) = read_varint(packed).expect("packed dictionary length");
+    // `decode_doc` reserves exactly `len` more bytes, so the process-lifetime buffer holds no
+    // slack (wasm memory never shrinks).
+    let empty = Primed::new(Vec::new(), models.clone());
+    let segments = [Segment {
+        end: len as usize,
+        lang: 0,
+    }];
+    decode_doc(&|_| &empty, body, len as usize, &segments, &mut bytes)
+        .expect("packed dictionary decodes");
+    bytes
 }
 
 // ---------------------------------------------------------------------------
@@ -81,37 +115,7 @@ const WINDOW: usize = 64;
 /// most `WINDOW` gram hits plus `WINDOW` of fence hint).
 const SWITCH_PENALTY: i32 = 48;
 
-/// For every 4-gram hash, the set of languages whose dictionary contains a gram with that
-/// hash, as a bit per language id: one lookup scores a position for every language. Built
-/// from the precomputed per-language bitsets, so the first `compress` decodes no dictionary
-/// for it.
-struct GramTable {
-    masks: Vec<u32>,
-}
-
-const _: () = assert!(LANGUAGE_COUNT <= 32);
-
-impl GramTable {
-    fn new() -> Self {
-        let mut masks = vec![0u32; 1 << GRAM_BITS];
-        for (lang, assets) in ASSETS.iter().enumerate() {
-            assert_eq!(assets.grams.len(), GRAM_SET_BYTES, "gram set size mismatch");
-            for (byte, &bits) in assets.grams.iter().enumerate() {
-                let mut bits = bits;
-                while bits != 0 {
-                    masks[byte << 3 | bits.trailing_zeros() as usize] |= 1 << lang;
-                    bits &= bits - 1;
-                }
-            }
-        }
-        Self { masks }
-    }
-}
-
-fn gram_table() -> &'static GramTable {
-    static TABLE: OnceLock<GramTable> = OnceLock::new();
-    TABLE.get_or_init(GramTable::new)
-}
+const _: () = assert!(LANGUAGE_COUNT <= 24);
 
 /// Splits `doc` into language segments (contiguous, covering the whole document).
 pub fn segment(doc: &[u8]) -> Vec<Segment> {
@@ -240,9 +244,8 @@ fn add_gram_hits(doc: &[u8], rows: &mut [[i32; LANGUAGE_COUNT]], row_of: impl Fn
     if doc.len() < 4 {
         return;
     }
-    let table = gram_table();
     for pos in 0..doc.len() - 3 {
-        let mut mask = table.masks[gram_hash(doc, pos)];
+        let mut mask = gram_mask(GRAM_TABLE, gram_hash(doc, pos));
         let row = &mut rows[row_of(pos)];
         while mask != 0 {
             row[mask.trailing_zeros() as usize] += 1;
@@ -347,22 +350,39 @@ fn fence_language(label: &[u8]) -> Option<u8> {
 mod tests {
     use super::*;
 
-    /// The packed assets the build embeds must restore exactly the trained values: the packer
-    /// and the unpacker are symmetric, so a lossy pack would still round-trip frames and show
-    /// up only as a worse ratio.
+    /// The module must embed exactly the committed assets — the build script substitutes flat
+    /// priors for stale ones, which would only show as a worse ratio — restore the
+    /// dictionaries it codes byte for byte, and detect with the table of those dictionaries.
     #[test]
-    fn packed_assets_restore_the_trained_assets() {
+    fn embedded_assets_match_the_committed_assets() {
         let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
-        for (lang, (name, _)) in LANGUAGES.iter().enumerate() {
-            let raw = std::fs::read(root.join(format!("priors/{name}.bin"))).expect("raw priors");
-            let expected = Models::from_raw_priors(&raw);
-            let primed = primed(lang as u8);
-            assert_eq!(primed.models.lit_classes, expected.lit_classes, "{name}");
-            assert_eq!(primed.models.probs, expected.probs, "{name}");
-            let dict = std::fs::read(root.join(format!("dict/{name}.bin"))).expect("dictionary");
-            assert_eq!(&primed.bytes[WRAPPER.len()..], dict, "{name}");
-            assert_eq!(ASSETS[lang].grams, crate::grams::gram_set(&dict), "{name}");
+        let read = |path: String| std::fs::read(root.join(path)).unwrap_or_default();
+        for group in Group::ALL {
+            assert_eq!(
+                GROUP_PRIORS[group as usize],
+                read(format!("priors/{}.bin", group.name())),
+                "{group:?}"
+            );
         }
+        let mut dictionaries = Vec::new();
+        for (lang, (name, group)) in LANGUAGES.iter().enumerate() {
+            assert_eq!(
+                ASSETS[lang].priors,
+                read(format!("priors/{name}.bin")),
+                "{name}"
+            );
+            let shared = read(format!("dict/{}.bin", group.name()));
+            assert_eq!(shared.is_empty(), group.shared_budget() == 0, "{group:?}");
+            let suffix = read(format!("dict/{name}.bin"));
+            assert!(!suffix.is_empty(), "{name}");
+            let mut trained = shared;
+            trained.extend(suffix);
+            let primed = primed(lang as u8);
+            assert_eq!(&primed.bytes[..WRAPPER.len()], WRAPPER, "{name}");
+            assert_eq!(&primed.bytes[WRAPPER.len()..], trained, "{name}");
+            dictionaries.push(trained);
+        }
+        assert_eq!(GRAM_TABLE, crate::grams::gram_table(&dictionaries));
     }
 
     #[test]

@@ -24,6 +24,9 @@ mod grams;
 mod lang;
 mod languages;
 mod lz;
+#[cfg(feature = "train")]
+#[allow(dead_code)]
+mod pack;
 mod rc;
 #[cfg(feature = "train")]
 pub mod train;
@@ -205,44 +208,67 @@ pub fn segments(content: &[u8]) -> Vec<(usize, u8)> {
 }
 
 /// Codes `content` with the detected per-segment languages and returns the smallest whole
-/// frame. When detection is uncertain (see the gate below) it also codes the input as a single
-/// segment of the strongest gram-match language (up to 64 KiB) and keeps the smaller,
-/// comparing full payload length (body plus the segment table, which differs between single-
-/// and multi-segment frames). A confident single-language detection is coded as detected
-/// without trying alternatives.
+/// frame. A confident single-language detection (its one segment is the strongest gram-match
+/// language) is coded as detected. Otherwise — a multi-segment split, or a single language that
+/// is not the strongest dictionary match (the fence-hint-overwhelm case) — the input is also
+/// coded as a single segment of the strongest gram-match language and the smaller payload
+/// (body plus segment table) wins: multi-segment documents of 5-30 KB coded 1-4% larger as
+/// detected than as their best single language, and the winner was always the top gram
+/// candidate (further candidates changed nothing measurable).
+///
+/// The alternative costs a full second parse, so above twice `TRIAL_LEN` (where two prefix
+/// parses plus one full parse are cheaper than two full parses) both candidates are only
+/// compared on the document's first `TRIAL_LEN` bytes and the winner codes the whole document:
+/// the comparison then costs a bounded ~2 ms instead of a full second parse (the winner's full
+/// parse is the one the document needs anyway), and the prefix's choice codes the corpus
+/// within 0.03 pp of the full comparison.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
-    let (mut best_segments, gram_scores) = lang::analyze(content);
-    let mut best_body = lz::encode_doc(&lang::primed, content, &best_segments);
-    let best_cost = best_body.len() + segment_table_len(&best_segments);
-    // The extra parse costs as much as the first (~0.35 ms at 4 KiB, ~2.8 ms at 18 KiB,
-    // ~70 ms at 1 MiB), so it runs only up to 64 KiB. It matters at LLM-answer sizes:
-    // multi-segment documents of 5-30 KB coded 1-4% larger as detected than as the best single
-    // language (an 18 KB answer whose ```html fence pins a long `<script>` to the html
-    // dictionary: 5,145 vs 4,977 bytes as `text`), and the winner was the top gram candidate;
-    // trying further candidates changed nothing measurable. The gain does not stop at 64 KiB
-    // (a 90 KB document of that shape still codes ~2.7% larger than its best single language),
-    // but above it the extra parse costs more CPU (~15 ms at 90 KB, ~70 ms at 1 MiB, doubling
-    // compression time) than a few percent is worth here.
-    const CANDIDATE_MAX: usize = 64 * 1024;
+    const TRIAL_LEN: usize = 8 * 1024;
+    let (detected, gram_scores) = lang::analyze(content);
     let top = lang::top_language(&gram_scores);
-    let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
-    // Search only when detection is uncertain — a multi-segment split, or a single language
-    // that is not the strongest dictionary match (the fence-hint-overwhelm case). A confident
-    // single-language detection (its segment is the top gram candidate) is trusted as-is: it
-    // carries no never-worse-than-single guarantee, trading a few bytes on rare ties for not
-    // running an extra parse on the common pure-single-language document.
-    if content.len() <= CANDIDATE_MAX && detected_single != Some(top) {
-        let single = vec![Segment {
-            end: content.len(),
-            lang: top,
-        }];
-        let body = lz::encode_doc(&lang::primed, content, &single);
-        if body.len() + segment_table_len(&single) < best_cost {
-            best_body = body;
-            best_segments = single;
-        }
+    if detected.len() == 1 && detected[0].lang == top {
+        let body = lz::encode_doc(&lang::primed, content, &detected);
+        return (detected, body);
     }
-    (best_segments, best_body)
+    let single = vec![Segment {
+        end: content.len(),
+        lang: top,
+    }];
+    if content.len() <= 2 * TRIAL_LEN {
+        let detected_body = lz::encode_doc(&lang::primed, content, &detected);
+        let single_body = lz::encode_doc(&lang::primed, content, &single);
+        return if single_body.len() + 1 < detected_body.len() + segment_table_len(&detected) {
+            (single, single_body)
+        } else {
+            (detected, detected_body)
+        };
+    }
+    let prefix = &content[..TRIAL_LEN];
+    let detected_prefix = clip_segments(&detected, TRIAL_LEN);
+    let single_prefix = clip_segments(&single, TRIAL_LEN);
+    let detected_cost = lz::encode_doc(&lang::primed, prefix, &detected_prefix).len()
+        + segment_table_len(&detected_prefix);
+    let single_cost = lz::encode_doc(&lang::primed, prefix, &single_prefix).len() + 1;
+    let chosen = if single_cost < detected_cost {
+        single
+    } else {
+        detected
+    };
+    let body = lz::encode_doc(&lang::primed, content, &chosen);
+    (chosen, body)
+}
+
+/// The segments of the first `len` bytes: those ending within it, the one crossing it cut.
+fn clip_segments(segments: &[Segment], len: usize) -> Vec<Segment> {
+    let mut clipped: Vec<Segment> = segments
+        .iter()
+        .take_while(|s| s.end < len)
+        .copied()
+        .collect();
+    // The last segment ends at the content length, past `len`, so one segment always remains.
+    let lang = segments[clipped.len()].lang;
+    clipped.push(Segment { end: len, lang });
+    clipped
 }
 
 /// Bytes the segment table occupies in a payload: one language byte for a single segment, else

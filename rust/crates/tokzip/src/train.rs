@@ -1,8 +1,10 @@
-//! Offline trainer (cargo feature `train`): builds each language's dictionary suffix
-//! (`dict/<language>.bin`) by COVER-style segment selection, clusters context bytes into
-//! literal classes by their next-byte statistics, then counts the bits coded at every model
-//! node while compressing the language's training documents with its dictionary and turns the
-//! counts into the initial probabilities shipped in `priors/<language>.bin`.
+//! Offline trainer (cargo feature `train`): builds the dictionary parts (a group's shared part,
+//! `dict/<group>.bin`, and each language's suffix, `dict/<language>.bin`) by COVER-style
+//! segment selection, clusters context bytes into literal classes by their next-byte
+//! statistics, then counts the bits coded at every model node while compressing each
+//! language's training documents with its dictionary and turns the counts into the initial
+//! probabilities shipped as each group's packed literal priors (`priors/<group>.bin`) and each
+//! language's own nodes (`priors/<language>.bin`).
 
 pub use crate::languages::Group;
 use crate::lz::{
@@ -15,6 +17,16 @@ use std::path::Path;
 /// The embedded languages with their groups, in id order.
 pub fn languages() -> &'static [(&'static str, Group)] {
     &crate::languages::LANGUAGES
+}
+
+/// The language's own part of a raw trained model, as `priors/<language>.bin` holds it.
+pub fn language_priors(raw: &[u8]) -> Vec<u8> {
+    crate::pack::language_part(raw)
+}
+
+/// The group's literal part of a raw trained model, packed as `priors/<group>.bin` holds it.
+pub fn group_priors(raw: &[u8]) -> Vec<u8> {
+    crate::pack::literal_part(raw)
 }
 
 /// Documents of `lang`'s train split from a tokzip-corpus checkout, in manifest order, skipping
@@ -55,8 +67,8 @@ fn corpus_docs<'a>(
         .map(move |file| std::fs::read(dir.join(file)).expect("doc"))
 }
 
-/// Bound on the dictionary-training input per language.
-const MAX_DICT_TRAIN_BYTES: usize = 32 * 1024 * 1024;
+/// Bound on the dictionary-training input per language (`train_dictionary` reads no more).
+pub const MAX_DICT_TRAIN_BYTES: usize = 32 * 1024 * 1024;
 /// Every held-out document used to pick the segment size, bounded so the sweep stays fast.
 const MAX_VALIDATION_BYTES: usize = 1024 * 1024;
 /// Dmer length: the shortest fragment worth a dictionary reference (the coder's minimum match
@@ -66,10 +78,12 @@ const FREQ_BITS: u32 = 20;
 /// Candidate segment sizes; the one whose dictionary codes the held-out documents smallest wins.
 const SEGMENT_SIZES: [usize; 5] = [64, 128, 256, 512, 1024];
 
-/// Trains a language's dictionary suffix from `docs`: COVER-style greedy selection of the
-/// segments whose dmers occur most often across the documents, with the segment size chosen by
-/// coding held-out documents with each candidate dictionary (`wrapper` precedes the suffix).
-pub fn train_dictionary(docs: &[Vec<u8>], budget: usize, wrapper: &[u8]) -> Vec<u8> {
+/// Trains a dictionary part from `docs`: COVER-style greedy selection of the segments whose
+/// dmers occur in the most documents, with the segment size chosen by coding held-out
+/// documents with each candidate dictionary. `prefix` is the dictionary content that precedes
+/// the part (the wrapper, plus the group's shared part for a language suffix): its fragments
+/// are not selected again.
+pub fn train_dictionary(docs: &[Vec<u8>], budget: usize, prefix: &[u8]) -> Vec<u8> {
     let mut bounded: Vec<&[u8]> = Vec::new();
     let mut total = 0usize;
     for doc in docs {
@@ -83,6 +97,7 @@ pub fn train_dictionary(docs: &[Vec<u8>], budget: usize, wrapper: &[u8]) -> Vec<
     let mut validation = Vec::new();
     let mut validation_bytes = 0usize;
     let mut fit: Vec<u8> = Vec::new();
+    let mut fit_lens: Vec<usize> = Vec::new();
     for (i, doc) in bounded.iter().enumerate() {
         if i % 10 == 0 && validation_bytes < MAX_VALIDATION_BYTES {
             let take = doc.len().min(MAX_VALIDATION_BYTES - validation_bytes);
@@ -90,13 +105,14 @@ pub fn train_dictionary(docs: &[Vec<u8>], budget: usize, wrapper: &[u8]) -> Vec<
             validation_bytes += take;
         } else {
             fit.extend_from_slice(doc);
+            fit_lens.push(doc.len());
         }
     }
     let lit_classes = train_lit_classes(validation.iter().map(Vec::as_slice));
     let mut best: Option<(usize, usize)> = None; // (cost, k)
     for k in SEGMENT_SIZES {
-        let suffix = cover(&fit, budget, k);
-        let mut dict = wrapper.to_vec();
+        let suffix = cover(&fit, &fit_lens, prefix, budget, k);
+        let mut dict = prefix.to_vec();
         dict.extend_from_slice(&suffix);
         let cost = coded_size(dict, lit_classes, &validation);
         if best.is_none_or(|(c, _)| cost < c) {
@@ -105,22 +121,40 @@ pub fn train_dictionary(docs: &[Vec<u8>], budget: usize, wrapper: &[u8]) -> Vec<
     }
     let k = best.expect("segment sizes").1;
     let all: Vec<u8> = bounded.concat();
-    cover(&all, budget, k)
+    let lens: Vec<usize> = bounded.iter().map(|d| d.len()).collect();
+    cover(&all, &lens, prefix, budget, k)
 }
 
-/// Greedy COVER selection over `data`: each of the `epochs` slices of `data` contributes its
-/// highest-scoring `k`-byte segment (score = total frequency of the dmers it contains; the
+/// Greedy COVER selection over `data` (the concatenation of documents of `doc_lens`): each of
+/// the `epochs` slices of `data` contributes its highest-scoring `k`-byte segment (score =
+/// total document frequency of the dmers it contains; the
 /// dmers of a selected segment are then zeroed so later segments do not repeat its content),
 /// and the segments are laid out best first, so the most valuable fragments have the lowest
 /// dictionary offsets, until `budget` is filled.
-fn cover(data: &[u8], budget: usize, k: usize) -> Vec<u8> {
+fn cover(data: &[u8], doc_lens: &[usize], prefix: &[u8], budget: usize, k: usize) -> Vec<u8> {
     if data.len() < k.max(DMER) {
         return data.to_vec();
     }
     let dmers = data.len() - DMER + 1;
+    // Document frequency: a dmer counts once per document, so a document repeating a fragment
+    // many times does not outvote the fragments many documents share.
     let mut freqs = vec![0u32; 1 << FREQ_BITS];
-    for pos in 0..dmers {
-        freqs[dmer_hash(data, pos)] += 1;
+    let mut seen = vec![u32::MAX; 1 << FREQ_BITS];
+    let mut doc_start = 0usize;
+    for (id, &len) in doc_lens.iter().enumerate() {
+        let end = (doc_start + len).min(dmers + DMER - 1);
+        for pos in doc_start..end.saturating_sub(DMER - 1) {
+            let h = dmer_hash(data, pos);
+            if seen[h] != id as u32 {
+                seen[h] = id as u32;
+                freqs[h] += 1;
+            }
+        }
+        doc_start += len;
+    }
+    // Fragments the preceding dictionary content already holds are not worth selecting again.
+    for pos in 0..prefix.len().saturating_sub(DMER - 1) {
+        freqs[dmer_hash(prefix, pos)] = 0;
     }
     // Twice the budget's worth of segments are ranked so the best fill the budget.
     let epochs = (2 * budget / k).clamp(1, (dmers / k).max(1));
@@ -193,7 +227,8 @@ fn coded_size(dict: Vec<u8>, lit_classes: LitClasses, docs: &[Vec<u8>]) -> usize
         .sum()
 }
 
-/// A language being trained: its full dictionary (wrapper + suffix) and its priors documents.
+/// A language being trained: its full dictionary (wrapper + group part + suffix) and its
+/// priors documents.
 pub struct Trainee {
     pub name: String,
     pub group: Group,
@@ -207,12 +242,13 @@ const PRIORS_ROUNDS: usize = 3;
 /// A literal node whose trained value would have saved fewer bits than this over a flat node on
 /// the training bits stays flat: such nodes are many (deep tree nodes of rare contexts) and
 /// worth little, and every flat subtree is skipped by the packed priors (`pack.rs`).
-const PRIORS_MIN_GAIN: f64 = 4.0;
+const PRIORS_MIN_GAIN: f64 = 6.0;
 
 /// Trains the priors of every trainee (each compressed as one segment against its own
 /// dictionary): the literal class tables and literal-tree priors are shared by every language
 /// of a group and trained on the group's pooled literal statistics; the other nodes are per
-/// language. Returns each trainee's raw serialized model (`PRIORS_SIZE` bytes), in order.
+/// language. Returns each trainee's raw serialized model (`PRIORS_SIZE` bytes), in order
+/// (`language_priors` / `group_priors` split it into the parts the repository holds).
 pub fn train_priors(trainees: &[Trainee]) -> Vec<Vec<u8>> {
     let groups: Vec<Group> = Group::ALL
         .into_iter()

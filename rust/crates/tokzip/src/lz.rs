@@ -42,7 +42,7 @@ const EMPTY: i32 = -1;
 /// Literal context classes of the previous byte (`lit_classes.0`) and of the byte before it
 /// (`lit_classes.1`); a literal is coded through the tree of the pair.
 pub const LIT_CLASSES: usize = 128;
-pub const LIT_CLASSES2: usize = 4;
+pub const LIT_CLASSES2: usize = 32;
 const IS_MATCH: usize = 0;
 const IS_REP: usize = IS_MATCH + NUM_STATES;
 const IS_REP_G0: usize = IS_REP + NUM_STATES;
@@ -80,11 +80,14 @@ fn dist_group(base: usize) -> (usize, usize, usize) {
     )
 }
 
-/// Raw serialized model (the trainer's output, `priors/<language>.bin`): both literal class
-/// tables, then every node's initial probability quantized to 8 bits (`p11 = (q << 3) | 4`).
+/// Raw serialized model (the trainer's output): both literal class tables, then every node's
+/// initial probability quantized to 8 bits (`PRIORS_DEFAULT` is exactly `PROB_INIT`, any other
+/// `q` is `p11 = (q << 3) | 4`, see `unquantize`); `pack.rs` splits it into the parts the
+/// repository holds.
+#[cfg_attr(not(feature = "train"), allow(dead_code))]
 pub const PRIORS_SIZE: usize = 512 + MODEL_SIZE;
-/// The quantized value of an untrained node (`PROB_INIT`); the packed form the module embeds
-/// skips untrained literal subtrees (see `pack.rs`).
+/// The quantized value of an untrained node (`PROB_INIT`); the packed literal priors skip
+/// untrained subtrees (see `pack.rs`).
 pub const PRIORS_DEFAULT: u8 = (PROB_INIT >> 3) as u8;
 
 /// The two literal class tables: previous-byte value → class (values < `LIT_CLASSES`) and
@@ -94,161 +97,283 @@ pub type LitClasses = ([u8; 256], [u8; 256]);
 #[derive(Clone)]
 pub struct Models {
     pub lit_classes: LitClasses,
+    /// The nodes before `LIT`, then the trained literal trees (256 nodes each; the two
+    /// matched-literal trees as one run of 512), each where `tree_at` says.
     pub probs: Vec<u16>,
+    /// Per literal tree (`(first - LIT) >> 8`), its start in `probs`, or `UNUSED` for a tree
+    /// left flat by training (the `probs` of a dense model, such as the trainer's, hold every
+    /// tree at its layout position).
+    tree_at: Vec<u32>,
 }
 
 impl Models {
     /// Flat models (every node at `PROB_INIT`), the trainer's starting point.
     #[cfg(any(test, feature = "train"))]
     pub fn new(lit_classes: LitClasses) -> Self {
+        Self::dense(lit_classes, vec![PROB_INIT; MODEL_SIZE])
+    }
+
+    /// A model over every node at its layout position.
+    #[cfg(any(test, feature = "train"))]
+    fn dense(lit_classes: LitClasses, probs: Vec<u16>) -> Self {
         Self {
             lit_classes,
-            probs: vec![PROB_INIT; MODEL_SIZE],
+            probs,
+            tree_at: (0..TREES).map(|t| (LIT + t * 256) as u32).collect(),
         }
     }
 
-    /// Restores a model from its packed parts (`pack.rs`): the language's own nodes (those
-    /// before `LIT`, verbatim) and its group's literal part — the class tables, then each
-    /// 256-node tree (plain literal trees, then the two matched-literal trees) as flag bits
-    /// followed by the values of the nodes whose subtree is not all `PRIORS_DEFAULT`.
+    /// Every node at its layout position (`MODEL_SIZE` values), flat trees included.
+    #[cfg(any(test, feature = "train"))]
+    pub fn dense_probs(&self) -> Vec<u16> {
+        let mut probs = vec![PROB_INIT; MODEL_SIZE];
+        probs[..LIT].copy_from_slice(&self.probs[..LIT]);
+        for t in 0..TREES {
+            let first = LIT + t * 256;
+            if let Some(at) = self.tree_start(first) {
+                probs[first..first + 256].copy_from_slice(&self.probs[at..at + 256]);
+            }
+        }
+        probs
+    }
+
+    /// Start in `probs` of the 256 nodes of the literal tree at layout position `first`
+    /// (`None` for a flat tree).
+    #[inline]
+    fn tree_start(&self, first: usize) -> Option<usize> {
+        let at = self.tree_at[(first - LIT) >> 8];
+        (at != UNUSED).then_some(at as usize)
+    }
+
+    /// Restores a model from its packed parts (`pack.rs`, the form the repository and the
+    /// module hold): the language's own nodes (those before `LIT`, verbatim) and its group's
+    /// literal part — the class tables, then each 256-node tree (plain literal trees, then the
+    /// two matched-literal trees) as flag bits followed by the values of the nodes whose subtree
+    /// is not all `PRIORS_DEFAULT` (the flat probability).
     pub fn from_packed(language: &[u8], literal: &[u8]) -> Self {
-        assert_eq!(language.len(), LIT, "packed priors size mismatch");
-        let mut raw = literal[..512].to_vec();
-        raw.extend_from_slice(language);
-        raw.resize(PRIORS_SIZE, PRIORS_DEFAULT);
+        Self::try_from_packed(language, literal).expect("packed priors match the model layout")
+    }
+
+    /// [`Models::from_packed`] for parts that may be stale (from before a model layout change):
+    /// `None` when they do not fit the layout.
+    pub fn try_from_packed(language: &[u8], literal: &[u8]) -> Option<Self> {
+        if language.len() != LIT || literal.len() < 512 {
+            return None;
+        }
+        let mut lit_classes = ([0u8; 256], [0u8; 256]);
+        lit_classes.0.copy_from_slice(&literal[..256]);
+        lit_classes.1.copy_from_slice(&literal[256..512]);
+        if !(lit_classes.0.iter().all(|&c| (c as usize) < LIT_CLASSES)
+            && lit_classes.1.iter().all(|&c| (c as usize) < LIT_CLASSES2))
+        {
+            return None;
+        }
+        let mut probs: Vec<u16> = language.iter().map(|&q| unquantize(q)).collect();
+        let mut tree_at = vec![UNUSED; TREES];
         let mut rest = &literal[512..];
         let mut nodes = [0u8; 256];
-        for tree in raw[512 + LIT..].as_chunks_mut::<256>().0 {
+        let mut tree = [PROB_INIT; 256];
+        for (t, slot) in tree_at.iter_mut().enumerate() {
             // The walk reads only the flags; the values, which start after the tree's flag
             // bits, are copied to the recorded nodes once their count is known.
             let (mut flag_count, mut node_count) = (0, 0);
-            walk_packed_tree(1, rest, &mut flag_count, &mut nodes, &mut node_count);
-            let values = &rest[flag_count.div_ceil(8)..];
-            for (&node, &value) in nodes[..node_count].iter().zip(values) {
-                tree[node as usize] = value;
+            walk_packed_tree(1, rest, &mut flag_count, &mut nodes, &mut node_count)?;
+            let values = rest.get(flag_count.div_ceil(8)..)?;
+            if values.len() < node_count {
+                return None;
             }
             rest = &values[node_count..];
+            let first = LIT + t * 256;
+            let matched_pair = first == LIT_MATCHED || first == LIT_MATCHED + 256;
+            if node_count == 0 && !matched_pair {
+                continue;
+            }
+            tree.fill(PROB_INIT);
+            for (&node, &value) in nodes[..node_count].iter().zip(values) {
+                tree[node as usize] = unquantize(value);
+            }
+            // The matched-literal trees are always present, one right after the other.
+            *slot = probs.len() as u32;
+            probs.extend_from_slice(&tree);
         }
-        assert!(rest.is_empty(), "packed priors size mismatch");
-        Self::from_raw_priors(&raw)
+        rest.is_empty().then_some(Self {
+            lit_classes,
+            probs,
+            tree_at,
+        })
     }
 
-    /// Restores a raw serialized model.
+    /// Restores a raw serialized model (the trainer's output form, `PRIORS_SIZE` bytes).
+    #[cfg(feature = "train")]
     pub fn from_raw_priors(priors: &[u8]) -> Self {
-        assert_eq!(priors.len(), PRIORS_SIZE, "priors size mismatch");
+        Self::try_from_raw_priors(priors).expect("raw priors match the model layout")
+    }
+
+    #[cfg(feature = "train")]
+    fn try_from_raw_priors(priors: &[u8]) -> Option<Self> {
+        if priors.len() != PRIORS_SIZE {
+            return None;
+        }
         let mut lit_classes = ([0u8; 256], [0u8; 256]);
         lit_classes.0.copy_from_slice(&priors[..256]);
         lit_classes.1.copy_from_slice(&priors[256..512]);
-        assert!(
-            lit_classes.0.iter().all(|&c| (c as usize) < LIT_CLASSES)
-                && lit_classes.1.iter().all(|&c| (c as usize) < LIT_CLASSES2),
-            "invalid literal class"
-        );
-        Self {
-            lit_classes,
-            probs: priors[512..]
-                .iter()
-                .map(|&q| (u16::from(q) << 3) | 4)
-                .collect(),
-        }
+        let valid = lit_classes.0.iter().all(|&c| (c as usize) < LIT_CLASSES)
+            && lit_classes.1.iter().all(|&c| (c as usize) < LIT_CLASSES2);
+        valid.then(|| {
+            Self::dense(
+                lit_classes,
+                priors[512..].iter().map(|&q| unquantize(q)).collect(),
+            )
+        })
+    }
+}
+
+/// The 11-bit probability of a quantized prior value: `PRIORS_DEFAULT` is exactly the flat
+/// probability (as a node the packed priors skip restores), any other value `(q << 3) | 4`.
+#[inline]
+fn unquantize(q: u8) -> u16 {
+    if q == PRIORS_DEFAULT {
+        PROB_INIT
+    } else {
+        (u16::from(q) << 3) | 4
     }
 }
 
 const TREES: usize = (MODEL_SIZE - LIT) / 256;
-const TREE_WORDS: usize = TREES.div_ceil(64);
+/// Marks a tree absent from `Models::tree_at` (flat) or `DocModels::slot` (not used yet).
+const UNUSED: u32 = 0;
 
-/// A document's working models: the language's primed nodes, copied on demand — the nodes
-/// before `LIT` at once, each literal tree the first time a literal uses it — into a buffer
-/// reused across documents, so a short document never pays for the whole model.
+/// A document's working models: the language's primed nodes, copied on demand into an arena —
+/// the nodes before `LIT` at once, each literal tree (the two matched-literal trees together)
+/// the first time a literal uses it — so a document holds only the trees it touches, and a
+/// short one never pays for the whole model. The arena and the slot table are reused across
+/// documents.
 pub struct DocModels<'p> {
     base: &'p Models,
+    /// The arena: the nodes before `LIT`, then the used trees in the order they were touched.
     probs: Vec<u16>,
-    ready: [u64; TREE_WORDS],
+    /// Per tree, its start in the arena (`UNUSED` until touched; no tree starts at 0).
+    slot: Vec<u32>,
 }
 
 thread_local! {
-    /// Model buffers of finished documents, reused by the next ones (fully initialized, so
-    /// a buffer's stale contents are only ever overwritten before being read).
-    static MODEL_POOL: std::cell::RefCell<Vec<Vec<u16>>> = const { std::cell::RefCell::new(Vec::new()) };
+    /// Buffers of finished documents, reused by the next ones.
+    static MODEL_POOL: std::cell::RefCell<Vec<(Vec<u16>, Vec<u32>)>> = const { std::cell::RefCell::new(Vec::new()) };
 }
 
 impl<'p> DocModels<'p> {
     fn new(base: &'p Models) -> Self {
-        let mut probs = MODEL_POOL
+        let (mut probs, mut slot) = MODEL_POOL
             .with(|pool| pool.borrow_mut().pop())
-            .unwrap_or_else(|| vec![PROB_INIT; MODEL_SIZE]);
-        probs[..LIT].copy_from_slice(&base.probs[..LIT]);
-        Self {
-            base,
-            probs,
-            ready: [0; TREE_WORDS],
-        }
+            .unwrap_or_else(|| (Vec::new(), vec![UNUSED; TREES]));
+        probs.clear();
+        probs.extend_from_slice(&base.probs[..LIT]);
+        slot.fill(UNUSED);
+        Self { base, probs, slot }
     }
 
     /// Start of the literal tree for the context `(previous byte, the byte before it)`, copied
     /// from the primed model on first use.
     #[inline]
     fn lit_block(&mut self, prev: (u8, u8)) -> usize {
-        self.tree(lit_block(&self.base.lit_classes, prev))
+        self.tree(lit_block(&self.base.lit_classes, prev), 256)
     }
 
-    /// Start of the matched-literal trees (both ready).
+    /// Start of the matched-literal trees (both, contiguous).
     #[inline]
     fn matched_block(&mut self) -> usize {
-        self.tree(LIT_MATCHED + 256);
-        self.tree(LIT_MATCHED)
+        self.tree(LIT_MATCHED, 512)
     }
 
+    /// Arena start of the `len` nodes at layout position `first`, copied from the primed model
+    /// (flat when training left the tree so) on first use.
     #[inline]
-    fn tree(&mut self, first: usize) -> usize {
+    fn tree(&mut self, first: usize, len: usize) -> usize {
         let t = (first - LIT) >> 8;
-        if (self.ready[t >> 6] >> (t & 63)) & 1 == 0 {
-            self.ready[t >> 6] |= 1 << (t & 63);
-            self.probs[first..first + 256].copy_from_slice(&self.base.probs[first..first + 256]);
+        if self.slot[t] == UNUSED {
+            self.slot[t] = self.probs.len() as u32;
+            match self.base.tree_start(first) {
+                Some(at) => self.probs.extend_from_slice(&self.base.probs[at..at + len]),
+                None => self.probs.resize(self.probs.len() + len, PROB_INIT),
+            }
         }
-        first
+        self.slot[t] as usize
+    }
+
+    /// Adds per-node counts recorded at this document's arena indices (`per` values per node)
+    /// to `to` at the nodes' layout positions, clearing `from` (trainer support: the coder
+    /// counts at the indices it codes with, which are arena indices for literal trees).
+    fn scatter<T: Copy + Default + std::ops::AddAssign>(
+        &self,
+        from: &mut [T],
+        to: &mut [T],
+        per: usize,
+    ) {
+        let mut move_run = |at: usize, first: usize, len: usize| {
+            for k in 0..len * per {
+                to[first * per + k] += from[at * per + k];
+                from[at * per + k] = T::default();
+            }
+        };
+        move_run(0, 0, LIT);
+        for (t, &at) in self.slot.iter().enumerate() {
+            if at != UNUSED {
+                let first = LIT + t * 256;
+                let len = if first == LIT_MATCHED { 512 } else { 256 };
+                move_run(at as usize, first, len);
+            }
+        }
     }
 
     /// The fully adapted models (the trainer's starting state).
     #[cfg(any(test, feature = "train"))]
-    fn into_models(mut self) -> Models {
-        for t in 0..TREES {
-            self.tree(LIT + t * 256);
+    fn into_models(self) -> Models {
+        let mut probs = self.base.dense_probs();
+        probs[..LIT].copy_from_slice(&self.probs[..LIT]);
+        for (t, &at) in self.slot.iter().enumerate() {
+            if at != UNUSED {
+                let first = LIT + t * 256;
+                let len = if first == LIT_MATCHED { 512 } else { 256 };
+                let at = at as usize;
+                probs[first..first + len].copy_from_slice(&self.probs[at..at + len]);
+            }
         }
-        Models {
-            lit_classes: self.base.lit_classes,
-            probs: self.probs.clone(),
-        }
+        Models::dense(self.base.lit_classes, probs)
     }
 }
 
 impl Drop for DocModels<'_> {
     fn drop(&mut self) {
-        let probs = std::mem::take(&mut self.probs);
-        MODEL_POOL.with(|pool| pool.borrow_mut().push(probs));
+        let buffers = (
+            std::mem::take(&mut self.probs),
+            std::mem::take(&mut self.slot),
+        );
+        MODEL_POOL.with(|pool| pool.borrow_mut().push(buffers));
     }
 }
 
 /// Depth-first walk over one packed tree's flag bits (see `Models::from_packed`): records the
 /// nodes whose flag is set, in the order their values follow, and walks their children.
+/// `None` when the flags end early.
 fn walk_packed_tree(
     node: usize,
     flags: &[u8],
     flag_count: &mut usize,
     nodes: &mut [u8; 256],
     node_count: &mut usize,
-) {
-    let bit = (flags[*flag_count / 8] >> (*flag_count % 8)) & 1;
+) -> Option<()> {
+    let bit = (flags.get(*flag_count / 8)? >> (*flag_count % 8)) & 1;
     *flag_count += 1;
     if bit == 0 {
-        return;
+        return Some(());
     }
     nodes[*node_count] = node as u8;
     *node_count += 1;
     if node < 128 {
-        walk_packed_tree(2 * node, flags, flag_count, nodes, node_count);
-        walk_packed_tree(2 * node + 1, flags, flag_count, nodes, node_count);
+        walk_packed_tree(2 * node, flags, flag_count, nodes, node_count)?;
+        walk_packed_tree(2 * node + 1, flags, flag_count, nodes, node_count)?;
     }
+    Some(())
 }
 
 /// Start of the literal tree for the context `(previous byte, the byte before it)`.
@@ -930,7 +1055,11 @@ pub fn encode_doc<'p>(
     encode_doc_with_stats(lookup, doc, segments, None).0
 }
 
-/// [`encode_doc`] that can also count the bits coded at every model node (trainer support).
+/// [`encode_doc`] that can also count the bits coded at every model node (trainer support):
+/// `stats` holds two counts per node in layout order (`[2 * node + bit]`), accumulated across
+/// calls. The coder counts at the indices it codes with — arena indices for the literal trees
+/// — so each segment's counts are gathered in a scratch buffer and scattered to layout
+/// positions through the segment's models.
 pub fn encode_doc_with_stats<'p>(
     lookup: &dyn Fn(u8) -> &'p Primed,
     doc: &[u8],
@@ -938,11 +1067,14 @@ pub fn encode_doc_with_stats<'p>(
     stats: Option<Vec<u32>>,
 ) -> (Vec<u8>, Option<Vec<u32>>) {
     let mut rc = Encoder::new();
-    rc.stats = stats;
+    let mut stats = stats;
+    let mut scratch_stats = stats.as_ref().map(|_| vec![0u32; 2 * MODEL_SIZE]);
     #[cfg(feature = "train")]
-    if COST_ENABLED.load(std::sync::atomic::Ordering::Relaxed) {
-        rc.cost = Some(vec![0.0; MODEL_SIZE]);
-    }
+    let mut cost = COST_ENABLED
+        .load(std::sync::atomic::Ordering::Relaxed)
+        .then(|| vec![0.0f64; MODEL_SIZE]);
+    #[cfg(feature = "train")]
+    let mut scratch_cost = cost.as_ref().map(|_| vec![0.0f64; MODEL_SIZE]);
     let mut cs = CoderState::new();
     let mut lang_models = LangModels::new(lookup, segments);
     let mut chains = Chains::new(doc.len());
@@ -963,6 +1095,11 @@ pub fn encode_doc_with_stats<'p>(
             },
         };
         let mut models = lang_models.take(seg.lang);
+        rc.stats = scratch_stats.take();
+        #[cfg(feature = "train")]
+        {
+            rc.cost = scratch_cost.take();
+        }
         run_encode_optimal(
             &mut rc,
             &mut models,
@@ -977,13 +1114,21 @@ pub fn encode_doc_with_stats<'p>(
             mf.insert(inserted);
             inserted += 1;
         }
+        if let Some(mut scratch) = rc.stats.take() {
+            models.scatter(&mut scratch, stats.as_mut().unwrap(), 2);
+            scratch_stats = Some(scratch);
+        }
+        #[cfg(feature = "train")]
+        if let Some(mut scratch) = rc.cost.take() {
+            models.scatter(&mut scratch, cost.as_mut().unwrap(), 1);
+            scratch_cost = Some(scratch);
+        }
         lang_models.put(seg.lang, models);
         chains = mf.chains;
         start = seg.end;
     }
-    let stats = rc.stats.take();
     #[cfg(feature = "train")]
-    if let Some(cost) = rc.cost.take() {
+    if let Some(cost) = cost {
         let mut report = COST_REPORT.lock().unwrap();
         let groups = [
             ("flags", IS_MATCH, LEN),
@@ -1091,6 +1236,10 @@ fn run_encode_optimal(
         let hist_prices = DistPrices::new(models, HIST_DIST);
         let dict_prices = DistPrices::new(models, DICT_OFF);
 
+        // Positions inside a match of at least `NICE_LEN` found earlier in the chunk: no
+        // explicit match starting there can beat continuing that match, so the (costly) match
+        // search is skipped and only literals and reps are relaxed.
+        let mut skip_until = 0usize;
         for i in 0..(end_target - pos) {
             if nodes[i].price == INF {
                 continue;
@@ -1124,7 +1273,10 @@ fn run_encode_optimal(
             let mut long_rep = false;
             for idx in 0..4usize {
                 let l = mf.len_at(gpos, reps[idx] as usize + 1, max_len);
-                long_rep |= l >= NICE_LEN;
+                if l >= NICE_LEN {
+                    long_rep = true;
+                    skip_until = skip_until.max(i + l);
+                }
                 if idx == 0 && l >= 1 {
                     let price = base
                         + rep_bit
@@ -1173,10 +1325,15 @@ fn run_encode_optimal(
 
             // A rep match already at nice length is taken as is (no explicit match can beat
             // a rep of the same length), so the chain walk is skipped.
-            if long_rep {
+            if long_rep || i < skip_until {
                 continue;
             }
             mf.find_pairs(gpos, max_len, &mut pairs);
+            if let Some(&(plen, _)) = pairs.last() {
+                if plen as usize >= NICE_LEN {
+                    skip_until = i + plen as usize;
+                }
+            }
             let mat_bit = match_bit + price_bit(models.probs[IS_REP + state], 0);
             let hist_bit = mat_bit + price_bit(models.probs[IS_DICT + state], 0);
             let dict_bit = mat_bit + price_bit(models.probs[IS_DICT + state], 1);
@@ -1639,6 +1796,40 @@ mod tests {
             body_mixed.len(),
             body_single.len()
         );
+    }
+
+    /// Packing a model's parts (`pack.rs`) and restoring them must give the raw model back
+    /// node for node; a lossy pair would still round-trip frames and show only as a worse ratio.
+    #[cfg(feature = "train")]
+    #[test]
+    fn packed_priors_restore_the_raw_model() {
+        let mut raw = crate::pack::flat_raw();
+        let mut x = 0x2545_F491u32;
+        for (i, q) in raw.iter_mut().enumerate() {
+            x = x.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+            // Class tables within range; a mix of trained nodes, default nodes, and whole
+            // default trees, including the flat value stored explicitly inside a trained tree.
+            // Slot 0 of a tree is not a node (tree indices start at 1) and stays flat.
+            *q = match i {
+                0..256 => (x >> 24) as u8 % LIT_CLASSES as u8,
+                256..512 => (x >> 24) as u8 % LIT_CLASSES2 as u8,
+                _ if i >= 512 + LIT
+                    && (((i - 512 - LIT) / 256).is_multiple_of(3)
+                        || (i - 512 - LIT).is_multiple_of(256)) =>
+                {
+                    PRIORS_DEFAULT
+                }
+                _ if x & 0x300 == 0 => PRIORS_DEFAULT,
+                _ => (x >> 24) as u8,
+            };
+        }
+        let expected = Models::from_raw_priors(&raw);
+        let restored = Models::from_packed(
+            &crate::pack::language_part(&raw),
+            &crate::pack::literal_part(&raw),
+        );
+        assert_eq!(restored.lit_classes, expected.lit_classes);
+        assert_eq!(restored.dense_probs(), expected.dense_probs());
     }
 
     #[test]

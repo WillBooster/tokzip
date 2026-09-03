@@ -41,7 +41,7 @@ export interface DecompressOptions {
 export interface Codec {
   /**
    * Compresses a string (stored as UTF-8; must be well-formed UTF-16) into a self-describing
-   * binary frame. The first call in a process builds the detection table and decodes the
+   * binary frame. The first call in a process decodes the
    * dictionaries it uses (~10 ms); later calls do not.
    */
   compress: (text: string) => Uint8Array;
@@ -58,6 +58,11 @@ interface Exports {
   tokzip_out_ptr(): number;
   tokzip_out_len(): number;
 }
+
+// The UTF-8 length comes from `Buffer.byteLength`: native, exact, and available on every
+// runtime this package targets (Node, Bun, and Workers with `nodejs_compat`). Encoding the
+// string with `TextEncoder` just to count its bytes would encode every document twice.
+import { Buffer } from 'node:buffer';
 
 const textEncoder = new TextEncoder();
 // Fatal decoding: a frame whose content is not valid UTF-8 is corrupt, never U+FFFD.
@@ -87,7 +92,7 @@ export function createCodec(loadModule: () => WebAssembly.Module): Codec {
    */
   function withInput<T>(input: string | Uint8Array, run: (exports: Exports, ptr: number, len: number) => T): T {
     const exports = (wasm ??= instantiate());
-    const len = typeof input === 'string' ? utf8Length(input) : input.length;
+    const len = typeof input === 'string' ? Buffer.byteLength(input, 'utf8') : input.length;
     let trapped = false;
     let ptr: number | undefined;
     try {
@@ -136,23 +141,6 @@ export function createCodec(loadModule: () => WebAssembly.Module): Codec {
       });
     },
   };
-}
-
-/** UTF-8 length of a well-formed string. */
-function utf8Length(text: string): number {
-  let length = 0;
-  for (let i = 0; i < text.length; i++) {
-    const codePoint = text.codePointAt(i) ?? 0;
-    if (codePoint < 0x80) length += 1;
-    else if (codePoint < 0x8_00) length += 2;
-    else if (codePoint < 0x1_00_00) length += 3;
-    else {
-      // A supplementary code point occupies two UTF-16 units.
-      length += 4;
-      i++;
-    }
-  }
-  return length;
 }
 
 /** Copies the module-owned output buffer out of wasm memory (it is reused by the next call). */

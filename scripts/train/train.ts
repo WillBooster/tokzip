@@ -1,8 +1,10 @@
 /**
  * Offline trainer: writes the shared wrapper dictionary (`dict/wrapper.bin`), then runs the
- * Rust trainer, which builds every language's dictionary suffix (`dict/<language>.bin`) and
- * literal classes plus initial model probabilities (`priors/<language>.bin`) from the corpus
- * train split. Both outputs are embedded into the wasm module by the Rust build.
+ * Rust trainer, which builds the code group's shared dictionary part (`dict/code.bin`), every
+ * language's dictionary suffix (`dict/<language>.bin`), every group's literal classes plus
+ * literal priors (`priors/<group>.bin`), and every language's own model priors
+ * (`priors/<language>.bin`) from the corpus train split. All are embedded into the wasm module
+ * by the Rust build.
  *
  *   bun scripts/train/train.ts
  */

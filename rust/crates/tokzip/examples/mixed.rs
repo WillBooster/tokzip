@@ -66,26 +66,59 @@ fn main() {
         100.0 * oracle as f64 / raw as f64
     );
 
-    // Compression time by input size.
-    let big: Vec<u8> = html
+    // Compression time and ratio by input size: every input is an equal share of each
+    // language's bench documents, so a size never measures one language only.
+    const TOTAL: usize = 1 << 20;
+    let langs = [
+        "html",
+        "javascript",
+        "en-US",
+        "text",
+        "ja-JP",
+        "python",
+        "typescript",
+    ];
+    let shares: Vec<Vec<u8>> = langs
         .iter()
-        .chain(js.iter())
-        .chain(en.iter())
-        .flat_map(|d| d.iter().copied())
+        .map(|lang| {
+            let mut share = Vec::new();
+            for doc in tokzip::train::bench_docs(&corpus, lang) {
+                if share.len() >= TOTAL / langs.len() {
+                    break;
+                }
+                share.extend_from_slice(&doc);
+            }
+            share.truncate(TOTAL / langs.len());
+            share
+        })
         .collect();
-    for size in [1024usize, 4096, 16384, 65536, 262_144] {
-        let doc = &big[..size.min(big.len())];
+    for size in [1024usize, 4096, 16384, 65536, 262_144, 1 << 20] {
+        // The same take from every share, bounded by the shortest, keeps the shares equal.
+        let take = shares
+            .iter()
+            .map(Vec::len)
+            .min()
+            .unwrap_or(0)
+            .min(size / langs.len());
+        let doc: Vec<u8> = shares
+            .iter()
+            .flat_map(|share| &share[..take])
+            .copied()
+            .collect();
+        let doc = doc.as_slice();
         let t = Instant::now();
         let iters = (2_000_000 / size).max(3);
+        let mut coded = 0;
         for _ in 0..iters {
-            std::hint::black_box(tokzip::compress(doc));
+            coded = std::hint::black_box(tokzip::compress(doc)).len();
         }
         let per = t.elapsed().as_secs_f64() * 1000.0 / iters as f64;
         println!(
-            "{:>7} B: {:.2} ms/doc ({:.1} MB/s)",
+            "{:>7} B: {:.2} ms/doc ({:.1} MB/s) {:.2}%",
             doc.len(),
             per,
-            doc.len() as f64 / per / 1000.0
+            doc.len() as f64 / per / 1000.0,
+            100.0 * coded as f64 / doc.len() as f64
         );
     }
 }

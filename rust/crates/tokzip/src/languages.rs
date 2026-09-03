@@ -12,6 +12,8 @@ pub enum Group {
     Code,
 }
 
+// The budgets and names drive the trainer and the build script; the library reads the table.
+#[allow(dead_code)]
 impl Group {
     pub const ALL: [Group; 4] = [Group::Prose, Group::Japanese, Group::Chinese, Group::Code];
 
@@ -24,13 +26,26 @@ impl Group {
         }
     }
 
-    /// Dictionary suffix budget. Ratio keeps improving with budget, but every language ships
-    /// in the wasm module, so the budget is bounded by the module size target: halving a prose
-    /// dictionary costs about 1 pp on its documents, halving a code dictionary about 0.4 pp,
-    /// and prompts and answers are mostly prose.
-    pub fn dictionary_budget(self) -> usize {
+    /// Budget of the dictionary part every language of the group shares (`dict/<group>.bin`,
+    /// between the wrapper and the language's own suffix): programming languages have most of
+    /// their frequent fragments — English words, Markdown, license headers, C-family syntax —
+    /// in common, so one shared part replaces most of what each code dictionary repeated.
+    pub fn shared_budget(self) -> usize {
         match self {
             Group::Code => 64 * 1024,
+            _ => 0,
+        }
+    }
+
+    /// Dictionary suffix budget (beyond the group's shared part). Ratio keeps improving with
+    /// budget, but every language ships in the wasm module, so the budget is bounded by the
+    /// module size target: a 256 KB prose dictionary codes the corpus 0.2 pp smaller but a
+    /// production mix 0.2 pp larger (denser detection tables misdetect more) for +225 KB of
+    /// module; with the shared part, 48 KB per code language costs 0.1 pp on the corpus against
+    /// 64 KB and saves 65 KB of module, and 32 KB costs 0.2 pp.
+    pub fn dictionary_budget(self) -> usize {
+        match self {
+            Group::Code => 48 * 1024,
             _ => 128 * 1024,
         }
     }
