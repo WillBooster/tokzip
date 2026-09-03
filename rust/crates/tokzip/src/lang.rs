@@ -74,9 +74,7 @@ pub fn primed(lang: u8) -> &'static Primed {
             };
             unpack_dictionary(packed, &models, Vec::new())
         });
-        let mut bytes = Vec::with_capacity(
-            WRAPPER.len() + shared.len() + ASSETS[lang as usize].packed_suffix.len() * 4,
-        );
+        let mut bytes = Vec::with_capacity(WRAPPER.len() + shared.len());
         bytes.extend_from_slice(WRAPPER);
         bytes.extend_from_slice(shared);
         let bytes = unpack_dictionary(ASSETS[lang as usize].packed_suffix, &models, bytes);
@@ -96,6 +94,8 @@ fn unpack_dictionary(packed: &[u8], models: &Models, mut bytes: Vec<u8>) -> Vec<
         return bytes;
     }
     let (len, body) = read_varint(packed).expect("packed dictionary length");
+    // The buffer lives for the process, so it is sized exactly (wasm memory never shrinks).
+    bytes.reserve_exact(len as usize);
     let empty = Primed::new(Vec::new(), models.clone());
     let segments = [Segment {
         end: len as usize,
