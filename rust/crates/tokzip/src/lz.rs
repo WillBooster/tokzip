@@ -857,6 +857,10 @@ pub fn encode_doc_with_stats<'p>(
 ) -> (Vec<u8>, Option<Vec<u32>>) {
     let mut rc = Encoder::new();
     rc.stats = stats;
+    #[cfg(feature = "train")]
+    {
+        rc.cost = Some(vec![0.0; MODEL_SIZE]);
+    }
     let mut cs = CoderState::new();
     let mut lang_models = LangModels::new(lookup, segments);
     let mut chains = Chains::new(doc.len());
@@ -896,8 +900,39 @@ pub fn encode_doc_with_stats<'p>(
         start = seg.end;
     }
     let stats = rc.stats.take();
+    #[cfg(feature = "train")]
+    {
+        let cost = rc.cost.take().unwrap();
+        let mut report = COST_REPORT.lock().unwrap();
+        let groups = [
+            ("flags", IS_MATCH, LEN),
+            ("len", LEN, REP_LEN),
+            ("rep_len", REP_LEN, DICT_LEN),
+            ("dict_len", DICT_LEN, HIST_DIST),
+            ("hist_dist", HIST_DIST, DICT_OFF),
+            ("dict_off", DICT_OFF, LIT),
+            ("lit", LIT, LIT_MATCHED),
+            ("lit_matched", LIT_MATCHED, MODEL_SIZE),
+        ];
+        for (i, (_, from, to)) in groups.iter().enumerate() {
+            report[i] += cost[*from..*to].iter().sum::<f64>();
+        }
+        report[groups.len()] += rc.direct_bits as f64;
+        report[groups.len() + 1] += (doc.len() * 8) as f64;
+    }
     (rc.finish(), stats)
 }
+
+/// Bits coded per model group across every `encode_doc` call (codec iteration aid): flags,
+/// len, rep_len, dict_len, hist_dist, dict_off, lit, lit_matched, direct bits, input bits.
+/// (matches, direct bits) for history and dictionary matches, then the dictionary offset
+/// histogram at 128-byte granularity (codec iteration aid).
+#[cfg(feature = "train")]
+pub static DIST_HIST: std::sync::Mutex<[(u64, u64, std::collections::BTreeMap<u32, u64>); 3]> =
+    std::sync::Mutex::new([(0, 0, std::collections::BTreeMap::new()), (0, 0, std::collections::BTreeMap::new()), (0, 0, std::collections::BTreeMap::new())]);
+
+#[cfg(feature = "train")]
+pub static COST_REPORT: std::sync::Mutex<[f64; 10]> = std::sync::Mutex::new([0.0; 10]);
 
 /// Normative at every segment start: rep distances the new segment's window cannot reach
 /// (the previous segment's dictionary was longer) reset to distance 1, so a matched literal
@@ -1232,6 +1267,18 @@ fn emit_match(
 }
 
 fn encode_dist(rc: &mut Encoder, probs: &mut [u16], group: usize, len_state: usize, value: u32) {
+    #[cfg(feature = "train")]
+    {
+        let mut h = DIST_HIST.lock().unwrap();
+        let g = (group == DICT_OFF) as usize;
+        h[g].0 += 1;
+        h[g].1 += u64::from(dist_slot(value).max(START_POS_MODEL + 1 + 2 * ALIGN_BITS) - START_POS_MODEL - 1 - 2 * ALIGN_BITS) / 2 * 0; // placeholder
+        let footer = if dist_slot(value) >= END_POS_MODEL { (dist_slot(value) >> 1) - 1 - ALIGN_BITS } else { 0 };
+        h[g].1 += u64::from(footer);
+        if g == 1 {
+            *h[2].2.entry(value >> 7).or_insert(0) += 1;
+        }
+    }
     let (slot_base, spec_base, align_base) = dist_group(group);
     let slot = dist_slot(value);
     rc.encode_tree(probs, slot_base + len_state * 64, 6, slot);

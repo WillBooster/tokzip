@@ -60,6 +60,25 @@ fn main() {
         grand.2 += comp;
         grand.3 += decomp;
     }
+    {
+        let report = tokzip::train::cost_report();
+        let names = ["flags", "len", "rep_len", "dict_len", "hist_dist", "dict_off", "lit", "lit_matched", "direct", "input"];
+        let total: f64 = report[..9].iter().sum();
+        let line: Vec<String> = names
+            .iter()
+            .zip(report.iter())
+            .map(|(n, c)| format!("{n} {:.1}%", 100.0 * c / total))
+            .collect();
+        println!("cost share: {}", line.join("  "));
+        let (hn, hd, dn, dd, ent) = tokzip::train::dist_report();
+        println!(
+            "hist matches {hn}: {:.2} slot bits + {:.2} direct bits each; dict matches {dn}: {:.2} slot bits + {:.2} direct bits each; 128-B fragment index entropy {ent:.2} bits",
+            report[4] / hn as f64,
+            hd as f64 / hn as f64,
+            report[5] / dn as f64,
+            dd as f64 / dn as f64
+        );
+    }
     let mb = grand.0 as f64 / 1e6;
     println!(
         "ALL          {:>7.2}%  compress {:.1} MB/s  decompress {:.1} MB/s  <=1K docs {:.3} ms each",

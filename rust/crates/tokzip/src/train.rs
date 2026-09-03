@@ -326,3 +326,24 @@ fn cluster_contexts(counts: &[[u32; 256]], classes_count: usize) -> [u8; 256] {
     }
     classes
 }
+
+/// Bits coded per model group so far (see `lz::COST_REPORT`).
+pub fn cost_report() -> [f64; 10] {
+    *crate::lz::COST_REPORT.lock().unwrap()
+}
+
+/// Distance statistics (see `lz::DIST_HIST`): history (matches, direct bits), dictionary
+/// (matches, direct bits), and the dictionary offset histogram entropy in bits per match.
+pub fn dist_report() -> (u64, u64, u64, u64, f64) {
+    let h = crate::lz::DIST_HIST.lock().unwrap();
+    let total: u64 = h[2].2.values().sum();
+    let entropy: f64 = h[2]
+        .2
+        .values()
+        .map(|&c| {
+            let p = c as f64 / total as f64;
+            -p * p.log2()
+        })
+        .sum::<f64>();
+    (h[0].0, h[0].1, h[1].0, h[1].1, entropy)
+}

@@ -21,6 +21,12 @@ pub struct Encoder {
     out: Vec<u8>,
     /// When set, `[2 * node]` / `[2 * node + 1]` count the 0 / 1 bits coded at `node`.
     pub stats: Option<Vec<u32>>,
+    /// When set, `[node]` accumulates the bits (information content) coded at `node`.
+    #[cfg(feature = "train")]
+    pub cost: Option<Vec<f64>>,
+    /// Bits coded directly (unmodeled distance bits).
+    #[cfg(feature = "train")]
+    pub direct_bits: u64,
 }
 
 impl Encoder {
@@ -32,6 +38,10 @@ impl Encoder {
             cache_size: 1,
             out: Vec::new(),
             stats: None,
+            #[cfg(feature = "train")]
+            cost: None,
+            #[cfg(feature = "train")]
+            direct_bits: 0,
         }
     }
 
@@ -39,6 +49,11 @@ impl Encoder {
     pub fn encode_bit(&mut self, probs: &mut [u16], idx: usize, bit: u32) {
         if let Some(stats) = &mut self.stats {
             stats[2 * idx + bit as usize] += 1;
+        }
+        #[cfg(feature = "train")]
+        if let Some(cost) = &mut self.cost {
+            let p = f64::from(probs[idx]) / f64::from(1u32 << PROB_BITS);
+            cost[idx] -= if bit == 0 { p } else { 1.0 - p }.log2();
         }
         let prob = &mut probs[idx];
         let bound = (self.range >> PROB_BITS) * u32::from(*prob);
@@ -57,6 +72,10 @@ impl Encoder {
     }
 
     pub fn encode_direct_bits(&mut self, value: u32, count: u32) {
+        #[cfg(feature = "train")]
+        {
+            self.direct_bits += u64::from(count);
+        }
         for i in (0..count).rev() {
             self.range >>= 1;
             if (value >> i) & 1 != 0 {
