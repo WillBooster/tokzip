@@ -66,9 +66,10 @@ fn main() {
         100.0 * oracle as f64 / raw as f64
     );
 
-    // Compression time and ratio by input size (documents concatenated up to 1 MiB).
-    let mut big: Vec<u8> = Vec::new();
-    for lang in [
+    // Compression time and ratio by input size (documents of several languages concatenated,
+    // an equal share of each, up to 1 MiB).
+    const TOTAL: usize = 1 << 20;
+    let langs = [
         "html",
         "javascript",
         "en-US",
@@ -76,9 +77,12 @@ fn main() {
         "ja-JP",
         "python",
         "typescript",
-    ] {
+    ];
+    let mut big: Vec<u8> = Vec::new();
+    for lang in langs {
+        let stop = big.len() + TOTAL / langs.len();
         for doc in tokzip::train::bench_docs(&corpus, lang) {
-            if big.len() >= 1 << 20 {
+            if big.len() >= stop {
                 break;
             }
             big.extend_from_slice(&doc);
