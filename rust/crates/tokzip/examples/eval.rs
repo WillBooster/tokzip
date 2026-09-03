@@ -75,7 +75,6 @@ fn main() {
             "lit",
             "lit_matched",
             "direct",
-            "input",
         ];
         let total: f64 = report[..9].iter().sum();
         let line: Vec<String> = names
@@ -83,7 +82,11 @@ fn main() {
             .zip(report.iter())
             .map(|(n, c)| format!("{n} {:.1}%", 100.0 * c / total))
             .collect();
-        println!("cost share over every parse attempted: {}", line.join("  "));
+        println!(
+            "cost share over every parse attempted ({:.1}% of the parsed input): {}",
+            100.0 * total / report[9],
+            line.join("  ")
+        );
     }
     let mb = grand.0 as f64 / 1e6;
     println!(
