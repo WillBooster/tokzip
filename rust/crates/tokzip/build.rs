@@ -30,7 +30,19 @@ fn main() {
             continue;
         }
         println!("cargo:rerun-if-changed={}", path.display());
-        let raw = std::fs::read(&path).expect("priors");
+        let mut raw = std::fs::read(&path).expect("priors");
+        // A model layout change leaves the committed priors at the old size until the trainer
+        // (which needs this build) rewrites them: embed flat priors meanwhile.
+        if raw.len() != lz::PRIORS_SIZE {
+            println!(
+                "cargo:warning={} has {} bytes, expected {}; embedding flat priors until retrained",
+                path.display(),
+                raw.len(),
+                lz::PRIORS_SIZE
+            );
+            raw = vec![0; 512];
+            raw.resize(lz::PRIORS_SIZE, lz::PRIORS_DEFAULT);
+        }
         let name = path
             .file_stem()
             .expect("file stem")
