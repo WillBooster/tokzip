@@ -76,12 +76,9 @@ fn main() {
                         LANGUAGES[first].0,
                         LANGUAGES[first].0
                     );
-                    let (own, shared) = raws.split_at_mut(i.max(first));
-                    let (source, target) = if first < i {
-                        (&own[first], &mut shared[0])
-                    } else {
-                        (&shared[0], &mut own[i])
-                    };
+                    // `first` was recorded in an earlier iteration, so `first < i`.
+                    let (earlier, rest) = raws.split_at_mut(i);
+                    let (source, target) = (&earlier[first], &mut rest[0]);
                     target[..512].copy_from_slice(&source[..512]);
                     target[512 + lz::LIT..].copy_from_slice(&source[512 + lz::LIT..]);
                 }
