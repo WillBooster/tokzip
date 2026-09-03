@@ -15,31 +15,71 @@ const WRAPPER: &[u8] = include_bytes!("../../../../dict/wrapper.bin");
 /// A language's embedded assets: its trained dictionary suffix and its priors as packed by the
 /// build script (`build.rs`).
 macro_rules! assets {
-    ($name:literal) => {
-        (
-            $name,
-            include_bytes!(concat!("../../../../dict/", $name, ".bin")),
-            include_bytes!(concat!(env!("OUT_DIR"), "/", $name, ".priors")),
-        )
+    ($name:literal, $kind:expr) => {
+        Language {
+            name: $name,
+            kind: $kind,
+            suffix: include_bytes!(concat!("../../../../dict/", $name, ".bin")),
+            priors: include_bytes!(concat!(env!("OUT_DIR"), "/", $name, ".priors")),
+        }
     };
 }
 
-/// Language ids are frame-format identity (v0: any change is a format change). Each entry:
-/// name, trained dictionary suffix, packed model priors.
-pub const LANGUAGES: [(&str, &[u8], &[u8]); 7] = [
-    assets!("text"),
-    assets!("en-US"),
-    assets!("ja-JP"),
-    assets!("html"),
-    assets!("css"),
-    assets!("javascript"),
-    assets!("typescript"),
+/// What a language's documents are made of; decides its dictionary budget (`train.rs`).
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Kind {
+    Prose,
+    Code,
+}
+
+pub struct Language {
+    pub name: &'static str,
+    pub kind: Kind,
+    pub suffix: &'static [u8],
+    pub priors: &'static [u8],
+}
+
+/// Language ids are frame-format identity (v0: any change is a format change).
+pub const LANGUAGES: [Language; 21] = [
+    assets!("text", Kind::Prose),
+    assets!("en-US", Kind::Prose),
+    assets!("ja-JP", Kind::Prose),
+    assets!("html", Kind::Code),
+    assets!("css", Kind::Code),
+    assets!("javascript", Kind::Code),
+    assets!("typescript", Kind::Code),
+    assets!("c", Kind::Code),
+    assets!("cpp", Kind::Code),
+    assets!("csharp", Kind::Code),
+    assets!("dart", Kind::Code),
+    assets!("haskell", Kind::Code),
+    assets!("java", Kind::Code),
+    assets!("jsp", Kind::Code),
+    assets!("php", Kind::Code),
+    assets!("python", Kind::Code),
+    assets!("ruby", Kind::Code),
+    assets!("rust", Kind::Code),
+    assets!("zig", Kind::Code),
+    assets!("zh-CN", Kind::Prose),
+    assets!("zh-TW", Kind::Prose),
 ];
 pub const LANGUAGE_COUNT: usize = LANGUAGES.len();
 const LANG_HTML: u8 = 3;
 const LANG_CSS: u8 = 4;
 const LANG_JAVASCRIPT: u8 = 5;
 const LANG_TYPESCRIPT: u8 = 6;
+const LANG_C: u8 = 7;
+const LANG_CPP: u8 = 8;
+const LANG_CSHARP: u8 = 9;
+const LANG_DART: u8 = 10;
+const LANG_HASKELL: u8 = 11;
+const LANG_JAVA: u8 = 12;
+const LANG_JSP: u8 = 13;
+const LANG_PHP: u8 = 14;
+const LANG_PYTHON: u8 = 15;
+const LANG_RUBY: u8 = 16;
+const LANG_RUST: u8 = 17;
+const LANG_ZIG: u8 = 18;
 
 static PRIMED: [OnceLock<Primed>; LANGUAGE_COUNT] = [const { OnceLock::new() }; LANGUAGE_COUNT];
 
@@ -47,11 +87,11 @@ static PRIMED: [OnceLock<Primed>; LANGUAGE_COUNT] = [const { OnceLock::new() }; 
 /// cached for the process; the encoder's match index is built on first encode.
 pub fn primed(lang: u8) -> &'static Primed {
     PRIMED[lang as usize].get_or_init(|| {
-        let (_, suffix, packed_priors) = LANGUAGES[lang as usize];
-        let mut bytes = Vec::with_capacity(WRAPPER.len() + suffix.len());
+        let language = &LANGUAGES[lang as usize];
+        let mut bytes = Vec::with_capacity(WRAPPER.len() + language.suffix.len());
         bytes.extend_from_slice(WRAPPER);
-        bytes.extend_from_slice(suffix);
-        Primed::new(bytes, Models::from_priors(packed_priors))
+        bytes.extend_from_slice(language.suffix);
+        Primed::new(bytes, Models::from_priors(language.priors))
     })
 }
 
@@ -96,7 +136,7 @@ fn gram_sets() -> &'static [GramSet] {
     SETS.get_or_init(|| {
         LANGUAGES
             .iter()
-            .map(|(_, suffix, _)| GramSet::new(suffix))
+            .map(|language| GramSet::new(language.suffix))
             .collect()
     })
 }
@@ -317,6 +357,18 @@ fn fence_language(label: &[u8]) -> Option<u8> {
         b"ts" | b"typescript" | b"tsx" | b"mts" => Some(LANG_TYPESCRIPT),
         b"html" | b"htm" | b"xml" | b"svg" | b"vue" | b"svelte" => Some(LANG_HTML),
         b"css" | b"scss" | b"less" => Some(LANG_CSS),
+        b"c" | b"h" => Some(LANG_C),
+        b"cpp" | b"c++" | b"cc" | b"cxx" | b"hpp" => Some(LANG_CPP),
+        b"cs" | b"csharp" | b"c#" => Some(LANG_CSHARP),
+        b"dart" => Some(LANG_DART),
+        b"hs" | b"haskell" => Some(LANG_HASKELL),
+        b"java" => Some(LANG_JAVA),
+        b"jsp" => Some(LANG_JSP),
+        b"php" => Some(LANG_PHP),
+        b"py" | b"python" | b"python3" => Some(LANG_PYTHON),
+        b"rb" | b"ruby" => Some(LANG_RUBY),
+        b"rs" | b"rust" => Some(LANG_RUST),
+        b"zig" => Some(LANG_ZIG),
         _ => None,
     }
 }
@@ -331,9 +383,9 @@ mod tests {
     #[test]
     fn packed_priors_restore_the_raw_priors() {
         let priors_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../priors");
-        for (name, _, packed) in &LANGUAGES {
+        for Language { name, priors, .. } in &LANGUAGES {
             let raw = std::fs::read(priors_dir.join(format!("{name}.bin"))).expect("raw priors");
-            let (unpacked, expected) = (Models::from_priors(packed), Models::from_raw_priors(&raw));
+            let (unpacked, expected) = (Models::from_priors(priors), Models::from_raw_priors(&raw));
             assert_eq!(unpacked.lit_classes, expected.lit_classes, "{name}");
             assert_eq!(unpacked.probs, expected.probs, "{name}");
         }

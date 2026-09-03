@@ -8,15 +8,27 @@ use crate::lz::{
     encode_doc_with_stats, LitClasses, Models, Primed, Segment, LIT_CLASSES, LIT_CLASSES2,
     MODEL_SIZE,
 };
+use crate::lang::Kind;
 use crate::rc::PROB_BITS;
 use std::path::Path;
 
-/// Language names, in id order.
-pub fn languages() -> Vec<&'static str> {
+/// Language names with their dictionary suffix budgets, in id order.
+pub fn languages() -> Vec<(&'static str, usize)> {
     crate::lang::LANGUAGES
         .iter()
-        .map(|(name, _, _)| *name)
+        .map(|language| (language.name, dictionary_budget(language.kind)))
         .collect()
+}
+
+/// Dictionary suffix budget by language kind. Ratio keeps improving with budget, but every
+/// language ships in the wasm module, so the budget is bounded by the module size target:
+/// halving a prose dictionary costs about 1 pp on its documents, halving a code dictionary
+/// about 0.4 pp, and prompts and answers are mostly prose.
+pub fn dictionary_budget(kind: Kind) -> usize {
+    match kind {
+        Kind::Prose => 128 * 1024,
+        Kind::Code => 64 * 1024,
+    }
 }
 
 /// Documents of `lang`'s train split from a tokzip-corpus checkout, in manifest order, skipping
@@ -57,9 +69,6 @@ fn corpus_docs<'a>(
         .map(move |file| std::fs::read(dir.join(file)).expect("doc"))
 }
 
-/// Dictionary suffix budget per language. Ratio keeps improving with budget, but every
-/// language ships in the wasm module, so the budget is bounded by the module size target.
-pub const DICTIONARY_BUDGET: usize = 128 * 1024;
 /// Bound on the dictionary-training input per language.
 const MAX_DICT_TRAIN_BYTES: usize = 32 * 1024 * 1024;
 /// Every held-out document used to pick the segment size, bounded so the sweep stays fast.

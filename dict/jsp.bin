@@ -1,0 +1,1644 @@
+ 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+ 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+ 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+ 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+ 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+ 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+ 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+ 123456789 1234ission permission="edit">
+	<li>
+        <wiki:PageType type="page">
+          <a href="<wiki:EditLink format='url' />" accesskey="e"  class="action edit"
+            title="<fmt:message key='actions.edit.title'/>" ><fmt:message key='actions.edit'/></a>
+        </wiki:PageType>
+        <wiki:PageType type="attachment">
+          <a href="<wiki:BaseURL/>Edit.jsp?page=<wiki:ParentPageName />" accesskey="e" class="action edit"
+            title="<fmt:message key='actions.editparent.title'/>" ><fmt:message key='  "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+--%>
+" %>
+<%@ page import="org.apache.wiki.pages.PageManager" %>
+<%@ page import="org.apache.wiki.preferences.Preferences" %>
+<%@ page import="org.apache.wiki.preferences.Preferences.TimeFormat" %>
+<%@ page import="org.apache.wiki.ui.EditorManager" %>
+<%@ page import="org.apache.wiki.ui.TemplateManager" %>
+<%@ page import="org.apache.wiki.util.HttpUtil" %>
+<%@ page import="org.apache.wiki.util.TextUtil" %>
+<%@ page import="org.apache.wiki.variables.VariableManager" %>
+<%@ page import="org.apache.wiki.workflow.DeditPageHelp">EditPageHelp</wiki:EditLink></fmt:param>
+         </fmt:message>
+      </div>
+    </wiki:NoSuchPage>
+
+    <wiki:InsertPage page="EditPageHelp" />
+  </wiki:Tab>
+</wiki:TabbedSection>
+<%--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "Liced on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--%>
+<html>
+  <body>
+    <p>OK</p>
+  </body>
+</html><%--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You unde
+      <p>
+      <wiki:CsrfProtection/>
+      <input type="hidden" name="page" value="<wiki:Variable var='pagename' />" />
+      <input type="submit" name="rename" value="<fmt:message key='info.rename.submit' />" />
+      <input type="text" name="renameto"
+             value="<c:out value='${param.renameto}' default='<%= wikiPage.getName() %>'/>" size="40" />
+      &nbsp;&nbsp;
+      <input type="checkbox" name="references" checked="checked" />
+      <fmt:message key="info.updatereferrers"/>
+      </p>
+    %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<fmt:setLocale value="${prefs.Language}" />
+<fmt:setBundle basename="templates.default"/>
+<%
+  Context c = Context.findContext(pageContext);
+  Page wikiPage = c.getPage();
+  int attCount = c.getEngine().getManager( AttachmentManager.class ).listAttachments( c.getPage() ).size();
+  String attTitle = LocaleSupport.getLocalizedMessage(pageContext, "attach.tab");
+  if( attCount ! wiki.getManager( PageManager.class ).getCurrentLock( wikipage );
+        wiki.getManager( PageManager.class ).unlockPage( lock );
+        session.removeAttribute( "lock-"+pagereq );
+
+        //
+        //  Set author and changenote information
+        //
+        modifiedPage.setAuthor( storedUser );
+
+        if( changenote != null ) {
+            modifiedPage.setAttribute( Page.CHANGENOTE, changenote );
+        } else {
+            modifiedPage.removeAttribute( Page.CHANGENOTE );
+        }
+
+        //
+    NOTE ); %>
+		<%= (changenote==null) ? "" : changenote  %>
+      </td>
+    </tr>
+    </wiki:HistoryIterator><%-- </wiki:AttachmentsIterator> --%>
+
+  </table>
+  </div></div>
+  </wiki:Tab>
+
+  </wiki:TabbedSection> <%-- end of .tabs --%>
+
+</wiki:PageType>
+
+</wiki:PageExists>
+
+<wiki:NoSuchPage>
+  <fmt:message key="common.nopage">
+    <fmt:param><wiki:EditLink><fmt:message key="common.createit"/></wiki:EditLink></fmt:param>
+  </fmt:message>
+</wiki:NoSuchPage>
+<%--
+    Licensed to the Apache Software Foundatio></head>
+  <body>
+    <jsp:setProperty name="bean" property="booleanPrimitive" value=""/>
+    <p>01-${bean.booleanPrimitive}</p>
+    <jsp:setProperty name="bean" property="booleanPrimitive" value="foo"/>
+    <p>02-${bean.booleanPrimitive}</p>
+    <jsp:setProperty name="bean" property="booleanPrimitive" value="true"/>
+    <p>03-${bean.booleanPrimitive}</p>
+    <jsp:setProperty name="bean" property="booleanPrimitive" value="TRuE"/>
+    <p>04-${bean.booleanPrimitive}</p>
+    <jsp:setProperty name="bean" proper>' />
+
+    <div class="zebra-table sortable table-filter">
+    <table class="wikitable" >
+      <tr>
+        <th scope="col"><fmt:message key="info.version"/></th>
+        <th scope="col"><fmt:message key="info.date"/></th>
+        <th scope="col"><fmt:message key="info.size"/></th>
+        <th scope="col"><fmt:message key="info.author"/></th>
+        <th scope="col"><fmt:message key="info.changes"/></th>
+        <th class="changenote" scope="col"><fmt:message key="info.changenote"/></th>
+      </tr>
+
+     cisionRequiredException e ) {
+        	String redirect = wikiContext.getURL( ContextEnum.PAGE_VIEW.getRequestContext(), "ApprovalRequiredForPageChanges" );
+            response.sendRedirect( redirect );
+            return;
+        } catch( RedirectException e ) {
+            session.setAttribute( VariableManager.VAR_MSG, e.getMessage() );
+            response.sendRedirect( e.getRedirect() );
+            return;
+        }
+        response.sendRedirect(wikiContext.getViewURL(pagereq));
+        return;
+    } ev></div>
+    </td>
+  </tr>
+  </table>
+
+  </form>
+  </wiki:Permission>
+  <wiki:Permission permission="!upload">
+    <div class="formhelp"><fmt:message key="attach.add.permission"/></div>
+  </wiki:Permission>
+
+  <wiki:Permission permission="delete">
+    <h3><fmt:message key="info.deleteattachment"/></h3>
+    <form action="<wiki:Link format='url' context='<%=ContextEnum.PAGE_DELETE.getRequestContext()%>' />"
+           class="wikiform"
+              id="deleteForm"
+          method="post" accept-charset="<wikie="20" value="" />
+       </td>
+     </tr>
+     <tr>
+       <td><label for="password">Password </label></td>
+       <td>
+          <input type="password" name="password" id="password" size="20" value="" />
+       </td>
+     </tr>
+     <tr>
+       <td><label for="password2">Confirm password</label></td>
+       <td>
+         <input type="password" name="password2" id="password2" size="20" value="" />
+       </td>
+     </tr>
+     <tr>
+       <td><label for="fullname">Full name</label></td>
+       <td>
+         </li>
+      </wiki:CheckRequestContext>
+      <wiki:CheckRequestContext context="comment">
+      <li class="divider" />
+      <li class="dropdown-header">
+        <fmt:message key="editor.commentsignature"/>
+      </li>
+      <li class="dropdown-header">
+        <input class="form-control" type="text" name="author" id="authorname"  size="80" maxlength="80"
+             placeholder="<fmt:message key='editor.plain.name'/>"
+             value="${author}" />
+      </li>
+      <li  class="dropdown-header">
+ te( MarkupParser.PROP_CAMELCASELINKS, originalCCLOption );
+
+   /*FSS not used
+   String templateDir = (String)engine.getWikiProperties().get( Engine.PROP_TEMPLATEDIR );
+   String protocol = "http://";
+   if( request.isSecure() )
+   {
+       protocol = "https://";
+   }
+   */
+%>
+<form method="post" accept-charset="<wiki:ContentEncoding/>"
+      action="<wiki:CheckRequestContext
+     context='edit'><wiki:EditLink format='url'/></wiki:CheckRequestContext><wiki:CheckRequestContext
+     context='comment'><wiki:Co
+<html><body>
+<%@ taglib prefix="tags11" uri="http://tomcat.apache.org/tags11" %>
+<%@ taglib prefix="tags12" uri="http://tomcat.apache.org/tags12" %>
+<%@ taglib prefix="tags20" uri="http://tomcat.apache.org/tags20" %>
+<%@ taglib prefix="tags21" uri="http://tomcat.apache.org/tags21" %>
+<tags11:Echo echo="${'00-hello world'}"/>
+<tags11:Echo echo="#{'01-hello world'}"/>
+<tags12:Echo echo="${'02-hello world'}"/>
+<tags12:Echo echo="#{'03-hello org/tag-setters" prefix="ts" %>
+<html>
+  <head><title>Bug 64872 Float test case</title></head>
+  <body>
+  <%
+  for (int i=0; i < Integer.parseInt(request.getParameter("iterations")); i++) {
+  %>
+    <p>01 The value of foo is [<ts:tagFloat foo="${'12.34'}" />]</p>
+    <p>02 The value of foo is [<ts:tagFloat foo='${"12.34"}' />]</p>
+  <%
+  }
+  %>
+  </bhttp://tomcat.apache.org/bug69135-invalid-jar-lib" prefix="bz69135" %>
+<bz69135:relative-invalid-jar index="01" /><%--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the LiContext" content='<wiki:Variable var="requestcontext" />' />
+<wiki:Permission permission="edit"><meta name="wikiEditPermission" content="true"/></wiki:Permission>
+<meta name="wikiBaseUrl" content='<wiki:BaseURL />' />
+<meta name="wikiPageUrl" content='<wiki:Link format="url"  page="#$%"/>' />
+<meta name="wikiEditUrl" content='<wiki:EditLink format="url" page="#$%"/>' />
+<meta name="wikiCloneUrl" content='<wiki:EditLink format="url" page="#$%"/>&clone=<wiki:Variable var="pagename" />' />
+<meta name="wikiJson a new page, check if we're cloning --%>
+<%
+  String clone = request.getParameter( "clone" );
+  if( clone != null )
+  {
+    Page p = engine.getManager( PageManager.class ).getPage( clone );
+    if( p != null )
+    {
+        AuthorizationManager mgr = engine.getManager( AuthorizationManager.class );
+        PagePermission pp = new PagePermission( p, PagePermission.VIEW_ACTION );
+
+        try
+        {
+          if( mgr.checkPermission( context.getWikiSession(), pp ) )
+          {
+            usertext = engin/> <span class="icon-columns"/>
+             </label>
+           </a>
+         </li>
+      </ul>
+    </div>
+
+    <c:set var="editors" value="<%= engine.getManager( EditorManager.class ).getEditorList() %>" />
+    <c:if test='${fn:length(editors)>1}'>
+   <div class="btn-group config">
+      <%-- note: 'dropdown-toggle' is only here to style the last button properly! --%>
+      <button class="btn btn-default dropdown-toggle"><span class="icon-pencil"></span><span class="caret"></span></button>
+      <ul class.
+--%>
+
+<%@ page import="java.util.*" %>
+<%@ page import="org.apache.wiki.api.core.*" %>
+<%@ page import="org.apache.wiki.ui.admin.*" %>
+<%@ page errorPage="/Error.jsp" %>
+<%@ taglib uri="http://jspwiki.apache.org/tags" prefix="wiki" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<fmt:setLocale value="${prefs.Language}" />
+<fmt:setBundle basename="templates.default"/>
+<script>
+function constructdate(date)
+{
+  var d = new />
+    <wiki:CsrfProtection/>
+
+    <div class="form-inline form-group">
+
+    <input class="btn active" type="submit" name="ok" id="ok" value="<fmt:message key="find.submit.find"/>" />
+    <input class="btn btn-default" type="submit" name="go" id="go" value="<fmt:message key="find.submit.go"/>" />
+    <input type="hidden" name="start" id="start" value="0" />
+    <input type="hidden" name="maxitems" id="maxitems" value="20" />
+
+    <div class="btn-group" data-toggle="buttons">
+      <label class="btn btn-defakey="workflow.heading" /></h3>
+<p><fmt:message key="workflow.instructions"/></p>
+
+<!-- Pending Decisions -->
+<h4><fmt:message key="workflow.decisions.heading" /></h4>
+
+<c:if test="${empty decisions}">
+  <div class="information">
+    <fmt:message key="workflow.noinstructions"/>
+  </div>
+</c:if>
+
+<c:if test="${!empty decisions}">
+  <p id="workflow-owner-instructions"><fmt:message key="workflow.owner.instructions"/></p>
+  <table class="wikitable" aria-describedby="workflow-actor-instructions">
+    <thead>
+    riting, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--%>
+<%@ page session="false" trimDirectiveWhitespaces="true" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+ <head>
+  <title>403 Access Denied</title>
+  <style type="text/css">
+    <!--
+    BODYle>Bug 45451 test case</title></head>
+  <body>
+    <tags:echo echo="00-\\\'${'hello world'}\\\'" />
+    <tags:echo echo="01-\\\'${\"hello world\"}\\\'" />
+    <tags:echo echo='02-\\\'${\'hello world\'}\\\'' />
+    <tags:echo echo='03-\\\'${"hello world"}\\\'' />
+  <     </label>
+      <label class="btn btn-default btn-xs">
+        <input type="radio" name="scope" ${param.scope eq "contents:" ? "checked='checked'" : ""} value="contents:" ><fmt:message key='find.scope.content' />
+      </label>
+      <label class="btn btn-default btn-xs">
+        <input type="radio" name="scope" ${param.scope eq "attachment:" ? "checked='checked'" : ""} value="attachment:" ><fmt:message key='find.scope.attach' />
+      </label>
+    </div>
+
+    </div>
+
+</form>
+
+<div><wiki:Include page="Arkflow.startTime"/></th>
+    </thead>
+    <% i = 1; %>
+    <tbody>
+      <c:forEach var="workflow" items="${workflows}">
+        <% evenOdd = (i % 2 == 0) ? "even" : "odd"; %>
+        <tr class="<%=evenOdd%>">
+          <!-- Workflow ID -->
+          <td  align="center"><c:out value="${workflow.id}"/></td>
+          <!-- Name of item -->
+          <td align="left">
+            <fmt:message key="${workflow.messageKey}">
+              <c:forEach var="messageArg" items="${workflow.messageArguments}">
+    %!
+    Logger log = LogManager.getLogger("JSPWiki");
+%>
+<%
+    Engine wiki = Wiki.engine().find( getServletConfig() );
+    AuthenticationManager mgr = wiki.getManager( AuthenticationManager.class );
+    Context wikiContext = Wiki.context().create( wiki, request, ContextEnum.WIKI_LOGIN.getRequestContext() );
+    pageContext.setAttribute( Context.ATTR_CONTEXT, wikiContext, PageContext.REQUEST_SCOPE );
+    Session wikiSession = wikiContext.getWikiSession();
+    ResourceBundle rb = Preferences.getBundle( wikiCoi:CheckVersion>
+    
+  <wiki:Editor />
+    
+</wiki:Tab>
+  
+  <wiki:PageExists>  
+
+  <wiki:Tab id="attach" title="<%= attTitle %>" accesskey="a">
+    <wiki:Include page="AttachmentTab.jsp"/>
+  </wiki:Tab>
+
+  <wiki:Tab id="info" title='<%=LocaleSupport.getLocalizedMessage(pageContext, "info.tab")%>'
+           url="<%=c.getURL(ContextEnum.PAGE_INFO.getRequestContext(), c.getPage().getName())%>"
+           accesskey="i" >
+  </wiki:Tab>
+
+  </wiki:PageExists>  
+    
+  <wiki:Tab id="edithelp" title='<%=LocaleS <wiki:UserProfile property="canChangeLoginName">  --%>
+    <p class="login-ref">
+      <fmt:message key="login.nopassword"/>
+      <a class="" href="#section-register" tabindex="5">
+        <fmt:message key="login.registernow">
+          <fmt:param><wiki:Variable var="applicationname" /></fmt:param>
+        </fmt:message>
+      </a>
+    </p>
+    <%-- </wiki:UserProfile> --%>
+
+</form>
+
+
+<%-- Lost pasword functionality --%>
+<c:set var="lostpwTab" value="${param.tab == 'lostpassword' ? 'data-activePane': ''}";
+
+    if( mgr.isContainerAuthenticated() ) {
+        loginURL = "j_security_check";
+    } else {
+        String redir = (String)ctx.getVariable("redirect");
+        if( redir == null ) redir = ctx.getEngine().getFrontPage();
+        loginURL = ctx.getURL( ContextEnum.WIKI_LOGIN.getRequestContext(), redir );
+    }
+
+%>
+<c:set var="allowsCookieAuthentication" value="<%= mgr.allowsCookieAuthentication() %>" />
+<div class="page-content">
+
+<%-- Login functionality --%>
+<wiki:UserCheck status="notauthenticated">
+   id="editform"
+     enctype="application/x-www-form-urlencoded" >
+
+    <wiki:CsrfProtection/>
+    <%-- Edit.jsp relies on these being found.  So be careful, if you make changes. --%>
+    <input type="hidden" name="page" value="<wiki:Variable var='pagename' />" />
+    <input type="hidden" name="action" value="save" />
+    <wiki:SpamFilterInputs/>
+
+    <p>
+      <input name='ok' type='submit' value='<fmt:message key="editor.plain.save.submit"/>' />
+      <input name='preview' type='submit' value='<fmt:me" />
+<link rel="alternate stylesheet" type="text/css" href="<wiki:Link format='url' templatefile='haddock.css'/>"
+    title="Standard" />
+
+<%-- Generated by https://realfavicongenerator.net/ --%>
+<link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
+<link rel="manifest" href="favicons/site.webmanifest">
+<link rel="m   BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;font-size:12px;}
+    H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;}
+    PRE, TT {border: 1px dotted #525D76}
+    A {color : black;}A.name {color : black;}
+    -->
+  </style>
+ </head>
+ <body>
+   <h1>403 Access Denied</h1>
+   <p>
+    You are not authorized to view       java.io.StringWriter sw = new java.io.StringWriter();
+        java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+        e.printStackTrace(pw);
+        pageAsHtml += "<pre>" + sw.toString() + "</pre>";
+        */
+    }
+
+   // Disable the WYSIWYG_EDITOR_MODE and reset the other properties immediately
+   // after the XHTML for CKeditor has been rendered.
+   context.setVariable( Context.VAR_WYSIWYG_EDITOR_MODE, Boolean.FALSE );
+   context.setVariable( VariableManager.VAR_RUNFILTERS,  null );
+   wikiPa
+--%>
+<jsp:element name="p">
+  <jsp:attribute name="style" omit="false">color:red</jsp:attribute>
+  <jsp:body>00-Red</jsp:body>
+</jsp:element>
+<jsp:element name="p">
+  <jsp:attribute name="style" omit="true">color:red</jsp:attribute>
+  <jsp:body>01-Not Red</jsp:body>
+</jsp:element>
+<jsp:element name="p">
+  <jsp:attribute name="style" omit="${false}">color:red</jsp:attribute>
+  <jsp:body>02-Red</jsp:body>
+</jsp:element>
+<jsp:element name=sts"><a href="${tomcatDocUrl}">Documentation</a></span>
+                <span id="nav-config"><a href="${tomcatDocUrl}config/">Configuration</a></span>
+                <span id="nav-examples"><a href="${tomcatExamplesUrl}">Examples</a></span>
+                <span id="nav-wiki"><a href="https://cwiki.apache.org/confluence/display/TOMCAT/">Wiki</a></span>
+                <span id="nav-lists"><a href="${tomcatUrl}lists.html">Mailing Lists</a></span>
+                <span id="nav-help"><a href="${tomcatUrl}finuserprofile){
+	   $('loginname').value = userprofile.loginName;
+	   $('loginid').value = userprofile.loginName;
+	   $('fullname').value = userprofile.fullname;
+	   $('email').value = userprofile.email;
+	   $('lastmodified').innerHTML = userprofile.modified || "";
+	   $('creationdate').innerHTML = userprofile.created || "";
+   });
+}
+
+function addNew()
+{
+  $('loginid').value = "--New--";
+  $('loginname').value = "--New--";
+  $('fullname').value = "Undefined";
+  $('email').value = "";
+  $('lastmodified').innermd, isChecked){
+        if(isChecked && (cmd=="livepreview")){ html2markup(); }
+    });
+
+    tinymce.init({
+      selector: "textarea[name=htmlPageText]",
+      //content_css : "template/haddock/haddock.css",
+      //extended_valid_elements: "...]",
+      //invalid_elements: blockquote ...",
+      language: Wiki.prefs( "Language" ), //"${prefs.Language}",
+      height: Wiki.prefs( resizeCookie ),
+      content_css: $("main-stylesheet").href,
+      //plugins from the standard 4.2.2. package
+      plugins: 'af="http://validator.w3.org/check?uri=referer"><img
+        src="http://www.w3.org/Icons/valid-html401"
+        alt="Valid HTML 4.01!" height="31" width="88"></a>
+    <a href="http://validator.w3.org/check?uri=referer"><img
+        src="http://www.w3.org/Icons/valid-xhtml10"
+        alt="Valid XHTML 1.0!" height="31" width="88" /></a>
+    <a href="http://validator.w3.org/check?uri=referer"><img
+        src="http://www.w3.org/Icons/valid-xhtml11"
+        alt="Valid XHTML 1.1!" height="31" width="88" /></a>
+</"prefs.user.skin"/></label></td>
+  <td>
+  <select id="prefSkin" name="prefSkin">
+    <c:forEach items="${skins}" var="i">
+      <option value='<c:out value='${i}'/>' <c:if test='${i == prefs.SkinName}'>selected="selected"</c:if> ><c:out value="${i}"/></option>
+    </c:forEach>
+  </select>
+  </td>
+  </tr>
+
+
+  <c:if test='${not empty languages}'>
+  <c:set var="prefLanguage" ><c:out value="${prefs.Language}" default="<%=request.getLocale().toString()%>" /></c:set>
+  <tr>
+  <td><label for="prefLanguage"><fmtperty="doublePrimitive" value="-42"/>
+    <p>63-${bean.doublePrimitive}</p>
+    <jsp:setProperty name="bean" property="doublePrimitive" value="+42"/>
+    <p>64-${bean.doublePrimitive}</p>
+
+    <jsp:setProperty name="bean" property="doubleObject" value=""/>
+    <p>71-${bean.doubleObject}</p>
+    <jsp:setProperty name="bean" property="doubleObject" value="42"/>
+    <p>72-${bean.doubleObject}</p>
+    <jsp:setProperty name="bean" property="doubleObject" value="-42"/>
+    <p>73-${bean.doubleObject}</p>
+ 2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+--%>
+<%@ taglib prefix="bugs" uri="http://tomcat.apache.org/bugs" %>
+<bugs:Bug48616b />
+<bugs:Bug46816a>
+  <bugs:Bug48616b />
+</bugs:Bug46816a><%--
+ ersion mode="latest">
+      <fmt:message key="info.lastmodified">
+        <fmt:param><wiki:PageVersion /></fmt:param>
+        <fmt:param><wiki:DiffLink version="latest" newVersion="previous"><wiki:PageDate format='${prefs["DateFormat"]}'/></wiki:DiffLink></fmt:param>
+        <fmt:param><wiki:Author /></fmt:param>
+      </fmt:message>
+    </wiki:CheckVersion>
+    <wiki:CheckVersion mode="notlatest">
+      <fmt:message key="actions.publishedon">
+        <fmt:param><wiki:PageDate format='${prefs["DateFormat"]}ractionDigits='1' minFractionDigits='1'/>&nbsp;<fmt:message key="info.kilobytes"/>
+      </td>
+      <td style="text-align:center;">
+        <a href="<wiki:PageInfoLink format='url' />" title="<fmt:message key='attach.moreinfo.title'/>"><wiki:PageVersion /></a>
+      </td>
+	  <td style="white-space:nowrap;" jspwiki:sortvalue="<%= att.getLastModified().getTime() %>">
+	  <fmt:formatDate value="<%= att.getLastModified() %>" pattern="${prefs.DateFormat}" timeZone="${prefs.TimeZone}" />
+	  </td>
+      <td><wiki:i:Link jsp='Login.jsp' format='url'><wiki:Param name='tab' value='register'/></wiki:Link>"
+          id="editProfile"
+       class="login-form"
+      method="post" accept-charset="UTF-8">
+
+  <wiki:CsrfProtection/>
+  <input type="hidden" name="redirect" value="<wiki:Variable var='redirect' default='' />" />
+
+  <p class="login-header"><fmt:message key="login.registernow.title" /></p>
+
+  <fmt:message key="prefs.errorprefix.profile" var="msg"/>
+  <wiki:Messages div="alert alert-danger" topic="profile" prefix="$   <b><%= util.HTMLFilter.filter(request.getUserPrincipal().getName()) %></b>
+    <br><br>
+<%
+  } else {
+%>
+    No user principal could be identified.<br><br>
+<%
+  }
+%>
+
+<%
+  String role = request.getParameter("role");
+  if (role == null)
+    role = "";
+  if (role.length() > 0) {
+    if (request.isUserInRole(role)) {
+%>
+      You have been granted role
+      <b><%= util.HTMLFilter.filter(role) %></b><br><br>
+<%
+    } else {
+%>
+      You have <i>not</i> been granted role
+      <b><%= util.HTMLFilter.filter(rmonth: is  <jsp:getProperty name="clock" property="dayOfMonth"/>
+<li>    Year: is  <jsp:getProperty name="clock" property="year"/>
+<li>    Month: is  <jsp:getProperty name="clock" property="month"/>
+<li>    Time: is  <jsp:getProperty name="clock" property="time"/>
+<li>    Date: is  <jsp:getProperty name="clock" property="date"/>
+<li>    Day: is  <jsp:getProperty name="clock" property="day"/>
+<li>    Day Of Year: is  <jsp:getProperty name="clock" property="dayOfYear"/>
+<li>    Week Of Year: is  <jsp:getPropei.core.Engine" %>
+<%@ page import="org.apache.wiki.api.core.Session" %>
+<%@ page import="org.apache.wiki.api.spi.Wiki" %>
+<%@ page import="org.apache.wiki.auth.AuthorizationManager" %>
+<%@ page import="org.apache.wiki.auth.UserManager" %>
+<%@ page import="org.apache.wiki.auth.WikiSecurityException" %>
+<%@ page import="org.apache.wiki.auth.login.CookieAssertionLoginModule" %>
+<%@ page import="org.apache.wiki.auth.user.DuplicateUserException" %>
+<%@ page import="org.apache.wiki.auth.user.UserProfile" %>
+<%rced to String, to be "",
+         https://bz.apache.org/bugzilla/show_bug.cgi?id=47413
+       -->
+      <tr>
+        <td>\${undefinedFoo}hello world\${undefinedBar}</td>
+        <td>String</td>
+        <td><jsp:setProperty name="values" property="stringValue" value="${undefinedFoo}hello world${undefinedBar}"/>${values.stringValue}</td>
+      </tr>
+      <tr>
+        <td>\${undefinedFoo}hello world\${undefinedBar}</td>
+        <td>String</td>
+        <td><my:values string="${undefinedFoo}hello world${undefilue="${fn:substringBefore(param.page,'_comments_')}" />
+<c:if test="${not empty mainblogpage}">
+<wiki:PageExists page="${mainblogpage}">
+  <p></p>
+  <c:set var="blogentrypage" value="${fn:replace(param.page,'_comments_','_blogentry_')}" />
+  <div class="pull-right">
+      <wiki:Link cssClass="btn btn-xs btn-default"  page="${mainblogpage}" >
+         <fmt:message key="blog.backtomain"><fmt:param>${mainblogpage}</fmt:param></fmt:message>
+      </wiki:Link>
+      <wiki:Link cssClass="btn btn-xs btn-primary" phref="<%=response.encodeURL("/examples/async/async2")%>"> Async 2 </a>
+
+4. Simple dispatch
+ - servlet does a startAsync()
+ - servlet calls dispatch(/path/to/jsp)
+ - servlet calls complete()
+   <a href="<%=response.encodeURL("/examples/async/async3")%>"> Async 3 </a>
+
+3. Timeout s1
+ - servlet does a startAsync()
+ - servlet does a setAsyncTimeout
+ - returns - waits for timeout to happen should return error page
+
+4. Timeout s2
+ - servlet does a startAsync()
+ - servlet does a setAsyncTimeout
+ - servlet does a aopdown-menu" data-hover-parent="div">
+        <c:forEach items="${editors}" var="edt">
+          <c:choose>
+            <c:when test="${edt != prefs.editor}">
+              <li>
+                <wiki:Link context="edit" cssClass="editor-type">${edt}</wiki:Link>
+              </li>
+            </c:when>
+            <c:otherwise>
+              <li class="active"><a>${edt}</a></li>
+            </c:otherwise>
+          </c:choose>
+      </c:forEach>
+      </ul>
+    </div>
+   </c:if>
+  </div>
+
+
+  <%-- is PREVIEW ).getPureText( p );
+          }
+        }
+        catch( Exception e ) {  /*log.error( "Accessing clone page "+clone, e );*/ }
+    }
+  }
+%>
+</wiki:NoSuchPage>
+<%
+  if( usertext == null )
+  {
+    usertext = engine.getManager( PageManager.class ).getPureText( context.getPage() );
+  }
+%>
+</wiki:CheckRequestContext>
+<%
+   if( usertext == null ) usertext = "";
+
+   String pageAsHtml;
+   try
+   {
+       //pageAsHtml = StringEscapeUtils.escapeEcmaScript( renderingManager.getHTML( context, usertext ) );
+ .
+--%>
+<%@ page language="java" pageEncoding="UTF-8"%>
+<%@ page import="java.util.Properties"%>
+<%@ page import="org.apache.commons.lang3.*" %>
+<%@ page import="org.apache.wiki.api.core.*" %>
+<%@ page import="org.apache.wiki.auth.*" %>
+<%@ page import="org.apache.wiki.auth.permissions.*" %>
+<%@ page import="org.apache.wiki.filters.*" %>
+<%@ page import="org.apache.wiki.pages.PageManager" %>
+<%@ page import="org.apache.wiki.parser.MarkupParser" %>
+<%@ page import="org.apache.wiki.render.*" %>
+harmap code fullscreen image insertdatetime link lists media paste preview searchreplace table wordcount',
+
+      setup: function( ed ){
+
+        editor = ed;
+
+        editor.on("init", function(){
+            //resizePreview...
+        });
+        editor.on("ResizeEditor", ( debounce( function(){
+           Wiki.prefs.set("EditorCookie", $(editor.getContentAreaContainer()).getStyle("height") );
+        }) ) );
+        //editor.on("change", html2markup );
+
+      }
+    });
+  });
+}
+
+});
+
+//]]>
+</script>
+<%--
+av.greet.anonymous" />
+    </span>
+  </wiki:UserCheck>
+  <wiki:UserCheck status="asserted">
+    <span class="username asserted">
+      <fmt:message key="fav.greet.asserted">
+      <fmt:param><wiki:Translate>[<wiki:UserName />]</wiki:Translate></fmt:param>
+    </fmt:message>
+    </span>
+  </wiki:UserCheck>
+  <wiki:UserCheck status="authenticated">
+    <span class="username authenticated">
+      <fmt:message key="fav.greet.authenticated">
+        <fmt:param><wiki:Translate>[<wiki:UserName />]</wiki:Translate>t"/>
+<%!
+  String printWikiGroupPutGroup( Group group, String name, boolean cursor, PageContext pageContext)
+  {
+    Principal[] m = group.members();
+    Arrays.sort( m, new PrincipalComparator() );
+
+    String delim = "\", \"";
+
+    StringBuffer ss = new StringBuffer();
+    MessageFormat mf = null;
+    Object[] args = null;
+
+      ss.append( "WikiGroup.putGroup( \"" );
+
+      ss.append( name );
+      ss.append( delim );
+
+      for( int j=0; j < m.length; j++ ) { ss.append( m[j].getName().trim()+"\\#ffffff">
+
+<meta name="robots" content="noindex,nofollow" />
+
+<%-- FIXME: for now, reuse haddock's stylesheet --%>
+<link rel="stylesheet" media="screen, projection, print" type="text/css"
+     href="<wiki:Link format='url' templatefile='../../templates/default/haddock.css'/>"/>
+
+</head>
+
+<body class="reader context-<wiki:Variable var='requestcontext' default='' />" >
+
+<div class="container ${prefs.Orientation}">
+
+  <div class="pagename"><wiki:Link><wiki:PageName/></wiki:Link></div>
+  <div class="page"><wikintPrimitive">
+      <jsp:attribute name="value">1</jsp:attribute>
+    </jsp:setProperty>
+    <jsp:setProperty name="bean" property="intPrimitive" value="1" />
+  </body>
+</html>
+
+<%--
+ String viewUrl = ( "Login".equals( redirectPage ) ) ? "Wiki.jsp" : wikiContext.getViewURL( redirectPage );
+
+        // Redirect!
+        log.info( "Redirecting user to {}", viewUrl );
+        response.sendRedirect( viewUrl );
+        return;
+    }
+
+    // If we've gotten here, the user hasn't authenticated yet.
+    // So, find the login form and include it. This should be in the same directory
+    // as this page. We don't need to use the wiki:Include tag.
+
+    response.setContentType("text/html; charset="+IncludeResources type="stylesheet"/>
+<wiki:IncludeResources type="inlinecss" />
+
+<%-- display the more-menu inside the leftmenu, when javascript is not avail --%>
+<noscript>
+<style type="text/css">
+#hiddenmorepopup { display:block; }
+</style>
+</noscript>
+
+<%-- JAVASCRIPT --%>
+<script type="text/javascript" src="<wiki:Link format='url' jsp='scripts/mootools.js'/>"></script>
+<script type="text/javascript" src="<wiki:Link format='url' jsp='scripts/jspwiki-common.js'/>"></script>
+<wiki:IncludeResources type="sc-core" value="${ab.title}" />
+        <input type="hidden" name="bean" value="${ab.id}" />
+        <%
+         out.write( ab.doGet(ctx) );
+         %>
+       </form>
+       </div>
+      </wiki:Tab>
+     </wiki:AdminBeanIterator>
+   </wiki:TabbedSection>
+
+<h3>Users</h3>
+   <wiki:Include page="admin/UserManagement.jsp"/>
+
+<h3>Group</h3>
+   <div>
+   <p>This is a list of all groups in this wiki.  If you click on the group name,
+   you will be taken to the administration page of that particular group.</p>
+   <p>iew">
+                  <input type="checkbox" data-cmd="livepreview" id="livepreview" ${prefs.livepreview ? 'checked="checked"' : ''}/>
+                  <fmt:message key='editor.plain.livepreview'/> <span class="icon-refresh"/>
+                </label>
+              </a>
+            </li>
+            <li>
+              <a>
+                <label for="previewcolumn">
+                  <input type="checkbox" data-cmd="previewcolumn" id="previewcolumn" ${prefs.previewcolumn ? 'checked="checked"' : ''}/>
+    x="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<html>
+  <head><title>Bug 60431 test case</title></head>
+  <body>
+    <<tags:ech100%"> <%-- Required for IE6 on Windows --%>
+<script type="text/javascript">
+//<![CDATA[
+
+   var oFCKeditor = new FCKeditor( 'htmlPageText' );
+   oFCKeditor.BasePath = 'scripts/fckeditor/';
+   oFCKeditor.Value = '<%=pageAsHtml%>';
+   oFCKeditor.Width  = '100%';
+   oFCKeditor.Height = '450';
+   oFCKeditor.Config['CustomConfigurationsPath'] = '<%=request.getContextPath()%>/scripts/fckconfig.js';
+   oFCKeditor.Config['StylesXmlPath'] = '<%=request.getContextPath()%>/scripts/fckstyles.xml';
+   oFCKeditor.Configame="remember" id="rememberme" <%=TextUtil.isPositive((String)session.getAttribute("remember")) ? "checked='checked'" : ""%> />
+          <label for="rememberme"><fmt:message key="editor.plain.remember"/></label>
+        </p>
+	    <%--FIXME: seems not to read the email of the user, but some odd previously cached value --%>
+        <p>
+          <label for="link" accesskey="m"><fmt:message key="editor.plain.email"/></label>
+          <%--<input type="text" name="link" id="link" size="24" value="${link}" />--using container auth, the container will have automatically attempted to log in the user before
+        // Login.jsp was loaded. Thus, if we got here, the container must have authenticated the user already.
+        // All we do is simply record that fact. Nice and easy.
+        Principal user = wikiSession.getLoginPrincipal();
+        log.info( "Successfully authenticated user {} (container auth)", user.getName() );
+    }
+
+    // If user logged in, set the user cookie with the wiki principal's name.
+    // t"/>
+<%--
+    This provides the WYSIWYG CKeditor for JSPWiki.
+--%>
+<%
+    Context context = Context.findContext( pageContext );
+    Engine engine = context.getEngine();
+
+    /* local download of CKeditor */
+    TemplateManager.addResourceRequest( context, TemplateManager.RESOURCE_SCRIPT,
+           context.getURL( ContextEnum.PAGE_NONE.getRequestContext(), "scripts/ckeditor/ckeditor.js" ) );
+
+    /*  Use CKEditor from a CDN
+    TemplateManager.addResourceRequest( context, TemplateManager.RESOURCE_SCRIPT, "/ dont care */ }
+
+  int pagesize = 20;
+  int startitem = itemcount-1; /* itemcount==1-20 -> startitem=0-19 ... */
+
+  String parm_start = (String)request.getParameter( "start" );
+  if( parm_start != null ) startitem = Integer.parseInt( parm_start ) ;
+
+  /* round to start of block: 0-19 becomes 0; 20-39 becomes 20 ... */
+  if( startitem > -1 ) startitem = ( startitem / pagesize ) * pagesize;
+
+  /* startitem drives the pagination logic */
+  /* startitem=-1:show all; startitem=0:show block 1-20; startitem=20:blorefix="mytag" uri="/WEB-INF/jsp/jsp2-example-taglib.tld" %>
+<html>
+  <head>
+    <title>JSP 2.0 Examples - Repeat SimpleTag Handler</title>
+  </head>
+  <body>
+    <h1>JSP 2.0 Examples - Repeat SimpleTag Handler</h1>
+    <hr>
+    <p>This tag handler accepts a "num" parameter and repeats the body of the
+    tag "num" times.  It's a simple example, but the implementation of
+    such a tag in JSP 2.0 is substantially simpler than the equivalent
+    JSP 1.2-style classic tag handler.</p>
+    <p>The body of the tarsion>
+
+<%-- Inserts no text if there is no page. --%>
+<wiki:InsertPage />
+
+<%-- Inserts blogcomment if appropriate 
+<% if( !blogpage.equals("") ) { %>
+--%>
+
+<% if( ! mainblogpage.equals("") ) { %>
+<wiki:PageExists page="<%= mainblogpage%>">
+
+  <% if( ! blogcommentpage.equals("") ) { %>
+  <wiki:PageExists page="<%= blogcommentpage%>">
+	<div class="weblogcommentstitle"><fmt:message key="blog.commenttitle"/></div>
+    <div class="weblogcomments"><wiki:InsertPage page="<%= blogcommentpage%>" /></div  <li><tt>admin-gui</tt> - allows access to the HTML GUI</li>
+      <li><tt>admin-script</tt> - allows access to the text interface</li>
+    </ul>
+   <p>
+    The HTML interface is protected against CSRF but the text interface is not.
+    To maintain the CSRF protection:
+   </p>
+   <ul>
+    <li>Users with the <tt>admin-gui</tt> role should not be granted the
+       <tt>admin-script</tt> role.</li>
+    <li>If the text interface is accessed through a browser (e.g. for testing
+        since this interface is in
+%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html lang="en" id="top" xmlns="http://www.w3.org/1999/xhtml" xmlns:jspwiki="http://jspwiki.apache.org">
+
+<head>
+  <title><fmt:message key="upload.title"><fmt:param><wiki:Variable var="applicationname" default="Apache JSPWiki"/></fmt:param></fmt:message></title>
+  <wiki:Include page="commonheader.jsp"/>
+  <meta name="robots" content="noindex,nofollow" />
+</head>
+
+<body>
+
+<div id="wikibody" cla %>
+<%
+  String variable03a = null;
+  String variable03b = null;
+%>
+<bugs:TesterScriptingTag attribute02="variable02a" attribute03="variable03a">
+  <bugs:TesterScriptingTag attribute02="variable02b" attribute03="variable03b">
+  </bugs:TesterScriptingTag>
+</bugs:TesterScriptingTag><%--
+ ger.REQ_EDITEDTEXT%>"
+            rows="4"
+            cols="80"><%=TextUtil.replaceEntities(usertext)%></textarea>
+  </div>
+  <div id="submitbuttons">
+    <input type="submit" name="edit" value="<fmt:message key='editor.preview.edit.submit'/>"
+      accesskey="e"
+          title="<fmt:message key='editor.preview.edit.title'/>" />
+    <input type="submit" name="ok" value="<fmt:message key='editor.preview.save.submit'/>"
+      accesskey="s"
+          title="<fmt:message key='editor.preview.save.title'/>" />
+lass="additinfo">
+       <th scope="row"><label>Last modified</label></th>
+       <td class="formvalue" id="lastmodified">
+       </td>
+     </tr>
+
+     <tr>
+        <td><input type="submit" name="action" value="Save"/></td>
+     </tr>
+
+     </table>
+   <div id="useractions">
+     <input type="submit" name="action" value="Remove" data-modal="+ .modal" />
+     <div class="modal">
+       <p>Are you sure you wish to remove this user?</p>
+     </div>
+     <input type="button" value="Add" onclick="javascript:addfalse}" />
+    <tags:echo echo="05-${false? true: false}" />
+    <tags:echo echo="06-${false? true :false}" />
+    <tags:echo echo="07-${false? true : false}" />
+    <tags:echo echo="08-${ false?true:false}" />
+    <tags:echo echo="09-${ false?true: false}" />
+    <tags:echo echo="10-${ false?true :false}" />
+    <tags:echo echo="11-${ false?true : false}" />
+    <tags:echo echo="12-${ false? true:false}" />
+    <tags:echo echo="13-${ false? true: false}" />
+    <tags:echo echo="14-${ false? true :false}" /operty='fullname' />" />
+    <p class="help-block"><fmt:message key="prefs.fullname.description"/></p>
+  </div>
+
+  <%-- E-mail --%>
+  <div class="form-group">
+    <input class="form-control" type="text" name="email" id="email" size="20"
+     placeholder="<fmt:message key='prefs.email'/>"
+           value="<wiki:UserProfile property='email' />" />
+    <p class="help-block"><fmt:message key="prefs.email.description"/></p>
+  </div>
+
+  <div class="form-group">
+    <button class="btn btn-success btn-block" type=hanged
+    any configuration files, please examine the file
+    <tt>conf/tomcat-users.xml</tt> in your installation. That
+    file must contain the credentials to let you use this webapp.
+   </p>
+   <p>
+    For example, to add the <tt>manager-gui</tt> role to a user named
+    <tt>tomcat</tt> with a password of <tt>s3cret</tt>, add the following to the
+    config file listed above.
+   </p>
+<pre>
+&lt;role rolename="manager-gui"/&gt;
+&lt;user username="tomcat" password="s3cret" roles="manager-gui"/&gt;
+</pre>
+<li><a href="#" data-cmd="bold" title="<fmt:message key='editor.plain.tbB.title' />"><b>bold</b></a></li>
+        <li><a href="#" data-cmd="italic" title="<fmt:message key='editor.plain.tbI.title' />"><i>italic</i></a></li>
+        <li><a href="#" data-cmd="mono" title="<fmt:message key='editor.plain.tbMONO.title' />"><tt>mono</tt></a></li>
+        <li><a href="#" data-cmd="sub" title="<fmt:message key='editor.plain.tbSUB.title' />">a<span class="sub">sub</span></a></li>
+        <li><a href="#" data-cmd="su/jstl/functions" prefix="fn" %>
+
+<%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
+<fmt:setLocale value="${prefs.Language}" />
+<fmt:setBundle basename="templates.default"/>
+<%
+  //FIXME: this should better move to UserPreferences.jsp but that doesn't seem to work. Ugh ?
+  Context c = Context.findContext( pageContext );
+  TemplateManager t = c.getEngine().getManager( TemplateManager.class );
+  pageContext.setAttribute( "skins", t.listSkins(pageContext, c.getTemplate() ) );
+  pageContext.setAttribute( "languanction"/>
+//]]></script>
+
+<meta http-equiv="Content-Type" content="text/html; charset=<wiki:ContentEncoding />" />
+<link rel="search" href="<wiki:LinkTo format='url' page='Search'/>"
+    title='Search <wiki:Variable var="ApplicationName" />' />
+<link rel="help"   href="<wiki:LinkTo format='url' page='TextFormattingRules'/>"
+    title="Help" />
+<%
+  Context c = Context.findContext( pageContext );
+  String frontpage = c.getEngine().getFrontPage();
+ %>
+ <link rel="start"  href="<wiki:LinkTo format='url' page='T_SCOPE);
+    pageContext.setAttribute("testBeanB", beanB, PageContext.REQUEST_SCOPE);
+    %>
+    <tags:echo echo="00-${testBeanA[\"bean\"].sayHello('JUnit')}" />
+    <tags:echo echo="01-${testBeanA.bean.sayHello('JUnit')}" />
+    <tags:echo echo="02-${testBeanB.sayHello('JUnit')}" />
+    <tags:echo-deferred echo="03-#{testBeanA[\"bean\"].sayHello('JUnit')}" />
+    <tags:echo-deferred echo="04-#{testBeanA.bean.sayHello('JUnit')}" />
+    <tags:echo-deferred echo="05-#{testBeanB.sayHello('JUnit')}" /> color="#ffffff">
+      <table>
+        <my:shuffle>
+          <jsp:attribute name="fragment1">
+            <tr>
+              <my:shuffle>
+                <jsp:attribute name="fragment1">
+                  <my:tile color="#ff0000" label="A"/>
+                </jsp:attribute>
+                <jsp:attribute name="fragment2">
+                  <my:tile color="#00ff00" label="B"/>
+                </jsp:attribute>
+                <jsp:attribute name="fragment3">
+                  <my:tile color="#0000ff" label=:TesterDynamicTag>
+<bugs:TesterDynamicTag bugs:x="foo">
+  <jsp:attribute name="attribute04">
+  </jsp:attribute>
+  <jsp:body>
+    <jsp:include page="/index.html"/>
+  </jsp:body>
+</bugs:TesterDynamicTag>
+<jsp:useBean id="bean2" class="org.apache.jasper.runtime.TesterBean" />
+<bugs:TesterDynamicTag bugs:x="foo">
+  <jsp:attribute name="attribute04">
+  </jsp:attribute>
+  <jsp:body>
+    <jsp:setProperty name="bean2" property="intPrimitive" value="1" />
+  </jsp:body>
+</bugs:TesterDynamicTag>
+<bugs:TesterDynamicTagense.  
+--%>
+
+<%@ page import="org.apache.logging.log4j.Logger" %>
+<%@ page import="org.apache.logging.log4j.LogManager" %>
+<%@ page import="org.apache.wiki.api.core.*" %>
+<%@ page import="org.apache.wiki.api.spi.Wiki" %>
+<%@ page import="org.apache.wiki.ui.TemplateManager" %>
+<%@ page errorPage="/Error.jsp" %>
+<%@ taglib uri="http://jspwiki.apache.org/tags" prefix="wiki" %>
+<%!
+    /**
+     * This page contains the logic for finding and including
+       the correct login form, which is usually loaded from
+/c:if> />
+         <span class="quicklinks"><span
+               class='quick2Top'><a href='#wikibody' title='Go to Top' >&laquo;</a></span><span
+               class='quick2Prev'><a href='#' title='Go to Previous Section'>&lsaquo;</a></span><span
+               class='quick2Edit'><a href='#' title='Edit this section'>&bull;</a></span><span
+               class='quick2Next'><a href='#' title='Go to Next Section'>&rsaquo;</a></span><span
+               class='quick2Bottom'><a href='#footer' title='Go to Bott   <td>\${param["foo"]}</td>
+            <td>${fn:escapeXml(param["foo"])}&nbsp;</td>
+          </tr>
+          <tr>
+            <td>\${my:reverse(param["foo"])}</td>
+            <td>${my:reverse(fn:escapeXml(param["foo"]))}&nbsp;</td>
+          </tr>
+          <tr>
+            <td>\${my:reverse(my:reverse(param["foo"]))}</td>
+            <td>${my:reverse(my:reverse(fn:escapeXml(param["foo"])))}&nbsp;</td>
+          </tr>
+          <tr>
+            <td>\${my:countVowels(param["foo"])}</td>
+ for the feed
+    String      mode        = request.getParameter("mode");
+    String      type        = request.getParameter("type");
+    
+    if( mode == null || !(mode.equals(RSSGenerator.MODE_BLOG) || mode.equals(RSSGenerator.MODE_WIKI)) ) {
+    	   mode = RSSGenerator.MODE_BLOG;
+    }
+    if( type == null || !(type.equals(RSSGenerator.RSS10) || type.equals(RSSGenerator.RSS20) || type.equals(RSSGenerator.ATOM ) ) ) {
+    	   type = RSSGenerator.RSS20;
+    }
+    // Set the content type and include the resps="ajaxpreview">Preview comes here</div>
+  </div>
+
+  <div class="resizer" data-pref="editorHeight"
+       title="<fmt:message key='editor.plain.edit.resize'/>"></div>
+
+</form>
+<script type="text/javascript">
+//<![CDATA[
+
+Wiki.add("[name=htmlPageText]", function( element){
+
+    function containerHeight(){ return editor.container.getStyle("height"); }
+    function editorHeight(){ return editor.iframe.getStyle("height"); }
+    function editorContent(){ return editor.getContent(); }
+    function resizePreview()ror/Forbidden.html" );
+            return;
+        }
+        UserProfile profile = userMgr.parseProfile( wikiContext );
+
+        // Validate the profile
+        userMgr.validateProfile( wikiContext, profile );
+
+        // If no errors, save the profile now & refresh the principal set!
+        if( wikiSession.getMessages( "profile" ).length == 0 ) {
+            try {
+                userMgr.setUserProfile( wikiContext, profile );
+                CookieAssertionLoginModule.setUserCookie( response, profile.get.request_uri"))%>)
+    does not exist.
+   </p>
+   <p>
+    The Host Manager application has been re-structured for Tomcat 7 onwards and
+    some URLs have changed. All URLs used to access the Manager application
+    should now start with one of the following options:
+   </p>
+    <ul>
+      <li><%=request.getContextPath()%>/html for the HTML GUI</li>
+      <li><%=request.getContextPath()%>/text for the text interface</li>
+    </ul>
+   <p>
+    Note that the URL for the text interface has changed from
+    &quotteForm" style="display:none;"
+          method="post" accept-charset="<wiki:ContentEncoding />"
+        onsubmit="return(confirm('<fmt:message key="attach.deleteconfirm"/>') && Wiki.submitOnce(this) );" >
+      <wiki:CsrfProtection/>
+      <input id="delete-all" name="delete-all" type="submit" value="Delete" />
+    </form>
+  </wiki:Permission>
+
+  <div class="zebra-table"><div class="slimbox-img sortable">
+  <table class="wikitable">
+    <tr>
+      <th scope="col"><fmt:message key="info.attachment.type"/></t );
+   Engine engine = context.getEngine();
+
+   String usertext = EditorManager.getEditedText( pageContext );
+%>
+<wiki:RequestResource type="script" resource="scripts/haddock-edit.js" />
+<wiki:RequestResource type="script" resource="engine://jspwiki.syntax.plain" />
+<wiki:RequestResource type="script" resource="scripts/haddock-wiki-edit.js" />
+<c:set var='context'><wiki:Variable var='requestcontext' /></c:set>
+<wiki:CheckRequestContext context="edit">
+<wiki:NoSuchPage> <%-- this is a new "text" size="30"
+               id="newgroup"
+            value='<fmt:message key="grp.newgroupname"/>'
+           onblur="if( this.value == '' ) { this.value = this.defaultValue; }; "
+          onfocus="if( this.value == this.defaultValue ) { this.value = ''; WikiGroup.onClickNew(); }; "/>
+    </div>
+    </wiki:Permission>
+  </td>
+  <td id="groupmembers">
+    <div style="float:left;">
+    <textarea rows="8" cols="30" disabled="disabled"
+              name="membersfield" id="membersfield" ></textarea>
+    umberGuessBean" %>
+
+<jsp:useBean id="numguess" class="num.NumberGuessBean" scope="session"/>
+<jsp:setProperty name="numguess" property="*"/>
+
+<html>
+<head><title>Number Guess</title></head>
+<body bgcolor="white">
+<font size=4>
+
+<% if (numguess.getSuccess()) { %>
+
+  Congratulations!  You got it.
+  And after just <%= numguess.getNumGuesses() %> tries.<p>
+
+  <% numguess.reset(); %>
+
+  Care to <a href="numguess.jsp">try again</a>?
+
+<% } else if (numguess.getNumGuesses() == 0) { %>
+
+  Welcome to the Number Guess     message = rb.getString( "lostpwd.nomail" );
+            log.error( "Tried to reset password and got SendFailedException: " + e );
+        } catch( AuthenticationFailedException e ) {
+            message = rb.getString( "lostpwd.nomail" );
+            log.error( "Tried to reset password and got AuthenticationFailedException: " + e );
+        } catch( Exception e ) {
+            message = rb.getString( "lostpwd.nomail" );
+            log.error( "Tried to reset password and got another exception: " + e );ine();
+    context.setVariable( Context.VAR_WYSIWYG_EDITOR_MODE, Boolean.TRUE );
+    context.setVariable( VariableManager.VAR_RUNFILTERS,  "false" );
+
+    Page wikiPage = context.getPage();
+    String originalCCLOption = (String)wikiPage.getAttribute( MarkupParser.PROP_CAMELCASELINKS );
+    wikiPage.setAttribute( MarkupParser.PROP_CAMELCASELINKS, "false" );
+
+    String usertext = EditorManager.getEditedText(pageContext);
+    Te}
+
+    if( !response.isCommitted() ) {
+        response.setContentType( "text/html; charset=" + wiki.getContentEncoding() );
+    }
+    String contentPage = wiki.getManager( TemplateManager.class ).findJSP( pageContext, wikiContext.getTemplate(), "ViewTemplate.jsp" );
+                                                            
+    log.debug( "Login template content is: {}", contentPage );
+    
+%><wiki:Include page="<%=contentPage%>" /><%--
+ perty="floatPrimitive" value=""/>
+    <p>101-${bean.floatPrimitive}</p>
+    <jsp:setProperty name="bean" property="floatPrimitive" value="42"/>
+    <p>102-${bean.floatPrimitive}</p>
+    <jsp:setProperty name="bean" property="floatPrimitive" value="-42"/>
+    <p>103-${bean.floatPrimitive}</p>
+    <jsp:setProperty name="bean" property="floatPrimitive" value="+42"/>
+    <p>104-${bean.floatPrimitive}</p>
+
+    <jsp:setProperty name="bean" property="floatObject" value=""/>
+    <p>111-${bean.floatObject}jsp"/>
+</c:when>
+<c:otherwise>
+
+<%-- If the page is an older version, then offer a note and a possibility to restore this version as the latest one. --%>
+<wiki:CheckVersion mode="notlatest">
+  <%
+    Context c = Context.findContext( pageContext );
+  %>
+  <c:set var="thisVersion" value="<%= c.getPage().getVersion() %>" />
+  <c:set var="latestVersion" value="<%= c.getEngine().getManager( PageManager.class ).getPage( c.getPage().getName(), WikiProvider.LATEST_VERSION ).getVersion() %>" />
+
+  <formtities( findParam( pageContext, "author" ) );
+    }
+
+    //
+    //  WYSIWYG editor sends us its greetings
+    //
+    String htmlText = findParam( pageContext, "htmlPageText" );
+    if( htmlText != null && cancel == null ) {
+        text = new HtmlStringToWikiTranslator( wiki ).translate( htmlText, wikiContext );
+    }
+
+    Page wikipage = wikiContext.getPage();
+    Page latestversion = wiki.getManager( PageManager.class ).getPage( pagereq );
+
+    if( latestversion == null ) {
+        latestversion =     <p>For security, access to the <a href="/manager/html">manager webapp</a> is restricted.
+                        Users are defined in:</p>
+                        <pre>$CATALINA_HOME/conf/tomcat-users.xml</pre>
+                        <p>In Tomcat @VERSION_MAJOR_MINOR@ access to the manager application is split between
+                           different users. &nbsp; <a href="${tomcatDocUrl}manager-howto.html">Read more...</a></p>
+                        <br />
+                        <h4><a hre" %>
+<%
+request.setAttribute("text", "World <&>");
+request.setAttribute("textQuote", "'World <&>'");
+%>
+<html>
+  <head><title>Bug 56265 test case</title></head>
+  <body>
+    <p>[1: <tags:bug56265 data-test="window.alert('Hello World <&>!')"/>]</p>
+    <p>[2: <tags:bug56265 data-test="window.alert('Hello ${text}!')"/>]</p>
+    <p>[3: <tags:bug56265 data-test="window.alert('Hello &apos;World <&>&apos;!')"/>]</p>
+    <p>[4: <tags:bug56265 data-test="window.alert('Hello ${textQuote}!')"/>]</p>s="control-label form-col-20" for="files"><fmt:message key="attach.add.selectfile"/></label>
+      <ul class="list-group form-col-50">
+        <li class="list-group-item droppable">
+          <label>Select files <%--or drop them here!--%></label>
+          <input type="file" name="files" id="files" size="60"/>
+          <a class="hidden delete btn btn-danger btn-xs pull-right">Delete</a>
+        </li>
+      </ul>
+    </div>
+    <div class="form-group">
+      <label class="control-label form-col-20" for="c   log.warn("Could not parse integer from parameter 'decision'. Somebody is being naughty.");
+        } catch ( NoSuchOutcomeException e ) {
+           log.warn("Could not look up Outcome from parameter 'outcome'. Somebody is being naughty.");
+        }
+    }
+    if( "abort".equals(request.getParameter("action")) )
+    {
+        try
+        {
+          // Extract parameters for decision ID & decision outcome
+          int id = Integer.parseInt( request.getParameter( "id" ) );
+          // Iterate through ou;
+    private CacheManager m_cacheManager = CacheManager.getInstance();
+    private String cacheName = "jspwiki.rssCache";
+    private Cache m_rssCache;
+    private int m_expiryPeriod = 24*60*60;
+    private int cacheCapacity = 1000;
+%>
+
+<%
+    if (m_cacheManager.cacheExists(cacheName)) {
+        m_rssCache = m_cacheManager.getCache(cacheName);
+    } else {
+        log.info("cache with name " + cacheName +  " not found in ehcache.xml, creating it with defaults.");
+        m_rssCache = new Cache(cacheName, co view this page.
+   </p>
+   <p>
+    By default the documentation web application is only accessible from a browser
+    running on the same machine as Tomcat. If you wish to modify this
+    restriction, you'll need to edit the documentation web applications's
+    <tt>context.xml</tt> file.
+   </p>
+ </body>
+
+</html>
+<%--
+ L=UTF-8" %>
+<%@page import="java.util.Map" %>
+<%@page import="java.util.Map.Entry" %>
+<%@page import="java.util.List" %>
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<% Map<String,List<String>> cipherList = (Map<String,List<String>>) request.getAttribute("cipherList");
+%>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta h   <td>${decision.workflowId}</td>
+
+          <%-- Name of item --%>
+          <td>
+            <fmt:message key="${decision.messageKey}">
+              <c:forEach var="messageArg" items="${activeWorkflows[decision.workflowId].messageArguments}">
+                <fmt:param>${messageArg}</fmt:param>
+              </c:forEach>
+            </fmt:message>
+          </td>
+
+          <%-- Requester --%>
+          <td>${activeWorkflows[decision.workflowId].owner.name}</td>
+
+          <%-- When did the actor start ss="leftmenu">
+    <wiki:InsertPage page="LeftMenu" />
+    <wiki:NoSuchPage page="LeftMenu">
+      <div class="error">
+        <wiki:EditLink page="LeftMenu">
+          <fmt:message key="fav.nomenu"><fmt:param>LeftMenu</fmt:param></fmt:message>
+        </wiki:EditLink>
+      </div>
+    </wiki:NoSuchPage>
+  </div>
+  
+  <div class="leftmenufooter">
+    <wiki:InsertPage page="LeftMenuFooter" />
+    <wiki:NoSuchPage page="LeftMenuFooter">
+      <div class="error">
+        <wiki:EditLink page="LeftMenuFooter">
+ ession.addMessage( "resetpwok", rb.getString( "lostpwd.emailed" ) );
+            pageContext.setAttribute( "passwordreset", "done" );
+        } else {
+            // Error
+            wikiSession.addMessage( "resetpw", message );
+        }
+    }
+
+    response.setContentType( "text/html; charset=" + wiki.getContentEncoding() );
+    response.setHeader( "Cache-control", "max-age=0" );
+    response.setDateHeader( "Expires", new Date().getTime() );
+    response.setDateHeader( "Last-Modified", new Date().getTts:tagBoolean foo="${false}" />]</p>
+    <p>02 The value of foo is [<ts:tagBoolean foo="${'false'}" />]</p>
+    <p>03 The value of foo is [<ts:tagBoolean foo='${"false"}' />]</p>
+    <p>04 The value of foo is [<ts:tagBoolean foo="${true}" />]</p>
+    <p>05 The value of foo is [<ts:tagBoolean foo="${'true'}" />]</p>
+    <p>06 The value of foo is [<ts:tagBoolean foo='${"true"}' />]</p>
+    <%--
+    <p>04 The value of foo is [<ts:tagBoolean foo="true" />]</p>
+    --%>
+  <%
+ml>
+  <jsp:useBean
+      id="bean"
+      type="org.apache.jasper.runtime.TesterBean.Inner"
+      >
+    <jsp:attribute name="beanName">bean2</jsp:attribute>
+  </jsp:useBean>
+  <jsp:useBean
+      id="bean3"
+      type="org.apache.jasper.runtime.TesterBean.Inner"
+      beanName="bean4"
+      />
+</htm.plain.preview.submit'/>"
+         title="<fmt:message key='editor.plain.preview.title'/>" />
+    --%>
+    <input class="btn btn-danger pull-right" type="submit" name="cancel" accesskey="q"
+           value="<fmt:message key='editor.plain.cancel.submit'/>"
+           title="<fmt:message key='editor.plain.cancel.title'/>" />
+
+    <%--TODO: allow page rename as part of an edit session
+    <wiki:Permission permission="rename">
+    <div class="form-group form-inline">
+    <label for="renameto"><fmt:i" >
+        </wiki:Tab>
+
+        </wiki:PageExists>
+      </wiki:TabbedSection>
+
+      <wiki:Include page="PageActionsBottom.jsp"/>
+
+    </div>
+
+    <wiki:Include page="Favorites.jsp"/>
+
+	<div class="clearbox"></div>
+  </div>
+
+  <wiki:Include page="Footer.jsp" />
+
+</div>
+</body>
+
+</html><%--
+ View' class='action'
+      onclick="SearchBox.navigate( '<wiki:Link format="url" page="__PAGEHERE__"/>','<fmt:message key="sbox.view.title"/>' );"
+        title="<fmt:message key="sbox.view.title"/>"><fmt:message key="sbox.view"/></a>
+      <a href="#" id='quickEdit' class='action'
+      onclick="SearchBox.navigate( '<wiki:Link format="url" context="edit" page="__PAGEHERE__"/>','<fmt:message key="sbox.edit.title"/>' );"
+        title="<fmt:message key="sbox.edit.title"/>"><fmt:message key="sbox.edit"/></a>
+ples - &lt;c:choose></h1>
+
+    <hr/>
+    <br/>
+    <a href="notes.html">Plugin Introductory Notes</a>
+    <br/>
+    <a href="howto.html">Brief Instructions for Writing Plugins</a>
+    <br/> <br/>
+    <hr/>
+
+    <br/>
+
+    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+    <c:forEach var="index" begin="0" end="4">
+      # ${index}:
+      <c:choose>
+        <c:when test="${index == 1}">
+          One!<br/>
+        </c:when>
+        <c:when test="${index == 4}">
+          Four!<br/>
+    Info()) %>
+<br>
+Query string: <%= util.HTMLFilter.filter(request.getQueryString()) %>
+<br>
+Content length: <%= request.getContentLength() %>
+<br>
+Content type: <%= util.HTMLFilter.filter(request.getContentType()) %>
+<br>
+Server name: <%= util.HTMLFilter.filter(request.getServerName()) %>
+<br>
+Server port: <%= request.getServerPort() %>
+<br>
+Remote user: <%= util.HTMLFilter.filter(request.getRemoteUser()) %>
+<br>
+Remote address: <%= util.HTMLFilter.filter(request.getRemoteAddr()) %>
+<br>
+Remote host: <%= utige "+pagereq+". User="+user+", host="+HttpUtil.getRemoteAddress(request) );
+
+
+    //
+    //  Determine and store the date the latest version was changed.  Since
+    //  the newest version is the one that is changed, we need to track
+    //  that instead of the edited version.
+    //
+    String lastchange = SpamFilter.getSpamHash( latestversion, request );
+
+    pageContext.setAttribute( "lastchange", lastchange, PageContext.REQUEST_SCOPE );
+
+    //
+    //  Attempt to lock the page.
+    //
+    PageLock lock =Count != 0 ) attTitle += " (" + attCount + ")";
+%>
+
+<wiki:TabbedSection defaultTab='${param.tab}' >
+
+  <wiki:Tab id="pagecontent" title='<%=LocaleSupport.getLocalizedMessage(pageContext, "view.tab")%>' accesskey="v">
+    <wiki:Include page="PageTab.jsp"/>
+    <wiki:PageType type="attachment">
+      <div class="information">
+	    <fmt:message key="info.backtoparentpage" >
+	      <fmt:param><wiki:LinkToParent><wiki:ParentPageName/></wiki:LinkToParent></fmt:param>
+        </fmt:message>
+      </div>
+      <ditle>Scripting expression test cases</title></head>
+  <body>
+    <p><%= "00-hello world" %></p>
+    <p><%= "01-hello \"world" %></p>
+    <p><%= "02-hello \\\"world" %></p>
+    <p><%= "03-hello ${world" %></p>
+    <p><%= "04-hello \\${world" %></p>
+    <tags:echo echo='<%= "05-hello world" %>' />
+    <tags:echo echo='<%= "06-hello \\\"world" %>' />
+    <tags:echo echo='<%= "07-hello \\\\\\\"world" %>' />
+    <tags:echo echo='<%= "08-hello ${world" %>' />
+    <tags:echo echo='<%= "09-hello \\\\${world" %>' />cript>
+  <div class="error"><fmt:message key="editor.fck.noscript" /></div>
+</noscript>
+
+   <p>
+     <label for="changenote"><fmt:message key='editor.plain.changenote'/></label>
+     <input type="text" id="changenote" name="changenote" size="80" maxlength="80" value="${changenote}"/>
+   </p>
+   <wiki:CheckRequestContext context="comment">
+    <fieldset>
+	<legend><fmt:message key="editor.commentsignature"/></legend>
+    <p>
+    <label for="authorname" accesskey="n"><fmt:message key="editor.plain.name"/></la"text/plain; charset=UTF-8"
+%><%@page import="java.net.URL,java.net.URLConnection"%><%
+    String[] testFiles = new String[] {"foo;bar.txt", "foo&bar.txt",
+            "foo#bar.txt", "foo%bar.txt", "foo+bar.txt", "foo bar.txt",
+            "foo bar/foobar.txt"};
+    for (String testFile : testFiles) {
+        URL url = application.getResource("/bug53257/" + testFile);
+        if (url == null) {
+            out.print("FAIL (url) - " + testFile + "\n");
+        } else {
+            URLConnection conn = url.op{"apos;"}\\${"&"}${"quot;baz"}${"&"}${"quot;"}' />
+    <tags:echo echo='18-${((x,y)->x+y)(1,2)}' />
+    <tags:echo echo='19-${{1,2,3,4}.stream().max().orElse(-1)}' />
+    <p>20-${{1,2,3,4}.stream().max().orElse(-1)}</p>
+    <tags:echo echo='21-${{1,2,3,4}.stream().sorted().map(u->{"value":u+10}).toList()}' />
+    <p>22-${{1,2,3,4}.stream().sorted().map(u->{"value":u+10}).toList()}</p>  </bodapache.el.TesterBeanA" %>
+<%@ page import="org.apache.el.TesterBeanB" %>
+<html>
+  <head><title>EL method test cases</title></head>
+  <body>
+    <%
+    TesterBeanA beanA = new TesterBeanA();
+    TesterBeanB beanB = new TesterBeanB();
+    beanB.setName("Tomcat");
+    beanA.setBean(beanB);
+    TF-8"%><%
+    String jndiName = request.getParameter("jndiName");
+
+    javax.naming.Context initCtx = new javax.naming.InitialContext();
+    javax.naming.Context envCtx = (javax.naming.Context) initCtx.lookup("java:comp/env");
+
+    try {
+        Object obj = envCtx.lookup(jndiName);
+        out.println(obj.toString());
+    } catch (javax.naming.NameNotFoundException e) {
+        out.println("Not Found");
+    } catch (javax.naming.NamingException e) {
+        out.println("Naming Error");
+    }
+%><%--
+ =attach ... --%>
+  <%--
+  <c:if test="${param.tab eq 'attach'}">
+  <li id="view">
+    <wiki:Link page="${page}" >
+        <span class="icon-view-menu"></span>
+        <span><fmt:message key="view.tab"/></span>
+    </wiki:Link>
+  </li>
+  </c:if>
+  --%>
+  <wiki:CheckRequestContext context='info|diff|upload|rename|edit|comment|conflict'>
+  <li id="view">
+    <wiki:Link page="${page}" >
+        <span class="icon-view-menu"></span>
+        <span><fmt:message key="view.tab"/></span>
+    </wiki:Link>
+  </li>
+  </wfs.oldprofile"/></wiki:UserProfile>
+      <wiki:UserProfile property="new"><fmt:message key="prefs.newprofile"/></wiki:UserProfile>
+      </h3>
+
+      <c:if test="${param.tab eq 'profile'}" >
+        <div class="formhelp">
+        <wiki:Messages div="error" topic="profile" prefix='<%=LocaleSupport.getLocalizedMessage(pageContext,"prefs.errorprefix.profile")%>'/>
+        </div>
+      </c:if>
+
+     <table>
+
+     <!-- Login name -->
+     <tr>
+       <td><label for="loginname"><fmt:message key="prefs.loginname"e key="newgroup.name"/></label></th>
+      <td><input type="text" name="group" size="30" value="<%=name%>" />
+      <div class="formhelp">
+        <fmt:message key="newgroup.name.description"/>
+      </div>
+      </td>
+    </tr>
+
+    <!-- Members -->
+    <%
+      StringBuffer s = new StringBuffer();
+      for ( int i = 0; i < members.length; i++ )
+      {
+        s.append( members[i].getName().trim() );
+     

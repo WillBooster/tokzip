@@ -19,15 +19,14 @@ fn main() {
         .map(PathBuf::from)
         .unwrap_or_else(|| root.join("../tokzip-corpus/corpus"));
     let wrapper = std::fs::read(root.join("dict/wrapper.bin")).expect("dict/wrapper.bin");
-    for name in tokzip::train::languages() {
+    for (name, budget) in tokzip::train::languages() {
         let docs: Vec<Vec<u8>> = tokzip::train::train_docs(&corpus, name).collect();
         assert!(
             !docs.is_empty(),
             "no train-split corpus for {name} under {}",
             corpus.display()
         );
-        let suffix =
-            tokzip::train::train_dictionary(&docs, tokzip::train::DICTIONARY_BUDGET, &wrapper);
+        let suffix = tokzip::train::train_dictionary(&docs, budget, &wrapper);
         std::fs::write(root.join("dict").join(format!("{name}.bin")), &suffix).expect("write dict");
         let mut dict = wrapper.clone();
         dict.extend_from_slice(&suffix);
