@@ -556,11 +556,13 @@ mod tests {
         assert_eq!(decompress(&[], usize::MAX), Err(DecodeError::Truncated));
         assert!(decompress(&frame[..frame.len() / 2], usize::MAX).is_err());
         let mut bad = frame.clone();
-        bad[0] = MAGIC | (1 << 2);
-        assert_eq!(
-            decompress(&bad, usize::MAX),
-            Err(DecodeError::UnsupportedVersion)
-        );
+        for version in (0..4).filter(|&v| v != VERSION) {
+            bad[0] = MAGIC | (version << 2);
+            assert_eq!(
+                decompress(&bad, usize::MAX),
+                Err(DecodeError::UnsupportedVersion)
+            );
+        }
         bad[0] = 0x42;
         assert_eq!(decompress(&bad, usize::MAX), Err(DecodeError::BadMagic));
         // A stored empty frame whose length varint encodes 2^64 must not wrap to 0 and decode.
