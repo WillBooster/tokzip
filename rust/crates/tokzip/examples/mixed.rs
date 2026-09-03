@@ -66,8 +66,8 @@ fn main() {
         100.0 * oracle as f64 / raw as f64
     );
 
-    // Compression time and ratio by input size (documents of several languages concatenated,
-    // an equal share of each, up to 1 MiB).
+    // Compression time and ratio by input size: every input is an equal share of each
+    // language's bench documents, so a size never measures one language only.
     const TOTAL: usize = 1 << 20;
     let langs = [
         "html",
@@ -78,18 +78,27 @@ fn main() {
         "python",
         "typescript",
     ];
-    let mut big: Vec<u8> = Vec::new();
-    for lang in langs {
-        let stop = big.len() + TOTAL / langs.len();
-        for doc in tokzip::train::bench_docs(&corpus, lang) {
-            if big.len() >= stop {
-                break;
+    let shares: Vec<Vec<u8>> = langs
+        .iter()
+        .map(|lang| {
+            let mut share = Vec::new();
+            for doc in tokzip::train::bench_docs(&corpus, lang) {
+                if share.len() >= TOTAL / langs.len() {
+                    break;
+                }
+                share.extend_from_slice(&doc);
             }
-            big.extend_from_slice(&doc);
-        }
-    }
+            share.truncate(TOTAL / langs.len());
+            share
+        })
+        .collect();
     for size in [1024usize, 4096, 16384, 65536, 262_144, 1 << 20] {
-        let doc = &big[..size.min(big.len())];
+        let doc: Vec<u8> = shares
+            .iter()
+            .flat_map(|share| &share[..(size / langs.len()).min(share.len())])
+            .copied()
+            .collect();
+        let doc = doc.as_slice();
         let t = Instant::now();
         let iters = (2_000_000 / size).max(3);
         let mut coded = 0;

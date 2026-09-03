@@ -50,8 +50,9 @@ fn main() {
         println!("cargo:rerun-if-changed={}", path.display());
         std::fs::read(path)
     };
-    // Group parts exist only for groups with a shared dictionary budget; everything else is
-    // required, and a missing language dictionary would otherwise ship silently as none.
+    // Committed priors may be missing or stale after a model change (flat priors stand in,
+    // with a warning); every dictionary file is required, since a missing one would otherwise
+    // ship silently as an empty part.
     let read_optional = |path: &Path| read(path).unwrap_or_default();
     let read_required =
         |path: &Path| read(path).unwrap_or_else(|e| panic!("{}: {e}", path.display()));

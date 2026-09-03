@@ -38,7 +38,7 @@
   "scripts": {
     "bench": "bun scripts/bench/bench.ts",
     "build": "bun run build/wasm && build-ts lib --input src/index.ts --module-type esm",
-    "build/wasm": "cd rust && cargo build --release --target wasm32-unknown-unknown -p tokzip-wasm && cp target/wasm32-unknown-unknown/release/tokzip_wasm.wasm ../wasm/tokzip.wasm",
+    "build/wasm": "cargo build --profile wasm --target wasm32-unknown-unknown --manifest-path rust/Cargo.toml -p tokzip-wasm && cp rust/target/wasm32-unknown-unknown/wasm/tokzip_wasm.wasm wasm/tokzip.wasm",
     "cleanup": "bun wb lint --fix --format",
     "format": "bun wb lint --format",
     "lint": "bun wb lint",
