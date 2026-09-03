@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { compress, decompress, TokzipDecodeError } from '../../src/index.ts';
+import { compress, decompress, FORMAT_VERSION, TokzipDecodeError } from '../../src/index.ts';
 
 const JAPANESE_PROMPT = `以下の要件を満たすブロック崩しゲームを作成してください。
 - キャンバスサイズは 800x600 とし、背景は暗い青にしてください。
@@ -48,6 +48,8 @@ describe('compress/decompress', () => {
     for (const input of inputs) {
       const frame = compress(input);
       expect(frame).toBeInstanceOf(Uint8Array);
+      // Header byte: magic nibble, two version bits, two layout bits.
+      expect((frame[0]! >> 2) & 3).toBe(FORMAT_VERSION);
       expect(decompress(frame)).toBe(input);
     }
   });

@@ -1,6 +1,14 @@
 {
   "name": "tokzip",
-  "private": true,
+  "version": "0.0.0-semantically-released",
+  "description": "Lossless compressor for prompts, LLM outputs, and source code stored at rest: one wasm module, automatic language detection, no options",
+  "keywords": [
+    "compression",
+    "llm",
+    "prompt",
+    "wasm",
+    "cloudflare-workers"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/WillBooster/tokzip.git"
@@ -9,21 +17,36 @@
   "author": "WillBooster Inc.",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "workerd": "./src/workers.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./src": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
+    }
   },
-  "module": "src/index.ts",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "src",
-    "wasm"
+    "dist/",
+    "src/",
+    "wasm/"
   ],
   "scripts": {
     "bench": "bun scripts/bench/bench.ts",
-    "build": "cargo build --release --target wasm32-unknown-unknown --manifest-path rust/Cargo.toml -p tokzip-wasm && cp rust/target/wasm32-unknown-unknown/release/tokzip_wasm.wasm wasm/tokzip.wasm",
+    "build": "bun run build/wasm && build-ts lib --input src/index.ts",
+    "build/wasm": "cargo build --release --target wasm32-unknown-unknown --manifest-path rust/Cargo.toml -p tokzip-wasm && cp rust/target/wasm32-unknown-unknown/release/tokzip_wasm.wasm wasm/tokzip.wasm",
     "cleanup": "bun wb lint --fix --format",
     "format": "bun wb lint --format",
     "lint": "bun wb lint",
     "lint-fix": "bun wb lint --fix",
     "prepare": "(bun lefthook install || true) && (test ! -f .lefthook/normalize-bun-lockfile.sh || bash .lefthook/normalize-bun-lockfile.sh)",
+    "release": "wb release",
     "test": "bun wb test",
     "test/ci": "bun wb test-on-ci",
     "train": "bun scripts/train/train.ts",
@@ -37,14 +60,20 @@
     "@willbooster/oxfmt-config": "1.2.2",
     "@willbooster/oxlint-config": "1.4.8",
     "@willbooster/wb": "22.0.1",
+    "build-ts": "21.0.9",
     "lefthook": "2.1.10",
     "oxfmt": "0.63.0",
     "oxlint": "1.78.0",
     "oxlint-tsgolint": "7.0.2001",
+    "semantic-release": "25.0.9",
     "sort-package-json": "4.0.0",
     "zod": "4.4.3"
   },
   "peerDependencies": {
     "typescript": "7.0.2"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

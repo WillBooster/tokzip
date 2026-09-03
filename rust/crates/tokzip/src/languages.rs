@@ -37,7 +37,7 @@ impl Group {
 }
 
 /// Language ids (the index) are frame-format identity, as are the dictionaries and priors
-/// they name.
+/// they name: changing any of them is a new format version.
 pub const LANGUAGES: [(&str, Group); 21] = [
     ("text", Group::Prose),
     ("en-US", Group::Prose),

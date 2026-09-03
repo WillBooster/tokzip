@@ -119,13 +119,12 @@ pub fn segment(doc: &[u8]) -> Vec<Segment> {
     analyze(doc).0
 }
 
-/// Language ids ranked by dictionary 4-gram overlap (no fence hint), best first, up to
-/// `MAX_CANDIDATES`, from pre-computed whole-document `scores`.
-pub fn top_languages(scores: &[i32; LANGUAGE_COUNT]) -> Vec<u8> {
-    let mut order: Vec<u8> = (0..LANGUAGE_COUNT as u8).collect();
-    order.sort_by_key(|&lang| std::cmp::Reverse(scores[lang as usize]));
-    order.truncate(MAX_CANDIDATES);
-    order
+/// The language with the most dictionary 4-gram overlap (no fence hint), from pre-computed
+/// whole-document `scores`.
+pub fn top_language(scores: &[i32; LANGUAGE_COUNT]) -> u8 {
+    (0..LANGUAGE_COUNT as u8)
+        .max_by_key(|&lang| (scores[lang as usize], std::cmp::Reverse(lang)))
+        .unwrap()
 }
 
 /// Splits `doc` into language segments and returns the whole-document gram totals (pre-fence)
@@ -252,8 +251,6 @@ fn add_gram_hits(doc: &[u8], rows: &mut [[i32; LANGUAGE_COUNT]], row_of: impl Fn
         }
     }
 }
-
-const MAX_CANDIDATES: usize = 3;
 
 /// Argmax language of `doc` from pre-computed gram `scores` plus fence hints (short-doc path).
 fn best_single_from(doc: &[u8], mut scores: [i32; LANGUAGE_COUNT]) -> u8 {

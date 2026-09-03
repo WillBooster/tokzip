@@ -31,7 +31,7 @@ export default {
     // own timing; `warm=false` tells the driver to discard that row (except the first /load,
     // which is meant to be cold).
     const wasWarm = warm;
-    const codec = await import('../../src/index.ts');
+    const codec = await import('../../src/workers.ts');
     warm = true;
     if (route === 'load') {
       for (const [name, text] of Object.entries(SAMPLES)) FRAMES.set(name, codec.compress(text));

@@ -1,7 +1,10 @@
-# tokzip frame format (version 0)
+# tokzip frame format (version 1)
 
-Pre-release: the format changes freely and no compatibility with previous frames is kept until
-it is fixed as version 1. Decoders reject any other version instead of misdecoding it.
+The format is the codec: the token grammar, the range coder, the language dictionaries, and the
+model priors together. Any change to any of them — a retrained or added dictionary as much as a
+new model — is a new version, and `compress` writes only the newest while `decompress` reads
+every version released before it. Decoders reject an unknown version instead of misdecoding
+it.
 
 The reference implementation is `rust/crates/tokzip`. All multi-byte integers are little-endian;
 varints are LEB128 (7 payload bits per byte, bit 7 = continue, canonical: a multi-byte varint
@@ -13,7 +16,7 @@ never ends in a zero byte).
 frame := header sizeVarint crc32 body
 ```
 
-- `header`: one byte — magic `1101` in the high nibble, then two version bits (0; the value 3
+- `header`: one byte — magic `1101` in the high nibble, then two version bits (1; the value 3
   is reserved for an extension byte that would follow), then two layout bits: 0 =
   single-segment, 1 = multi-segment, 2 = blocked, 3 = stored.
 - `sizeVarint`: decompressed length in bytes. For coded frames decoders reject a length above
@@ -57,17 +60,32 @@ content). Single segment: one byte, the language id. Multi-segment (layout 1): a
 segment count (at most 2^20; decoders reject more), then per segment a language-id byte and a
 varint length; lengths are non-zero and sum to `size` (the block length in a blocked frame).
 
-Language ids (format identity — the dictionaries and priors they name are part of the codec):
+Language ids (format identity — the dictionaries and priors they name are part of the codec).
+Each language belongs to a model group (§5):
 
-| id  | language   |
-| --- | ---------- |
-| 0   | text       |
-| 1   | en-US      |
-| 2   | ja-JP      |
-| 3   | html       |
-| 4   | css        |
-| 5   | javascript |
-| 6   | typescript |
+| id  | language   | group    | dictionary suffix |
+| --- | ---------- | -------- | ----------------- |
+| 0   | text       | prose    | 128 KB            |
+| 1   | en-US      | prose    | 128 KB            |
+| 2   | ja-JP      | japanese | 128 KB            |
+| 3   | html       | code     | 64 KB             |
+| 4   | css        | code     | 64 KB             |
+| 5   | javascript | code     | 64 KB             |
+| 6   | typescript | code     | 64 KB             |
+| 7   | c          | code     | 64 KB             |
+| 8   | cpp        | code     | 64 KB             |
+| 9   | csharp     | code     | 64 KB             |
+| 10  | dart       | code     | 64 KB             |
+| 11  | haskell    | code     | 64 KB             |
+| 12  | java       | code     | 64 KB             |
+| 13  | jsp        | code     | 64 KB             |
+| 14  | php        | code     | 64 KB             |
+| 15  | python     | code     | 64 KB             |
+| 16  | ruby       | code     | 64 KB             |
+| 17  | rust       | code     | 64 KB             |
+| 18  | zig        | code     | 64 KB             |
+| 19  | zh-CN      | chinese  | 128 KB            |
+| 20  | zh-TW      | chinese  | 128 KB            |
 
 Each language's dictionary is the shared wrapper (`dict/wrapper.bin`) followed by its trained
 suffix (`dict/<language>.bin`); its models start from `priors/<language>.bin` (§5).
@@ -84,9 +102,10 @@ dictionary into the content. Tokens never cross a segment boundary.
 
 One LZMA-style adaptive binary range coder (32-bit range, 11-bit probabilities, adaptation
 shift 5, renormalization at 2^24) codes the whole body (one block's payload in a blocked
-frame) across all of its segments. The encoder drops
-the always-zero first output byte and trims trailing zero bytes; the decoder feeds zeros past
-the end of the body and rejects a body that has bytes it never read.
+frame) across all of its segments. The encoder drops the always-zero first output byte, ends
+the stream on the value of the final interval with the most trailing zero bytes, and trims
+trailing zero bytes; the decoder feeds zeros past the end of the body and rejects a body that
+has bytes it never read.
 
 Coder state shared across segments: the 12-state LZMA state machine and the four most recent
 distances (`reps`, stored as distance − 1, initially 0). At every segment start, a rep whose
@@ -124,6 +143,16 @@ continuing into the dictionary before the content start and 0 where neither exis
 `priors/<language>.bin` holds the 256-entry previous-byte → class table (values < 128), the
 256-entry second-previous-byte → class table (values < 4), then every node's initial
 probability quantized to 8 bits (`p11 = (q << 3) | 4`). All are trained offline
-(`bun run train`) and are format identity: a retrain changes the coded stream. (The module
-embeds the priors in a packed form that skips untrained literal subtrees — a build-time
-representation of the same values, not part of the format; see `rust/crates/tokzip/build.rs`.)
+(`bun run train`) and are format identity: a retrain changes the coded stream.
+
+The class tables and the literal trees (everything from the literal context pairs on) are
+shared by the languages of a model group — prose (`text`, `en-US`), japanese, chinese, code —
+and trained on the group's pooled literal statistics; a literal node whose trained value would
+have saved fewer than 4 bits on the training data stays at the flat probability 1/2. The nodes
+before the literal trees are per language.
+
+The module embeds these values in a packed form that is not part of the format (see
+`rust/crates/tokzip/build.rs` and `pack.rs`): each group's literal part once, with every flat
+subtree skipped; each language's own nodes verbatim; and each dictionary suffix coded by the
+codec itself as one segment with the language's models and no dictionary, decoded on first
+use.
