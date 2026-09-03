@@ -30,8 +30,9 @@ pub fn gram_table(dictionaries: &[Vec<u8>]) -> Vec<u8> {
     let mut table = vec![0u8; GRAM_TABLE_BYTES];
     for (lang, bytes) in dictionaries.iter().enumerate() {
         for pos in 0..bytes.len().saturating_sub(3) {
-            let at = gram_hash(bytes, pos) * GRAM_ENTRY_BYTES;
-            let mask = gram_mask(&table, gram_hash(bytes, pos)) | 1 << lang;
+            let hash = gram_hash(bytes, pos);
+            let at = hash * GRAM_ENTRY_BYTES;
+            let mask = gram_mask(&table, hash) | 1 << lang;
             table[at..at + GRAM_ENTRY_BYTES]
                 .copy_from_slice(&mask.to_le_bytes()[..GRAM_ENTRY_BYTES]);
         }
