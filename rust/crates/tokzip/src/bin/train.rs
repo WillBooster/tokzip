@@ -47,12 +47,18 @@ fn main() {
                 .unwrap();
             let mut pooled: Vec<Vec<u8>> = Vec::new();
             // The member order rotates per round so that the trainer's fixed-stride held-out
-            // selection does not land on the same members every round.
-            for round in 0..longest {
+            // selection does not land on the same members every round; the pool stops at the
+            // trainer's input bound, which is all it reads.
+            let mut pooled_bytes = 0usize;
+            'pool: for round in 0..longest {
                 for m in 0..members.len() {
                     let i = members[(round + m) % members.len()];
                     if let Some(doc) = docs_by_language[i].get(round) {
                         pooled.push(doc.clone());
+                        pooled_bytes += doc.len();
+                        if pooled_bytes >= tokzip::train::MAX_DICT_TRAIN_BYTES {
+                            break 'pool;
+                        }
                     }
                 }
             }

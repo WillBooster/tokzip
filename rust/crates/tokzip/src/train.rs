@@ -67,8 +67,8 @@ fn corpus_docs<'a>(
         .map(move |file| std::fs::read(dir.join(file)).expect("doc"))
 }
 
-/// Bound on the dictionary-training input per language.
-const MAX_DICT_TRAIN_BYTES: usize = 32 * 1024 * 1024;
+/// Bound on the dictionary-training input per language (`train_dictionary` reads no more).
+pub const MAX_DICT_TRAIN_BYTES: usize = 32 * 1024 * 1024;
 /// Every held-out document used to pick the segment size, bounded so the sweep stays fast.
 const MAX_VALIDATION_BYTES: usize = 1024 * 1024;
 /// Dmer length: the shortest fragment worth a dictionary reference (the coder's minimum match
