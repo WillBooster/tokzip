@@ -1,11 +1,12 @@
 //! Embedded language dictionaries and automatic per-segment language detection.
 //!
 //! Every language's dictionary is the shared wrapper (Markdown/JSON scaffolding, generic
-//! prose) followed by its trained suffix. Detection needs no parser: each language keeps a
-//! bitset of the 4-grams in its suffix, the document is scored per 64-byte window by how many
-//! positions hit each language's set (labeled code fences add a hint for their language), and
-//! a Viterbi pass with a switch penalty turns the window scores into segments. The decoder
-//! never detects anything — it reads the segment table from the frame.
+//! prose) followed by its trained suffix. Detection needs no parser: one table maps every
+//! 4-gram hash to a bit mask of the languages whose suffix has it (at most 32 languages), the
+//! document is scored per 64-byte window by how many positions hit each language (labeled
+//! code fences add a hint for their language), and a Viterbi pass with a switch penalty turns
+//! the window scores into segments. The decoder never detects anything — it reads the segment
+//! table from the frame.
 
 use crate::languages::LANGUAGES;
 pub use crate::languages::LANGUAGE_COUNT;

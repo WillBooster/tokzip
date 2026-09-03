@@ -91,8 +91,9 @@ compressed size as a percentage of the input:
 
 Throughput through the wasm build in Bun on an Apple M-series laptop: compression ~2.5 MB/s
 (the price-based parse is the cost; a 4 KB document takes ~1.5 ms), decompression ~90 MB/s.
-Cloudflare's free plan allows 10 ms of CPU per request, so compress documents above ~20 KB
-on a paid plan or outside the request path.
+Cloudflare's free plan allows 10 ms of CPU per request: the first `compress` in an isolate
+(which decodes the dictionaries) and any document above ~20 KB need a paid plan or a place
+outside the request path.
 
 Run it yourself: `bun run bench` (add `--speed` for throughput and `--json <file>` for a
 machine-readable report). The harness verifies every tokzip frame round-trips losslessly.

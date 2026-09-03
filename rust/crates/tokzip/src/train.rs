@@ -92,7 +92,7 @@ pub fn train_dictionary(docs: &[Vec<u8>], budget: usize, wrapper: &[u8]) -> Vec<
             fit.extend_from_slice(doc);
         }
     }
-    let lit_classes = train_lit_classes(&validation);
+    let lit_classes = train_lit_classes(validation.iter().map(Vec::as_slice));
     let mut best: Option<(usize, usize)> = None; // (cost, k)
     for k in SEGMENT_SIZES {
         let suffix = cover(&fit, budget, k);
@@ -221,12 +221,12 @@ pub fn train_priors(trainees: &[Trainee]) -> Vec<Vec<u8>> {
     let lit_classes: Vec<LitClasses> = groups
         .iter()
         .map(|g| {
-            let docs: Vec<Vec<u8>> = trainees
-                .iter()
-                .filter(|t| t.group == *g)
-                .flat_map(|t| t.docs.iter().cloned())
-                .collect();
-            train_lit_classes(&docs)
+            train_lit_classes(
+                trainees
+                    .iter()
+                    .filter(|t| t.group == *g)
+                    .flat_map(|t| t.docs.iter().map(Vec::as_slice)),
+            )
         })
         .collect();
     let group_index = |t: &Trainee| groups.iter().position(|g| *g == t.group).unwrap();
@@ -308,7 +308,7 @@ pub fn train_priors(trainees: &[Trainee]) -> Vec<Vec<u8>> {
 /// Clusters the previous byte into `LIT_CLASSES` classes and the byte before it into
 /// `LIT_CLASSES2` classes, each by how well the class's pooled next-byte distribution predicts
 /// the successors of the byte value.
-fn train_lit_classes(docs: &[Vec<u8>]) -> LitClasses {
+fn train_lit_classes<'a>(docs: impl Iterator<Item = &'a [u8]>) -> LitClasses {
     let mut counts1 = vec![[0u32; 256]; 256];
     let mut counts2 = vec![[0u32; 256]; 256];
     for doc in docs {

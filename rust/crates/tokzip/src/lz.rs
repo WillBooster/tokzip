@@ -229,7 +229,7 @@ impl Drop for DocModels<'_> {
     }
 }
 
-/// Depth-first walk over one packed tree's flag bits (see `Models::from_priors`): records the
+/// Depth-first walk over one packed tree's flag bits (see `Models::from_packed`): records the
 /// nodes whose flag is set, in the order their values follow, and walks their children.
 fn walk_packed_tree(
     node: usize,

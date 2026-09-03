@@ -21,13 +21,21 @@ fn main() {
         }
         1e6 * t.elapsed().as_secs_f64() / n
     };
+    let Some(first) = docs.first() else {
+        eprintln!("no non-empty bench document of at most 1 KiB in the given <corpus root>:<language> arguments");
+        std::process::exit(1);
+    };
     println!("{} docs", docs.len());
     let t = Instant::now();
-    tokzip::segments(&docs[0]);
+    tokzip::segments(first);
     println!(
         "first call (asset decode + gram table) {:.1} ms",
         1e3 * t.elapsed().as_secs_f64()
     );
+    // A language's match index is built on its first encode; keep that out of the timings.
+    for lang in 0..tokzip::language_names().len() {
+        tokzip::frame_len_with_language(first, lang);
+    }
     println!(
         "segments   {:>8.1} us",
         time(&|d| {
