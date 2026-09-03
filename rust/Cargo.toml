@@ -7,6 +7,9 @@ members = ["crates/tokzip", "crates/tokzip-wasm"]
 [workspace.package]
 edition = "2021"
 
+# The wasm module is built with this profile. `opt-level = "s"` measured 24 KB smaller at the
+# same speed but its function order differed between macOS and Linux hosts, so the committed
+# module could not be reproduced by CI; `opt-level = 3` builds byte-identically on both.
 [profile.release]
 opt-level = 3
 lto = true
@@ -14,9 +17,3 @@ codegen-units = 1
 panic = "abort"
 strip = true
 
-# The wasm module is built with this profile: optimized for size (25 KB smaller than
-# `opt-level = 3` at the same measured speed). Native builds — the trainer and the corpus
-# harnesses — use the speed-optimized release profile.
-[profile.wasm]
-inherits = "release"
-opt-level = "s"
