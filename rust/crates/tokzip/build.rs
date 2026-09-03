@@ -105,11 +105,12 @@ fn main() {
         let literal_path = out.join(format!("{}.lit", group.name()));
         std::fs::write(&literal_path, &group_literals[group as usize]).expect("write group priors");
         group_priors.push_str(&format!("    include_bytes!({literal_path:?}),\n"));
-        let dict_path = root.join("dict").join(format!("{}.bin", group.name()));
+        // Only groups with a shared budget have a part; registering an absent file as a
+        // dependency would rebuild the crate every time.
         let part = if group.shared_budget() > 0 {
-            read_required(&dict_path)
+            read_required(&root.join("dict").join(format!("{}.bin", group.name())))
         } else {
-            read_optional(&dict_path)
+            Vec::new()
         };
         // Coded with the models of the group's first language (`lang.rs` decodes it so).
         let packed = LANGUAGES

@@ -1,0 +1,5 @@
+# The wasm module is optimized for size (opt-level "s" measured 25 KB smaller at the same
+# speed); native builds — the trainer and the corpus harnesses — keep the speed-optimized
+# release profile.
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "opt-level=s"]
