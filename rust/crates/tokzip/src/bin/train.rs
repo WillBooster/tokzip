@@ -8,9 +8,6 @@ use std::path::{Path, PathBuf};
 
 /// Per-language priors-training input bound; keeps a full run to tens of seconds per language.
 const MAX_PRIORS_TRAIN_BYTES: usize = 12 * 1024 * 1024;
-/// Priors rounds: the first parses with dictionary-primed models, each later one with the
-/// previous round's priors.
-const PRIORS_ROUNDS: usize = 3;
 
 fn main() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
@@ -19,15 +16,15 @@ fn main() {
         .map(PathBuf::from)
         .unwrap_or_else(|| root.join("../tokzip-corpus/corpus"));
     let wrapper = std::fs::read(root.join("dict/wrapper.bin")).expect("dict/wrapper.bin");
-    for name in tokzip::train::languages() {
+    let mut trainees = Vec::new();
+    for &(name, group) in tokzip::train::languages() {
         let docs: Vec<Vec<u8>> = tokzip::train::train_docs(&corpus, name).collect();
         assert!(
             !docs.is_empty(),
             "no train-split corpus for {name} under {}",
             corpus.display()
         );
-        let suffix =
-            tokzip::train::train_dictionary(&docs, tokzip::train::DICTIONARY_BUDGET, &wrapper);
+        let suffix = tokzip::train::train_dictionary(&docs, group.dictionary_budget(), &wrapper);
         std::fs::write(root.join("dict").join(format!("{name}.bin")), &suffix).expect("write dict");
         let mut dict = wrapper.clone();
         dict.extend_from_slice(&suffix);
@@ -41,24 +38,24 @@ fn main() {
             priors_docs.push(doc[..take].to_vec());
             total += take;
         }
-        let mut priors: Option<Vec<u8>> = None;
-        for _ in 0..PRIORS_ROUNDS {
-            priors = Some(tokzip::train::train_priors(
-                dict.clone(),
-                &priors_docs,
-                priors.as_deref(),
-            ));
-        }
-        std::fs::write(
-            root.join("priors").join(format!("{name}.bin")),
-            priors.unwrap(),
-        )
-        .expect("write priors");
         println!(
             "{name}: dictionary {} B from {} docs; priors from {} docs ({total} B)",
             suffix.len(),
             docs.len(),
             priors_docs.len()
         );
+        trainees.push(tokzip::train::Trainee {
+            name: name.to_string(),
+            group,
+            dict,
+            docs: priors_docs,
+        });
+    }
+    for (trainee, priors) in trainees.iter().zip(tokzip::train::train_priors(&trainees)) {
+        std::fs::write(
+            root.join("priors").join(format!("{}.bin", trainee.name)),
+            priors,
+        )
+        .expect("write priors");
     }
 }

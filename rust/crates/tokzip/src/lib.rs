@@ -2,8 +2,9 @@
 //! encoder detects the language(s) of the input itself and picks the best of its embedded
 //! dictionaries per segment.
 //!
-//! Frame layout (format v0 — pre-release, changes freely without compatibility):
-//!   [0]    header byte: high nibble 0b1101 (magic), bits 3–2 = version (0; 3 is reserved for
+//! Frame layout (format v1; every change to the codec — algorithm, dictionaries, or priors —
+//! is a new version, and a decoder reads every version released before it):
+//!   [0]    header byte: high nibble 0b1101 (magic), bits 3–2 = version (1; 3 is reserved for
 //!          an extension byte), bits 1–0 = layout (0 single-segment, 1 multi-segment,
 //!          2 blocked, 3 stored)
 //!   varint decompressed length
@@ -20,6 +21,7 @@
 
 mod error;
 mod lang;
+mod languages;
 mod lz;
 mod rc;
 #[cfg(feature = "train")]
@@ -31,8 +33,8 @@ use lz::Segment;
 use varint::{push_varint, read_varint, varint_len};
 
 const MAGIC: u8 = 0xD0;
-const VERSION: u8 = 0;
-/// The header byte of a version-0 frame with `layout`.
+const VERSION: u8 = 1;
+/// The header byte of a version-1 frame with `layout`.
 const fn header(layout: u8) -> u8 {
     MAGIC | (VERSION << 2) | layout
 }
@@ -186,6 +188,12 @@ pub fn frame_len_with_language(content: &[u8], lang: usize) -> usize {
     body.len() + 1 + varint_len(content.len() as u64) + 4 + 1
 }
 
+/// Embedded language names, in id order (diagnostic use).
+#[doc(hidden)]
+pub fn language_names() -> Vec<&'static str> {
+    languages::LANGUAGES.iter().map(|(name, _)| *name).collect()
+}
+
 /// Detected segments as `(end, language id)` pairs (diagnostic use).
 #[doc(hidden)]
 pub fn segments(content: &[u8]) -> Vec<(usize, u8)> {
@@ -197,55 +205,40 @@ pub fn segments(content: &[u8]) -> Vec<(usize, u8)> {
 
 /// Codes `content` with the detected per-segment languages and returns the smallest whole
 /// frame. When detection is uncertain (see the gate below) it also codes the input as a single
-/// segment of each top candidate language — all of them up to 4 KiB, only the strongest gram
-/// match up to 64 KiB, none above — and keeps the smallest, comparing full frame length (body plus the segment
-/// table, which differs between single- and multi-segment frames). A confident single-language
-/// detection is coded as detected without trying alternatives.
+/// segment of the strongest gram-match language (up to 64 KiB) and keeps the smaller,
+/// comparing full payload length (body plus the segment table, which differs between single-
+/// and multi-segment frames). A confident single-language detection is coded as detected
+/// without trying alternatives.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     let (mut best_segments, gram_scores) = lang::analyze(content);
     let mut best_body = lz::encode_doc(&lang::primed, content, &best_segments);
-    let mut best_cost = best_body.len() + segment_table_len(&best_segments);
-    // Every candidate costs a full extra optimal parse (~0.35 ms at 4 KiB, ~2.8 ms at 18 KiB,
-    // ~70 ms at 1 MiB), so up to 4 KiB all top candidates are tried, up to 64 KiB only the
-    // strongest gram match, and above that none. The single parse matters at LLM-answer sizes:
+    let best_cost = best_body.len() + segment_table_len(&best_segments);
+    // The extra parse costs as much as the first (~0.35 ms at 4 KiB, ~2.8 ms at 18 KiB,
+    // ~70 ms at 1 MiB), so it runs only up to 64 KiB. It matters at LLM-answer sizes:
     // multi-segment documents of 5-30 KB coded 1-4% larger as detected than as the best single
     // language (an 18 KB answer whose ```html fence pins a long `<script>` to the html
-    // dictionary: 5,145 vs 4,977 bytes as `text`), and the winner was the top gram candidate.
-    // The gain does not stop at 64 KiB (a 90 KB document of that shape still codes ~2.7% larger
-    // than its best single language), but above it the extra parse costs more CPU (~15 ms at
-    // 90 KB, ~70 ms at 1 MiB, doubling compression time) than a few percent is worth here.
-    const FULL_SEARCH_MAX: usize = 4 * 1024;
-    const SINGLE_CANDIDATE_MAX: usize = 64 * 1024;
-    {
-        let mut candidates = lang::top_languages(&gram_scores);
-        if content.len() > SINGLE_CANDIDATE_MAX {
-            candidates.clear();
-        } else if content.len() > FULL_SEARCH_MAX {
-            candidates.truncate(1);
-        }
-        let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
-        // Search only when detection is uncertain — a multi-segment split, or a single language
-        // that is not the strongest dictionary match (the fence-hint-overwhelm case). A
-        // confident single-language detection (its segment is the top gram candidate) is
-        // trusted as-is: it carries no never-worse-than-single guarantee, trading a few bytes on
-        // rare ties for not running extra parses on the common pure-single-language document.
-        if detected_single != candidates.first().copied() {
-            for lang in candidates {
-                if Some(lang) == detected_single {
-                    continue;
-                }
-                let single = vec![Segment {
-                    end: content.len(),
-                    lang,
-                }];
-                let body = lz::encode_doc(&lang::primed, content, &single);
-                let cost = body.len() + segment_table_len(&single);
-                if cost < best_cost {
-                    best_cost = cost;
-                    best_body = body;
-                    best_segments = single;
-                }
-            }
+    // dictionary: 5,145 vs 4,977 bytes as `text`), and the winner was the top gram candidate;
+    // trying further candidates changed nothing measurable. The gain does not stop at 64 KiB
+    // (a 90 KB document of that shape still codes ~2.7% larger than its best single language),
+    // but above it the extra parse costs more CPU (~15 ms at 90 KB, ~70 ms at 1 MiB, doubling
+    // compression time) than a few percent is worth here.
+    const CANDIDATE_MAX: usize = 64 * 1024;
+    let top = lang::top_language(&gram_scores);
+    let detected_single = (best_segments.len() == 1).then(|| best_segments[0].lang);
+    // Search only when detection is uncertain — a multi-segment split, or a single language
+    // that is not the strongest dictionary match (the fence-hint-overwhelm case). A confident
+    // single-language detection (its segment is the top gram candidate) is trusted as-is: it
+    // carries no never-worse-than-single guarantee, trading a few bytes on rare ties for not
+    // running an extra parse on the common pure-single-language document.
+    if content.len() <= CANDIDATE_MAX && detected_single != Some(top) {
+        let single = vec![Segment {
+            end: content.len(),
+            lang: top,
+        }];
+        let body = lz::encode_doc(&lang::primed, content, &single);
+        if body.len() + segment_table_len(&single) < best_cost {
+            best_body = body;
+            best_segments = single;
         }
     }
     (best_segments, best_body)
@@ -563,11 +556,13 @@ mod tests {
         assert_eq!(decompress(&[], usize::MAX), Err(DecodeError::Truncated));
         assert!(decompress(&frame[..frame.len() / 2], usize::MAX).is_err());
         let mut bad = frame.clone();
-        bad[0] = MAGIC | (1 << 2);
-        assert_eq!(
-            decompress(&bad, usize::MAX),
-            Err(DecodeError::UnsupportedVersion)
-        );
+        for version in (0..4).filter(|&v| v != VERSION) {
+            bad[0] = MAGIC | (version << 2);
+            assert_eq!(
+                decompress(&bad, usize::MAX),
+                Err(DecodeError::UnsupportedVersion)
+            );
+        }
         bad[0] = 0x42;
         assert_eq!(decompress(&bad, usize::MAX), Err(DecodeError::BadMagic));
         // A stored empty frame whose length varint encodes 2^64 must not wrap to 0 and decode.

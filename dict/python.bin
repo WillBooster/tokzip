@@ -1,0 +1,1929 @@
+    warnings.warn(
+        (
+            "This helper function iormalizer"):
+        if chardet is None:
+            try:
+      None,
+        host="localhost",
+        port=0,
+        requests"))
+
+            return request_content
+
+        return Server(tValidationError
+from pydantic_core import core_schema as cs
+
+froapplication/json"
+
+    def test_list(self):
+        assert list(uration ------------------------------------------------
+
+# If y CustomBaseModel(BaseModel):
+    model_config = ConfigDict(
+      url = f"http://{host}:{port}/"
+        with pytest.raises(reeturn None
+
+    def __enter__(self):
+        self.start()
+      e("utf-8")
+    assert expected_header in r.content
+    assert r.e_python(input_value)
+    else:
+        assert v.validate_pythonession
+    """
+    return Session()
+import requests
+
+
+def test_c self.case_insensitive_dict
+
+    @pytest.mark.parametrize(
+     om collections import OrderedDict
+from datetime import timedelta      v.validate_test(input_value)
+
+    error = exc_info.value.e      'loc': (3,),
+            'msg': 'Input should be a valid is_schema=cs.int_schema(), values_schema=cs.int_schema()))
+    wiModel"  [call-arg]
+model = Model(x=1)
+# MYPY: error: Missing namasRepr, IsStr
+
+from pydantic_core import SchemaValidator, Valida isinstance(session_setting, Mapping) and isinstance(request_set: 1})
+    assert exc_info.value.errors(include_url=False) == [
+ ict_class=CaseInsensitiveDict
+            ),
+            params=ass M:
+    x: int
+
+ValidatedM = pydantic.dataclasses.dataclass(Mnto the response object as a private
+        # attribute.
+      tirely.
+    """
+    if session_hooks is None or session_hooks.geUT)
+        else:
+            if self.wait_to_close_event:
+     sert s.to_python(1) == 1
+    assert s.to_python(None, mode='j_schema': {'type': 'int'}, 'values_schema': {'type': 'int'}, 'fases(ValidationError, match=re.escape(expected.message)):
+    atetime(2021, 2, 1, 7, 15)},
+    )
+    assert rv == (
+        'c_complex_json(value, expected):
+    v = SchemaSerializer(core_sct
+            and new_parsed.port in default_port
+        ):
+   
+AliasGeneratorModel(x=1)
+AliasGeneratorModel(x_=1)
+AliasGeneratreturn 1
+
+    v = SchemaValidator(cs.dict_schema(keys_schem,
+    PydanticDeprecatedSince20,
+    PydanticDeprecatedSince211,odel.model_construct(_fields_set={'x'}, x=1, y='2')
+Model.model_   app.register_blueprint(frontend)
+    app.register_blueprint(b       codes.temporary_redirect,
+                codes.permanentcalled
+from __future__ import annotations
+
+import logging
+importexc_info.value)
+
+    with pytest.raises(ValueError) as exc_info:      )
+        prep = self.prepare_request(req)
+
+        proxiep_safe=False,
+    classifiers=[
+        "Development Status :: 5s:
+                raise TooManyRedirects(
+                    fs, field_schema: Dict[str, Any]) -> None:
+        field_schema.useModel, alias_generator=lambda x: x + '_'):
+    x: int = Fiel, True)
+        return self.request("GET", url, **kwargs)
+
+    dgenerator")
+def hello_generator() -> t.Generator[str, None, None    # commit to fail. Show a validation error.
+    : t.Any, **kwargs: t.Any) -> str:
+    """Serialize data as JSON.0000-0000-000000000000'), '00000000-0000-0000-0000-000000000000'"values": {',
+        '"0": "foo",',
+        '"1": "foo",',
+     test_create_update_validate(client, auth, path):
+    auth.logint=10)),
+                'b': core_schema.typed_dict_field(core_sass Model(BaseModel):
+        a: str
+
+        @field_validator('lue)
+
+    assert client.get("/decorator").data == b"boom"
+    asinteger',
+                    'input': 'a',
+                },      s = cs.union_schema(
+            [step.left._apply_pipelinld_info = Field(default=default, default_factory=default_factoryance(value, Morsel):
+            c = morsel_to_cookie(value)
+   st.environ["wsgi.errors"]  # type: ignore[no-any-return]
+
+    re 'model_fields' attribute"):
+        assert len(m.model_fields) '})
+    assert m.model_dump() == {'a': 10.2, 'b': b'foobar', 'c'     __pydantic_initialised__: ClassVar[bool]
+        __pydanticlass:`Request`.
+        :param \*\*kwargs: Optional arguments t_registration,
+    app,
+    client,
+) -> None:
+    parent = flas    if isinstance(request, Request):
+            raise ValueErroodeError) as excinfo:
+        r.json()
+    assert isinstance(excmethod
+
+
+class Session(SessionRedirectMixin):
+    """A Requests wConnectionError,
+    ProtocolError,
+)
+from urllib3.exceptions i      except KeyError:
+            username, password = None, No
+class KwargsInheritingModel(KwargsModel, frozen=False):
+    html_search_options = {'type': 'default'}
+
+# The name of a java: Invalid value for "Config.from_attributes"  [pydantic-config]
+ ListConverter(BaseConverter):
+        def to_python(self, value      'type': 'fs',
+                'path': '/var/app/images',
+  the
+        :class:`Session`.
+
+        :param request: :class:`CoreSchemaHandler
+
+from pydantic_core import PydanticCustomErrort
+
+
+KwargsDynamicAliasModel(y='y', z=1)
+KwargsDynamicAliasModel(      """
+        headers = prepared_request.headers
+        urlroxy=no_proxy)
+            for k, v in env_proxies.items():
+    S"}'
+    assert Model.model_validate_json(json_data).x == timede  match=r"Expected `int` - serialized value may not be as expect_setitem__(self, name, value):
+        """Dict-like __setitem__ True, slots=True)
+class _Constraint:
+    constraint: _Constraintrewindable = prepared_request._body_position is not None and (
+ s_field(
+                name='b', schema=core_schema.list_schem def __init__(self):
+        #: A case-insensitive dictionary ofts(app, client):
+    @app.route("/json", methods=["POST"])
+    drn urlunparse(
+            [
+                parsed.scheme,
+    ositional_schema([core_schema.int_schema(), core_schema.int_scif typing.TYPE_CHECKING:
+    from .models import PreparedRequest     'mypy',
+        'pydantic-extra-types',
+        'pydantic-se(
+    ('fail_fast', 'expected'),
+    [
+        pytest.param(
+  (test_value, expected, app, app_ctx):
+    app.json.ensure_ascii multiple_content_length_response_handler)
+
+    with server as (h
+
+if TYPE_CHECKING:
+    from pydantic.v1.typing import CallableG  self,
+        rule: str,
+        endpoint: str | None = Noert v.to_python(UUID('12345678-1234-5678-1234-567812345678')) ==SON serializable Python object to send in the body of the :classtopIteration:
+                pass
+
+        if not stream:
+     alue = defaultdict(
+                dict,
+                {
+    definition_reference_schema(schema)
+            return schema
+  e TypeError(
+            f"create_cookie() got unexpected keywor     },
+     ...
+   }
+
+The other HTTP methods are supported - se class Module:
+        @staticmethod
+        def create_app():
+  exclude_none: bool = False,
+            exclude_computed_fieldsdantic import BaseModel, RootModel
+
+
+class Pets1(RootModel[list[]
+    assert v.validate_json(b'[[1, 2], [3,', allow_partial=Truest`` takes.
+        :rtype: requests.Response
+        """
+
+     lines == sorted_by_str
+
+
+def test_html_method():
+    class Objec Whether the connection pool should block for connections.
+
+     = _preloaded_ssl_context
+    elif isinstance(verify, str):
+    _dataclass',
+    'make_dataclass_validator',
+]
+
+_T = TypeVar('_TueError, match=".*must be absolute"):
+        flask.Flask(_ame_not_allowed(app, client):
+    with pytest.raises(ValueError)     'title': 'Model',
+                'type': 'object',
+    H:%M:%S %Z"')
+    assert flask.json.dumps(dt) == expected
+
+
+def ``"ssl_context"`` will be set and will be the
+          default r(self, variable_name: str, silent: bool = False) -> bool:
+     pool_block
+        )
+
+    def init_poolmanager(
+        self, co  if schema_type == 'arguments':
+        schema = generate_schemgister_validate_input(client, username, password, message):
+   ):
+    bp = flask.Blueprint("test", __name__)
+
+    @bp.route("/ft for the server to send
+            data before giving up, as avalid integer, unable to parse string as an ]
+
+
+@pytest.mark.parametrize("var,scheme", _proxy_combos)
+def teedicate_name}failed',  # pyright: ignore[reportArgumentType]
+  
+    @classmethod
+    def as_view(
+        cls, name: str, *clastModel,
+    TypeAdapter,
+)
+from pydantic._internal._config impor "https://github.com/psf/requests/pull/6710 for more details."
+  threading
+
+import pytest
+from tests.testserver.server import Seself, '__pydantic_fields_set__', state['__pydantic_fields_set__'field_name='a', input_value='different', input_type=str\]",
+    f __get_validators__(cls) -> 'CallableGenerator':
+     riminator_alias',
+    'get_discriminator_alias_and_values',
+    test_field: str = Field(default='', validation_alias=AliasChoicif not isinstance(e.reason, NewConnectionError):
+   0),
+    'bisque': (255, 228, 196),
+    'black': (0, 0, 0),
+    'ime(2022, 6, 8, 12, 13, 14), datetime(2022, 6, 8, 12, 13, 14)),
+     conn.ca_certs = None
+            conn.ca_cert_dir = None
+
+ool_kwargs["cert_file"] = client_cert
+    host_params = {
+      _schema
+
+    # insert_assert(Model.model_json_schema())
+     NaN values not permitted')),
+        (float('inf'), Err('Input ueprints: list[tuple[Blueprint, dict[str, t.Any]]] = []
+
+    dic_core_schema__(self, source_type: Any, handler: GetCoreSch discriminated a pydantic dataclass that is actually a wrapper a6"'),
+        (timedelta, lambda: timedelta(days=12, seconds=34,oute("/")
+    def index():
+        return flask.jsonify(vl_dump(mode='json') == {'a': 'Thu, 01 Jan 20 01:01:00', 'b': 360bute is deprecated and will be removed in"
+            " Flask 3      ('signup_ts', None),
+        ('friends', []),
+    ]
+
+
+@py description=about["__description__"],
+    long_description=reade(
+    'input_value,expected',
+    [
+        (
+            timedb.com/pydantic/pydantic/issues/12393"""
+
+    class Foo(BaseMoelf.deferred_functions.append(func)
+
+    @setupmethod
+    def re JSON-formatted string.
+
+        The serialization will be confi: type[BaseModel], obj: Any) -> Any:
+    with pytest.warns(
+    e
+
+try:
+    import threading
+except ImportError:
+    import dummc_info:
+        v.validate_python({'a': 11, 'c': 1, 'b': 12}, alidators'),
+    'BeforeValidator': (__spec__.parent, '.functi Untyped fields disallowed  [pydantic-field]
+
+
+DefaultTestingMode integer")
+    elif morsel["expires"]:
+        time_template =      ("No", False),
+            ("True", True),
+        ],
+    )(py_and_json: PyAndJson):
+    v = py_and_json({'type': 'dict', '
+kwargs_model = KwargsModel(x=1, y='y', z='z')
+kwargs_model = Kw_code == 302
+        close_server.set()
+
+
+def test_digestauth_40 passed to the ``dump`` implementation.
+
+    .. versionchanged::cs.no_info_plain_validator_function(func)
+
+    if s['type'] == 'er in the parsing, we choose them
+        # to look the same as questsCookieJar()
+
+    if cookie_dict is not None:
+        namesschema.str_schema(), core_schema.int_schema(ge=10))
+        lax_validator.validate_python({'x': '1'}, strict=True)
+    a Undefined
+from pydantic.v1.main import create_model, validate_m'
+
+
+class InheritingModel2(FrozenModel):
+    class Config:
+          'ctx': {'field_type': 'List', 'min_length': 2, 'actual_lengrust environment settings for proxy configuration, default
+     r\n'
+                b'Content-Length: 0\r\n'
+                b'return template_string()
+
+    # Register the blueprint
+    appeVar('T')
+
+
+class Response(BaseModel, Generic[T]):
+    data: T
+t_dict():
+    v = SchemaValidator(core_schema.dict_schema(core_s_model_title_generator_in_submodel(model_title_generator):
+  FieldInfo) or _is_field_cached_property(self, k))
+        }
+         response.status_code = getattr(resp, "status", None)
+
+       name: str,
+        import_name: str,
+        static_folder: s raise NotImplementedError
+
+
+class HTTPAdapter(BaseAdapter):
+          This method should not be called from user code, and is oer_version
+        ),
+        RequestsDependencyWarning,
+    )
+
+T], *, strict: bool = False) -> _Pipeline[_InT, _NewOutT]: ...
+
+error: Argument "_env_prefix" to "Settings" has incompatible ty      (frozenset, lambda: frozenset([1, 2, 3]), b'[1,2,3]'),
+   mport typing_extensions as te
+
+    from .sansio.app import App
+
+ate_attribute as get_template_attribute
+from .helpers import mak):
+    pass
+
+
+class BlueprintError(Exception):
+    pass
+
+
+clasupported Python version
+==========================
+This version  app
+
+    client = app.test_client()
+
+    rv = client.get("/")
+ r, g, b, alpha)
+
+    def __getitem__(self, item: Any) -> Any:
+  le)
+
+    context = ssl.create_default_context(ssl.Purpose.CLIENT      stream=stream,
+            timeout=timeout,
+            ve # Only scheme should be lower case
+            conn = self.pool    a: int
+
+        @model_validator(mode='after')
+    ne = None,
+        view_func: ft.RouteCallable | None = None,
+ es)
+        scheme = urlparse(request.url).scheme
+
+        is_pr: {'title': 'X', 'type': 'integer'}},
+            'required': ['foo")'),
+        # invalid identifier
+        ("cliapp.factory",) is MyEnum.a
+    assert v.validate_python('1') is MyEnum.a
+
+        (float('nan'), 'NaN'),
+    ],
+)
+def test_json_inf_nan_allowschema.with_default_schema(schema=core_schema.enum_schema(ColorEimal('123456789123456789123456789.123456789123456789123456789'), "ForbidExtraModel"  [call-arg]
+
+
+class KwargsForbidExtraModel(Bssert result.exit_code == 0
+    assert result.output == "teert ta.json_schema() == {'anyOf': [{'type': 'string'}, {'typedef __repr__(self) -> str:
+        return f"<{type(self).__name_foreRequestCallable)
+T_error_handler = t.TypeVar("T_error_handlechema.timedelta_schema())
+    if isinstance(expected, Err):
+   te_json_schema.mode
+
+    def __call__(self, core_schema: CoreSche:
+    ta = TypeAdapter(str)
+
+    assert ta.dump_json('à', ensuram kwargs: The keyword arguments from the call to send().
+     ill be removed in Flask 2.1. The file must be text
+        mode,in iter(self):
+            yield cookie.name, cookie.value
+
+    chema(items_schema=items, variadic_item_index=variadic_item_inde1.1
+    assert major >= 1
+    if major == 1:
+        assert minolidate_by_name=config_wrapper.validate_by_name,
+   __(self, request):
+        self._r = request
+        self._new_hquest, verify, proxies=None, cert=None):
+        """Returns a urtils import cached_property
+
+from .. import typing as ft
+from ..d work
+    out of the box with externally provided instances of logic to change parameters as desired. For
+        example, if o: Annotated[timedelta, AfterValidator(lambda x: x), PlainSerialis,
+                maxsize=self._pool_maxsize,
+                bd_function_parentheses = False
+
+# If true, the current module na microseconds'),
+        ),
+    ],
+    ids=repr,
+)
+def test_timeallable
+from typing import TYPE_CHECKING, Any, Literal
+
+from      {'type': 'int_type', 'loc': ('x',), 'msg':n = cls.__pydantic_run_validation__
+    try:
+        cls.__pydanschema.enum_schema(MyEnum, list(MyEnum.__members__.values())))
+
+.
+import importlib.metadata
+import os
+import platform
+import sslmsg': 'List should have at least 1 item after validation, not 0'ype': 'value_error',
+        },
+    ]
+
+
+def test_type_error(_INNER = core_schema.definitions_schema(
+    core_schema.definitDataclassClassOrWrapper']:
+        ...
+
+    @dataclass_transformerror: Property "y" defined in "Model" is read-only  [misc]
+Mode:
+    @pydantic_dataclass
+    class Foo:
+        bar: int
+     Foo(a='hello', b=b'more')) == IsStrictDict(a='hello', b=b'more')xtlib import ExitStack
+from copy import copy
+from types import Tby_alias=True)['properties'] == {
+        'x': {'default': 'teste, '2017-01-01T12:13:14.567', datetime(2017, 1, 1, 12, 13, 14, 5ath, name)
+
+
+class CookieConflictError(RuntimeError):
+    """Thext", test_path, "cliapp.message.txt"),
+    ),
+)
+def test_preparee generating dataclass
+            if sys.version_info >= (3, 10tions.abc import MutableMapping
+from datetime import datetime
+fr 1
+    assert model.model_dump(exclude_unset=True) == {'foo': 'F 8, 0, 0, 0, 123457, tzinfo=timezone.utc)),
+        ('1654646400[_InT, datetime.datetime]) -> _Pipeline[_InT, datetime.datetime]t, values):
+        values.setdefault("lang_code", flask.g.lang_atetime, time, timedelta, timezone
+from decimal import Decimal
+f in app.jinja_env.filters.keys()
+    assert app.jinja_env.filterises(TemplateNotFound) as e:
+            flask.render_template("Model2(BaseModel):
+    x: str = Field(..., alias=x_alias)
+    z: consume_socket_content(sock, timeout=0.5)
+        location = f'on_partial_typed_dict():
+    v = SchemaValidator(
+        core_sschema_generator: type[GenerateJsonSchema] = GenerateJsonSchema,chema.plain_serializer_function_ser_schema(partial(f, 'extra'), otationModel()
+# MYPY: error: Missing named argument "undefined"],
+        silent: bool = False,
+        text: bool = True,
+    tle = None
+
+# A shorter title for the navigation bar.  Default iendpoint
+
+    app.register_blueprint(bp, url_prefix="/py")
+
+    eneric type inference.
+    @overload
+    def validate_as(self, t    if dc_cls.__pydantic_model__.__config__.validate_assignment Jar, this class is pickleable."""
+        state = self.__dict__.f test_installed_module_paths(
+    modules_tmp_path, modules_tmppp_context_processor
+    def not_answer_context_processor():
+        extend(self.url_default_functions, app.url_default_functin True
+    except ValueError:
+        return False
+
+
+def _find_ppected \[input_value=123, input_type=int\]',
+    ata):
+    s = TaggedJSONSerializer()
+    assert s.loads(s.dumps(python(data)
+    benchmark(v.validate_python, data)
+
+
+def test_natetime.now(timezone.utc) + app.permanent_session_lifetime
+     equest variables this function accepts the same arguments as
+   )
+
+    m = re.fullmatch(r_hex_short, value_lower)
+    if m:
+     data
+    with app.app_context():
+        init_db()
+        get_ 'fields': {'b': {'type': 'model-field', 'schema': {'type': 'booigDict(from_attributes=True)
+        en_name: str
+        jp_nam'a': 'not_an_int'}), ('a',)],
+        [ArgsKwargs((), {'a': 1, '):
+    from werkzeug.routing import Rule
+
+    app.url_map.add(Ruent, '.types'),
+    'confloat': (__spec__.parent, '.types'),
+      ('424242424242424267', True),
+        ('4242424242424242675 __name__ == "__main__":
+    print(where())
+import sys
+
+from .co"python{sys.version_info.major}.{sys.version_info.minor}"
+    rv_CONSTRAINTS, *STRICT}
+
+LIST_CONSTRAINTS = {*LENGTH_CONSTRAINTS, .fields import PrivateAttr as PydanticModelPrivateAttr
+
+    # de(params=['python', 'json'])
+def py_and_json(request) -> PyAndJsype': 'tuple', 'items_schema': [{'type': 'int'}, {'type': 'bytes milliseconds since epoch
+        ('milliseconds', 1654646400, d      super().__init__(*args, **kwargs)
+        self.preserve_cor
+
+from . import packages, utils
+from .__version__ import (
+           x: MyExoticType
+
+        @field_serializer('x')
+     sert set(m.model_dump().keys()) == {'a', 'b', 'c', 'd'}
+    a,
+    'is_namedtuple',
+    'is_typeddict',
+    'is_typeddict_spenv = field_info_from_config.get('env') or field.field_info.extrarain(self: _Pipeline[_InT, _OutT], constraint: annotated_types.Pf self.has_static_folder:
+            state.add_url_rule(
+    Subclasses can override this to return a subclass of the setup st
+
+    close_server = threading.Event()
+    server = Server(digeclass MyModel(BaseModel):
+        x: int
+        y: str
+
+    m       Keyword.Namespace:         "bold #004461",   # class: 'kn a: list[int]
+
+        @field_validator('a', mode='before')
+     self.validator = SchemaValidator(schema, config)
+     del = SelfReferencingModel(submodel=SelfReferencingModel(submodely if it is unavailable.
+
+    ::
+
+        class User(db.Model):
+ster handlers for arbitrary exceptions::
+
+            @app.errors={
+                    'field_a': core_schema.model_field(schem:`~flask.current_app` is available, it will use its
+    :meth:`aeferred'
+
+    if method == 'validate':
+        assert ta.valida_type_hints = get_type_hints
+
+else:
+
+    def get_all_type_hints(assert server.handler_results[0] == b""
+
+    def test_request_re flask.url_for("index", _external=True) == "http://localhost/"
+
+(
+    'field_type,input_value,expected,raises_match,strict',
+ ontent.startswith(b"GET / HTTP/1.1")
+        sock.send(text_200_tput = v.validate_json(input_value)
+        assert output == exp"
+
+    kwargs.setdefault("allow_redirects", False)
+    rests["is_boolean"](False)
+
+
+def test_add_template_test(app):
+    )}
+    assert m.model_dump_json() == '{"a":"2032-01-01T01:01:00"dantic_private__ = None
+    __pydantic_extra__ = None
+
+    root:ate` instead',
+        '`load_str_bytes` is deprecated',
+    ]
+ 
+from flask import Flask
+
+app1 = Flask("app1")
+app2 = Flask("appeam the request content.
+        :param timeout: (optional) How  str | os.PathLike[str] | None) -> None:
+        if value is no__ = getattr_migration(__name__)
+from pathlib import Path
+from t      cs.arguments_v3_parameter(name='kwargs', sche Blueprint,
+        app: App,
+        options: t.Any,
+        fiation=True)
+
+    m = Model(x=1, y=2)
+
+    assert m.x == 1
+    wisert rv.data == b"dcba"
+
+
+def test_template_filter_after_route_w      {'a': 11, 'b': [{'a': 10, 'b': 20}, {'a': 30, 'b': 40}]}
+ return True
+
+    def from_object(self, obj: object | str) -> Noal[str]
+
+
+p = AddProject(name='x', slug='y', description='z')
+
+
+llable = t.Callable[
+    [t.Optional[str], t.Optional[t.Dict[str[misc]
+KwargsMutationModel.model_validate(model.__dict__)
+
+
+cla: int = 1
+
+
+KwargsNotFrozenModel(x=1).x = 2
+KwargsNotFrozenMydanticUserError
+from ._internal import _model_construction, _reaclass
+from pydantic.errors import PydanticUndefinedAnnotatidError()
+
+
+session_json_serializer = TaggedJSONSerializer()
+
+
+dename)
+
+    def set_cookie(self, cookie, *args, **kwargs):
+    s for TypedDict.
+    t.Mapping[str, t.Any],
+    t.Iterator[str], config=core_schema.CoreConfig(extra_fields_behavior='allow'),
+ dantic-alias]
+
+
+KwargsAliasGeneratorModel(x=1)
+KwargsAliasGe
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.inters��'),
+    }
+
+
+def test_from_attributes():
+    class PetCls:
+    , self_instance='foobar') == 'abc'
+    assert v.isinstance_pythocls: Type['Dataclass'],
+    config: Type[BaseConfig],
+    validaonse = Response[Model](data=model, error=None)
+response = Responnew fragment is encountered in a Location header, it should
+     in enumerate(self.__class__.__dataclass_fields__.values()):
+   est` object.
+    :param params: (optional) Dictionary, list of t config_wrapper: _config.ConfigWrapper,
+    ns_resolver: NsResolort dataclass
+
+
+@dataclass
+class Foo:
+    foo: int
+
+
+@datacl]]
+
+
+class InitSettingsSource:
+    __slots__ = ('init_kwargs',)
+value='xxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxx', inpualues
+        are passed through a loading function to attempt tld"
+    app.config["SERVER_NAME"] = domain_name
+    response = c evaluate_forwardref(type_: ForwardRef, globalns: Any, localns: f test_json_decode_compatibility_for_alt_utf_encodings():
+
+    d == [1, 2, 3]
+    assert y.deep['deep_thing'] == [1, 2, 3]
+
+
+def(typevars_map.keys(), typevars_map.values()) and typevars_map:
+ edelta(seconds=-86400.122), timedelta(seconds=-86400.122)),
+   t v.to_json([1, 2, 3]) == b'[1,2,3]'
+
+    expected_warnings = [y_name=True):
+    i: int = Field(alias='j')
+
+
+MetaclassArgumenert serializer.to_python(ModelB(a=123, b='test'), **kwargs) == {empts to parse values as any
+        valid JSON type, including IPv4Network,
+    IPv6Address,
+    IPv6Interface,
+    IPv6Network self, name: str | None = None
+    ) -> t.Callable[[T_templalidator
+
+from .nested_schema import inlined_schema, input_data_v weeks=2, hours=1, minutes=2, seconds=3)),
+        ({'le': timed: Union[int, str], g: Union[int, str], b: Union[int, str], alphaError, core_schema
+
+from ..conftest import Err, PyAndJson
+
+try:
+"
+    from inspect import Parameter, Signature, signature
+
+         If the ``obj`` argument is not given, passes an instance of   app.session_interface = MySessionInterface()
+
+    @app.get("/, value: Any, items: Union['AbstractSetIntStr', 'MappingIntStrAnema(), serialization=core_schema.filter_seq_schema(include={1, 3'a4paper').
+    #'papersize': 'letterpaper',
+    # The font sizee, no module index is generated.
+# html_domain_indices = True
+
+# ignore
+        self.static_url_path = static_url_path
+
+     Error
+
+    @property
+    def static_folder(self) -> str | None:
+schema.any_schema()))
+    with pytest.warns(
+        UserWag value to match a regular expression pattern.
+
+        Args:
+  return False
+
+            e.strerror = f"Unable to load confige'`` is a string
+        defining the content type of the given ": ("https://docs.python.org/3/", None),
+    "urllib3": ("https:sk("appname2")
+
+    pytest.raises(NoAppException, find_best_app,e]
+        ] = defaultdict(list)
+
+        #: A data structure ofLiteral,
+    NotRequired as TypedDictNotRequired,
+    Required a      '$defs': {
+            'a': {
+    .dump_python(MyModel(x={'foo': [1, 2]})) == {'x': {'foo': [1, 2]      y: int
+        z: int
+
+        @root_validator(pre=True)
+ OuterModel, SimpleModel
+
+
+@pytest.mark.benchmark(group='model_s=Model(a='12'))
+    m2 = deprecated_copy(m, include={'a'})
+
+    ument "y" for "KwargsModel"  [call-arg]
+kwargs_model.y = 'a'
+# M"
+
+    __slots__ = (
+        'name',
+        'value',
+    
+EXPECTED_TYPE_ERROR_PY_STRICT_MESSAGE = 'Input should be an insield('test', const=True)
+
+
+def test_field_include_deprecation():me: str) -> tuple[str | None, str]:
+    """Find the prefix that S, POST" not in output
+        output = invoke(["routes", "--all     {'kwargs': {'x': 1, 'y': True}},
+            Err(
+    display_as_type,
+    get_args,
+    get_origin,
+    is_literal_tyent_app.name)
+
+    result = runner.invoke(cli, ["test"])
+    atetime [type=datetime_type')),
+        ('2022-06-08T12:13:14', E    config.
+
+    Either you can fill the config from a config fi(
+    ArgsKwargs,
+    SchemaSerializer,
+    SchemaValidator,
+   | None] | None,
+        ]
+    ],
+) -> None:
+    """This should hias=False,
+            include=None,
+            exclude=None,
+ c', 'd', 'e', 'f', 'g', 'h'), include={6}) == seq_f('b', 'd', 'f       DeprecationWarning,
+                stacklevel=2,
+     : 'int_parsing',
+            'loc': ('abc',),
+      dict(include=None, exclude=None, expected=['0', '1', '2', '3' def __getattr__(self, name):
+        return getattr(self._io, n.to_json, None)
+    pytest.raises(NotImplementedError, t.to_pythDsn',
+    'RedisDsn',
+    'MongoDsn',
+    'KafkaDsn',
+    'validgedJSONSerializer
+
+if t.TYPE_CHECKING:  # pragma: no cover
+    io(test_apps, monkeypatch):
+    obj = ScriptInfo(app_import_path=a: int
+        b: int = 42
+        c: float
+
+    instance = Foo(ositive': False, 'day': 1, 'second': 0, 'microsecond': 0}),
+    _multi_host_url_regex_cache
+    if _multi_host_url_regex_cache iint) -> int:
+    return a + b
+
+
+@shared_task()
+def block() -> No    v = flask.session.get("value", "None")
+        return v
+
+    = constraint.min_length
+        max_len = constraint.max_lengthmport CoreConfig, ExtraBehavior
+
+__all__ = 'Err', 'PyAndJson', 'anged:: 2.0.1
+            The ``name`` option can be used to cha_fields['qux'].title == 'QUX'
+
+    assert not FooModel.__pyda == 'a'
+assert alias_model.y == 'a'
+assert alias_model.z == 'a'
+new_schema_validator(self, schema, schema_type, schema_type_pathlidate_strings({'a': '11', 'b': '22'}) == snapshot({'a': 11, 'b' flask.abort(403)
+
+    @grandchild.errorhandler(403)
+    def gra() == {
+        'properties': {'a': {'description': 'descr', 'tis_set__ == {'field_a', 'field_b'}
+
+    m2 = MyModel()
+    vassert m2._foo_ == {'private'}
+
+    m._foo_ = PydanticUndefined
+ igDict(alias_generator=None, frozen=True, extra=Extra.forbid)
+
+
+    extra: Extra = Extra.forbid
+        arbitrary_types_allowed:sertion_error', 'loc': ('y',), 'msg': 'Assertion failed, ', 'inpport SerializationInfo, SerializerFunctionWrapHandler, WhenUsed
+r to make sure that we have covered all possible types.
+
+    Thiself" in call to "instance_method" of "ModelWithAnnotatedValidatoint name to associate with the view
+            function.
+     raises(PydanticUserError):
+        deprecated_from_orm(Pet, Noneng containing path of cookie
+        :return: cookie.value
+     _value) == expected
+
+
+def test_var_kwargs_invalid_dict(py_and       .. versionadded:: 0.10
+
+        :param name: the optiona')
+
+
+def test_modify_schema_error():
+    with pytest.raises(
+    string to be sent with `request`, or None.
+
+    :rtype: str
+   port Request
+
+
+class UnexpectedUnicodeError(AssertionError, Unic   "#000000",        # class: 'nv' - to be revised
+        Name.ne)
+RecursiveGenericAlias = TypeAliasType(
+    'RecursiveGeneric: ...
+
+    class Bare:
+        @computed_field
+        def prop_r rendering. If this is set, a Jinja loader will be added.
+    :self.__pydantic_validate_values__()
+                if hasattr(stest
+
+from requests import hooks
+
+
+def hook(value):
+    return vnclude=include, exclude=exclude, update=update, deep=deep)
+
+
+@py_GenericAlias
+
+    def get_args(t: Type[Any]) -> Tuple[Any, ...](v).replace('typing.', '')
+
+
+def resolve_annotations(raw_annotat.json_schema(json_nested_type)))
+
+    assert v.validate_python([e'):
+        ta.validate_python(1, by_alias=False, by_name=Falseoat_to_255(self._rgba.g)}, {float_to_255(self._rgba.b)}, '
+     hon(seq_f(0, 1, 2, 3, 4), include={2: None}) == seq_f(1, 2, 3)
+ tr(pydantic_encoder, '__deprecated__')
+        pydantic_encoder(ydanticSerializationError,
+    PydanticSerializationUnexpectedVa"subdomain"] = bp_subdomain
+            elif state.subdomain is  also
+    included in the copied request context.
+
+    Example::dapter(Annotated[int, WithJsonSchema({'type': 'invalid'})]).json("payment_required", "payment"),
+    403: ("forbidden",),
+    40loc': (),
+            'msg': 'Value error, foobar',
+   assert text == answer
+            sock.close()
+
+    def test_ser
+    inner_schema = core_schema.model_schema(
+        ModelInner different pages for
+    #: different users.
+    accessed = Fals is present, otherwise
+        set and return a default value. Lpe': 'typed-dict-field', 'schema': {'type': 'nullable', 'schues in all_values for v in values)
+    elif is_root_model:
+    .keys() - original_modules:
+        sys.modules.pop(key)
+
+
+@pyt class Custom(Exception):
+        pass
+
+    @pytest.fixture()
+  (self, key: str, default: t.Any = None) -> t.Any:
+        self.a8),
+    'lightcyan': (224, 255, 255),
+    'lightgoldenrodyellow']
+    logging.root.handlers = []
+    root_level = logging.root.landler(ParentException)
+    def parent_exception_handler(e):
+   Union[str, bytes, int, Tuple[Union[str, bytes, int], Union[str, 3: True}
+        >>> self._normalize_indexes({'__all__': True}, return normalized_items
+        for i in range(v_length):
+  provide_automatic_options: bool | None = None,
+        **options):
+    monkeypatch.setitem(sys.modules, "dotenv", None)
+    monk       Use :meth:`register_error_handler` instead of modifying
+  raise AttributeError(name) from None
+
+    def __setattr_    )
+
+
+def parse_mypy_version(version: str) -> tuple[int, int, ra kwargs
+        # does not have the same name as a field
+     mport Response
+
+app = Flask(__name__)
+
+
+@app.after_request
+def aassert generate_schema_calls.count == (0 if defer_build else 1),fails non-deterministically under pytest-xdist")
+    def test_revalue='123456789012345678901234...89012345678901234567890', inpu False
+    ) -> bool:
+        """Updates the values in the cort sys
+import typing as t
+from functools import update_wrapper
+fh templates that should be added
+        to the app's template slue to be greater than or equal to a certain value."""
+ 9c43-2eb5a363657c')),
+        (UUID('a6cc5730-2261-11ee-9c43-2eb.get_environ()
+
+    # these characters are all IDNA-compatible
+ ntic_config__ = ConfigDict(extra='forbid')  # type: ignore
+
+    type "str"; expected "int"  [arg-type]
+
+
+class Dynamicath == SchemaTypePath('tests.test_plugins', 'test_plugin_path_da])
+
+    # cert specified first
+    ctx = run_command.make_contexviron(builder.environ_base or {})  # type: ignore[arg-type]
+    mport Any, Generic, Optional, TypeVar
+
+from typing_extensions im   'FieldInfo(annotation=int, required=False, default=5, metadatric, NamedTuple, TypeAlias, TypeVar, Union
+
+import pytest
+from pield]
+
+    # Not required
+    f: Optional[int]
+    g: int = 1
+     @bp.errorhandler(403)
+    def forbidden(_: Exception):
+   pe[Any],
+    fields: Iterable['ModelField'],
+    json_encoders: der=None)
+        cli = FlaskGroup(create_app=lambda: app)
+      field_a: str = Field(field_title_generator=field_title_per.plugin_settings
+    )
+    cls.__pydantic_serializer__ = Sche.teardown_request
+    def teardown_bp(exc):
+        evts.append(221),
+    'powderblue': (176, 224, 230),
+    'purple': (128, 0, :param app: The Flask application to configure the environment f"""Dispatches request methods to the corresponding instance meth43),
+    'darkslateblue': (72, 61, 139),
+    'darkslategray': (4Type[Any]] = {
+    list,
+    set,
+    tuple,
+    frozenset,
+    corators applied to the class itself
+    will not be applied to  Documentation",
+        author,
+        "Requests",
+        "Onstance(type_adapter.validator, _mock_val_ser.MockValSer), 'Shoulon import jsonify
+from flask.testing import EnvironBuilder
+from :meth:`dispatch_request` to
+    create a generic class-based viechild_1"
+
+    @child.before_request
+    def child_before2():
+   ts.
+        #:
+        #: To register a function, use the :meth:lambda cls, v, values, field, config: validator(cls, v, values=vssert calls == [
+            "before-signal",
+            "befor)  # Use it
+        assert json.loads(raw.decode())['x'] == 1  # = pickle.dumps(m)
+    m2 = pickle.loads(b)
+    assert m.a == m2of(datetime_timestamp, datetime_microseconds, datetime_str)
+
+
+##ueprint the functions are active for, or ``None`` for all
+      moved, use `__get_pydantic_core_schema__` instead.',
+    ):
+
+    Field(2, alias='j')
+
+
+NoArguments(i=1)
+# MYPY: error: Unexpe type "int"; expected "str | None"  [arg-type]
+# MYPYchema.tuple_schema([f, f]), core_schema.tuple_schema([f, f, f])]assert not hasattr(flask.g, "value")
+        assert b"Internal SydanticTypeError',
+    'PydanticValueError',
+    'ConfigError',   code as an integer.
+        """
+        exc_class: type[Excepalias]
+    x: int
+# MYPY: error: Required dynamic aliases disalrespond to the HTTP status code 200.
+"""
+
+from .structures imporreportAttributeAccessIssue]
+
+# Similarly, we shouldn't rely on t.., True, {}),
+        ({'a': None}, {'a': None}, True, {}),
+   lizer__.to_python(child, serialize_as_any=False) == {    if type_args:
+        resolved_type_args = tuple(replace_typsBadConfig1(BaseModel, from_attributes={}):
+# MYPY: error: Invalince20, match='^The `parse_obj` method is deprecated; use `modelsage:" in result.stdout
+
+
+def test_help_echo_exception():
+    det, info: ValidationInfo) -> int:
+            assert info.context:
+    msg_template = 'field required'
+
+
+class ExtraError(Pyda4}]
+
+    assert s.to_json(v) == b'[{"a":1,"b":2},{"a":3,"b":4}]'nt_app._get_current_object()  # type: ignore[attr-defined]
+    treturn isinstance(value, bool)
+
+    bp.add_app_template_test(is_.loads(any_serializer.to_json(value)) == value
+    assert any_sethe following example:
+
+    ```python {test="skip" lint="skip"}
+e_model('DynamicModel', __base__=Model),
+        create_model('D      error = "Title is required."
+
+        if error is notBaseSettings):
+    foo: str
+
+
+s = Settings()
+
+s = Settings(foo='orModel2(x=1)
+AliasGeneratorModel2(y=1, z=1)
+
+
+class KwargsAraises(TypeError, match='a is too short'):
+        MyDataclass(a_model()` overload:
+        model = create_model(cls.__name__, _g': 'Extra inputs are not permitted', 'input': '2'}
+    ]
+
+    w print(merged_output)
+        print('***********************')
+  test_str_enum():
+    class MyEnum(str, Enum):
+        a = 'x'
+ nnerModel
+        y: MyType
+
+    data = {'inner': {'x': 'hello'}return decorator
+
+    @setupmethod
+    def app_url_value_preproc    .. code-block:: python
+
+            @ape>")
+def tuple_status(code: int = 200) -> tuple[str, int]:
+    ra.with_info_wrap_validator_function(Model._wrap_validator, model the error message is the same as the error message produced by cls.__module__ = oldcls.__module__
+    request.files.__class__ =model('FooModel', a=(str, Field('cake', validate_default=True)),Pick the path in the namespace that contains the submodule.
+    
+
+
+def smart_deepcopy(obj: Obj) -> Obj:
+    """
+    Return type _north_star_data_bytes()
+
+
+def _north_star_data_bytes() -> bytesreturn_type = _decorators.get_callable_return_type(
+      if field_name in merged_params or param_name in merged_paramsts=posts)
+
+
+def get_post(id, check_author=True):
+    """Get a pome", UserWarning, "flask.app"
+        )
+        with app.test_re but after every request, not only those
+        handled by the  new user.
+
+    Validates that the username is not already taken      (Decimal('42.0'), Decimal('42.0')),
+        (Decimal('42.5...
+
+
+@overload
+def model_serializer(
+    *,
+    mode: Literal['exclude) == expected
+
+
+@pytest.mark.parametrize(
+    'schema_fundefaults to the language option
+# or 'en' if the language is notcimal
+from ipaddress import IPv4Address, IPv4Interface, IPv4NetR_MESSAGE)),
+        ([], Err(EXPECTED_TYPE_ERROR_MESSAGE)),
+   rendered by the
+        application. Equivalent to :meth:`.Flasketurn_schema=return_schema,
+            when_used=self.when_usedNone, True),
+        (date, '2017-01-01', date(2017, 1, 1), None  This is available on both app and blueprint objects. When usedlues(), (10, 20, 30)),
+        ({1: 10, 2: 20, '3': '30'}, Err('):
+    r"""Sends a PUT request.
+
+    :param url: URL for the newpath)
+    app = obj.load_app()
+    assert app.name == "testapp"
+tance(v, dict):
+                updated_mapping[k] = deep_update __call__(self, *args: object, **kwargs: object) -> object:
+        if lenient_issubclass(field.annotation, JsonWrapper):
+  ion=platform.python_implementation() == 'PyPy', reason='https:/se ColorError(reason='alpha values must be a valid float')
+
+    d_package import app
+
+    assert app.instance_path == os.fspath(MyEnum(Enum):
+        a = 1
+        b = 2
+
+        @cledelta(hours=1)
+    assert output.tzinfo.dst(datetime(2022, 1, 1str] = None,
+        _env_nested_delimiter: Optional[str] = Nonee() -> None:
+    class TestValidator(BaseModel):
+        x: str
+strings_event_handlers: list[BaseValidateHandlerProtocol] = []
+ dantic.config.ConfigDict.defer_build] is set.
+
+    Returns:
+    eturn the input with no modifications.
+    new_type = type_map.g
+    async def before():
+        nonlocal app_before_called
+    tContains()),
+        (None, RemovedContains()),
+        (None, ct(ser_json_bytes='base64', val_json_bytes='base64')
+
+    r = R(    salt=self.salt,
+            serializer=self.serializer,
+         {'-7200000': 'foo'},
+            b'{"-7200000":"foo"}',
+   ot_path=os.path.dirname(__file__))
+    app.config.update(
+    n_transaction() as sess:
+            assert len(sess) == 1
+     .567', ValidationError, 'type=date_from_datetime_inexact', Falseub.com/Quansight-Labs/pytest-run-parallel/issues/14
+def terError"
+
+    def test_handle_generic_http(self, app, cldapter(Model)
+    forbid_validator = TypeAdapter(ModelForbid)
+
+ ization_with_model_serializer(config: bool, runtime: bool) -> Novalid datetime or date, input is too short [type=datetime_fromte_test.html", value=False)
+
+    bp = flask.Blueprint("bp", __natenvType] = env_file_sentinel,
+        _env_file_encoding: OptioDict(TypedDict, total=False):
+        title: Optional[str]
+     default.
+
+        ``view_func`` does not necessarily need to be # This is a mistake: the first argument to a validator is the clype': 'array', 'items': {'$ref': '#/$defs/JsonType'}},
+  schema.py'))), ids=str
+)
+@pytest.mark.thread_unsafe  # TODO inveError(f'Type {tp.__name__!r} is not a valid `BaseModel` or `datn`` at the start of the test session to have
+    standard valuesraise TypeError('This object cannot be deepcopied')
+
+
+deubclassRegistered)
+        return "forbidden-registered"
+
+    @acho("Hello, World!")
+
+    runner = app.test_cli_runner()
+    # it.mark.skipif(greenlet is None, reason="greenlet not installed")` module is a backport module from V1."""
+
+from ._migration imponvalid-identifier',), 'msg': 'Field required', 'type': 'missing' Model.__private_attributes__ == {'_foo': PrivateAttr(defaulected=[]),
+    ],
+)
+def test_filter_args(params):
+    s = Sche      ((1, 2, '3'), (1, 2, 3)),
+        ([1, 2, '3'], (1, 2, 3))
+
+    @field_validator('name')
+    def noop_validator_with_annotlass CoverageTester(Missing):  # noqa F821
+# MYPY: error: Name "est that the blueprint handles. To register with a blueprint and)
+
+    flask.before_render_template.connect(record, app)
+    try'z')
+
+
+# Same as Model, but with frozen = True
+class FrozenMto the canonical URL '{exc.new_url}'."
+        ]
+
+        if f"{PartialDict(fields={'b': IsPartialDict(schema=IsPartialDict(typees in assignment (expression has type "None", variable has typeument "x" for "DynamicAliasModel2"  [call-arg]
+Dynamic raise errors.UrlExtraError(extra=url[m.end() :])
+
+   ssert schema['type'] == 'model'
+    assert schema['root_model'] _protected_namespace():
+    with pytest.warns(UserWarning, matchest_function_wrap():
+    def f(input_value, handler, _info):
+   mpany_id>")
+    def view(company_id):
+        return company_id
+8-1234-1234-1234-567812345678', UUID('12345678-1234-1234-1234-5t(
+    input_list: Union[List[T], Tuple[T, ...]],
+    *,
+    nam(1, 2): 1}) == b'{"1,2":1}'
+
+
+def test_tuple_pos_dict_key():
+   .* must return str, not {invalid_return_value.__class__}'
+    ):Handler) -> core_schema.CoreSchema:
+        """Gets the Py field_time=time(12, 0, 0),
+        field_time_con=time(12, 0, 0date(2022, 6, 8)),
+        ('seconds', '1654646400', date(2022,hema': core_schema.model_schema(
+                cls=MyModel,
+{'validate_by_alias': config_by_alias} if config_by_alias is not: 'foo'}) == {h2: 'foo'}
+    assert s.to_python({h2: 'foo'}, mod, 2}, {1, 2, 3}, {1, 2, 3, 4}],
+            [{1}, {1, 2, 3, 4, 5p.__metadata__
+        # the fallback is needed for the same rea the second element being a mapping between
+    # the field namemports:
+    """Test Flasks are created without import.
+
+    Avoi module_name = custom_module_name or request.node.name
+
+   p.app_ctx_globals_class()
+        self._cv_tokens: list[contextvython(Decimal(value)) is MyIntEnum.VALUE
+    assert v_int.validaa
+
+
+def test_model_copy(ModelTwo):
+    m = ModelTwo(a=24, d=Modench': {'name': 'bar', 'sub_branch': {'name': 'baz', 'sub_brt get_plugins
+
+    plugins = get_plugins()
+    if plugins:
+   n_short
+
+__all__ = (
+    'PydanticDeprecatedSince20',
+    'Pydane,
+    runtime_by_alias: bool | None,
+    runtime_by_name: boo   min_value = cls.ge
+    max_value = cls.le
+    if cls.gt is no 'Should be initialized before usage'
+
+    if method == 'schema'ap` mode."""
+
+    ModelWrapSerializer: TypeAlias = 'ModelWrapSerls
+inheriting = InheritingModel(x='1', y='1')
+Model(x='1', y='2'sert cleanup_stuff == [None]
+
+
+def test_app_tearing_down_with_pr: Extra
+        allow_mutation: bool
+        frozen: bool
+     custom_error_type='snap',
+            custom_error_message='Inp'] in {'int', 'float', 'decimal'}:
+            s = s.copy()
+    assert_type
+
+from pydantic import validate_call
+
+
+@validate_callache_control.max_age == 3600
+        rv.close()
+
+        class Sraises(SchemaError, match='`members` should have length > 0'):
+ 
+from werkzeug.exceptions import BadRequest
+from werkzeug.exceptn(ann_type))
+
+
+def update_field_forward_refs(field: 'ModelField'2, 3)), ([1, 2, 3], [1, 2, 3])])
+def test_union_tuple_list(inpu if len(value) == 3:
+        r, g, b = (parse_color_value(v) for'function': {'type': 'with-info', 'function': f},
+            's(Protocol):
+    def __len__(self) -> int: ...
+
+
+_NewOutGt = Typemembers the
+    matched endpoint and view arguments.
+
+    It is , b]) is True
+    assert all_identical([a, b], [a, b]) is True
+ : 'definition-ref', 'schema_ref': 'foobar'}), ref='foobar'
+            2024, 1, 1, 15, 0, tzinfo=datetime.timezone.utc
+      
+GenericModelT = TypeVar('GenericModelT', bound='GenericModel')
+  def is_none_type(type_: Any) -> bool:
+        for none_type innput': None},
+        ],
+    ),
+    (
+        {'x': None, 'y': Nx': {'class_name': 'Model'},
+            }
+        ]
+
+    res = ected_to_json
+
+
+@pytest.mark.parametrize(
+    't,expected_to_jso   """Constrain a value to meet a certain condition.
+
+        Wepe': 'tagged-union',
+            'discriminator': 'foo',
+    self._infer_discriminator_values_for_choice(choice, source_name=Loader(os.path.join(self.root_path, self.template_folder))
+     presentation when you want to return a string
+    representationerator = Generator[AnyCallable, None, None]
+    ReprArgs = Sequ= plain_repr(v)
+    assert r.startswith('SchemaValidator(title="ssert MyModel.model_construct(a='a_value').a == 'a_value'
+    aretty__(self, fmt: Callable[[Any], Any], **kwargs: Any) -> Gener, message, category):
+        recorded.append((message, category   The return values of teardown functions are ignored.
+
+        strip_whitespace = True
+    min_length = 1
+    max_length =  least 3 items after validation, not 2 [type=too_short,')),
+     {'key': {'inner_key': 0}, 'other_key': 1},
+            'extrabclass and
+    provides all of the attributes Werkzeug defines p self.v_args_name = 'args'
+        self.v_kwargs_name = 'kwargsundefined_repr():
+    assert repr(PydanticUndefined) == 'Pydantine and content_type:
+        if content_type.endswith(('json', 'used to
+        reconstruct the same URL or a modified URL.
+    port re
+from collections import deque
+from typing import Any
+
+imWarning):
+    """A Pydantic specific experimental functionality = _cv_request.get(None)
+    rv: dict[str, t.Any] = {}
+    if appfoo': 'banana', 'spam': [1, 2, '3']}, {'foo': 'banana', 'spam': : bool,
+    extra: ExtraValues | None,
+) -> dict[str, Parameter]n the string.
+        """
+        return self.predicate(lambda vremote_addr = flask.request.remote_addr
+        flask.g.user_agehere is no guarantee on the order in which the session for each
+=r'Circular reference detected \(id repeated\)'):
+        s.to_p.model_rebuild()
+
+    node = Model.model_validate({'f': {'f': {'gister_type_strategy
+https://hypothesis.readthedocs.io/en/latest     ('mypy-plugin.ini', 'generics.py'),
+        ('mypy-plugin.iself._handle_choice(choice['schema'])
+        elif choice['type'  and not self.files
+        ):
+            from .debughelpers     b'1704067200000.0',
+            'milliseconds',
+   omain = self.get_cookie_domain(app)
+        path = self.get_cookprint, loader
+
+    def list_templates(self) -> list[str]:
+   def build_base_model(
+            base_model: Type[GenericedRootModel = RootModel[int]
+
+    class SubRootModel(RootModel):values: dict[str, Any]) -> Any: ...
+
+
+class V1ValidatorWithKwargidator(Parent.__pydantic_core_schema__)
+    Parent.__pydate. This currently just returns the value of
+        the :data:`python < 3.9 generic aliases don't exist so any of these like `lor value in values for x in all_literal_values(value))
+
+
+def is_ror")
+    def bp_test():
+        raise InternalServerError()
+
+    value = current_app.config["SEND_FILE_MAX_AGE_DEFAULT"]
+
+     'b': 2, 'c': 3},
+        {'a': 1, 'c': 3, 'extra': 'value'},
+   'forbid')
+import json
+import pickle
+from enum import Enum
+from sting attribute of the model.
+    """
+    for base in bases:
+   = fields  # type: ignore
+
+
+def complete_dataclass(
+    cls: type) == 'https://example.com/'
+    assert url.host == 'example.com'_fields.keys() == {'foo', 'bar', 'x', 'y'}
+    m = model(foo='a'      f: SubModel
+
+    m = Model(e='e', f=SubModel(c='foo', d=[S('rgb', self.as_rgb_tuple())]
+
+    def __eq__(self, other: Any) pipeline, valid_cases, invalid_cases',
+    [
+        (int, valid...], kwargs: dict[str, t.Any]
+    ) -> BaseRequest:
+        kwa as t
+
+from jinja2 import BaseLoader
+from jinja2 import Environms.allowed_schemes and scheme.lower() not in cls.allowed_schemes:h, template_name):
+    def check(sender, template, context):
+    all the types that are allowed by type `tp`
+    `tp` can be a `
+    'pydantic:PyObject': 'pydantic.types:ImportString',
+    'pypter(model)
+
+    schema = ta.json_schema(mode='validation')
+    e[str, str | None, t.Callable[[], bool] | None]:
+        attemp     ('infer', 92534400000.0, datetime(1972, 12, 7, tzinmedelta.max, {'positive': True, 'day': 999999999, 'second': 8639siveGenTypedDict[T]'
+
+        class RecursiveGenTypedDict(Tyg_argument,')],
+        [{'Foo': 1}, ((1,), {})],
+        [{'a':etrize('method', ['validate', 'serialize', 'json_schema', 'json_.param(time(12, 13, 14, 123), time(12, 13, 14, 123), id='time-mi    cloudpickle = None
+    else:
+        cloudpickle = None
+
+T[_InT, Any]:
+        """Constrain a value to be a multiple of a f test_enum_int_validation_should_fail_for_incorrect_decimal_valnError',
+    'PydanticCustomError',
+    'PydanticKnownError',
+tiveInt',
+    'NegativeInt',
+    'NonNegativeInt',
+    'NonPositpytest
+
+from flaskr.db import get_db
+
+
+def test_index(client, au_parent_namespace():
+    # It's important to use the annotation  Field(strict=True)
+    c: int = Field(strict=False)
+
+
+# et_config(config: Union[ConfigDict, Type[object], None]) -> Type[date(cls, value: Any) -> 'NameEmail':
+        if value.__clas, False, ...),
+        (None, None, False, None),
+        ({}, {""This method is used to get the Pydantic core schema of the cl and self.__dict__ == other.__dict__
+                and self._      (deque([1, '2', 3]), [1, 2, 3]),
+        (deque([1, 'wronueprintSetupState  # noqa
+from .sansio.scaffold import _sentinel   continue
+            # we remove the prefix before splitting return _cv_app.get(None) is not None
+
+
+class AppContext:
+    "e rest of the key-value pairs are updated recursively with this  ((1, 10), (2, 20), ('3', '30')),
+            id='Tuple[Any, Anyool, Field(validation_alias='z')]
+
+    def func(**kwargs: Unpacktyping_inspection import typing_objects
+from typing_inspection.i],  # typing.Sequence
+    Sequence[float],  # typing.Sequence
+  to_255(c) for c in self._rgba[:3])
+        if alpha is None[Any]:
+    while hasattr(type_, '__supertype__'):
+        type_ LazyClassAttribute,
+    ValueItems,
+    all_identical,
+    deep (
+    Callable[[_FieldWrapSerializerT], _FieldWrapSerializerT]
+e of test_float_enum.<locals>.MyEnum '
+        '[type=is_instanc),  # noqa: UP007
+        (foobar, 'foobar'),
+        (time.timeed_result")
+
+    @merged.cli.command("merged")
+    def merged_co'int'}], (1, 2, '33'), (1, 2, 33)),
+        (0, [{'type': 'str'}elf._attempt_rebuild:
+            schema = self._attempt_rebuis_hashable(tp: Any, /) -> bool:
+    """Return whether the providrts %}
+    <div class="user">
+        <a href="{{ user.url }}" tmport_email_validator() -> None:
+    global email_validator
+    ument "z" for "Model"  [call-arg]
+model.x = 2
+model.mt  # not sensible, but should still be handled gracefully
+# MYPYed[CustomType, PydanticMetadata(), GroupedMetadataMarker()]
+
+   amel_to_snake'),
+        ('camelToSnake', 'camel_to_snake'),
+      'val_temporal_unit': val_temporal_unit,
+        }
+
+lls = []
+
+    class Model:
+        __slots__ = '__dict__', '__pyram(
+            int,
+            Field(gt=0),
+            'FieengthError',
+    'AnyStrMaxLengthError',
+    'StrError',
+    'Stm.read().decode("utf8") == '"\u20ac"'
+
+
+def test_blueprint_with_, 'on_success'))
+        on_errors = tuple(h.on_error for h in enull_session(self, app: Flask) -> NullSession:
+        """Createt in session
+import pytest
+
+import flask
+from flask.globals imposible to inherit from stdlib dataclasses, where
+    the Pydanteneration_shared import GetJsonSchemaHandler as _GetJsonSchemaH      'y': 'hopefully not a secret',
+    }
+
+
+def test_serial url
+
+    from docutils.nodes import reference
+    from docutilsassert(exc_info.value.errors(include_url=False))
+   sult = handler(value, info)
+        if info.mode == 'json':
+    
+@deprecated(
+    'The `Color` class is deprecated, use `pydantir
+
+    app.redirect = redirect
+
+    with app.app_context(), pyte used for serialization.
+        check_fields: Whether to check ntation uses the value from the ``SESSION_COOKIE_PATH``
+      self.assertEqual(str(tz), tz.tzname(None))
+
+    def test_constr@flask.stream_with_context
+            def generate(hello):
+    ](Annotated[str, validate_as(str).str_contains('potato')])
+    wtching filename, optionally ignoring case.
+    """
+    for f in ma=cs.str_schema(), alias='FieldA', mode='positional_or_keyword'  self.url_adapter = app.create_url_adapter(self.request)
+     lizer('area_string')
+        def serialize_area_string(self, areremoved.
+
+    Attributes:
+        message: Description of the wa,
+    'UUID3',
+    'UUID4',
+    'UUID5',
+    'UUID6',
+    'UUID7hema()),
+                }
+            ),
+            custom_iniassert warning.args[0] == 'Warning message'
+    assert warning.ac]
+Model.from_orm({})
+# MYPY: error: "Model" does not have from_schema.no_info_after_validator_function(lambda x: x * 2, core_ cli = self.app.cli
+
+        if "obj" not in kwargs:
+    /palletsprojects.com/donate"),
+        ProjectLink("PyPI Releasentic.color
+import pydantic.types
+from pydantic.v1.utils im int(value.total_seconds())
+
+        return value  # typv, round_trip=True) == b'{"[1,2]":3,"[4,5]":9}'
+
+
+def test_custo
+    # Default
+    d: int = Field(1)
+
+    # Default factory
+    self.pop(exc_value)
+
+
+class RequestContext:
+    """The reque dynamically created parametrized versions of generic models tostance(field, str) for field in fields):
+        raise Pydanpected_removal is not None else (since[0] + 1, 0)
+
+    def __str{_r_255}{_r_comma}{_r_255}{_r_comma}{_r_255}(?:{_r_comma}{_r_alpapply constraint 'gt' to supplied value {x}")
+
+
+def greater_thantor(cs.complex_schema(strict=True))
+    flask.session.get("data", "<missing>")
+
+    with client:
+  s returns an iterator of strings, which can be used as a
+    strn[int, float, str]:
+    return f.random.choice((int, float, str)alias='y')
+    z: int
+
+
+AliasModel(y=1, z=2)
+
+x_alias = 'y'
+
+
+cltrategy(
+    pydantic.PaymentCardNumber,
+    st.from_regex('|'.NS"] = True
+    cleanup_stuff = []
+
+    @app.teardown_appcontextstance(multiple_of, Decimal):
+                s['multiple_of'] =der_fields_too_large", "fields_too_large"),
+    444: ("no_responsed.
+        _prepare_model_fields(created_model, fields, instantom_init=True,
+    )
+    ModelInner.__pydantic_validator__ = SAndJson, input_value, expected):
+    v = py_and_json(
+    efault_value()
+
+    assert default is not None
+    assert defauate in the right folder?")
+        info.append("  See https://fle=self)
+            calls.append(('inner', self.__dict__, self._     # Assume IP Network is defined with a default value for ``sis not default
+    assert m._baz['a'] is not default['a']
+
+    mate = 'ensure this value has at most {limit_value} items'
+
+    dithm
+
+
+def add_luhn_digit(card_number: str) -> str:
+    # See htate,
+    FutureDate,
+    PastDatetime,
+]
+
+
+class DeferredModel(B     'cockroachdb+asyncpg',
+    }
+    user_required = True
+
+
+claschema('foobar'), [core_schema.int_schema(ref='foobar')]
+     ema())
+
+    v = SchemaValidator(core_schema.dataclass_args_schemlocalns, type_params)
+    except TypeError as e:
+        if 'Unapected_json
+
+    v_json = s.to_python(value, mode='json')
+    v_ython({datetime(2000, 1, 1): 2, datetime(2000, 1, 2): 4}) == {
+context)
+    ctx = run_command.make_context("run", ["--cert", "ssert m.__repr_name__() == 'MyTestModel'
+    assert str(m) == 'a=oding=encoding, allow_pickle=allow_pickle, json_loads=json_loads    {'86401000.001': 'foo'},
+            b'{"86401000.001":"foo"     reference_module_globals = sys.modules[created_model.__modur field_name, field in dc_fields_with_pydantic_field_defaults.itported for `mode='plain'`, which is the default:
+
+    - `(self)`teger', 'exclusiveMinimum': 0, 'exclusiveMaximum': 100},
+     be in a valid time format, numeric times may not exceed 86,399 value='ÿÿÿÿÿÿÿÿÿÿÿÿ...ÿÿÿÿÿÿÿÿÿÿÿ', inpuict(frozen=True)
+        a: int
+        b: int
+
+    m = Model(a    # field is complex and there's a value, decode that as JSON,a directory, not a {path_type(secrets_path)}')
+
+        for fiel1" to "Model" has incompatible type "None"; expected "Maybe[int]    previously_seen_type_refs.remove(type_ref)
+    finally:
+    ('c0a8f9a8-aa5e-882b-a067-9cb3a51f5c11', UUID('c0a8f9a8-aa5e-882 pipeline: Any, valid_cases: list[Any], invalid_cases: list[Any]] = {}.values().__class__
+
+
+def iter_contained_typevars(v: Any) en used on an app, this
+        is called for every request. Whes = _apply_constraint(s, annotated_types.Le(constraint.le))
+    module')
+def any_serializer():
+    return Schemaent, '.networks'),
+    'FtpUrl': (__spec__.parent, '.networks'), valid UUID, invalid group length in group 4: expected 12, foundalidateJsonHandlerProtocol,
+    ValidatePythonHandlerProtocol,
+ ssert Rectangle.model_computed_fields['area'].description == 'Anid date or datetime, dates after 9999')),  # nowish in ns
+     ng or Decimal object [type=decimal_type, input_value=True, inputs.ConstrainedNumberMeta) -> pydantic.types.ConstrainedNumberMeta
+
+def _default_factory_str() -> str:
+    return 'x'
+
+
+def _defaur, Any] = {}
+
+        if settings.__config__.case_sensitive:
+    2, 3, 'wrong', 4), 3),
+        ((1, 2, 'wrong'), IsNonNegative(eturn CustomOnValidatePython(), None, None
+
+    plugin = Plugin(    'to_upper',
+        'coerce_numbers_to_str',
+        'ascii__type: type, use_cloudpickle: bool):
+    if use_cloudpickle:
+   ent, auth):
+    # change the post author to another user
+    wi     # If the request method is HEAD and we don't have a handlert not vi.is_excluded('a')
+    assert vi.is_included('a')
+    g': "Input should be 'Div'",
+            'type': 'literal_error'    (Fraction('42.5'), Fraction('42.5')),
+        (Fraction('1e1 plugin = CustomPlugin()
+    with install_plugin(plugin):
+
+   test_session_dynamic_cookie_name():
+    # This session interfat(subprocess_run_code):
+    @subprocess_run_code
+    def run_in_their generic origin types to be equal, rather than exact type e PositiveFloat,
+    PositiveInt,
+    Secret,
+    SecretBytes,
+  ":"foo"}'),
+        (MyModel(a=1, b='foo'), b'{"a":1,"b":"foo"}'tional[Set[str]] = None
+
+
+# (comment to keep line numbers unchanan actually replace it with something else
+        # for testingion does apply for the inner model
+    result_inner = inner_valissert validate_on_init is not False, 'validate_on_init=False is stance is None
+
+        def on_success(self, result: Any) -> Noalue = math.ceil(Fraction(min_value) / Fraction(cl   bases,
+        namespace,
+        __pydantic_generic_metada) is None
+    assert flask.g.get("foo", "bar") == "bar"
+    # __     InnerModel,
+                InnerModel(int_field=42, str_fiy
+class Child(Parent):
+    child_attr: str = Field(exclude=True)PYDANTIC_CORE_VERSION
+
+
+def _ensure_pydantic_core_version() -> Npython(gen(False)) == (1, 2, 3)
+
+    msg = r'Error ite) is False, 'Expected iterables with different lengths to evaluaModelStrictMode(a='1', b='2', c='3')
+
+
+class ModelOverride1(Mcd-4c0c-b4b4-761974bf71d7'), 4, UUID('0e7ac198-9acd-4c0c-b4b4-76COOKIE_SIZE` config key.
+
+        See :attr:`~werkzeug.wrappers.config(self_config: 'ConfigType', parent_config: 'ConfigType', *ENERIC_TYPES_CACHE.get(_early_cache_key(parent, typevar_values))pe_path, schema_kind, config, plugin_ value='test_plugin:plugin1', group='pydantic')
+    mock_entry_2q_extra_forbid(benchmark) -> None:
+    m1 = ModelNoExtra()
+    mtetime](
+        Annotated[
+            datetime.datetime,
+   extract_source_code_from_function(source_code_or_function)
+      not set so order information can be maintained like python
+    on({1: 2, '3': 4}) == {1: 2, '3': 4}
+    aations as _annotations
+
+from dataclasses iming that.  This will
+        also trigger the execution of functe_json('1') == complex(1, 0)
+    assert v.validate_json('1.0') =(b'foo') == b'foo'
+    assert v.validate_python('foo') == b'foo'eger'}}
+
+
+def test_recursive_type_alias() -> None:
+    t = Typ return
+
+    if isinstance(function, BuiltinFunctionType):
+   se
+    error_msg_templates: Dict[str, str] = {}
+    arbextra=1)  # type: ignore[typeddict-item]
+
+
+class KwargsBadExtraMaclass(slots=True)
+class AliasPath:
+    """!!! abstract "Usage Dn_alias', 'serialization_alias'],
+        allowed_types: tuple[todel = FutureModel(x=1, y='a')
+forward_model = ForwardReferenport GenerateSchema
+from pydantic.json_schema import Genera, '2', b'3']),
+        ({1, '2', b'3'}, IsList(1, '2', b'3', cheidator(field_name, allow_reuse=True)
+    def my_custom_valida raise_errors=raise_errors,
+        ns_resolver=ns_resolver,
+   0.7
+
+
+def model_factory() -> type:
+    class NonImportableModel(we try to resolve the type directly and otherwise just
+    # ret      origin = get_origin(tp)
+        if not origin or not ha valid string',
+            'input': datetime.date(1992, 12, 11)[tests.mypy.modules.decorator_implicit_classmethod.Model]"
+     ), exclude={-1, -2}) == b'["a","c","e"]'
+
+
+def test_filter():
+  ue(value: int | str, max_val: int = 255) -> float:
+    """Parse zation(benchmark):
+    model = ComplexModel(field1='test', field """A docs"""
+
+        b: str = '1'
+
+        """B docs"""
+
+  ic types for equality, as long as all field values are equal,
+  idator(v: Any) -> Union[bytes]:
+    if isinstance(v, bytes):
+  erator', MODEL_TITLE_GENERATORS)
+def test_dataclass_model = PrivateAttr(default)
+
+    class ParentAModel(GrandParentModelAny
+
+import pytest
+from dirty_equals import FunctionCheck, IsStr elif request.param == 'dataclass':
+        return lambda fieldsrn: New model class inheriting from `cls` with instantiated
+    ave at most 4 items after validation, not 5 [type=too_long,')),
+ny) -> Callable[[], Any]:
+    FieldInfo = import_cached_field_       In python 3.9, `typing.Dict`, `typing.List`, ...
+     tx': {'error': HasRepr(repr(ValueError('error 1')))},
+   f _field_name_for_signature(field_name: str, field_info: FieldInor_key,
+            discriminator_value=discriminator_value,
+   match=r'Input should be 1 or 2 \[type=enum, input_value=3, inputs
+            num_digits += exponent
+            decimal_placesaclass(frozen=True)
+    class MyDatetimeValidator:
+        tz_co(m, MyModel)
+    assert m.field_a == 'test'
+    assert m.field_bnsform(field_specifiers=(dataclasses.field, Field, PrivateAttr))ion behavior.
+
+    See [usage documentation](../concepts/serialict(type='list', items_schema=inner) if nested_ref else inner)
+
+ :
+    a: int = 1
+
+    model_config = dict(frozen=False, from_ebcdab58-6eb8-46fb-a190-d07a33e9eac8'), '"ebcdab58-6eb8-46fb-a19__ = ()
+
+
+class MultiHostDsn(AnyUrl):
+    __slots__ = AnyUrl.__s_val_before(cls, v: list[str]):
+            v.append('parent bef to include the alpha channel. There are three options for this ppercase letter
+    snake = re.sub(r'([a-z])([A-Z])', lambda m:  issues https://youtrack.jetbrains.com/issue/PY-21915
+    # and rsion
+from pallets_sphinx_themes import get_version
+from palletsn to_jsonable_python(v)
+    return v
+
+
+def expand_grouped_metada,
+    'IPvAnyAddress',
+    'IPvAnyInterface',
+    'IPvAnyNetwork:
+
+    import pydantic
+
+    class ModelMixin(pydantic.BaseMod   # in order to verify that the prebuilt validator is used
+   bool = ...,
+    slots: bool = ...,
+) -> type[PydanticDataclass]:ation' in def_ref_schema:
+            traverse_schema(def_ref_scmport TypeAdapter
+from pydantic.warnings import TypedDictExtraCo     (False, True, {'my_alias': 'hello'}),
+        (False, False=Decimal('1.0'), lt=Decimal('10.0'))),
+            [Decimal('1. applies for the core schema that can be reused in schema genera2:13:14',
+        'field_datetime_con': '2020-01-01T00:00:00',
+ ic.typing:DictIntStrAny',
+    'pydantic.typing:DictStrAny',
+       ({'foo': 'apple', 'bar': '123'}, {'foo': 'aor(cs.datetime_schema()).validate_python('2022-06-08T12:13:14-12ion)
+
+    try:
+        raise Exception("dummy")
+    except Excepemented  # delegate to the other item in the comparison
+
+
+clasname__}.{name}'
+
+    _private_attr_default = SetNameInt(1)
+
+    =2)
+    assert m.double == 4
+    assert TypeAdapter(MyDataClass)obar', alias_priority=2)",
+            id="Annotated[int, Field      TypeError: If the number of arguments does not match the plass SettingsWithConfigDict(BaseSettings):
+    bar: str
+
+    mo'int'}})
+    assert v.validate_test({'1': 1, '2': 2}) == {Decimais prevents headaches like MyGeneric(x=1) != MyGeneric[Any](x=1)lambda _: float('nan')), Field(allow_inf_nan=False)])
+
+   'x'].alias == 'x1'
+    assert Child.model_fields['x'].alias == '     alias: A callable that takes a field name and returns an al      hints[name] = try_eval_type(value, globalns, localns)
+    ion to validate with either a list or a tuple
+    # schema, depeecimal_max_digits',
+                {'max_digits': max_digits},
+schema.get('description') == 'Subclassed Model docstring'
+
+
+@pytlable[..., Any],
+    field_constructor: Callable[..., Any],
+ onfig={})
+class AddProject:
+    name: str
+    slug: Optierrors.NumberNotGtError(limit_value=field_type.gt)
+    elif fiel     # This allows a custom open_session method to use the reentCardBrand, PaymentCardNumber
+
+pytestmark = pytest.mark.filtert.from_type(ipaddress.IPv4Network) | st.from_type(ipaddress.IPv6ator = ModelWithAllowReuseValidator(name='xyz')
+
+
+T = Typrefs by referencing the schema in multiple places
+    t t = field.default
+            merged_params[param_name] = Paramelineno
+        cls.__qualname__ = original_cls.__qualname__
+    a duplicate of the same method in the Flask
+        class.
+
+     Model(foo='fo

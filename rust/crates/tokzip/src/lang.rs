@@ -1,45 +1,48 @@
 //! Embedded language dictionaries and automatic per-segment language detection.
 //!
 //! Every language's dictionary is the shared wrapper (Markdown/JSON scaffolding, generic
-//! prose) followed by its trained suffix. Detection needs no parser: each language keeps a
-//! bitset of the 4-grams in its suffix, the document is scored per 64-byte window by how many
-//! positions hit each language's set (labeled code fences add a hint for their language), and
-//! a Viterbi pass with a switch penalty turns the window scores into segments. The decoder
-//! never detects anything — it reads the segment table from the frame.
+//! prose) followed by its trained suffix. Detection needs no parser: one table maps every
+//! 4-gram hash to a bit mask of the languages whose suffix has it (at most 32 languages), the
+//! document is scored per 64-byte window by how many positions hit each language (labeled
+//! code fences add a hint for their language), and a Viterbi pass with a switch penalty turns
+//! the window scores into segments. The decoder never detects anything — it reads the segment
+//! table from the frame.
 
-use crate::lz::{Models, Primed, Segment};
+use crate::languages::LANGUAGES;
+pub use crate::languages::LANGUAGE_COUNT;
+use crate::lz::{decode_doc, Models, Primed, Segment};
+use crate::varint::read_varint;
 use std::sync::OnceLock;
 
 const WRAPPER: &[u8] = include_bytes!("../../../../dict/wrapper.bin");
 
-/// A language's embedded assets: its trained dictionary suffix and its priors as packed by the
-/// build script (`build.rs`).
-macro_rules! assets {
-    ($name:literal) => {
-        (
-            $name,
-            include_bytes!(concat!("../../../../dict/", $name, ".bin")),
-            include_bytes!(concat!(env!("OUT_DIR"), "/", $name, ".priors")),
-        )
-    };
+/// A language's embedded assets as packed by the build script (`build.rs`, see `pack.rs`).
+struct Assets {
+    /// The trained dictionary suffix coded by the codec itself.
+    packed_suffix: &'static [u8],
+    /// The language's own model nodes; the literal part comes from `GROUP_PRIORS`.
+    priors: &'static [u8],
 }
 
-/// Language ids are frame-format identity (v0: any change is a format change). Each entry:
-/// name, trained dictionary suffix, packed model priors.
-pub const LANGUAGES: [(&str, &[u8], &[u8]); 7] = [
-    assets!("text"),
-    assets!("en-US"),
-    assets!("ja-JP"),
-    assets!("html"),
-    assets!("css"),
-    assets!("javascript"),
-    assets!("typescript"),
-];
-pub const LANGUAGE_COUNT: usize = LANGUAGES.len();
+// `ASSETS` (per language, in id order) and `GROUP_PRIORS` (per `Group`, in `Group::ALL` order).
+include!(concat!(env!("OUT_DIR"), "/assets.rs"));
+
 const LANG_HTML: u8 = 3;
 const LANG_CSS: u8 = 4;
 const LANG_JAVASCRIPT: u8 = 5;
 const LANG_TYPESCRIPT: u8 = 6;
+const LANG_C: u8 = 7;
+const LANG_CPP: u8 = 8;
+const LANG_CSHARP: u8 = 9;
+const LANG_DART: u8 = 10;
+const LANG_HASKELL: u8 = 11;
+const LANG_JAVA: u8 = 12;
+const LANG_JSP: u8 = 13;
+const LANG_PHP: u8 = 14;
+const LANG_PYTHON: u8 = 15;
+const LANG_RUBY: u8 = 16;
+const LANG_RUST: u8 = 17;
+const LANG_ZIG: u8 = 18;
 
 static PRIMED: [OnceLock<Primed>; LANGUAGE_COUNT] = [const { OnceLock::new() }; LANGUAGE_COUNT];
 
@@ -47,12 +50,27 @@ static PRIMED: [OnceLock<Primed>; LANGUAGE_COUNT] = [const { OnceLock::new() }; 
 /// cached for the process; the encoder's match index is built on first encode.
 pub fn primed(lang: u8) -> &'static Primed {
     PRIMED[lang as usize].get_or_init(|| {
-        let (_, suffix, packed_priors) = LANGUAGES[lang as usize];
-        let mut bytes = Vec::with_capacity(WRAPPER.len() + suffix.len());
+        let (_, group) = LANGUAGES[lang as usize];
+        let assets = &ASSETS[lang as usize];
+        let models = Models::from_packed(assets.priors, GROUP_PRIORS[group as usize]);
+        let (len, body) = read_varint(assets.packed_suffix).expect("packed dictionary length");
+        let mut bytes = Vec::with_capacity(WRAPPER.len() + len as usize);
         bytes.extend_from_slice(WRAPPER);
-        bytes.extend_from_slice(suffix);
-        Primed::new(bytes, Models::from_priors(packed_priors))
+        // The suffix was coded with the language's models and no dictionary (`pack.rs`).
+        let empty = Primed::new(Vec::new(), models.clone());
+        let segments = [Segment {
+            end: len as usize,
+            lang: 0,
+        }];
+        decode_doc(&|_| &empty, body, len as usize, &segments, &mut bytes)
+            .expect("packed dictionary decodes");
+        Primed::new(bytes, models)
     })
+}
+
+/// The trained dictionary suffix of a language (without the wrapper).
+fn suffix(lang: u8) -> &'static [u8] {
+    &primed(lang).bytes[WRAPPER.len()..]
 }
 
 // ---------------------------------------------------------------------------
@@ -65,23 +83,24 @@ const WINDOW: usize = 64;
 /// most `WINDOW` gram hits plus `WINDOW` of fence hint).
 const SWITCH_PENALTY: i32 = 48;
 
-struct GramSet {
-    bits: Vec<u64>,
+/// For every 4-gram hash, the set of languages whose dictionary contains a gram with that
+/// hash, as a bit per language id: one lookup scores a position for every language.
+struct GramTable {
+    masks: Vec<u32>,
 }
 
-impl GramSet {
-    fn new(bytes: &[u8]) -> Self {
-        let mut bits = vec![0u64; (1usize << GRAM_BITS) / 64];
-        for pos in 0..bytes.len().saturating_sub(3) {
-            let h = gram_hash(bytes, pos);
-            bits[h >> 6] |= 1u64 << (h & 63);
-        }
-        Self { bits }
-    }
+const _: () = assert!(LANGUAGE_COUNT <= 32);
 
-    #[inline]
-    fn contains(&self, h: usize) -> bool {
-        (self.bits[h >> 6] >> (h & 63)) & 1 != 0
+impl GramTable {
+    fn new() -> Self {
+        let mut masks = vec![0u32; 1 << GRAM_BITS];
+        for lang in 0..LANGUAGE_COUNT as u8 {
+            let bytes = suffix(lang);
+            for pos in 0..bytes.len().saturating_sub(3) {
+                masks[gram_hash(bytes, pos)] |= 1 << lang;
+            }
+        }
+        Self { masks }
     }
 }
 
@@ -91,14 +110,9 @@ fn gram_hash(bytes: &[u8], pos: usize) -> usize {
     (v.wrapping_mul(0x9E37_79B1) >> (32 - GRAM_BITS)) as usize
 }
 
-fn gram_sets() -> &'static [GramSet] {
-    static SETS: OnceLock<Vec<GramSet>> = OnceLock::new();
-    SETS.get_or_init(|| {
-        LANGUAGES
-            .iter()
-            .map(|(_, suffix, _)| GramSet::new(suffix))
-            .collect()
-    })
+fn gram_table() -> &'static GramTable {
+    static TABLE: OnceLock<GramTable> = OnceLock::new();
+    TABLE.get_or_init(GramTable::new)
 }
 
 /// Splits `doc` into language segments (contiguous, covering the whole document).
@@ -106,13 +120,12 @@ pub fn segment(doc: &[u8]) -> Vec<Segment> {
     analyze(doc).0
 }
 
-/// Language ids ranked by dictionary 4-gram overlap (no fence hint), best first, up to
-/// `MAX_CANDIDATES`, from pre-computed whole-document `scores`.
-pub fn top_languages(scores: &[i32; LANGUAGE_COUNT]) -> Vec<u8> {
-    let mut order: Vec<u8> = (0..LANGUAGE_COUNT as u8).collect();
-    order.sort_by_key(|&lang| std::cmp::Reverse(scores[lang as usize]));
-    order.truncate(MAX_CANDIDATES);
-    order
+/// The language with the most dictionary 4-gram overlap (no fence hint), from pre-computed
+/// whole-document `scores`.
+pub fn top_language(scores: &[i32; LANGUAGE_COUNT]) -> u8 {
+    (0..LANGUAGE_COUNT as u8)
+        .max_by_key(|&lang| (scores[lang as usize], std::cmp::Reverse(lang)))
+        .unwrap()
 }
 
 /// Splits `doc` into language segments and returns the whole-document gram totals (pre-fence)
@@ -229,17 +242,16 @@ fn add_gram_hits(doc: &[u8], rows: &mut [[i32; LANGUAGE_COUNT]], row_of: impl Fn
     if doc.len() < 4 {
         return;
     }
-    let sets = gram_sets();
+    let table = gram_table();
     for pos in 0..doc.len() - 3 {
-        let h = gram_hash(doc, pos);
+        let mut mask = table.masks[gram_hash(doc, pos)];
         let row = &mut rows[row_of(pos)];
-        for (lang, set) in sets.iter().enumerate() {
-            row[lang] += set.contains(h) as i32;
+        while mask != 0 {
+            row[mask.trailing_zeros() as usize] += 1;
+            mask &= mask - 1;
         }
     }
 }
-
-const MAX_CANDIDATES: usize = 3;
 
 /// Argmax language of `doc` from pre-computed gram `scores` plus fence hints (short-doc path).
 fn best_single_from(doc: &[u8], mut scores: [i32; LANGUAGE_COUNT]) -> u8 {
@@ -317,6 +329,18 @@ fn fence_language(label: &[u8]) -> Option<u8> {
         b"ts" | b"typescript" | b"tsx" | b"mts" => Some(LANG_TYPESCRIPT),
         b"html" | b"htm" | b"xml" | b"svg" | b"vue" | b"svelte" => Some(LANG_HTML),
         b"css" | b"scss" | b"less" => Some(LANG_CSS),
+        b"c" | b"h" => Some(LANG_C),
+        b"cpp" | b"c++" | b"cc" | b"cxx" | b"hpp" => Some(LANG_CPP),
+        b"cs" | b"csharp" | b"c#" => Some(LANG_CSHARP),
+        b"dart" => Some(LANG_DART),
+        b"hs" | b"haskell" => Some(LANG_HASKELL),
+        b"java" => Some(LANG_JAVA),
+        b"jsp" => Some(LANG_JSP),
+        b"php" => Some(LANG_PHP),
+        b"py" | b"python" | b"python3" => Some(LANG_PYTHON),
+        b"rb" | b"ruby" => Some(LANG_RUBY),
+        b"rs" | b"rust" => Some(LANG_RUST),
+        b"zig" => Some(LANG_ZIG),
         _ => None,
     }
 }
@@ -325,17 +349,20 @@ fn fence_language(label: &[u8]) -> Option<u8> {
 mod tests {
     use super::*;
 
-    /// The packed priors the build embeds must restore exactly the trained values: the packer
+    /// The packed assets the build embeds must restore exactly the trained values: the packer
     /// and the unpacker are symmetric, so a lossy pack would still round-trip frames and show
     /// up only as a worse ratio.
     #[test]
-    fn packed_priors_restore_the_raw_priors() {
-        let priors_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../priors");
-        for (name, _, packed) in &LANGUAGES {
-            let raw = std::fs::read(priors_dir.join(format!("{name}.bin"))).expect("raw priors");
-            let (unpacked, expected) = (Models::from_priors(packed), Models::from_raw_priors(&raw));
-            assert_eq!(unpacked.lit_classes, expected.lit_classes, "{name}");
-            assert_eq!(unpacked.probs, expected.probs, "{name}");
+    fn packed_assets_restore_the_trained_assets() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
+        for (lang, (name, _)) in LANGUAGES.iter().enumerate() {
+            let raw = std::fs::read(root.join(format!("priors/{name}.bin"))).expect("raw priors");
+            let expected = Models::from_raw_priors(&raw);
+            let primed = primed(lang as u8);
+            assert_eq!(primed.models.lit_classes, expected.lit_classes, "{name}");
+            assert_eq!(primed.models.probs, expected.probs, "{name}");
+            let dict = std::fs::read(root.join(format!("dict/{name}.bin"))).expect("dictionary");
+            assert_eq!(suffix(lang as u8), dict, "{name}");
         }
     }
 

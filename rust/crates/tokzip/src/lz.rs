@@ -107,14 +107,16 @@ impl Models {
         }
     }
 
-    /// Restores a packed model (`pack.rs`): the class tables and the nodes before the literal
-    /// trees verbatim, then each 256-node tree (plain literal trees, then the two matched-literal
-    /// trees) as flag bits followed by the values of the nodes whose subtree is not all
-    /// `PRIORS_DEFAULT`.
-    pub fn from_priors(packed: &[u8]) -> Self {
-        let mut raw = packed[..512 + LIT].to_vec();
+    /// Restores a model from its packed parts (`pack.rs`): the language's own nodes (those
+    /// before `LIT`, verbatim) and its group's literal part — the class tables, then each
+    /// 256-node tree (plain literal trees, then the two matched-literal trees) as flag bits
+    /// followed by the values of the nodes whose subtree is not all `PRIORS_DEFAULT`.
+    pub fn from_packed(language: &[u8], literal: &[u8]) -> Self {
+        assert_eq!(language.len(), LIT, "packed priors size mismatch");
+        let mut raw = literal[..512].to_vec();
+        raw.extend_from_slice(language);
         raw.resize(PRIORS_SIZE, PRIORS_DEFAULT);
-        let mut rest = &packed[512 + LIT..];
+        let mut rest = &literal[512..];
         let mut nodes = [0u8; 256];
         for tree in raw[512 + LIT..].as_chunks_mut::<256>().0 {
             // The walk reads only the flags; the values, which start after the tree's flag
@@ -150,14 +152,84 @@ impl Models {
                 .collect(),
         }
     }
+}
+
+const TREES: usize = (MODEL_SIZE - LIT) / 256;
+const TREE_WORDS: usize = TREES.div_ceil(64);
+
+/// A document's working models: the language's primed nodes, copied on demand — the nodes
+/// before `LIT` at once, each literal tree the first time a literal uses it — into a buffer
+/// reused across documents, so a short document never pays for the whole model.
+pub struct DocModels<'p> {
+    base: &'p Models,
+    probs: Vec<u16>,
+    ready: [u64; TREE_WORDS],
+}
+
+thread_local! {
+    /// Model buffers of finished documents, reused by the next ones (fully initialized, so
+    /// a buffer's stale contents are only ever overwritten before being read).
+    static MODEL_POOL: std::cell::RefCell<Vec<Vec<u16>>> = const { std::cell::RefCell::new(Vec::new()) };
+}
+
+impl<'p> DocModels<'p> {
+    fn new(base: &'p Models) -> Self {
+        let mut probs = MODEL_POOL
+            .with(|pool| pool.borrow_mut().pop())
+            .unwrap_or_else(|| vec![PROB_INIT; MODEL_SIZE]);
+        probs[..LIT].copy_from_slice(&base.probs[..LIT]);
+        Self {
+            base,
+            probs,
+            ready: [0; TREE_WORDS],
+        }
+    }
+
+    /// Start of the literal tree for the context `(previous byte, the byte before it)`, copied
+    /// from the primed model on first use.
+    #[inline]
+    fn lit_block(&mut self, prev: (u8, u8)) -> usize {
+        self.tree(lit_block(&self.base.lit_classes, prev))
+    }
+
+    /// Start of the matched-literal trees (both ready).
+    #[inline]
+    fn matched_block(&mut self) -> usize {
+        self.tree(LIT_MATCHED + 256);
+        self.tree(LIT_MATCHED)
+    }
 
     #[inline]
-    fn lit_block(&self, prev: (u8, u8)) -> usize {
-        lit_block(&self.lit_classes, prev)
+    fn tree(&mut self, first: usize) -> usize {
+        let t = (first - LIT) >> 8;
+        if (self.ready[t >> 6] >> (t & 63)) & 1 == 0 {
+            self.ready[t >> 6] |= 1 << (t & 63);
+            self.probs[first..first + 256].copy_from_slice(&self.base.probs[first..first + 256]);
+        }
+        first
+    }
+
+    /// The fully adapted models (the trainer's starting state).
+    #[cfg(any(test, feature = "train"))]
+    fn into_models(mut self) -> Models {
+        for t in 0..TREES {
+            self.tree(LIT + t * 256);
+        }
+        Models {
+            lit_classes: self.base.lit_classes,
+            probs: self.probs.clone(),
+        }
     }
 }
 
-/// Depth-first walk over one packed tree's flag bits (see `Models::from_priors`): records the
+impl Drop for DocModels<'_> {
+    fn drop(&mut self) {
+        let probs = std::mem::take(&mut self.probs);
+        MODEL_POOL.with(|pool| pool.borrow_mut().push(probs));
+    }
+}
+
+/// Depth-first walk over one packed tree's flag bits (see `Models::from_packed`): records the
 /// nodes whose flag is set, in the order their values follow, and walks their children.
 fn walk_packed_tree(
     node: usize,
@@ -286,10 +358,11 @@ fn price_tree_reverse(probs: &[u16], base: usize, bits: u32, symbol: u32) -> u32
     price
 }
 
-impl Models {
+impl DocModels<'_> {
     /// Price of the literal at `pos` (excluding the `is_match` decision bit).
-    fn price_literal(&self, win: &Window, pos: usize, state: usize, reps: &[u32; 4]) -> u32 {
+    fn price_literal(&mut self, win: &Window, pos: usize, state: usize, reps: &[u32; 4]) -> u32 {
         let block = self.lit_block(win.prev_bytes(pos));
+        let matched = self.matched_block();
         let probs = &self.probs;
         let symbol = u32::from(win.doc[pos]);
         let mut price = 0;
@@ -301,7 +374,7 @@ impl Models {
                 i -= 1;
                 let mb = (match_byte >> i) & 1;
                 let bit = (symbol >> i) & 1;
-                price += price_bit(probs[LIT_MATCHED + ((mb as usize) << 8) + m], bit);
+                price += price_bit(probs[matched + ((mb as usize) << 8) + m], bit);
                 m = (m << 1) | bit as usize;
                 if mb != bit {
                     break;
@@ -345,7 +418,7 @@ struct DistPrices {
 const FULL_DIST: usize = 1 << (END_POS_MODEL as usize >> 1);
 
 impl DistPrices {
-    fn new(models: &Models, group: usize) -> Self {
+    fn new(models: &DocModels, group: usize) -> Self {
         let (slot_base, spec_base, align_base) = dist_group(group);
         let mut slot = [[0u32; 64]; NUM_LEN_TO_POS];
         for (ls, row) in slot.iter_mut().enumerate() {
@@ -538,36 +611,43 @@ fn hash4(bytes: &[u8], pos: usize, bits: u32) -> usize {
 }
 
 #[inline]
-fn hash3(bytes: &[u8], pos: usize) -> usize {
+fn hash3(bytes: &[u8], pos: usize, bits: u32) -> usize {
     let v =
         u32::from(bytes[pos]) | u32::from(bytes[pos + 1]) << 8 | u32::from(bytes[pos + 2]) << 16;
-    (v.wrapping_mul(0x9E37_79B1) >> (32 - HASH3_BITS)) as usize
+    (v.wrapping_mul(0x9E37_79B1) >> (32 - bits)) as usize
 }
 
 /// Hash chains over the document, built incrementally as the parse advances.
 pub struct Chains {
     bits: u32,
+    bits3: u32,
     head4: Vec<i32>,
     head3: Vec<i32>,
     prev4: Vec<i32>,
 }
 
 /// Hash-table width for a sequence of `len` bytes: at least twice its positions, bounded.
-fn hash4_bits(len: usize) -> u32 {
-    let mut bits = HASH4_MIN_BITS;
-    while bits < HASH4_MAX_BITS && (1usize << bits) < len * 2 {
+fn hash_bits(len: usize, min: u32, max: u32) -> u32 {
+    let mut bits = min;
+    while bits < max && (1usize << bits) < len * 2 {
         bits += 1;
     }
     bits
 }
 
+fn hash4_bits(len: usize) -> u32 {
+    hash_bits(len, HASH4_MIN_BITS, HASH4_MAX_BITS)
+}
+
 impl Chains {
     fn new(len: usize) -> Self {
         let bits = hash4_bits(len);
+        let bits3 = hash_bits(len, HASH4_MIN_BITS, HASH3_BITS);
         Self {
             bits,
+            bits3,
             head4: vec![EMPTY; 1 << bits],
-            head3: vec![EMPTY; 1 << HASH3_BITS],
+            head3: vec![EMPTY; 1 << bits3],
             prev4: vec![EMPTY; len],
         }
     }
@@ -575,7 +655,7 @@ impl Chains {
     #[inline]
     fn insert(&mut self, bytes: &[u8], pos: usize) {
         if pos + 3 <= bytes.len() {
-            self.head3[hash3(bytes, pos)] = pos as i32;
+            self.head3[hash3(bytes, pos, self.bits3)] = pos as i32;
         }
         if pos + 4 <= bytes.len() {
             let h = hash4(bytes, pos, self.bits);
@@ -620,7 +700,7 @@ impl DictIndex {
         offsets.pop();
         let mut head3 = vec![EMPTY; 1 << HASH3_BITS];
         for pos in (0..bytes.len().saturating_sub(2)).rev() {
-            head3[hash3(bytes, pos)] = pos as i32;
+            head3[hash3(bytes, pos, HASH3_BITS)] = pos as i32;
         }
         Self {
             bits,
@@ -661,7 +741,8 @@ impl Primed {
     /// itself.
     #[cfg(any(test, feature = "train"))]
     pub fn self_primed(bytes: Vec<u8>, lit_classes: LitClasses) -> Self {
-        let mut models = Models::new(lit_classes);
+        let base = Models::new(lit_classes);
+        let mut models = DocModels::new(&base);
         let mut state = CoderState::new();
         let empty = Primed::new(Vec::new(), Models::new(lit_classes));
         let mut mf = MatchFinder {
@@ -687,6 +768,7 @@ impl Primed {
             bytes.len(),
             &mut inserted,
         );
+        let models = models.into_models();
         Self::new(bytes, models)
     }
 
@@ -723,12 +805,12 @@ impl MatchFinder<'_> {
         let dlen = self.dict.bytes.len();
         let mut best_len = 0usize;
         if max_len >= 3 && pos + 3 <= doc.len() {
-            let cand = self.chains.head3[hash3(doc, pos)];
+            let cand = self.chains.head3[hash3(doc, pos, self.chains.bits3)];
             let mut dist = 0usize;
             if cand >= 0 && pos - cand as usize <= MAX_DIST_LEN3 {
                 dist = pos - cand as usize;
             } else if dlen >= 3 {
-                let cand = self.dict.index.head3[hash3(doc, pos)];
+                let cand = self.dict.index.head3[hash3(doc, pos, HASH3_BITS)];
                 if cand >= 0 {
                     dist = pos + dlen - cand as usize;
                 }
@@ -809,11 +891,11 @@ pub struct Segment {
     pub lang: u8,
 }
 
-/// Per-document language state: each language's models are cloned from the primed state on
-/// first use and keep adapting across that language's segments.
+/// Per-document language state: each language's working models start from the primed state
+/// on first use and keep adapting across that language's segments.
 struct LangModels<'a, 'p> {
     lookup: &'a dyn Fn(u8) -> &'p Primed,
-    models: Vec<Option<Models>>,
+    models: Vec<Option<DocModels<'p>>>,
 }
 
 impl<'a, 'p> LangModels<'a, 'p> {
@@ -821,17 +903,17 @@ impl<'a, 'p> LangModels<'a, 'p> {
         let langs = segments.iter().map(|s| usize::from(s.lang) + 1).max();
         Self {
             lookup,
-            models: vec![None; langs.unwrap_or(0)],
+            models: (0..langs.unwrap_or(0)).map(|_| None).collect(),
         }
     }
 
-    fn take(&mut self, lang: u8) -> Models {
+    fn take(&mut self, lang: u8) -> DocModels<'p> {
         self.models[lang as usize]
             .take()
-            .unwrap_or_else(|| (self.lookup)(lang).models.clone())
+            .unwrap_or_else(|| DocModels::new(&(self.lookup)(lang).models))
     }
 
-    fn put(&mut self, lang: u8, models: Models) {
+    fn put(&mut self, lang: u8, models: DocModels<'p>) {
         self.models[lang as usize] = Some(models);
     }
 }
@@ -857,6 +939,10 @@ pub fn encode_doc_with_stats<'p>(
 ) -> (Vec<u8>, Option<Vec<u32>>) {
     let mut rc = Encoder::new();
     rc.stats = stats;
+    #[cfg(feature = "train")]
+    if COST_ENABLED.load(std::sync::atomic::Ordering::Relaxed) {
+        rc.cost = Some(vec![0.0; MODEL_SIZE]);
+    }
     let mut cs = CoderState::new();
     let mut lang_models = LangModels::new(lookup, segments);
     let mut chains = Chains::new(doc.len());
@@ -896,8 +982,36 @@ pub fn encode_doc_with_stats<'p>(
         start = seg.end;
     }
     let stats = rc.stats.take();
+    #[cfg(feature = "train")]
+    if let Some(cost) = rc.cost.take() {
+        let mut report = COST_REPORT.lock().unwrap();
+        let groups = [
+            ("flags", IS_MATCH, LEN),
+            ("len", LEN, REP_LEN),
+            ("rep_len", REP_LEN, DICT_LEN),
+            ("dict_len", DICT_LEN, HIST_DIST),
+            ("hist_dist", HIST_DIST, DICT_OFF),
+            ("dict_off", DICT_OFF, LIT),
+            ("lit", LIT, LIT_MATCHED),
+            ("lit_matched", LIT_MATCHED, MODEL_SIZE),
+        ];
+        for (i, (_, from, to)) in groups.iter().enumerate() {
+            report[i] += cost[*from..*to].iter().sum::<f64>();
+        }
+        report[groups.len()] += rc.direct_bits as f64;
+        report[groups.len() + 1] += (doc.len() * 8) as f64;
+    }
     (rc.finish(), stats)
 }
+
+/// Whether `encode_doc` accounts the bits it codes into `COST_REPORT` (codec iteration aid).
+#[cfg(feature = "train")]
+pub static COST_ENABLED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+/// Bits coded per model group across every `encode_doc` call (codec iteration aid): flags,
+/// len, rep_len, dict_len, hist_dist, dict_off, lit, lit_matched, direct bits, input bits.
+#[cfg(feature = "train")]
+pub static COST_REPORT: std::sync::Mutex<[f64; 10]> = std::sync::Mutex::new([0.0; 10]);
 
 /// Normative at every segment start: rep distances the new segment's window cannot reach
 /// (the previous segment's dictionary was longer) reset to distance 1, so a matched literal
@@ -934,7 +1048,7 @@ const INF: u32 = u32::MAX;
 /// chosen path is replayed through the adaptive coder before the next chunk is parsed).
 fn run_encode_optimal(
     rc: &mut Encoder,
-    models: &mut Models,
+    models: &mut DocModels,
     cs: &mut CoderState,
     mf: &mut MatchFinder,
     start: usize,
@@ -1169,13 +1283,14 @@ fn relax(
 
 fn emit_literal(
     rc: &mut Encoder,
-    models: &mut Models,
+    models: &mut DocModels,
     cs: &mut CoderState,
     win: &Window,
     pos: usize,
 ) {
     rc.encode_bit(&mut models.probs, IS_MATCH + cs.state, 0);
     let block = models.lit_block(win.prev_bytes(pos));
+    let matched = models.matched_block();
     let probs = &mut models.probs;
     let symbol = u32::from(win.doc[pos]);
     let mut m = 1usize;
@@ -1186,7 +1301,7 @@ fn emit_literal(
             i -= 1;
             let mb = (match_byte >> i) & 1;
             let bit = (symbol >> i) & 1;
-            rc.encode_bit(probs, LIT_MATCHED + ((mb as usize) << 8) + m, bit);
+            rc.encode_bit(probs, matched + ((mb as usize) << 8) + m, bit);
             m = (m << 1) | bit as usize;
             if mb != bit {
                 break;
@@ -1206,7 +1321,7 @@ fn emit_literal(
 /// reaching into the dictionary codes the absolute dictionary offset instead.
 fn emit_match(
     rc: &mut Encoder,
-    models: &mut Models,
+    models: &mut DocModels,
     cs: &mut CoderState,
     pos: usize,
     dlen: usize,
@@ -1265,7 +1380,7 @@ fn decode_dist(rc: &mut Decoder, probs: &mut [u16], group: usize, len_state: usi
     base + reduced
 }
 
-fn emit_rep(rc: &mut Encoder, models: &mut Models, cs: &mut CoderState, idx: usize, len: usize) {
+fn emit_rep(rc: &mut Encoder, models: &mut DocModels, cs: &mut CoderState, idx: usize, len: usize) {
     let probs = &mut models.probs;
     rc.encode_bit(probs, IS_MATCH + cs.state, 1);
     rc.encode_bit(probs, IS_REP + cs.state, 1);
@@ -1323,15 +1438,15 @@ pub fn decode_doc<'p>(
         let dlen = dict.len();
         clamp_reps(&mut cs, out.len() - base, dlen);
         let mut models = lang_models.take(seg.lang);
-        let lit_classes = models.lit_classes;
         while out.len() - base < seg.end {
             if rc.overran() {
                 return Err(DecodeError::Corrupt);
             }
             let pos = out.len() - base;
-            let probs = &mut models.probs;
-            if rc.decode_bit(probs, IS_MATCH + cs.state) == 0 {
-                let block = lit_block(&lit_classes, prev_bytes(&out[base..], dict, pos));
+            if rc.decode_bit(&mut models.probs, IS_MATCH + cs.state) == 0 {
+                let block = models.lit_block(prev_bytes(&out[base..], dict, pos));
+                let matched = models.matched_block();
+                let probs = &mut models.probs;
                 let mut m = 1usize;
                 if cs.prev_was_match() {
                     // u64 compare: `as usize + 1` would wrap at u32::MAX on 32-bit targets.
@@ -1344,7 +1459,7 @@ pub fn decode_doc<'p>(
                     while i > 0 {
                         i -= 1;
                         let mb = (match_byte >> i) & 1;
-                        let bit = rc.decode_bit(probs, LIT_MATCHED + ((mb as usize) << 8) + m);
+                        let bit = rc.decode_bit(probs, matched + ((mb as usize) << 8) + m);
                         m = (m << 1) | bit as usize;
                         if mb != bit {
                             break;
@@ -1358,6 +1473,7 @@ pub fn decode_doc<'p>(
                 cs.state = state_after_literal(cs.state);
                 continue;
             }
+            let probs = &mut models.probs;
             let len;
             if rc.decode_bit(probs, IS_REP + cs.state) == 0 {
                 let dist_m1 = if rc.decode_bit(probs, IS_DICT + cs.state) == 1 {
@@ -1407,12 +1523,7 @@ pub fn decode_doc<'p>(
             if u64::from(cs.reps[0]) >= (pos + dlen) as u64 || pos + len > seg.end {
                 return Err(DecodeError::Corrupt);
             }
-            let dist = cs.reps[0] as usize + 1;
-            for _ in 0..len {
-                let p = out.len() - base;
-                let b = source_byte(&out[base..], dict, p, dist);
-                out.push(b);
-            }
+            copy_match(out, base, dict, cs.reps[0] as usize + 1, len);
         }
         lang_models.put(seg.lang, models);
     }
@@ -1424,6 +1535,26 @@ pub fn decode_doc<'p>(
         return Err(DecodeError::Corrupt);
     }
     Ok(())
+}
+
+/// Appends the `len` bytes `dist` back from the end of `out[base..]`, whose source may start in
+/// the dictionary, run into the output, and overlap the bytes being appended.
+#[inline]
+fn copy_match(out: &mut Vec<u8>, base: usize, dict: &[u8], dist: usize, mut len: usize) {
+    let pos = out.len() - base;
+    if dist > pos {
+        let start = dict.len() - (dist - pos);
+        let from_dict = (dict.len() - start).min(len);
+        out.extend_from_slice(&dict[start..start + from_dict]);
+        len -= from_dict;
+    }
+    // The source is now inside the output: copy in non-overlapping runs of `dist` bytes.
+    while len > 0 {
+        let src = out.len() - dist;
+        let run = dist.min(len);
+        out.extend_from_within(src..src + run);
+        len -= run;
+    }
 }
 
 #[inline]

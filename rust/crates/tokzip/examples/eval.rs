@@ -7,6 +7,9 @@ use std::path::Path;
 use std::time::Instant;
 
 fn main() {
+    if std::env::var_os("TOKZIP_COST").is_some() {
+        tokzip::train::enable_cost_report();
+    }
     let mut grand = (0usize, 0usize, 0f64, 0f64);
     let mut small = (0usize, 0f64);
     for arg in std::env::args().skip(1) {
@@ -59,6 +62,31 @@ fn main() {
         grand.1 += packed;
         grand.2 += comp;
         grand.3 += decomp;
+    }
+    if std::env::var_os("TOKZIP_COST").is_some() {
+        let report = tokzip::train::cost_report();
+        let names = [
+            "flags",
+            "len",
+            "rep_len",
+            "dict_len",
+            "hist_dist",
+            "dict_off",
+            "lit",
+            "lit_matched",
+            "direct",
+        ];
+        let total: f64 = report[..9].iter().sum();
+        let line: Vec<String> = names
+            .iter()
+            .zip(report.iter())
+            .map(|(n, c)| format!("{n} {:.1}%", 100.0 * c / total))
+            .collect();
+        println!(
+            "cost share over every parse attempted ({:.1}% of the parsed input): {}",
+            100.0 * total / report[9],
+            line.join("  ")
+        );
     }
     let mb = grand.0 as f64 / 1e6;
     println!(

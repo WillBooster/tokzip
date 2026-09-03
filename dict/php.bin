@@ -1,0 +1,1415 @@
+                if (isset($packages[$pkg])) {
+                    $packages[$pkg]->setHomepage($url);
+                }
+            /**
+     * Adds installer
+     *
+     * @param InstallerInterface $installer installer instance
+     */
+    public function ));
+
+            return 1;
+        }
+
+        if (!($composer = $this->tryComposer())) {
+            $composer = $this->createCotputInterface;
+use Composer\Repository\CompositeRepository;
+use Composer\Repository\PlatformRepository;
+use Composer\Repository\
+    /** @var Loop */
+    private $loop;
+    /** @var IOInterface */
+    private $io;
+    /** @var ?EventDispatcher */
+    privaomposer.
+ *
+ * (c) Nils Adermann <naderman@naderman.de>
+ *     Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * For the full copyright s();
+        self::assertEquals('plugin1', $plugins[0]->name); // @phpstan-ignore property.notFound
+        self::assertEquals('yright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Componce(PackageInterface $package): void
+    {
+        try {
+            $installer = $this->getInstaller($package->getType());
+    this->repository
+            ->expects($this->any())
+            ->method('getPackages')
+            ->will($this->returnValue([      } catch (\Exception $e) {
+            $this->runCleanup($cleanupPromises);
+
+            throw $e;
+        } finally {
+   s($wrongImplementationClassTypes, 'RuntimeException');
+    }
+}
+<?php declare(strict_types=1);
+
+/*
+ * This file is part of Compos      $repo->removePackage($package);
+    }
+
+    /**
+     * Returns the installation path of a package
+     *
+     * @return str       new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the package'),
+                new InputOption('descrackage2
+
+------------------------------------------------------------------------------
+vendor3/suggested is suggested by:
+ - ve       'install' => PackageEvents::POST_PACKAGE_INSTALL,
+                'update' => PackageEvents::POST_PACKAGE_UPDATE,
+      ng
+            if (!$this->io->isDecorated()) {
+                $this->io->writeError('');
+            }
+        }
+    }
+
+    /*       ],
+                ];
+
+                $promises[] = $this->loop->getHttpDownloader()->add($repoUrl, $opts);
+    tches = [];
+        $batch = [];
+        foreach ($operations as $index => $operation) {
+            if ($operation instanceof Ioser\Semver\Constraint\Constraint;
+use Composer\Semver\Constraint\ConstraintInterface;
+
+/**
+ * Selects the best possible versionr\Util\Filesystem;
+use Composer\Config;
+
+class RepositoryManagerTest extends TestCase
+{
+    /** @var string */
+    protected $tmpublic static function invalidImplementationClassNames(): array
+    {
+        return [
+            [null],
+            [""],
+   nt;
+use Composer\Util\ProcessExecutor;
+use Composer\Util\Platform;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class        // reset the plugin manager's installed plugins
+        $this->pm = $this->getMockBuilder('Composer\Plugin\PluginManager'nction supports(string $packageType): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     *isset($options['require-dev'])) {
+            $options['require-dev'] = $this->formatRequirements($options['require-dev']);
+    poser\Package\RootPackageInterface')->getMock();
+        $composer->setPackage($package);
+
+        self::assertSame($package, $cpackageName): ?string
+    {
+        if (!$packageName || strpos($packageName, '/') === false) {
+            return null;
+     ' => 'http://example.org']],
+            ['vcs', ['url' => 'http://github.com/foo/bar']],
+            ['git', ['url' => 'http://   if (null === $platformRequirementFilter) {
+            $platformRequirementFilter = PlatformRequirementFilterFactory::ignoreN      $appTester = $this->getApplicationTester();
+        self::assertSame(0, $appTester->run(['command' => 'license', '--no-dev    * @dataProvider provideInvalidRepoCreationTestCases
+     *
+     * @param array<string, mixed> $options
+     * = $matches[2][$key];
+            }
+
+            return $this->gitConfig;
+        }
+
+        return $this->gitConfig = [];
+    }  $repositories = $input->getOption('repository');
+        if (count($repositories) > 0) {
+            $config = Factory::createUnit\Framework\MockObject\MockObject&\Composer\Repository\RepositoryManager
+     */
+    private function getRepositoryManagerMocPHP_EOL.'deactivate v1'.PHP_EOL.'activate v2'.PHP_EOL, $this->io->getOutput());
+    }
+
+    public function testUninstall(): void  if (!isset(BasePackage::$stabilities[$value])) {
+                    throw new \InvalidArgumentException(
+         $process->expects([
+            'echo -n foo',
+            'echo -n bar',
+        ], true);
+
+        $dispatcher = $t      'name' => 'test/pkg',
+            'version' => '1.2.3',
+            'license' => 'MIT',
+            'require' => [
+    ;
+
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Handler\Proxy;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\RequestOptionrettyVersion();
+    }
+
+    private function transformVersion(string $version, string $prettyVersion, string $stability): string
+ ($package instanceof AliasPackage && $package->getVersion() === VersionParser::DEFAULT_BRANCH_ALIAS) {
+            $package = $Directory());
+        $downloader = $this->getDownloader();
+
+        try {
+            $downloader->download($package, $path);
+ edPackage) || empty($addedPackage)) {
+                break;
+            }
+
+            $addedPackage = strtolower($addedPackage1'],
+        ], true);
+
+        self::expectException(ScriptExecutionException::class);
+        self::expectExceptionMessage('Ertected function extract(PackageInterface $package, string $file, string $path): PromiseInterface
+    {
+        // Can throw an U     } else {
+            Platform::clearEnv('COMPOSER_BIN_DIR');
+        }
+    }
+
+    public static function createsVendorBinFot.org' => false])
+                ) {
+                    $createDefaultPackagistRepo = false;
+                    continue;
+   nction __construct(string $contents)
+    {
+        $contents = trim($contents);
+        if ($contents === '') {
+   t, $output);
+        $composer->getEventDispatcher()->dispatch($commandEvent->getName(), $commandEvent);
+
+        $composer->get      $license
+        );
+        $input->setOption('license', $license);
+
+        $io->writeError(['', 'Define your dependenciepaces.php @generated by Composer
+
+$vendorDir = dirname(__DIR__);
+$baseDir = dirname(dirname($vendorDir));
+
+return array(
+    'Maoser\Command;
+
+use Composer\Composer;
+use Composer\DependencyResolver\Request;
+use Composer\Installer;
+use , false);
+
+        $expected = '> post-install-cmd: echo -n foo'.PHP_EOL.
+            '> post-install-cmd: Composer\Test\EventDition("JsonManipulator: \$childrenClean is not defined. Please report at https://github.com/composer/composer/issues/new.");
+    this->initTempComposer();
+        $this->createInstalledJson([self::getPackage()]);
+
+        $this->expectException(UnexpectedVaparam string[] $expected
+     */
+    public function testFilterRequiredPackages(array $pkgs, PackageInterface $requirer, array $kage = self::getPackage();
+        $package->setDistUrl('http://example.com/script.js');
+
+        $path = self::getUniqueTmpDireusername: string|null, password: string|null}> The map of authentication data
+     */
+    public function getAuthentications();
+ackage\PackageInterface')->getMock();
+        $packageMock->expects($this->once())
+            ->method('getSourceReference')
+     ['text' => '{Downloading .*}', 'regex' => true],
+            ['text' => '{Downgrading .*}', 'regex' => true],
+        ]);
+
+  poser\Pcre\Preg;
+use Composer\Repository\PlatformRepository;
+
+/**
+ * @author Jordi Boggiano <j.boggiano@seld.be>
+ */
+class JsonMetConfigSource(): ConfigSourceInterface
+    {
+        return $this->configSource;
+    }
+
+    public function setAuthConfigSources = array_merge($rootPackage->getRequires(), $rootPackage->getDevRequires());
+        foreach ($reqs as $package => $constraint)   }));
+
+        $httpDownloaderMock = $this->getMockBuilder('Composer\Util\HttpDownloader')->disableOriginalConstructor()->getMassertStringContainsString(
+            'No packages - skipping audit.',
+            trim($appTester->getDisplay(true))
+        'reference' => null,
+            'type' => 'metapackage',
+            'install_path' => null,
+            'aliases' => a   if (PlatformRepository::isPlatformPackage($requirement)) {
+                return Preg::replace(
+                    [
+           assert(is_string($match['start']));
+        assert(is_string($match['content']));
+        assert(is_string($match['end'])if ($request->getLockedRepository()) {
+                foreach ($request->getLockedRepository()->getPackages() as $package) {
+  se,
+        'optimize-autoloader' => false,
+        'classmap-authoritative' => false,
+        'apcu-autoloader' => false,
+     nfig = new Config;
+        $this->setupConfig($config);
+        $cachePath = $config->get('cache-vcs-dir').'/'.Preg::replace('{[     ->setHelp(
+                <<<EOT
+The <info>update</info> command reads the composer.json file from the
+current directory,      $io = $this->getMockBuilder('Composer\IO\IOInterface')->getMock(),
+            $this->getProcessExecutorMock(),
+        ])
+if (is_dir($path)) {
+                $fs = new Filesystem();
+                $fs->removeDirectory($path);
+            } elseif (->getPrettyConstraint().' ('.$package1->getPrettyString().' '.$provideType.' '.$reasonData->getTarget().' '.$provided.')';
+     kage = [];
+
+    /**
+     * @var array<string, array<string, string>>
+     */
+    private $removedVersionsByPackage = [];
+
+   ace $input, ?string $packageName = null, ?string $directory = null, ?string $packageVersion = null, ?string $stability = 'stable  if (Preg::isMatchStrictGroups('#,\s*$#', $matches['start']) && Preg::isMatch('#^\}$#', $matches['end'])) {
+                $maversion of the two
+            return version_compare($b->getVersion(), $a->getVersion());
+        });
+
+        if (count($this-$repoConfig['packagist']) && $repoConfig === ['packagist' => false])
+                    || (isset($repoConfig['packagist.org'])ption('optimize-autoloader', 'o', InputOption::VALUE_NONE, 'Optimize autoloader during autoloader dump.'),
+   ow new TransportException("Your configuration does not allow connections to $url. See https://getcomposer.org/doc/06-config.md#sSilencer;
+use Composer\Console\Input\InputArgument;
+use Seld\Signal\SignalHandler;
+use Symfony\Component\Console\Input\InputIntete($messages, bool $newline = true, int $verbosity = self::NORMAL);
+
+    /**
+     * Writes a message to the error output.
+     *mposer && git remote set-url origin -- 'https://example.com/composer/composer' && git remote set-url composer -- 'https://exam* @var Request */
+    protected $request;
+    /**
+     * @var Link|BasePackage|ConstraintInterface|string
+     * @phpstan-var Re      'dev' => true,
+    ),
+    'versions' => array(
+        '__root__' => array(
+            'pretty_version' => 'dev-master',
+xecutor::escape($file) . ' > ' . ProcessExecutor::escape($targetFilepath);
+
+            if (0 === $this->process->execute($comma an exception
+     * otherwise.
+     *
+     * @param string   $question  The question to ask
+     * @param callable $validator A($http_response_header);
+                if ($statusCode >= 400 && Response::findHeaderValue($http_response_header, 'content-typError('<warning>You are using the deprecated option "dev". Dev packages are installed by default now.</warning>');
+   espace GuzzleHttp;
+
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\Respon     $versionSelector = new VersionSelector($repositorySet, $platformRepo);
+        $package = $versionSelector->findBestCandida      $sourceLiteral = array_shift($literals);
+                $sourcePackage = $this->deduplicateDefaultBranchAlias($pool->litePluginInterface
+{
+    public $version = 'installer-v3';
+
+    public function activate(Composer $composer, IOInterface $io)
+    {  if ($subName !== null) {
+                $curVal = json_decode($matches['content'], true);
+                unset($curVal[$nameisset($this->aliasesPerPackage[$package->id])) {
+            foreach ($this->aliasesPerPackage[$package->id] as $alias    fwrite(STDERR, '!!Versions:console:'.InstalledVersions::getVersion('symfony/console').';process:'.InstalledVersions::getVers      $json = '{"name": "vendor/-pack__age", "description": "description"}';
+        self::assertEquals($expectedError, $this    $requirer = self::getPackage('requirer/pkg');
+        yield 'no require' => [$pkgs, $requirer, []];
+
+        $requirer = selpublic const STABILITY_STABLE = 0;
+    public const STABILITY_RC = 5;
+    public const STABILITY_BETA = 10;
+    public const STAnction removeSubNode(string $mainNode, string $name): bool
+    {
+        $decoded = JsonFile::parseJson($this->contents);
+
+   proper reference
+                $url = 'https://gitlab.com/api/v4/projects/' . $match[1] . '/repository/archive.' . $match[2] tall(InstalledRepositoryInterface $repo, PackageInterface $package)
+    {
+        $this->io->writeError("  - " . InstallOperatio $progress = true, array $options = [])
+    {
+        return $this->get($originUrl, $fileUrl, $options, $fileName, $progress);
+ createPoolForPackages(array $packageNames, ?LockArrayRepository $lockedRepo = null): Pool
+    {
+        $request = new Request($    $reason = Problem::getMissingPackageReason($repositorySet, $request, $pool, $isVerbose, $targetName, $reasonData->getConstrackage, null for an unknown identifier
+     */
+    public function getVersionPackage(string $version, string $identifier);
+}
+<?phesolver;
+
+use Composer\Package\AliasPackage;
+use Composer\Package\BasePackage;
+use Composer\Package\Version\VersionParser;
+us'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $file = new JsonFile($dir param  string[]    $headers array of returned headers like from getLastHeaders()
+     * @return string|null
+     * repository by name
+                if (false === $repository) {
+                    $this->disableRepoByName((string) $name);
+ lse, bool $installDevPackages = false, ?array $repositories = null, bool $disablePlugins = false, bool $disableScripts = false, tions['http']['header']) && !is_array($options['http']['header'])) {
+            $options['http']['header'] = explode("\r\n", tr    $dir = $this->initTempComposer();
+        unlink($dir . '/composer.json');
+        unlink($dir . '/auth.json');
+
+  mposer([
+            'require' => [
+                'vendor1/package2' => '1.*',
+                'vendor2/package1' => '2.*'
+       $result['abandoned'] = $abandonedEnv;
+                }
+
+                return $result;
+
+            default:
+           $val = rtrim((string) $this->process(false !== $val ? $val : $this->config[$key], $flags), '/\\');
+                $val = oConfig, $this->io, $this->config, $this->httpDownloader, $this->processExecutor);
+            $this->driver->initialize();
+
+   if ($hasRootIdentifierComposerJson) {
+                $data = $driver->getComposerInformation($driver->getRootIdentifier());
+  om/mygroup/myproject', 'http://gitlab.com/api/v4/projects/mygroup%2Fmyproject'],
+            ['git@gitlab.com:mygroup/myproject'eption;
+use InvalidArgumentException;
+use Composer\Test\TestCase;
+use Composer\Package\Link;
+use RuntimeException;
+use Generatormposer\EventDispatcher\EventDispatcher;
+use Composer\Advisory\SecurityAdvisory;
+use Composer\Advisory\PartialSecurityAdvisory;
+ud isn't required by the project
+     *
+     * @covers       \Composer\Command\BaseDependencyCommand
+     * @covers       \Compos\Autoload;
+
+use Composer\Autoload\ClassLoader;
+use Composer\Test\TestCase;
+
+/**
+ * Tests the Composer\Autoload\ClassLoader class)]);
+        $im->notifyInstalls($io);
+
+        // collect suggestions
+        $this->suggestedPackagesReporter->addSuggestionsF[] $rootAliases
+     * @phpstan-param list<array{package: string, version: string, alias: string, alias_normalized: string}> $ro  case 'autoloader-suffix':
+                if ($this->config[$key] === '') { // we need to guarantee null or non-empty-string
+ckage(self::getPackage('foo/aaa', '1.0.0'));
+        $this->arrayRepo->addPackage(self::getPackage('foo/bbb', '1.0.0'));
+        $loader->add('Pearlike_', __DIR__ . '/Fixtures');
+        $loader->add('', __DIR__ . '/FALLBACK');
+        $loader->addPsr4each ($candidates as $candidate) {
+            if ($this->isPackageAcceptable($candidate->getNames(), $candidate->getStability() && $this->redirects < $this->maxRedirects) {
+            $hasFollowedRedirect = true;
+            $result = $this->handleRedirenValue(\React\Promise\resolve(true)));
+
+        $downloader = $this->getDownloaderMock(null, null, $process, $filesystem);
+      if (!empty($config['repositories']) && is_array($config['repositories'])) {
+            $this->repositories = array_reverse($tt = new RepositorySet($minimumStability ?? $this->getMinimumStability($input));
+            $repositorySet->addRepository($this-ion().')';
+    }
+
+    /***************************************
+     * Wrappers around the aliased package *
+     ***************mposer\Json\JsonFile;
+use Composer\Test\TestCase;
+use Symfony\Component\Console\Tester\ApplicationTester;
+
+class InitCommandTest/info> [<comment>Y,n</comment>]? ')
+            )
+        ) {
+            $finder = new Finder();
+            $finder->depth(0)-oader->install($packageMock, 'composerPath');
+        $downloader->cleanup('install', $packageMock, 'composerPath');
+   $this->winCompat("git checkout 'ref' -- && git reset --hard 'ref' --"),
+            [
+                'cmd' => $this->winCompat( request counts.
+
+        $tempAdditionalOptions = $additionalOptions;
+        if (isset($tempAdditionalOptions['retry-auth-fail InputArgument('package', InputArgument::OPTIONAL, 'Package name to be installed', null, $this->suggestAvailablePackage()),
+    dy: string, headers: list<string>}
+     */
+    private $defaultHandler = ['status' => 200, 'body' => '', 'headers' => []];
+    /ckage with a requirement
+     * @param  BasePackage[] $providers The providers of the requirement
+     * @param  Rule::RULE_* $reption(sprintf(
+                    'Could not find package %s in any version matching your PHP version, PHP extensions and Compre('update', $sourcePackageMock, '/path', $initialPackageMock);
+        $downloader->update($initialPackageMock, $sourcePackageM     $errorMessage = '';
+            set_error_handler(static function ($code, $msg) use (&$errorMessage): bool {
+    orm-reqs flag if present
+        if ($input->hasOption('ignore-platform-reqs') && $input->hasOption('ignore-platform-req')) {
+  LE_FIXED, [
+                'package' => $package,
+            ]);
+            $this->addRule(RuleSet::TYPE_REQUEST, $rule);
+   edRepo = null;
+        if (null !== $composer) {
+            $installedRepo = $composer->getRepositoryManager()->getLocalReposittension_loaded('curl') && \function_exists('curl_multi_exec') && \function_exists('curl_multi_init');
+    }
+}
+<?php
+
+namespace I    $advisories = array_merge_recursive([], ...$repoAdvisories);
+        ksort($advisories);
+
+        return $advisories;
+    }AuthorString(): void
+    {
+        $command = new InitCommand;
+        $author = $this->callParseAuthorString($command, 'John Smn' => 'requires', 'method' => Link::TYPE_REQUIRE],
+        'conflict' => ['description' => 'conflicts', 'method' => Link::TYPE_Crl downloader
+     * @throws TransportException
+     * @return Response
+     */
+    public function copy(string $url, string $to      'first/pkg' => '1.0.0',
+                'second/pkg' => '^3.4',
+    this->finder));
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        if (is_dir($this->root)e === $progress) {
+                throw new \RuntimeException('Failed getting info from curl handle '.$i.' ('.$this->jobs[$i]['abilityFlags = [], array $rootAliases = [], array $rootReferences = [], array $rootRequires = [], array $temporaryConstraints =     $cookie->setValue('b');
+        $cookie->setPath('c');
+        $cookie->setDomain('bar.com');
+        $cookie->setExpires(10w new \LogicException('Attempted removing a package which was previously marked irremovable');
+        }
+
+        $this->package  if ($response->getStatusCode() >= 400 && $response->getHeader('content-type') === 'application/json') {
+                    Htvendor/package", "description": "generic description", "minimum-stability": "rc" }';
+        self::assertTrue($this->check($json     * Use the list of locked packages to constrain the loaded packages
+     * This will reduce packages with significant numberr bitbucket login page asking to authenticate
+        if (
+            $job['origin'] === 'bitbucket.org'
+            && !$this-aram resource $context     The stream context
+     * @param string[] $responseHeaders
+     * @param int      $maxFileSize The maetStatusCode());
+        chmod($directory.'/composer.json', 0700);
+    }
+
+    private const MINIMAL_VALID_CONFIGURATION = [
+    onfig->merge(['config' => ['github-protocols' => $protocols]]);
+
+        $downloader = $this->getDownloaderMock(null, $config, $ ->willReturn([]);
+        $root->expects($this->atLeastOnce())
+            ->method('getProvides')
+            ->willReturn([])   $constraint = $link->getConstraint();
+                if ($platformRequirementFilter->isIgnored($link->getTarget())) {
+     $attributes['ipResolve'] = 4;
+        } elseif ($attributes['ipResolve'] === null && Platform::getEnv('COMPOSER_IPRESOLVE')hpstan-return self::STABILITY_*
+     */
+    public function getStabilityPriority(): int
+    {
+        return self::$stab if (!Filesystem::isReadable($this->file)) {
+            $io->writeError('<error>'.$this->file.' is not readable.</error>');
+
+     $stack->push(Middleware::redirect());
+        $handler = $stack->resolve();
+        $request = new Request('GET', 'httrivate static $options = [
+        'http' => [
+            'method' => CURLOPT_CUSTOMREQUEST,
+            'content' => CURLOPT_Pil\Http\Response;
+use Composer\Downloader\TransportException;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\AssertionFaile     ['name' => 'vendor2/package1', 'version' => '2.0.0'],
+                        ['name' => 'vendor2/package2', 'versiackageMatches['version']);
+
+                                return $packageMatches['name'].' '.$packageMatches['version'];
+    00",
+    "name": "My Project",
+    "name_with_namespace": "My Group / My Project",
+    "path": "myproject",
+    "path_with_nameskage1 suggests:
+ - vendor3/suggested: helpful for vendor1/package1
+
+vendor2/package2 suggests:
+ - vendor4/dev-suggested: helpfuletMostCurrentVersion($this->getRepos()->findPackages($name));
+                if ($pkg instanceof CompletePackageInterface) {
+  r3/suggested' => 'helpful for vendor1/package1'], 'require' => ['vendor6/package6' => '^1.0'], 'require-dev' => ['vendor3/suggesd('getPrettyVersion')
+            ->will($this->returnValue('1.0.0'));
+
+        $process = $this->getProcessExecutorMock();e->getAliasOf()->getPrettyName().'</info> (<comment>'.$this->package->getAliasOf()->getFullPrettyVersion().'</comment>)';
+   n([
+            'command' => 'init',
+            '--no-interaction' => true,
+            '--name' => 'test/pkg',
+            '-- array<mixed> $composerJson
+     * @param array<mixed> $command
+     */
+    public function testConfigReads(array $composerJson,   $e->setResponse($this->decodeResult($result, $http_response_header));
+
+            throw $e;
+        }
+
+        return false;mposer
+                $targetUrl = $locationHeader;
+            } elseif (parse_url($locationHeader, PHP_URL_HOST)) {
+  ownloadManager::getDownloaderForPackage).
+        $rootReqPackage->setType('metapackage');
+        $anotherPackage->setType('met      };
+
+        $promise = new Promise($resolver, $canceler);
+        $promise = $promise->then(function ($response) use (&$jonction write(bool $devMode, InstallationManager $installationManager)
+    {
+        $this->devMode = $devMode;
+    alDefinitionsPerPackage[$packageName][$groupHash][$dependencyHash][] = $package;
+                    $packageIdenticalDefinitioneOutput) {
+            return;
+        }
+
+        if (null === $this->io) {
+            echo $buffer;
+
+            return;
+     ler::create($io, $composer);
+
+        [$preferSource, $preferDist] = $this->getPreferredInstallOptions($composer->getConfig(), $tSame($expected, array_map(static function ($p): string {
+            return $p->getName();
+        }, $packages));
+   nParser->parseConstraints($data[$type . '-versions']);
+                $composer = new Constraint('==', $versionParser->normali$learnedString;
+            case self::RULE_PACKAGE_ALIAS:
+                $aliasPackage = $pool->literalToPackage($literals[0])curlHandle, CURLOPT_URL, $url);
+        curl_setopt($curlHandle, CURLOPT_FOLLOWLOCATION, false);
+        curl_setopt($curlHandle@param mixed[] $additionalOptions
+     *
+     * @return mixed[]
+     */
+    protected function getOptionsForUrl(string $origin->ensureDirectoryExists($this->workingDir.'/.git');
+
+        // not using PHPUnit's expected exception because Prophecy exceptiothis->addedPackagesByNames as $name => $packages) {
+            if (\count($packages) > 1) {
+                $reason = Rule::on testGetStreamWithStream(): void
+    {
+        $this->setPerforceToStream();
+
+        $stream = $this->perforce->getStream();
+on testRequestInstall(): void
+    {
+        $repo = new ArrayRepository;
+        $foo = self::getPackage('foo', '1');
+   matches as $position => $foundPackage) {
+                    if (in_array($foundPackage['name'], $existingPackages, true)) {
+ iled to download ' . $this->namespace . '/' . $this->repository . ':' . $e->getMessage() . '</warning>');
+                    $g>io->overwriteError('', false);
+        }
+
+        $branches = $driver->getBranches();
+        // make sure the root identifier     [],
+            ['setting-key' => 'scripts.test', 'setting-value' => ['foo bar']],
+            ['scripts' => ['test' => 'foo   $problem->addRule(new GenericRule([], Rule::RULE_ROOT_REQUIRE, ['packageName' => $packageName, 'constraint' => $constraint])) if ($io->isInteractive()) {
+                if (!$io->askConfirmation(sprintf('<info>Do you want to move %s?</info> [<comment>nthis->pool = $pool;
+        $this->rules = new RuleSet;
+    }
+
+    /**
+     * Creates a new rule for the requirements of a pestions by transitive dependencies can be shown with --all'
+        ];
+
+        yield 'without lockfile, show suggested grouped     $literal = $literals[0];
+
+            if (!$this->decisions->decided($literal)) {
+                $this->decisions->decide($run, $expectLock, ?array $expectInstalled, ?string $expectOutput, ?string $expectOutputOptimized, string $expect, $expectResult)st->getUpdateAllowTransitiveRootDependencies()) {
+            $hints[] = "Use the option --with-all-dependencies (-W) to allow ufs;
+    /** @var int */
+    private $idGen = 0;
+    /** @var bool */
+    private $disabled;
+    /** @var bool */
+    private $altallerEvents
+     * @param bool        $devMode           Whether or not we are in dev mode
+     * @param bool        $executeOpagent.fr>
+ * @author Jordi Boggiano <j.boggiano@seld.be>
+ */
+class RequireCommand extends BaseCommand
+{
+    use CompletionTrait;commendedRequireVersion($package),
+        ];
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function findSimilmand = $this->generateP4Command($task, $useP4Client);
+        $this->executeCommand($command);
+        $clientSpec = $tents = stream_get_contents($job['bodyHandle']);
+                    }
+                    $response = new CurlResponse(['url' !isset($composer['support']['source']) && isset($this->project['web_url'])) {
+                    $label = array_search($identi, false],
+            'no match wrong domain' => [$noproxy, 'barbaz.com', false],
+            'no match FQDN' => [$noproxy, 'foarg($argument);
+        }
+
+        if (!Platform::isWindows()) {
+            return "'".str_replace("'", "'\\''", $argument)."'"://api.github.com/repos/composer/packagist';
+        $repoSshUrl = 'git@github.com:composer/packagist.git';
+        $identn array_merge(
+            array_fill_keys(array_keys($require), 'require'),
+            array_fill_keys(array_keys($requireDev)d the command to execute
+     * @param  mixed   $output  the output will be written into this var if passed by ref
+     *       is_callable($output) ? $output : function (string $type, string $buffer): void {
+            $this->outputHandler($type, $bufferModified, true, IOInterface::DEBUG);
+        }
+
+        $this->checkCurlResult(curl_multi_add_handle($this->multiHandle, $curlHa$commitHash = '03a15d220da53c52eddd5f32ffca64a7b3801bea';
+        $anotherCommitHash = '03a15d220da53c52eddd5f32ffca64a7b3801bea    $lock = new JsonFile($lockFile);
+                    $lockData = $lock->read();
+                    $lockData['content-hash'ring           $path    download path
+     * @return string           file name
+     */
+    protected function getFileName(Packa$localFilename = realpath($_SERVER['argv'][0]);
+        if (false === $localFilename) {
+            $localFilename = $_SERVER['a/'.$this->originUrl.'/api/v4/projects/'.$this->urlEncodeAll($this->namespace).'%2F'.$this->urlEncodeAll($this->repository);
+           while (!empty($this->branches) && $this->branches[\count($this->branches) - 1][self::BRANCH_LEVEL] >= $level) {
+      $gitHubDriver = new GitHubDriver($repoConfig, $io, $this->config, $httpDownloader, $process);
+        $gitHubDriver-chino@opendisplay.com>
+ * @author Nils Adermann <naderman@naderman.de>
+ */
+class FileDownloader implements DownloaderInterface,    $renderRecursively = $parameters['--recursive'] ?? false;
+
+        $this->initTempComposer([
+            'repositories' => [
+-format' => ['http://proxy.com:80', null, 'http://proxy.com:80'],
+            'with-format' => ['http://proxy.com:80', $format, d' => 'GET', 'max_redirects' => 20, 'follow_location' => 1, 'header' => ['User-Agent: foo']]], ['http' => ['method' => 'GET', 'h  ->with($config);
+
+        $loader = new ValidatingArrayLoader($internalLoader, true, null, ValidatingArrayLoader::CHECK_ALL);
+orm.
+Package operations: 1 install, 0 updates, 0 removals
+  - Installing root/another (1.0.0)
+Generating autoload files', trim($= stripos(implode('', $job['request']['options']['http']['header']), 'if-modified-since')) {
+                $resolve(new Respon($oldPackage, $newPackage, $this->workingDir);
+        $downloader->cleanup('update', $newPackage, $this->workingDir, $oldPackagace $io, Config $config, HttpDownloader $httpDownloader, ?EventDispatcher $dispatcher = null, ?ProcessExecutor $process = nul array<int|string, string> Map of tag name to identifier */
+    private $tags;
+
+    /** @var array<int|string, string> Map of brcontent = $this->getContents($resource)->getBody();
+        } catch (TransportException $e) {
+            if ($e->getCode() !== s->filesystem->removeDirectoryPhp($dir);
+            }
+        }
+
+        return \React\Promise\resolve(null);
+   Capabilities()
+    {
+        return array(
+            'Composer\Plugin\Capability\CommandProvider' => 'Installer\CommandProvideion setOptions(array $options)
+    {
+        $this->options = array_replace_recursive($this->options, $options);
+   oader->expects(
+            [['url' => sprintf('https://api.%s/', $this->origin), 'status' => 401]],
+            true
+     ion getUrl(): string
+    {
+        if ($this->fallbackDriver) {
+            return $this->fallbackDriver->getUrl();
+     $jar->setCookie(new SetCookie([
+            'Name' => 'foo',
+            'Value' => 'bar',
+            'Domain' => 'foo.com',
+       "\u{ff0f}" => '/',
+            "\u{2044}" => '/',
+            "\u{2215}" => '/',
+            "\u{00b4}" => '/',
+    his->manager = $factory->createArchiveManager($factory->createConfig(), $dm, $loop);
+        $this->targetDir = $this->testDir.'= null)
+    {
+        $this->composer = $composer;
+        $this->io = $io;
+        $this->process = $process ?? new Proces(
+    'ClassMapBar' => $baseDir . '/lib/rootbar.php',
+    'ClassMapFoo' => $baseDir . '/src/rootfoo.php',
+    'Composer\\Instaltion configure()
+    {
+        $this
+            ->setName('require')
+            ->setAliases(['r'])
+            ->setDescript>with($this->equalTo('github.com'), $this->equalTo('user'), $this->equalTo('pass'));
+
+        $fs = new HttpDownloader($io, $th      $_SERVER['http_proxy'] = 'http://username:password@proxyserver.net:3128/';
+        $_SERVER['no_proxy'] = '*';
+
+        $updateAllowTransitiveDependencies = Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS_NO_ROOT_REQUIRE;
+        $flags = '';
+'vendor4/dev-suggested' => new Link('vendor1/package1', 'vendor4/dev-suggested', self::getVersionConstraint('>=', '1.0'), Link::      '',
+                '&'
+            )
+        );
+
+        $repoData = $this->fetchWithOAuthCredentials($resource, true)->dtory\VcsRepository');
+        $rm->setRepositoryClass('hg', 'Composer\Repository\VcsRepository');
+        $rm->setRepositoryClasew MockHandler([
+            new Response(302, ['Location' => 'http://test.com']),
+            new Response(200),
+      $data['version'] = Preg::replace('{[.-]?dev$}i', '', $data['version']);
+                $data['version_normalized'] = Preg::nction download(PackageInterface $package, string $path, ?PackageInterface $prevPackage = null, bool $output = true): Prom the client, or a
+     * relative path to append to the base path of the client. The URL can
+     * contain the query string  if ($job['attributes']['storeAuth'] !== false) {
+                    $this->authHelper->storeAuth($job['origin'], $job['attrib      $normalizedBranch = $this->versionParser->normalizeBranch($branch);
+
+            // validate that the branch name has no witerals = $this->policy->selectPreferredPackages($this->pool, $decisionQueue, $rule->getRequiredPackage());
+
+        $selectedLiion setupGitDriver(string $url): void
+    {
+        $this->gitDriver = new GitDriver(
+            ['url' => $url],
+   NONE, 'Skip the audit step after updating the composer.lock file (can also be set via the COMPOSER_NO_AUDIT=1 env var).'),
+ mand removes a package from the current
+list of installed packages
+
+<info>php composer.phar remove</info>
+
+Read more at htties, array $options): void
+    {
+        $io = new BufferIO('', OutputInterface::VERBOSITY_NORMAL, new OutputFormatter(false));
+versionData = $this->guessHgVersion($packageConfig, $path);
+        if (null !== $versionData && null !== $versionData['veEQUIRED | InputOption::VALUE_IS_ARRAY, 'Ignore a specific platform requirement (php & ext- packages).'),
+  f the rules is disabled.
+     *
+     * @param  Rule $rule The rule to check against
+     * @return bool Whether the rules are eqinput, OutputInterface $output): int
+    {
+        $file = $input->getArgument('file') ?: Factory::getComposerFile();
+  ation($origin, $auth);
+
+        $expectedHeaders = array_merge($headers, ['Authorization: Bearer ' . $auth['username']]);
+
+ nd operations are executed.
+     *
+     * The event listener method receives an Composer\Installer\InstallerEvent instance.
+    ions of the package group so we can list them later in Problem output
+        foreach ($package->getNames(false) as $name) {
+  equest options to apply to each request:
+     *
+     *     $client = new Client([
+     *         'base_uri'        => 'http://wwtion($this->loader->getErrors(), $this->loader->getWarnings(), $packageData);
+                }
+                $this->addPackagckage3' => new Link(
+                'vendor2/package2',
+                'vendor2/package3',
+                new MatchAllConstra->aliasOf->getArchiveName();
+    }
+
+    public function setArchiveName(?string $name): void
+    {
+        $this->aliasOf->setArcr' . PHP_EOL . PHP_EOL);
+        fwrite($spec, 'SubmitOptions:  revertunchanged' . PHP_EOL . PHP_EOL);
+        fwrite($spec, 'Liuth as $domain => $token) {
+            if ($domain !== 'gitlab.com' && !in_array($domain, $config->get('gitlab-domains'), true)r.json should not be modified by config reads');
+    }
+
+    public static function provideConfigReads(): \Generator
+    {
+r()->normalize($version);
+
+        $pkg = new CompletePackage($name, $normVersion, $version);
+        $pkg->setSuggests($suggest    $message = $testData['TEST'];
+                $condition = !empty($testData['CONDITION']) ? $testData['CONDITION'] : null;
+ttp_url_to_repo": "https://gitlab.com/mygroup/myproject.git",
+    "ssh_url_to_repo": "git@gitlab.com:mygroup/myproject.git",
+   this->token,
+            $this->bitbucket->requestToken($this->origin, $this->consumer_key, $this->consumer_secret)
+     :assertFileExists($target);
+
+        $tmppath = sys_get_temp_dir().'/composer_archiver/'.$this->manager->getPackageFilename($pa  $resource = sprintf(
+            'https://api.bitbucket.org/2.0/repositories/%s/%s/src/%s/%s',
+            $this->owner,
+     , $checkAll, $checkVersion);
+
+        $lockErrors = [];
+        $composer = $this->createComposerInstance($input, $io, $file);
+  array($vendorDir . '/src-fruit'),
+    'Acme\\Cake\\' => array($vendorDir . '/src-cake', $vendorDir . '/lib-cake'),
+);
+<?php dler = HandlerStack::create($mock);
+        $client = new Client(['handler' => $handler]);
+        $client->get('http  $reflMethod = new \ReflectionMethod('Composer\\Util\\Svn', 'getCredentialString');
+        $reflMethod->setAccessible(true);
+O_METHOD_TLSv1_2_CLIENT
+            || (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT') && $value === \STREAM_CRYPTO_METHOD_TLSv1{unique_perforce_client_name?: string, depot?: string, branch?: string, p4user?: string, p4password?: string}
+ */
+class Perforceint $literal1, int $literal2, $reason, $reasonData)
+    {
+        parent::__construct($reason, $reasonData);
+
+        if ($liter$this->newlyCreated) {
+                @unlink($this->json->getPath());
+            }
+
+            $signalHandler->unregister();quires($links['require-dev']);
+        }
+
+        $commandEvent = new CommandEvent(PluginEvents::COMMAND, 'remove', $input, $outl === $result) {
+                    return $fileName;
+                }
+
+                if (!file_exists($fileName)) {
+       'B/sub/prefixA.foo',
+            'B/sub/prefixB.foo',
+            'B/sub/prefixC.foo',
+            'B/sub/prefixD.foo',
+   $consoleIO = new ConsoleIO($inputMock, $outputMock, $helperMock);
+
+        self::assertTrue($consoleIO->isInteractive());
+ erface      $prevPackage previous package instance in case of an update
+     * @phpstan-return PromiseInterface<void|null>
+          substr($hash, 32, 8),
+            substr($hash, 40, 8),
+            substr($hash, 48, 8),
+            substr($hash, 56, 8),er\Util;
+
+use Composer\Pcre\Preg;
+use React\Promise\PromiseInterface;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIteraeption(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("Option first is missing a version constraint, u($from, \strlen($commonPath)), '/');
+        $commonPathCode = str_repeat('../', $sourcePathDepth);
+
+        // allow top level s->getIO()->writeError(sprintf(
+                'Using version <info>%s</info> for <info>%s</info>',
+    gestion (excluding dev)' => [
+            false,
+            ['--by-package' => true, '--by-suggestion' => true, '--no-dev' =turns true if the user needs to set an https_proxy environment variable
+     *
+     * This method can be removed after the transsingException;
+
+/**
+ * Reads/writes project lockfile (composer.lock).
+ *
+ * @author Konstantin Kudryashiv <ever.zet@gmail.com>
+      ->getMockBuilder('Composer\Config\JsonConfigSource')
+            ->disableOriginalConstructor()
+            ->getMock()
+       $formattedEventNameWithArgs = $event->getName() . ($event->getArguments() !== [] ? ' (' . implode(', ', $event->getAtring $eventName, $listener, int $priority = 0): void
+    {
+        $this->listeners[$eventName][$priority][] = $listener;
+    }   $currentContent = Silencer::call('file_get_contents', $path);
+        if (false === $currentContent || $currentContent !== $c->getStatusCode());
+        self::assertMatchesRegularExpression("/homepage\s*:\s*Invalid URL format/", $appTester->getErrorOutpS_ARRAY);
+        $update->addOption('no-dev', null, InputOption::VALUE_NONE);
+        $update->addOption('no-install', nullg|UriInterface $uri     URI object or string.
+     * @param array               $options Request options to apply. See \GuzzleH$mock->getLastRequest()->getHeaderLine('Referer')
+        );
+    }
+
+    public function testAddsGuzzleRedirectHeader()
+       * Constructor.
+     *
+     * @param string      $name     The event name
+     * @param string|null $fileName The file n as $file) {
+            $targetPath = $target . DIRECTORY_SEPARATOR . $ri->getSubPathname();
+            if ($file->isDir()) {
+lver\Operation\UpdateOperation;
+use Composer\DependencyResolver\Operation\InstallOperation;
+use Composer\DependencyResolver\Oper    $sectionData = $token;
+
+            $data[$section] = $sectionData;
+            $section = $sectionData = nulleates an NTFS junction.
+     *
+     * @return void
+     */
+    public function junction(string $target, string $junction)
+    {"update-with-dependencies". This is now default behaviour. The --no-update-with-dependencies option can be used to remove a pack      '/C/prefixE.foo',
+            '/C/prefixF.foo',
+            '/D/prefixA',
+            '/D/prefixB',
+            '/D/prefix     $scriptEvent->setOriginatingEvent($event);
+                            $return = $this->dispatch($scriptName, $scriptEvent)versionArray = $guesser->guessVersion(['version' => 'self.version'], 'dummy/path');
+
+        self::assertIsArray($versionArray);$gitLabUtil->authorizeOAuthRefresh($this->scheme, $this->originUrl)) {
+                        return parent::getContents($url);rtSame(
+'./composer.json has been updated
+Running composer update required/pkg
+Loading composer repositories with package infor@param PackageInterface[]          $packages          array of packages
+     * @param PackageInterface[]|null     $devPackages  onInput $input) use ($includeRootPackage, $includePlatformPackages): array {
+            $composer = $this->requireComposedJson([$rootReqPackage, $rootAnotherPackage]);
+        $this->createComposerLock([$rootReqPackage, $rootAnotherPackage]);
+
+ onsole\Completion\CompletionInput;
+
+/**
+ * Adds completion to arguments and options.
+ *
+ * @internal
+ */
+trait CompletionTrait
+{     ['packages' => ['vendor/package']],
+            <<<OUTPUT
+Invalid argument vendor/package. Use "composer require vendor/\StreamHandler
+ */
+class StreamHandlerTest extends TestCase
+{
+    private function queueRes()
+    {
+        Server::flush();
+       $reflProp = new \ReflectionProperty($this->io, 'output');
+                            if (PHP_VERSION_ID < 80100) {
+  _token'], 'oauth2');
+
+            $authConfigSource = $storeInLocalAuthConfig && $localAuthConfig !== null ? $localAuthConfig : er->getAutoloadGenerator();
+        if ($event instanceof ScriptEvent) {
+            $generator->setDevMode($event->isDevMode())t = trim($this->commandResult);
+            $resArray = explode(PHP_EOL, $result);
+            foreach ($resArray as $line) {
+   = static::configFromString($io, $config, $repository, $allowFilesystem);
+
+        return static::createRepo($io, $config, $repohis->attemptCloneFallback();
+
+                    return new Response(['url' => 'dummy'], 200, [], 'null');
+   tring, BasePackage> */
+    protected $fixedPackages = [];
+    /** @var array<string, BasePackage> */
+    protected $lockedPackaspl_object_hash($conflictRule);
+        $ruleSeen[$why] = true;
+
+        if ($conflictRule->getType() === RuleSet::TYPE_LEARNED)$configValidator = new ConfigValidator(new NullIO());
+        [, , $warnings] = $configValidator->validate(__DIR__ . '/Fixtures/nloader;
+    /** @var \Composer\Config&\PHPUnit\Framework\MockObject\MockObject */
+    private $config;
+    /** @var Bitbucke      'E export-ignore',
+            'F/ export-ignore',
+            'G/* export-ignore',
+            'H/** export-ignore',
+   svn.example.org/', self::getCmd(" --username 'till' --password 'test' ")],
+            ['http://svn.apache.org/', ''],
+   invalid value (foo:bar), must be an http/https URL',
+                    'support.forum : invalid value (foo:bar), must be an htthis->lastCacheWrites[$package->getName()] = $cacheKey;
+                $this->cache->copyFrom($cacheKey, $fileName);
+       * Checks if the given path is absolute
+     *
+     * @return bool
+     */
+    public function isAbsolutePath(string $path)
+ "- Root composer.json requires ".$packageName.self::constraintToText($constraint).' but ';
+
+                if (defined('HHVM_VEarray $aliases, string $minimumStability, array $stabilityFlags, bool $preferStable, bool $preferLowest, array $platformOverrideig, $url, $package->getDistReference());
+        }
+
+        return $url;
+    }
+
+    /**
+     * @inheritDoc
+     * @throws \Runtiset($config['version']) || !is_scalar($config['version'])) {
+            throw new \UnexpectedValueException('Package '.$configs as $pkg) {
+            $replacement = $pkg->getReplacementPackage() !== null ? $pkg->getReplacementPackage() : 'none';
+         $methodName = substr($callable, strpos($callable, '::') + 2);
+
+                    if (!class_exists($className)) ons['curl'][\CURLOPT_HTTPAUTH] = \CURLAUTH_NTLM;
+                    $options['curl'][\CURLOPT_USERPWD] = "$value[0]:$value[1]";($installed['versions'][$packageName])) {
+                return $includeDevRequirements || !isset($installed['versions'][$packaguzzlehttp/guzzle', '7.4', 'Not passing a callable or string to %s::%s() is deprecated and will cause an error in 8.0.', __CLASS   $decision = $this->decisions->atOffset($decisionId);
+                    $rule = $decision[Decisions::DECISION_REASON];
+
+        * const VERSION = '@package_version@';
+     * const BRANCH_ALIAS_VERSION = '@package_branch_alias_version@';
+     * const Rxecutor->expects(
+            [['cmd' => 'p4 set', 'stdout' => 'P4USER=TEST_P4VARIABLE_USER' . PHP_EOL, 'return' => 0]],
+       };
+    }
+
+    /**
+     * Suggest package names available on all configured repositories.
+     */
+    private function sugges      [false, 'https://github.com/acme'],
+            [true, 'https://github.com/acme/repository'],
+            [true, 'git@greach (array_merge(array_values($selected->getProvides()), array_values($selected->getReplaces())) as $link) {
+   g' => '>2.0-dev,<2.4-dev',
+                    ],
+                    'suggest' => [
+                        'foo/bar' => 'Foo bie\CookieJar;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\InvalidArgumentException;
+use GuzzleHttp\Promis     * Initializes repositories
+     *
+     * Returns an array of repos in order they should be checked in
+     >returnCallback(static function ($value, $options = 0) use (&$lockData): void {
+                $lockData = json_encode($value,   * @internal
+     *
+     * @param  ?int $index job id
+     * @return int         number of active (queued or started) jobs
+    esponseInfo
+     */
+    public function setResponseInfo(array $responseInfo): void
+    {
+        $this->responseInfo = $respoue)));
+        self::assertEquals(['require' => ['root/req' => '1.*']], (new JsonFile('./composer.json'))->read());
+       'cache-repo-dir' => $config->get('cache-repo-dir'),
+            'cache-files-dir' => $config->get('cache-files-dir'),
+   => 'Consumer Key (hidden): ', 'reply' => $this->consumer_key],
+            ['ask' => 'Consumer Secret (hidden): ', 'reply' => $t    $tests[basename($file)] = [str_replace($fixturesDir.'/', '', $file), $message, $condition, $composer, $lock, $installed, $ruheckLock ? 'errors' : 'warnings').'</info>');
+        } else {
+            $io->write('<info>' . $name . ' is valid</info>');
+       * before directories, creating a single non-recursive loop
+     * to delete files/directories in the correct order.
+    PackageList($nextRepoPackages, $isVerbose, $pool, $constraint).' from '.$nextRepo->getRepoName().' but '.$topPackage->getPrso add it manually later by using "composer config --global --auth bitbucket-oauth.bitbucket.org <consumer-key> <consumer-secret a partial update but that version is rejected by your minimum-stability. Make sure you list it as an argument for the update co$handler) {
+            $this->io->writeError('Received '.$signal.', aborting', true, IOInterface::DEBUG);
+
+            $handlerion setNotificationUrl(string $notificationUrl): void
+    {
+        $this->notificationUrl = $notificationUrl;
+        ['{res_headers}', [$request], 'NULL'],
+            ['{req_body}', [$request], 'foo'],
+            ['{res_body}', [$reques->setPreferStable($input->getOption('prefer-stable'))
+                ->setPreferLowest($input->getOption('prefer-lowest'))
+    $ruleSet->add($rules[RuleSet::TYPE_REQUEST][2], RuleSet::TYPE_REQUEST);
+
+        self::assertCount(1, $ruleSet->getIteratorFor([    * Set the conflicting packages
+     *
+     * @param array<string, Link> $conflicts A set of package links
+     tp\Cookie\SetCookie;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * @covers \GuzzleHttp\Cookie\SessionCookieJar
+ */
+class SessionCookieing $repositoryName, string $username, ?string $password = null)
+    {
+        if ($this->hasAuthentication($repositoryName)) http://mycompany.com/gitlab/mygroup/myproject', true],
+            ['https://mycompany.com/gitlab/mygroup/myproject', extensequired/pkg', 'version' => '2.0.0', 'require' => ['common/dep' => '^1']],
+                        ['name' => 'required/pkg', 've     'extra.branch-alias.5.x-dev : the target branch (3.1.x-dev) is not a valid numeric alias for this version',
+    = new Psr7\Request('GET', 'http://foo.com');
+        $response = new Psr7\Response();
+        $stats = new TransferStats(
+   use PHPStan\Type\IntegerType;
+use PHPStan\Type\StringType;
+use PHPStan\Type\Type;
+use PHPStan\Type\ObjectType;
+use PHPStan\Type\FilterIterator<string, SplFileInfo, Iterator<string, SplFileInfo>>
+ */
+class ArchivableFilesFilter extends FilterIterator
+{
+     createWithMiddleware(?array $queue = null, ?callable $onFulfilled = null, ?callable $onRejected = null): HandlerStack
+    mposer install step which verifies the lock file integrity and should not allow
+     * removal of any packages. At the same timens::getInstalledPackages(), 320)."\n");
+        fwrite(STDERR, '!!PluginA:'.(InstalledVersions::isInstalled('plugin/a') ? Instalckages[0]->getTransportOptions();
+                if (!isset($transportOptions['symlink']) || $transportOptions['symlink'] !== th($path);
+        $sourceType = $package->getSourceType();
+        $datetime = null;
+
+        if ($path && in_array($sourceType     $mock->assertComplete();
+        }
+        foreach ($this->ioMocks as $mock) {
+            $mock->assertComplete();
+  'An error was encountered during the on_headers event';
+                $response = new RequestException($msg, $request, $respommandNotFoundException;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
+uset cache
+            clearstatcache();
+
+            if ($process->isSuccessful()) {
+                if (!is_dir($directory)) {
+  on getChangeList(string $reference): mixed
+    {
+        $index = strpos($reference, '@');
+        if ($index === fa     $binaryInstaller = new Installer\BinaryInstaller($io, rtrim($composer->getConfig()->get('bin-dir'), '/'), $comp    $parser = new VersionParser;
+        $guesser = new VersionGuesser($this->config, $this->process, $parser);
+        $dumper ->setSourceUrl((string) realpath($this->testDir));
+        $package->setSourceReference('master');
+        $package->setSourceTyl' => $repoApiUrl, 'body' => '{"master_branch": "test_master", "owner": {"login": "composer"}, "name": "packagist"}'],
+   tExtra(['plugin-modifies-downloads' => true]);
+        $dlModifyingPlugin2->setExtra(['plugin-modifies-downloads' => true]);
+
+  as well. Use an array to provide a URL
+     * template and additional variables to use in the URL template expansion.
+ oo:bar@example.org/', 'echo https://foo:***@example.org/'],
+            ['echo http://foo@example.org', 'echo http://foo@example     $headers = [
+            'Accept-Encoding: gzip',
+            'Connection: close',
+        ];
+        $origin = 'gitl   ['p4 -u user -c composer_perforce_TEST_depot -p port client -i < '.ProcessExecutor::escape('path/composer_perforce_TEST_depotion setFilesystem(Filesystem $fs): void
+    {
+        $this->filesystem = $fs;
+    }
+}
+<?php
+
+// autoload_classmap.php @gent version from git branch
+        if (0 === $this->process->execute(['git', 'branch', '-a', '--no-color', '--no-abbrev', '-v']     'ECDHE-RSA-AES128-SHA256',
+            'ECDHE-ECDSA-AES128-SHA256',
+            'ECDHE-RSA-AES128-SHA',
+            'ECDHE-     'Expires' => null,
+                    'Max-Age' => null,
+                    'Path' => '/',
+                    'Secure' =b.com',
+                [
+                    'username' => 'my_username',
+                    'password' => 'my_password',
+    kage('root/another');
+        // Set as a metapackage so that we can do the whole post-remove update & install process without Con' => $version, 'commit' => $commit, 'pretty_version' => $prettyVersion, 'feature_version' => $featureVersion, 'feature_pretty_straint->matches(new Constraint('==', $p->getVersion()));
+                });
+                if (0 === count($filtered)) {
+  der warningProvider
+     *
+     * @param array<string, mixed> $config
+     * @param string[]             $expectedWarnings
+     sset($defaults['ssl']['capath']) && (!is_dir($defaults['ssl']['capath']) || !Filesystem::isReadable($defaults['ssl']['capath']))  $conf[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_1;
+        } else {
+            $conf[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_ null
+    },
+    {
+        "name": "ext-foobar",
+        "version": "2.3.4",
+        "status": "failed",
+        "failed_requireeUrls(): array
+    {
+        return $this->getUrls($this->sourceUrl, $this->sourceMirrors, $this->sourceReference, $this->source'_conditional'] = Psr7\Utils::caselessRemove(['Accept-Encoding'], $options['_conditional']);
+            $modify['set_headers'][est;
+
+use Composer\DependencyResolver\Request;
+use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterFactory;
+uis->getTestCookies();
+        foreach ($this->getTestCookies() as $cookie) {
+            $this->jar->setCookie($cookie);
+   et metadata for the '.$this->url.' repository, try running in interactive mode so that you can enter your GitHub credentials to      $iterator = $this->rules->getIteratorFor(RuleSet::TYPE_REQUEST);
+                foreach ($iterator as $rule) {
+  |null, type?: string, install_path?: string, aliases?: string[], dev_requirement: bool, replaced?: string[], provided?: strOR
+    );
+}
+
+require_once __DIR__ . '/composer/autoload_real.php';
+
+return ComposerAutoloaderInitFilesAutoloadOrder::getLoader()ption('The openssl extension is required for phar signatures to be verified but it is not available. '
+                . 'If youforce->checkStream();
+        self::assertFalse($result);
+        self::assertFalse($this->perforce->isStream());
+  z]: )? )? | [a-z]: )}ix', $path, $match)) {
+            $prefix = $match[1];
+            $path = substr($path, \strlen($prefix))ion getComposerInformation(string $identifier): ?array
+    {
+        $composerFileContent = $this->getFileContent('compos     $cwd = Platform::getCwd();
+
+        $relativePath = $this->findShortestPath($link, $target);
+        chdir(\dirname($link))Output::VERBOSITY_VERBOSE);
+        $best = $versionSelector->findBestCandidate($packageName, null, 'stable', null, 0, $io);
+    JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        if ($composerLock !== []) {
+            file_pundler([new Response(), new Response()]);
+        $client = new Client([
+            'handler' => $mock,
+            'base_uri' =OUTPUT
+<warning>Cannot use required/pkg's latest version 1.1.0 as it requires php ^20 which is not satisfied by your platform.
+.    $apcuPrefix = $input->getOption('apcu-prefix');
+        $apcu = $apcuPrefix !== null || $input->getOption('apcu') || $confility, this class will be removed in Composer 3.0
+ */
+final class TlsHelper
+{
+    /**
+     * Match hostname against a certificate   new Command\ConfigCommand(),
+            new Command\DependsCommand(),
+            new Command\ProhibitsCommand(),
+   ete it and run composer update to generate a new lock file.');
+            }
+        }
+
+        if (empty($lockedPackages)) {
+  ire-dev but it is present in require</warning>
+<warning>root/another could not be found in require-dev but it is present in requblished root package
+        // only B should be installed, as A is the root
+
+        $a = self::getPackage('A', '1.0.0', 'Compo   'ext-json is ignored if listed' => [['ext-json', 'monolog/monolog'], 'ext-json', true],
+            'php is not ignored if noe' => 'foo/bar',
+                    'source' => ['url' => 'https://example.org', 'reference' => 1234, 'type' => 'baz'],
+   s*(\d+)\s*}', $output, $match)) {
+                        $datetime = new \DateTime('@'.$match[1], new \DateTimeZone('UTC'));
+  torySet $repositorySet, Request $request, Pool $pool, bool $isVerbose, array $installedMap = [], array $learnedPool = []): striion = $version;
+        $this->prettyVersion = $prettyVersion;
+
+        $this->stability = VersionParser::parseStability($versi root troubleshooting article
+            $allReposPackages = $packages;
+            $topPackage = reset($allReposPackages);
+  IRED, 'Output format. Must be "table", "plain", "json", or "summary".', Auditor::FORMAT_TABLE, Auditor::FORMATS),
+    TmpDirectory();
+        $this->repoConfig = $this->getRepoConfig();
+        $this->config = $this->getConfig();
+ ositoryUrl = implode(DIRECTORY_SEPARATOR, [__DIR__, 'Fixtures', 'path', '*']);
+        $repository = $this->createPathRepo(['urltDefined(): void
+    {
+        $input = new ArrayInput([]);
+
+        $output = $this->getMockBuilder('Symfony    $hhvm = $finder->find('hhvm');
+        if ($hhvm === null) {
+            self::markTestSkipped('HHVM is not installed');
+   s->io->askAndHideAnswer('Password: ');
+
+        $headers = ['Content-Type: application/x-www-form-urlencoded'];
+
+        $apiUrlhasZipArchive;
+    /** @var bool */
+    private static $isWindows;
+
+    /** @var ZipArchive|null */
+    private $zipArchiveObjec' => 'Basic project for testing',
+            'minimum-stability' => 'dev',
+            'autoload' => ['psr-0' => []],
+       * Get the working directory at startup time
+     *
+     * @return string|false
+     */
+    public function getInitialWorking $uri, $options);
+    }
+
+    /**
+     * Create and send an HTTP POST request.
+     *
+     * Use an absolute path to override theforce->writeClientSpecToFile($stream);
+
+        rewind($stream);
+
+        $expectedArray = $this->getExpectedClientSpec(false);ty($GLOBALS['__composer_autoload_files'][$fileIdentifier])) {
+                $GLOBALS['__composer_autoload_files'][$fileIdentifcom>
+ */
+class UpdateOperation extends SolverOperation implements OperationInterface
+{
+    protected const TYPE = 'update';
+
+   ion setClassMapAuthoritative($classMapAuthoritative)
+    {
+        $this->classMapAuthoritative = $classMapAuthoritative;
+  r\Test\Mock\FactoryMock;
+use Composer\Test\Mock\HttpDownloaderMock;
+use Composer\Test\Mock\IOMock;
+use Composer\Test\Mock\Procesl\Http\ProxyManager;
+use Composer\Util\StreamContextFactory;
+use Composer\Test\TestCase;
+
+class StreamContextFactoryTest ex  $message .= "\nThis can be due to an antivirus or the Windows Search Indexer locking the file while they are analyzed";
+     g/doc/03-cli.md#clear-cache-clearcache-cc
+EOT
+            )
+        ;
+    }
+
+    protected function executase;
+
+class TransactionTest extends TestCase
+{
+    public function setUp(): void
+    {
+    }
+
+    public function testTransactio     ['foo', null, 'bar', 'The cookie value must not be empty'],
+            ['foo', 'baz', '', 'The cookie domain must not be eRequestAccessTokenWithUsernameAndPassword(): void
+    {
+        $this->io->expects([
+            ['auth' => [$this->* @var Config */
+    protected $config;
+    /** @var ProcessExecutor */
+    protected $process;
+    /** @var Filesystem */
+        $level = $this->setPropagateLearn($level, $lastLiteral, $why);
+
+                    if ($level === 0) {
+ dler = $options['handler'];
+
+        try {
+            return P\Create::promiseFor($handler($request, $options));
+  ckage->expects($this->once())->method('isDev')->will($this->returnValue(true));
+        $package->expects($this->any())->methothis->cleanBackups($rollbackDir, $this->getLastBackupVersion($rollbackDir));
+            }
+
+            return 0;
+     ckage\Loader;
+
+use Composer\Package\BasePackage;
+use Composer\Package\CompleteAliasPackage;
+use Composer\Package\ComplHelper(),
+        ]));
+
+        // Register error handler again to pass it the IO instance
+        ErrorHandler::register($io);
+      'bitbucket.org' => [
+                'access-token' => 'bitbucket_access_token',
+                'access-token-expiration'Context('http://example.org', ['http' => ['header' => 'User-Agent: foo']]);
+            $options = stream_context_get_options((?ExecutableFinder $executableFinder = null, ?ProcessExecutor $processExecutor = null)
+    {
+        $this->executableFinder = $   if (strpos($exec, 'composer ') === 0) {
+                        $exec = $this->getPhpExecCommand() . ' ' . Pr-line
+            $replaces = $this->convertLinksToMap($replaces, 'setReplaces');
+        }
+
+        $this->replaces = $replacesitory([$arrayRepoOne, $arrayRepoTwo]);
+
+        self::assertEquals([$foo2], $repo->findPackagesWithReplacersAndProviders('foo'.0
+     * @dataProvider dataCurlSSLOptions
+     *
+     * @param non-empty-string $url
+     * @param ?non-empty-string $auth
+    his->infoCache[$identifier])) {
+            if ($this->shouldCache($identifier) && $res = $this->cache->read($identifier)) {
+       ['1.1.0.0', 'a/provider'],
+            ['1.2.0.0', 'a/provider2'],
+            ['2.2.0.0', 'b/replacer'],
+            ['3.0ta3', '1.2.3.0-beta3'],
+            ['1.2.3-beta3-dev', '1.2.3.0-beta3-dev'],
+            ['1.2.3-beta3-fips', '1.2.3.0-beta3', SERVER, $server);
+        $proxyManager = ProxyManager::getInstance();
+
+        $proxy = $proxyManager->getProxyForRequest($url) 'these do' : 'it does').' not match the constraint.' . $suffix];
+        }
+
+        if (!Preg::isMatch('{^[A-Za-z0-9_./-]+$}', String('- Removing not/req (1.0.0)', $appTester->getDisplay(true));
+    }
+
+    public function testRemovePackageByName(): voiassertInstanceOf(RequestExceptionInterface::class, $e);
+        self::assertNotInstanceOf(NetworkExceptionInterface::class, $e);o> to find the latest keys');
+
+        $validator = static function ($value): string {
+            $value = (string) $value;
+   ed = false;
+    /** @var array<int, array{type: string, url: string}>|false|null */
+    private $fundingInfo;
+
+    /**
+     * Gilags, $alreadyLoaded);
+            $packages[] = $result['packages'];
+            $namesFound[] = $result['namesFound'];
+   ace": "mygroup/mysubgroup/my-pro.ject",
+    "web_url": "https://gitlab.com/mygroup/mysubgroup/my-pro.ject"
+}
+JSON;
+
+    int = $reasonData['constraint'];
+
+            $packages = $pool->whatProvides($packageName, $constraint);
+  bar', '1.2.0');
+        $packages = [$package1, $package2, $package3];
+
+        $repositorySet = $this->createMockReposit    // in $PATH. This allows support for `@php foo` where foo is a binary name found in PATH but not an actual relative path
+ his->fixedPackages as $package) {
+            $presentMap[$packageIds ? $package->getId() : spl_object_hash($package)] = $pa" or " "
+     *
+     * @return list<array{name: string, version?: string}>
+     */
+    public function parseNameVersionPairs(arrckage::STABILITY_*>        $acceptableStabilities array of stability => BasePackage::STABILITY_* value
+      'name : Foo/Bar is invalid, it should not contain uppercase characters. We suggest using foo/bar instead.',
+   R['HTTP_PROXY'], $_SERVER['HTTPS_PROXY'], $_SERVER['NO_PROXY']);
+        \putenv('HTTP_PROXY=');
+        \putenv('HTTPS_PROXY=')       (is_array($this->expectations) && count($this->expectations) > 0 ? 'Expected '.var_export($this->expectations[0]['cmd'],  | E_USER_WARNING | E_USER_NOTICE | E_DEPRECATED | E_USER_DEPRECATED | E_STRICT;
+        }
+        $old = error_reporting();
+   all/update/uninstall steps
+     *
+     * Note that cleanup will be called for all packages, either after install/update/uninstalaskAndValidate')
+            ->with(
+                'Do you want to store credentials for '.$origin.' in '.$configSourceName.' x[0];
+        if (!isset($this->prefixesPsr0[$first][$prefix])) {
+            $this->prefixesPsr0[$first][$prefix] = $paths;
+
+  self-update --rollback</info> to return to version <comment>%s</comment>',
+                Composer::VERSION
+            ));
+   erything is initialized we can
+            // purge packages from local repos if they have been deleted on the filesystem
+       $repos = RepositoryFactory::defaultRepos(null, $thi

@@ -1,5 +1,5 @@
 declare module '*.wasm' {
-  /** A compiled module under bundlers/runtimes with wasm support, or the file path (Bun). */
-  const module: WebAssembly.Module | string;
+  /** A compiled module, as Cloudflare Workers bundlers provide for a `.wasm` import. */
+  const module: WebAssembly.Module;
   export default module;
 }
