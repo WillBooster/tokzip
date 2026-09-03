@@ -46,8 +46,11 @@ fn main() {
                 .max()
                 .unwrap();
             let mut pooled: Vec<Vec<u8>> = Vec::new();
+            // The member order rotates per round so that the trainer's fixed-stride held-out
+            // selection does not land on the same members every round.
             for round in 0..longest {
-                for &i in &members {
+                for m in 0..members.len() {
+                    let i = members[(round + m) % members.len()];
                     if let Some(doc) = docs_by_language[i].get(round) {
                         pooled.push(doc.clone());
                     }

@@ -1,30 +1,11 @@
-ifier: MIT
-
-#include "doctest_compatibility.h"
-
-#define JSON_TESTS_PRIVATE
-#include <nlohmann/json.hpp>
-using nlohmann::json;
-
-template<typename Iter>
-using can_post_increment_temporary = decltype((std::declval<Iter>()++)++);
-
-template<typename Iter>
-using can_post_decrement_temporary = decltype((std::declval<Iter>()--)--);
-
-TEST_CASE("iterator class")
-{
-    SECTION("construction")
-    {
-        SECTION("constructor")
-        {
-            SECTION("null")
-            {
-                json j(json::value_t::null);
-                json::iterator const it(&j);
-            }
-
-            SECTION("object")
+:json;
+    json j = json{{"foo", json::object()}};
+    j.at(json::json_pointer("/foo/bar"));
+}
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++ (supporting code)
+// |  |  |__   |  |  | | | |  version 3.11.3
+// |_____|      SECTION("object")
             {
                 json j(json::value_t::object);
                 json::iterator const it(&j);
@@ -33,83 +14,119 @@ TEST_CASE("iterator class")
             SECTION("array")
             {
                 json j(json::value_t::array);
-                json::iterator const it(&j);
-            }
-        }
+                json:: std::string message = fmt::format(format_str.get(), *value);
+#else
+    auto buf = fmt::memory_buffer();
+    fmt::format_to(std::back_inserter(buf), format_str.get(), *value);
+#endif
+  } catch (std::exception&) {
+  }
+}
 
-        SECTION("copy assignment")
-        {
-            json j(json::value_t::null);
-            json::iterator const it(&j);
-    x) {
-  using limits = std::numeric_limits<double>;
-  EXPECT_EQ(fmt::format("{}", std::complex<double>(1, limits::quiet_NaN())),
-            "(1+nan i)");
-  EXPECT_EQ(fmt::format("{}", std::complex<double>(1, -limits::infinity())),
-            "(1-inf i)");
+extern "C" int LLVMFuzzerTestOneInpuinteger_t = typename BasicJsonType::number_integer_t;
+    using number_unsigned_t = typename BasicJsonType::number_unsigned_t;
+    using number_float_t = typename BasicJsonType::number_float_t;
+    using string_t = typename BasicJsonType::string_t;
+    u MIT
 
-  EXPECT_EQ(fmt::format("{}", std::complex<int>(1, 2)), "(1+2i)");
+#pragma once
+
+#include <cstdint> // size_t
+#include <utility> // declval
+#include <string> // string
+
+#include <nlohmann/detail/abi_macros.hpp>
+#include <nlohmann/detail/meta/detected.hpp>
+#include <nlohmann/detail/meta/type_traits.hpp>
+
+// Formatting library for C++ - tests of formatters for standard library types
+//
+// Copyright (c) 2012 - present, Victor Zverovich
+// All rights reserved.
+//
+// For the license information refer to format.h.
+
+#include "fmt/std.h"
+
+#include <bitset>
+#incst json object =
+    {
+        {"the good", "il buono"},
+        {"the bad", "il cattivo"},
+        {"the ugly", "il brutto"}
+    };
+
+    // output element with key "the ugly"
+    std::cout << object.at("the ugly") << '\n';
+
+    // exception type_error.304
 
   EXPECT_EQ(fmt::format("{}", std::complex<double>(1, 2.2)), "(1+2.2i)");
   EXPECT_EQ(fmt::format("{}", std::complex<double>(1, -2.2)), "(1-2.2i)");
   EXPECT_EQ(fmt::format("{}", std::complex<double>(0, 2.2)), "2.2i");
-  EXPECT_EQ(fmt::format("{}", std::complex<double>(0, -2.2)), "-2.2i");
+  EXPECT_EQ(fmt::format("{}", std::      CHECK(std::string(it->type_name()) == "number");
+                it = j.end();
+                CHECK_THROWS_WITH_AS(std::string(it->type_name()), "[json.exception.invalid_iterator.214] cannot get value", json::invalid_iterator&);
+    espace fmt {
+template <> struct formatter<throws_on_move> : formatter<string_view> {
+  auto format(const throws_on_move&, format_context& ctx) const
+      -> decltype(ctx.out()) {
+    string_view str("<throws_on_move>");
+    return formatter<string_view>::c2 = json::to_bson(j1);
 
-  EXPECT_EQ(fmt::format("{:+}", std::complex<double>(0, 2.2)), "+2.2i");
-  EXPECT_EQ(fmt::format("{:+}", std::complex<double>(0, -2.2)), "-2.2i");
-  EXPECT_EQ(fmt::format("{:+}", std::complex<double>(1, -2.2)), "(+1-2.2i)");
-  EXPECT_EQ(fmt::format("{:+}", std::complex<double>(1, 2.2)), "(+1+2.2i)");
-  EXPECT_EQ(fmt::format("{: }", std::complex<double>(1, 2.2)), "( 1+2.2i)");
-  EXPECT_EQ(fmt::format("{:ern C++
-// |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
-//
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
-// SPDX-License-Identifier: MIT
+            // parse serialization
+            json const j2 = json::from_bson(vec2);
 
-#pragma once
+            // serializations must match
+            assert(json::to_bson(j2) == vec2);
+        }
+        catch (const json::parse_error&)
+     n.hpp>
+using nlohmann::json;
 
-#include <cmath> // isfinite
-#include <cstdint> // uint8_t
-#include <functional> // function
-#include <string> // string
-#include <utility> // move
-#include <vector> // vector
-
-#include <nlohmann/detail/exceptions.hpp>
-#include <nlohmann/detail/input/input_adapters.hpp>
-#include <nlohmann/detail/input/json_sax.hpp>
-#include <nlohmann/detail/input/lexer.hpp>
-#include <nlohmann/detail/macro_scope.hpp>
-#include <nlohmann/detail/meta/is_sax.hpp>
-#include <nlohmann/detail/string_concat.hpp>
-#include <nlohmann/detail/value_t.hpp>
-
-NLOHMANN_JSON_NAMESPACE_BEGIN
-namespace detail
+TEST_CASE("modifiers")
 {
-////////////
-// parser //
-////////////
+    SECTION("clear()")
+    {
+        SECTION("boolean")
+        {
+            json j = true;
+            json const k = j;
 
-enum class parse_event_t : std::uint8_t
-{
-    /// the parser read `{` and started to process a JSON object
-    object_start,
-    /// the parser read `}` and finishion refer to format.h.
+            j.clear();
+            CHECK(j == json(json::value_t::boolean));
+)");
 
-// clang-format off
-#include "test-assert.h"
-// clang-format on
+  struct unformattable {};
+  EXPECT_FALSE((fmt::is_formattable<unformattable>::value));
+  EXPECT_FALSE((fmt::is_formattable<std::optional<unformattable>>::value));
+  EXPECT_TRUE((fmt::is_formattable<std::optional<int>>::value));
+#endif
+}
 
-#include "fmt/base.h"
+TEST(std_teeturn capacity;
+    }));
+  }
+};
 
-#include <climits>      // INT_MAX
-#include <cstring>      // std::strlen
-#include <functional>   // std::equal_to
-#include <iterator>     // std::back_insert_iterator, std::distance
-#include <limits>       // std::numeric_limits
-#include <string>       // std::string
+TEST(buffer_test, ctor) {
+  {
+    mock_buffer<int> buffer;
+    EXPECT_EQ(nullptr, buffer.data());
+    EXPECT_EQ(static_cast<size_t>(0), buffer.size());
+    EXPECT_EQ(static_cast<size_t>(0), buffer.capacity());
+  }
+  {
+  s2 {
+struct my_exception : public std::exception {
+ private:
+  std::string msg;
+
+ public:
+  my_exception(const std::string& s) : msg(s) {}
+  const char* what() const noexcept override;
+};
+const char* my_exception::what() const noexcept { return msg.c_str():string
 #include <type_traits>  // std::is_same
 
 #include "gmock/gmock.h"
@@ -123,301 +140,35 @@ using testing::Return;
 
 #ifdef FMT_FORMAT_H_
 #  error core-test includes format.h
-#endif
+#endif_arg_test, test_types);
 
-fmt::appender copy(fmt::string_view s, fmt::appender out) {
-  for (char c : s) *out++ = c;
-  return out;
+template <typename T, fmt::enable_if_t<std::is_integral<T>::value, int> = 0>
+auto test_value() -> T {
+  return static_cast<T>(42);
 }
 
-TEST(string_view_test, value_type) {
-  static_assert(std::is_same<string_view::value_type, char>::value, "");
-}
+template <typename T,
+          fmt::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+auto array_2 = {1, 2, 4};
+    json object_1 = {{"A", "a"}, {"B", "b"}};
+    json object_2 = {{"B", "b"}, {"A", "a"}};
+    json number_1 = 17;
+    json number_2 = 17.000000000000001L;
+    json string_1 = "foo";
+    json string_2 = "bar";
 
-TEST(string_view_test, ctor) {
-  EXPECT_STREQ("abc", fmt::string_view("abc").data());
-  EXPECT_EQ(3u, fmt::string_view("abc").size());
+    // output v: MIT
 
-  EXPECT_STREQ("defg", fmt::string_vntainer_type&) with number", json::type_error);
-            }
-        }
-    }
-}
-#include <iostream>
-#include <nlohmann/json.hpp>
+/*
+This file implements a parser test suitable for fuzz testing. Given a byte
+array data, it performs the following steps:
 
-using ordered_json = nlohmann::ordered_json;
+- j1 = from_msgpack(data)
+- vec = to_msgpack(j1)
+- j2 = from_msgpack(vec)
+- assert(j1 == j2)
 
-int main()
-{
-    ordered_json j;
-    j["one"] = 1;
-    j["two"] = 2;
-    j["three"] = 3;
-
-    std::cout << j.dump(2) << '\n';
-}
-#include <iostream>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
-int main()
-{
-    // create JSON object
-    const json object =
-    {
-        {"the good", "il buono"},
-        {"the bad", "il cattivo"},
-        {"the ugly", "il brutto"}
-    };
-
-    // output element with key "the ugly"
-    std::cout << object.at("the ugly") << '\n';
-
-    // exception type_error.304
-    try
-    {
-        // use at() on a non-object type
-        const json str = "I am a string";
-        std::cout << str.at("the good") << '\n';
-    }
-    catch (const json::type_error& e)
-    {
-        std::cout << e.what() << '\n';
-    }
-
-    // exception out_of_range.401
-    try
-    {
-        // try to read from a nonexisting key
- st char*) {}
-};
-
-struct test_struct {};
-
-FMT_BEGIN_NAMESPACE
-template <typename Char> struct formatter<test_struct, Char> {
-  FMT_CONSTEXPR auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
-    return ctx.begin();
-  }
-
-  auto format(test_struct, format_context& ctx) const -> decltype(ctx.out()) {
-    return copy("test", ctx.out());
-  }
-};
-FMT_END_NAMESPACE
-
-TEST(arg_test, format_args) {
-  auto args = fmt::format_args();
-  EXPECT_FALSE(args.get(1));
-}
-
-TEST(arg_test, make_value_with_custom_context) {
-  auto t = test_struct();
-  auto arg = fmt::detail::value<custom_context>(
-      fmt::detail::arg_mapper<custom_context>().map(t));
-  auto ctx = custom_context();
-  auto parse_ctx = fmt::format_parse_context("");
-  arg.custom.format(&t, parse_ctx, ctx);
-  EXPECT_TRUE(ctx.called);
-}
-
-// Use a unique result type to make sure that there are no undesirable
-// conversions.
-struct test_result {};
-
-template <typename T> struct mock_visitor {
-  template <typename U> struct result {
-    using type = test_resconst j1 = json::from_bson(vec1);
-
-        if (j1.is_discarded())
-        {
-            return 0;
-        }
-
-        try
-        {
-            // step 2: round trip
-            std::vector<uint8_t> const vec2 = json::to_bson(j1);
-
-            // parse serialization
-            json const j2 = json::from_bson(vec2);
-
-            // serializations must match
-            assert(json::to_bson(j2) == vec2);
-        }
-        catch (const json::parse_error&)
-        {
-            // parsing a BSON serialization must not fail
-            assert(false);
-        }
-    }
-    catch (const json::parse_error&)
-    {
-        // parse errors are ok, because input may be random bytes
-    }
-    catch (const json::type_error&)
-    {
-        // type errors can occur during parsing, too
-    }
-    catch (const json::out_of_range&)
-    {
-        // out of range errors can occur during parsing, too
-    }
-
-    // return 0 - non-zero return values are reserved for future use
-    return 0;
-}
-//     __ _clude <vector>
-
-#include "fuzzer-common.h"
-
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size);
-
-int main(int argc, char** argv) {
-  for (int i = 1; i < argc; ++i) {
-    std::ifstream in(argv[i]);
-    assert(in);
-    in.seekg(0, std::ios_base::end);
-    const auto size = in.tellg();
-    assert(size >= 0);
-    in.seekg(0, std::ios_base::beg);
-    std::vector<char> buf(static_cast<size_t>(size));
-    in.read(buf.data(), size);
-    assert(in.gcount() == size);
-    LLVMFuzzerTestOneInput(as_bytes(buf.data()), buf.size());
-  }
-}
-// Formatting library for C++ - test utilities
-//
-// Copyright (c) 2012 - present, Victor Zverovich
-// All rights reserved.
-//
-// For the license information refer to format.h.
-
-#include "util.h"
-
-#include <cstring>
-
-const char* const file_content = "Don't panic!";
-
-fmt::buffered_file open_buffered_file(FILE** fp) {
-#if FMT_USE_FCNTL
-  auto pipe = fmt::pipe();
-  pipe.write_end.write(file_content, std::strlen(file_content));
-  pipe.write_end.close();
-  fmt::buffered_fi};
-
-bool operator==(const char* p, zstring_sentinel) { return *p == '\0'; }
-bool operator!=(const char* p, zstring_sentinel) { return *p != '\0'; }
-
-struct zstring {
-  const char* p;
-  auto begin() const -> const char* { return p; }
-  auto end() const -> zstring_sentinel { return {}; }
-};
-
-#  ifdef __cpp_lib_ranges
-struct cpp20_only_range {
-  struct iterator {
-    int val = 0;
-
-    using value_type = int;
-    using difference_type = std::ptrdiff_t;
-    using iterator_concept = std::input_iterator_tag;
-
-    iterator() = default;
-    iterator(int i) : val(i) {}
-    auto operator*() const -> int { return val; }
-    auto operator++() -> iterator& {
-      ++val;
-      return *this;
-    }
-    void operator++(int) { ++*this; }
-    auto operator==(const iterator& rhs) const -> bool {
-      return val == rhs.val;
-    }
-  };
-
-  int lo;
-  int hi;
-
-  auto begin() const -> iterator { return iterator(lo); }
-  auto end() const -> iterator { return iterator(hi); }
-};
-
-static_assert(std::input_iterator<cpp20_only_range::iteraTH_AS(j_array.insert(j_array.end(), j_array.begin(), j_array.end()), "[json.exception.invalid_iterator.211] passed iterators may not belong to container",
-                                     json::invalid_iterator&);
-                CHECK_THROWS_WITH_AS(j_array.insert(j_array.end(), j_other_array.begin(), j_other_array2.end()), "[json.exception.invalid_iterator.210] iterators do not fit",
-                                     json::invalid_iterator&);
-            }
-        }
-
-        SECTION("range for object")
-        {
-            json j_object1 = {{"one", "eins"}, {"two", "zwei"}};
-            json j_object2 = {{"eleven", "elf"}, {"seventeen", "siebzehn"}};
-
-            SECTION("proper usage")
-            {
-                j_object1.insert(j_object2.begin(), j_object2.end());
-                CHECK(j_object1.size() == 4);
-            }
-
-            SECTION("empty range")
-            {
-                j_object1.insert(j_object2.begin(), j_object2.begin());
-                CHECK(j_object1.size() == 2);
-        "");
-}
-
-struct test_format_string_handler {
-  constexpr void on_text(const char*, const char*) {}
-
-  constexpr auto on_arg_id() -> int { return 0; }
-
-  template <typename T> constexpr auto on_arg_id(T) -> int { return 0; }
-
-  constexpr void on_replacement_field(int, const char*) {}
-
-  constexpr auto on_format_specs(int, const char* begin, const char*) -> const
-      char* {
-    return begin;
-  }
-
-  constexpr void on_error(const char*) { error = true; }
-
-  bool error = false;
-};
-
-template <size_t N> constexpr bool parse_string(const char (&s)[N]) {
-  auto h = test_format_string_handler();
-  fmt::detail::parse_format_string<true>(fmt::string_view(s, N - 1), h);
-  return !h.error;
-}
-
-TEST(base_test, constexpr_parse_format_string) {
-  static_assert(parse_string("foo"), "");
-  static_assert(!parse_string("}"), "");
-  static_assert(parse_string("{}"), "");
-  static_assert(parse_string("{42}"), "");
-  static_assert(parse_string("{foo}"), "");
-  static_assert(parse_string("{:}"), "");
-}
-#endif  // FMT_USE_CONSTE  json array = {1, 2, 3, 4, 5};
-
-    // get an iterator to one past the last element
-    json::iterator it = array.end();
-
-    // decrement the iterator to point to the last element
-    --it;
-
-    // serialize the element that the iterator points to
-    std::cout << *it << '\n';
-}
-#include <iostream>
-#include <iomanip>
+The provided function `LLVMFuzude <iomanip>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -431,855 +182,146 @@ int main()
         {"happy", true},
         {"name", "Niels"},
         {"nothing", nullptr},
-        {
-            "answer", {
-                {"everything", 42}
-            }
-        },
-        {"list", {1, 0, 2}},
-        {
-            "object", {
-                {"currency", "USD"},
-                {"value", 42.99}
-            }
-        }
-    };
+   .hpp>
 
-    // add new values
-    j["new"]["key"]["value"] = {"another", "list"};
+int main(int argc, char** argv)
+{
+    nlohmann::json j;
 
-    // count elements
-    auto s = j.size();
-    j["size"] = s;
+    return 0;
+}
+#include <iostream>
+#include <nlohmann/json.hpp>
 
-    // pretty print with indent of 4 spaces
-    std::cout << std::setw(4) << j  json j = {1, 2, 3};
-                j.push_back({"foo", "bar"});
-                CHECK(j == json({1, 2, 3, {"foo", "bar"}}));
+using json = nlohmann::json;
+using namespace nlohmann::literals;
 
-                json k = {1, 2, 3};
-                k.push_back({1, 2, 3});
-                CHECK(k == json({1, 2, 3, {1, 2, 3}}));
-            }
+int main()
+{
+    try
+    {
+        // executing a failing JSl;
+    json j_boolean = true;
+    json j_number_integer = 17;
+    json j_number_unsigned_integer = 12345678987654321u;
+    json j_number_float = 23.42;
+    json j_object = {{"one", 1}, {"two", 2}};
+    json j_array = {1, 2, 4, 8, 16};
+    json j_stringe "fmt/base.h"
 
-            SECTION("object")
-            {
-                json j = {{"key1", 1}};
-                j.push_back({"key2", "bar"});
-                CHECK(j == json({{"key1", 1}, {"key2", "bar"}}));
-
-                // invalid values (no string/val pair)
-                CHECK_THROWS_WITH_AS(j.push_back({1}), "[json.exception.type_error.308] cannot use push_back() with object", json::type_error&);
-                CHECK_THROWS_WITH_AS(j.push_back({1, 2}), "[json.exception.type_error.308] cannot use push_back() with object", json::type_error&);
-                CHECK_THROWS_WITH_AS(j.push_back({1, 2, 3, 4}), "[json.exception.type_error.308] cannot use push_back() with object", json::type_error&);
-            }
-        }
+#include <climits>      // INT_MAX
+#include <cstring>      // std::strlen
+#include <functional>   // std::equal_to
+#include <iterator>     // std::back_insert_iterator, std::distance
+#include <limits>       // std::numeric_limits
+#incluout << e.what() << '\n';
     }
 
-    SECTION("emplacJSON_VERSION_MINOR) && defined(NLOHMANN_JSON_VERSION_PATCH)
-        #if NLOHMANN_JSON_VERSION_MAJOR != 3 || NLOHMANN_JSON_VERSION_MINOR != 11 || NLOHMANN_JSON_VERSION_PATCH != 3
-            #warning "Already included a different version of the library!"
-        #endif
-    #endif
+    // exception out_of_range.401
+    try
+    {
+        // try to write beyond the array limit
+        array.at(5) = "sixth";
+    }
+    catch (const json::out_of_range& e)
+    {
+        std::cout << e.what() << n(int argc, char** argv) {
+  for (int i = 1; i < argc; ++i) {
+    std::ifstream in(argv[i]);
+    assert(in);
+    in.seekg(0, std::ios_base::end);
+    const auto size = in.tellg();
+    assert(size >= 0);
+    in.seekg(0, std::ios_base::beg);
+    std::vector<clude <map>
+#include <numeric>
+#include <queue>
+#include <stack>
+#include <string>
+#include <utility>
+#include <vector>
+
+#if FMT_CPLUSPLUS > 201703L && FMT_HAS_INCLUDE(<ranges>)
+#  include <ranges>
 #endif
 
-#define NLOHMANN_JSON_VERSION_MAJOR 3   // NOLINT(modernize-macro-to-enum)
-#define NLOHMANN_JSON_VERSION_MINOR 11  // NOLINT(modernize-macro-to-enum)
-#define NLOHMANN_JSON_VERSION_PATCH 3   // NOLINT(modernize-macro-to-enum)
-
-#ifndef JSON_DIAGNOSTICS
-    #define JSON_DIAGNOSTICS 0
-#endif
-
-#ifndef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
-    #define JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON 0
-#endif
-
-#if JSON_DIAGNOSTICS
-    #define NLOHMANN_JSON_ABI_TAG_DIAGNOSTICS _diag
-#else
-    #define NLOHMANN_JSON_ABI_TAG_DIAGNOSTICS
+#include "fmt/format.h"
+#include "gtest/gtest.h"alpha;
+    std::cout << array_1 << " != " << array_2 << " " << (array_1 != array_2) << '\n';
+    std::cout << object_1 << " != " << object_2 << " " << (object_1 != object_2) << '\n';
+    std::cout << number_1 << " != " << number_2 << " " << (number_1 != nu   #define NLOHMANN_JSON_ABI_TAG_DIAGNOSTICS
 #endif
 
 #if JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
     #define NLOHMANN_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON _ldvcmp
 #else
     #define NLOHMANN_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON
-pename BasicJsonType>
-static void from_json(const BasicJsonType& j, age& a)
-{
-    a.m_val = j.template get<int>();
-}
+#endif(const char*) {}
+};
 
-template <typename BasicJsonType>
-static void from_json(const BasicJsonType& j, name& n)
-{
-    n.m_val = j.template get<std::string>();
-}
-
-template <typename BasicJsonType>
-static void from_json(const BasicJsonType& j, country& c)
-{
-    const auto str = j.template get<std::string>();
-    const std::map<std::string, country> m =
-    {
-        {"中华人民共和国", country::china},
-        {"France", country::france},
-        {"Российская Федерация", country::russia}
-    };
-
-    const auto it = m.find(str);
-    // TODO(nlohmann) test exceptions
-    c = it->second;
-}
-
-template <typename BasicJsonType>
-static void from_json(const BasicJsonType& j, person& p)
-{
-    p.m_age = j["age"].template get<age>();
-    p.m_name = j["name"].template get<name>();
-    p.m_country = j["country"].template get<country>();
-}
-
-static void from_json(const nlohmann::json& j, address& a)
-{
-    a.m auto p = std::pair<int, float>(42, 1.5f);
-  EXPECT_EQ(fmt::format("{}", p), "(42, 1.5)");
-}
-
-struct unformattable {};
-
-TEST(ranges_test, format_tuple) {
-  auto t =
-      std::tuple<int, float, std::string, char>(42, 1.5f, "this is tuple", 'i');
-  EXPECT_EQ(fmt::format("{}", t), "(42, 1.5, \"this is tuple\", 'i')");
-
-  EXPECT_EQ(fmt::format("{}", std::tuple<>()), "()");
-
-  EXPECT_TRUE((fmt::is_formattable<std::tuple<>>::value));
-  EXPECT_FALSE((fmt::is_formattable<unformattable>::value));
-  EXPECT_FALSE((fmt::is_formattable<std::tuple<unformattable>>::value));
-  EXPECT_FALSE((fmt::is_formattable<std::tuple<unformattable, int>>::value));
-  EXPECT_FALSE((fmt::is_formattable<std::tuple<int, unformattable>>::value));
-  EXPECT_FALSE(
-      (fmt::is_formattable<std::tuple<unformattable, unformattable>>::value));
-  EXPECT_TRUE((fmt::is_formattable<std::tuple<int, float>>::value));
-}
-
-struct not_default_formattable {};
-struct bad_format {};
+struct test_struct {};
 
 FMT_BEGIN_NAMESPACE
-template <> struct formatter<not_default_formattable> {
-etail::has_to_string_view<non_string>::value);
-}
-
-// std::is_constructible is broken in MSVC until version 2015.
-#if !FMT_MSC_VERSION || FMT_MSC_VERSION >= 1900
-struct explicitly_convertible_to_wstring_view {
-  explicit operator fmt::wstring_view() const { return L"foo"; }
-};
-
-TEST(xchar_test, format_explicitly_convertible_to_wstring_view) {
-  // Types explicitly convertible to wstring_view are not formattable by
-  // default because it may introduce ODR violations.
-  static_assert(
-      !fmt::is_formattable<explicitly_convertible_to_wstring_view>::value, "");
-}
-#endif
-
-TEST(xchar_test, format) {
-  EXPECT_EQ(L"42", fmt::format(L"{}", 42));
-  EXPECT_EQ(L"4.2", fmt::format(L"{}", 4.2));
-  EXPECT_EQ(L"abc", fmt::format(L"{}", L"abc"));
-  EXPECT_EQ(L"z", fmt::format(L"{}", L'z'));
-  EXPECT_THROW(fmt::format(fmt::runtime(L"{:*\x343E}"), 42), fmt::format_error);
-  EXPECT_EQ(L"true", fmt::format(L"{}", true));
-  EXPECT_EQ(L"a", fmt::format(L"{0}", 'a'));
-  EXPECT_EQ(L"a", fmt::format(L"{0}", L'a'));
-  EXPECT_EQ(L"Crator it = j.end();
-                CHECK((it.m_it.array_iterator == it.m_object->m_data.m_value.array->end()));
-                --it;
-                CHECK((it.m_it.array_iterator != it.m_object->m_data.m_value.array->begin()));
-                CHECK((it.m_it.array_iterator != it.m_object->m_data.m_value.array->end()));
-                --it;
-                CHECK((it.m_it.array_iterator != it.m_object->m_data.m_value.array->begin()));
-                CHECK((it.m_it.array_iterator != it.m_object->m_data.m_value.array->end()));
-                --it;
-                CHECK((it.m_it.array_iterator != it.m_object->m_data.m_value.array->begin()));
-                CHECK((it.m_it.array_iterator != it.m_object->m_data.m_value.array->end()));
-                --it;
-                CHECK((it.m_it.array_iterator == it.m_object->m_data.m_value.array->begin()));
-                CHECK((it.m_it.array_iterator != it.m_object->m_data.m_value.array->end()));
-            }
-        }
-    }
-    SECTION("equality-preserving")
-    42;
-            auto lt = j.get<udt::legacy_type>();
-            CHECK(lt.number == "4242");
-        }
-    }
-}
-
-namespace nlohmann
-{
-template <>
-struct adl_serializer<std::vector<float>>
-{
-    using type = std::vector<float>;
-    static void to_json(json& j, const type& /*type*/)
-    {
-        j = "hijacked!";
-    }
-
-    static void from_json(const json& /*unnamed*/, type& opt)
-    {
-        opt = {42.0, 42.0, 42.0};
-    }
-
-    // preferred version
-    static type from_json(const json& /*unnamed*/)
-    {
-        return {4.0, 5.0, 6.0};
-    }
-};
-} // namespace nlohmann
-
-TEST_CASE("even supported types can be specialized" * doctest::test_suite("udt"))
-{
-    json const j = std::vector<float> {1.0, 2.0, 3.0};
-    CHECK(j.dump() == R"("hijacked!")");
-    auto f = j.get<std::vector<float>>();
-    // the single argument from_json method is preferred
-    CHECK((f == std::vector<float> {4.0, 5.0, 6.0}));
-}
-
-namespace nlohmann
-{
-template <typename T>
-struct adl_serializer<std::unique_ptr<T>>
-{
-    static void to_json(j  {"integer", 42},
-                {"floating-point", 17.23}
-            }
-        },
-        {"string", "Hello, world!"},
-        {"array", {1, 2, 3, 4, 5}},
-        {"null", nullptr}
-    };
-
-    bool v1;
-    int v2;
-    short v3;
-    float v4;
-    int v5;
-    std::string v6;
-    std::vector<short> v7;
-    std::unordered_map<std::string, json> v8;
-
-    // use explicit conversions
-    json_types["boolean"].get_to(v1);
-    json_types["number"]["integer"].get_to(v2);
-    json_types["number"]["integer"].get_to(v3);
-    json_types["number"]["floating-point"].get_to(v4);
-    json_types["number"]["floating-point"].get_to(v5);
-    json_types["string"].get_to(v6);
-    json_types["array"].get_to(v7);
-    json_types.get_to(v8);
-
-    // print the conversion results
-    std::cout << v1 << '\n';
-    std::cout << v2 << ' ' << v3 << '\n';
-    std::cout << v4 << ' ' << v5 << '\n';
-    std::cout << v6 << '\n';
-
-    for (auto i : v7)
-    {
-        std::cout << i << ' ';
-    }
-    std::cout << "\n\n";
-
-    for (auto i : v8)
-   uto first = std::istream_iterator<int>(iss);
-  auto last = std::istream_iterator<int>();
-  EXPECT_EQ("1, 2, 3, 4, 5", fmt::format("{}", fmt::join(first, last, ", ")));
-}
-
-// Mirrors C++20 std::ranges::basic_istream_view::iterator.
-struct noncopyable_istream_iterator : std::istream_iterator<int> {
-  using base = std::istream_iterator<int>;
-  explicit noncopyable_istream_iterator(std::istringstream& iss) : base{iss} {}
-  noncopyable_istream_iterator(const noncopyable_istream_iterator&) = delete;
-  noncopyable_istream_iterator(noncopyable_istream_iterator&&) = default;
-};
-static_assert(!std::is_copy_constructible<noncopyable_istream_iterator>::value,
-              "");
-
-TEST(ranges_test, movable_only_istream_iter_join) {
-  auto&& iss = std::istringstream("1 2 3 4 5");
-  auto first = noncopyable_istream_iterator(iss);
-  auto last = std::istream_iterator<int>();
-  EXPECT_EQ("1, 2, 3, 4, 5",
-            fmt::format("{}", fmt::join(std::move(first), last, ", ")));
-}
-
-struct movable_iter_range {
-  std::istringstream reate an array from std::deque
-    std::deque<double> c_deque {1.2, 2.3, 3.4, 5.6};
-    json j_deque(c_deque);
-
-    // create an array from std::list
-    std::list<bool> c_list {true, true, false, true};
-    json j_list(c_list);
-
-    // create an array from std::forward_list
-    std::forward_list<std::int64_t> c_flist {12345678909876, 23456789098765, 34567890987654, 45678909876543};
-    json j_flist(c_flist);
-
-    // create an array from std::array
-    std::array<unsigned long, 4> c_array {{1, 2, 3, 4}};
-    json j_array(c_array);
-
-    // create an array from std::set
-    std::set<std::string> c_set {"one", "two", "three", "four", "one"};
-    json j_set(c_set); // only one entry for "one" is used
-
-    // create an array from std::unordered_set
-    std::unordered_set<std::string> c_uset {"one", "two", "three", "four", "one"};
-    json j_uset(c_uset); // only one entry for "one" is used
-
-    // create an array from std::multiset
-    std::multiset<std::string> c_mset {"one", "two", "one", "four"};
-    json j_mseay_not_object[0].is_array());
-            CHECK(array_not_object[1].is_array());
-        }
-
-        {
-            // create object from string literal
-            json const j = "{ \"happy\": true, \"pi\": 3.141 }"_json; // NOLINT(modernize-raw-string-literal)
-
-            // or even nicer with a raw string literal
-            auto j2 = R"({
-                "happy": true,
-                "pi": 3.141
-            })"_json;
-
-            // or explicitly
-            auto j3 = json::parse(R"({"happy": true, "pi": 3.141})");
-
-            // explicit conversion to string
-            std::string const s = j.dump();    // {\"happy\":true,\"pi\":3.141}
-
-            // serialization with pretty printing
-            // pass in the amount of spaces to indent
-            std::cout << j.dump(4) << std::endl; // NOLINT(performance-avoid-endl)
-            // {
-            //     "happy": true,
-            //     "pi": 3.141
-            // }
-
-            std::cout << std::setw(2) << j << std::endl; // NOLINT(performance-avoid-.0 (see https://github.com/nlohmann/json/issues/593)
-*/
-template<typename BasicJsonType>
-class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
-{
-    /// the iterator with BasicJsonType of different const-ness
-    using other_iter_impl = iter_impl<typename std::conditional<std::is_const<BasicJsonType>::value, typename std::remove_const<BasicJsonType>::type, const BasicJsonType>::type>;
-    /// allow basic_json to access private members
-    friend other_iter_impl;
-    friend BasicJsonType;
-    friend iteration_proxy<iter_impl>;
-    friend iteration_proxy_value<iter_impl>;
-
-    using object_t = typename BasicJsonType::object_t;
-    using array_t = typename BasicJsonType::array_t;
-    // make sure BasicJsonType is basic_json or const basic_json
-    static_assert(is_basic_json<typename std::remove_const<BasicJsonType>::type>::value,
-                  "iter_impl only accepts (const) basic_json");
-    // superficial check for the LegacyBidirectionalIterator named requirformat_error_code) {
-  std::string msg = "error 42", sep = ": ";
-  {
-    auto buffer = fmt::memory_buffer();
-    fmt::format_to(fmt::appender(buffer), "garbage");
-    fmt::detail::format_error_code(buffer, 42, "test");
-    EXPECT_EQ(to_string(buffer), "test: " + msg);
+template <typename Char> struct formatter<test_struct, Char> {
+  FMT_CONSTEXPR auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    return ctx.begin();
   }
-  {
-    auto buffer = fmt::memory_buffer();
-    auto prefix =
-        std::string(fmt::inline_buffer_size - msg.size() - sep.size() + 1, 'x');
-    fmt::detail::format_error_code(buffer, 42, prefix);
-    EXPECT_EQ(msg, to_string(buffer));
-  }
-  int codes[] = {42, -1};
-  for (size_t i = 0, n = sizeof(codes) / sizeof(*codes); i < n; ++i) {
-    // Test maximum buffer size.
-    msg = fmt::format("error {}", codes[i]);
-    fmt::memory_buffer buffer;
-    auto prefix =
-        std::string(fmt::inline_buffer_size - msg.size() - sep.size(), 'x');
-    fmt::detail::format_error_code(buffer, codes[i], prefix);
-    EXPECT_EQ(prefix + sep + msg, to_string(buffer));
-    size_t size = fmt::inline_buffer_size;
-    EXPECT_EQ(size, buffer.size());
-    buffer.reeturn (m_it.object_iterator == other.m_it.object_iterator);
 
-            case value_t::array:
-                return (m_it.array_iterator == other.m_it.array_iterator);
-
-            case value_t::null:
-            case value_t::string:
-            case value_t::boolean:
-            case value_t::number_integer:
-            case value_t::number_unsigned:
-            case value_t::number_float:
-            case value_t::binary:
-            case value_t::discarded:
-            default:
-                return (m_it.primitive_iterator == other.m_it.primitive_iterator);
-        }
-    }
-
-    /*!
-    @brief comparison: not equal
-    @pre The iterator is initialized; i.e. `m_object != nullptr`.
-    */
-    template < typename IterImpl, detail::enable_if_t < (std::is_same<IterImpl, iter_impl>::value || std::is_same<IterImpl, other_iter_impl>::value), std::nullptr_t > = nullptr >
-    bool operator!=(const IterImpl& other) const
-    {
-        return !operator==(other);
-    }
-
-    /*!
-    @brief comparison: smaller
-    @prename T, typename U>
-void test_length(const char* length_spec, U value) {
-  long long signed_value = 0;
-  unsigned long long unsigned_value = 0;
-  // Apply integer promotion to the argument.
-  unsigned long long max = max_value<U>();
-  using fmt::detail::const_check;
-  if (const_check(max <= static_cast<unsigned>(max_value<int>()))) {
-    signed_value = static_cast<int>(value);
-    unsigned_value = static_cast<unsigned long long>(value);
-  } else if (const_check(max <= max_value<unsigned>())) {
-    signed_value = static_cast<unsigned>(value);
-    unsigned_value = static_cast<unsigned long long>(value);
-  }
-  if (sizeof(U) <= sizeof(int) && sizeof(int) < sizeof(T)) {
-    signed_value = static_cast<long long>(value);
-    unsigned_value = static_cast<unsigned long long>(
-        static_cast<typename std::make_unsigned<unsigned>::type>(value));
-  } else {
-    signed_value = static_cast<typename make_signed<T>::type>(value);
-    unsigned_value = static_cast<typename std::make_unsigned<T>::type>(value);
-  }
-  std:_null.clear();
-    j_boolean.clear();
-    j_number_integer.clear();
-    j_number_float.clear();
-    j_object.clear();
-    j_array.clear();
-    j_string.clear();
-
-    // serialize the cleared values()
-    std::cout << j_null << '\n';
-    std::cout << j_boolean << '\n';
-    std::cout << j_number_integer << '\n';
-    std::cout << j_number_float << '\n';
-    std::cout << j_object << '\n';
-    std::cout << j_array << '\n';
-    std::cout << j_string << '\n';
-}
-#include <iostream>
-#include <iomanip>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-using namespace nlohmann::literals;
-
-// function to print UBJSON's diagnostic format
-void print_byte(uint8_t byte)
-{
-    if (32 < byte and byte < 128)
-    {
-        std::cout << (char)byte;
-    }
-    else
-    {
-        std::cout << (int)byte;
-    }
-}
-
-int main()
-{
-    // create a JSON value
-    json j = R"({"compact": true, "schema": false})"_json;
-
-    // serialize it to UBJSON
-    std::vector<std::uint8_t> v = json::to_ubjson(j);
-
-    // print the vector contench = R"({"a":{"bb":{"ccc":null}}})"_json;
-                json result = R"({"a":{"bb":{}}})"_json;
-
-                original.merge_patch(patch);
-                CHECK(original == result);
-            }
-        }
-    }
-}
-#include <iostream>
-#include <iomanip>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
-int main()
-{
-    // a JSON text given as std::vector
-    std::vector<std::uint8_t> text = {'[', '1', ',', '2', ',', '3', ']', '\0'};
-
-    // parse and serialize JSON
-    json j_complete = json::parse(text);
-    std::cout << std::setw(4) << j_complete << "\n\n";
-}
-#include <iostream>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
-int main()
-{
-    // create several JSON values
-    json array_1 = {1, 2, 3};
-    json array_2 = {1, 2, 4};
-    json object_1 = {{"A", "a"}, {"B", "b"}};
-    json object_2 = {{"B", "b"}, {"A", "a"}};
-    json number_1 = 17;
-    json number_2 = 17.000000000000001L;
-    json string_1 = "foo";
-    json string_2 = "bar";
-
-    // output values and comparisons
-    sespace fmt
-
-TEST(ostream_test, template) {
-  EXPECT_EQ("2", fmt::format("{}", test_template<int>()));
-}
-
-TEST(ostream_test, format_to_n) {
-  char buffer[4];
-  buffer[3] = 'x';
-  auto result = fmt::format_to_n(buffer, 3, "{}", fmt_test::abc());
-  EXPECT_EQ(3u, result.size);
-  EXPECT_EQ(buffer + 3, result.out);
-  EXPECT_EQ("abcx", fmt::string_view(buffer, 4));
-  result = fmt::format_to_n(buffer, 3, "x{}y", fmt_test::abc());
-  EXPECT_EQ(5u, result.size);
-  EXPECT_EQ(buffer + 3, result.out);
-  EXPECT_EQ("xabx", fmt::string_view(buffer, 4));
-}
-
-struct copyfmt_test {};
-
-std::ostream& operator<<(std::ostream& os, copyfmt_test) {
-  std::ios ios(nullptr);
-  ios.copyfmt(os);
-  return os << "foo";
-}
-
-namespace fmt {
-template <> struct formatter<copyfmt_test> : ostream_formatter {};
-}  // namespace fmt
-
-TEST(ostream_test, copyfmt) {
-  EXPECT_EQ("foo", fmt::format("{}", copyfmt_test()));
-}
-
-TEST(ostream_test, to_string) {
-  EXPECT_EQ("abc", fmt::to_string(fmt_test::abc()));
-}
-
-TEST(ostream_test, range) {
-  auto strs = std
-class json_sax_dom_parser
-{
-  public:
-    using number_integer_t = typename BasicJsonType::number_integer_t;
-    using number_unsigned_t = typename BasicJsonType::number_unsigned_t;
-    using number_float_t = typename BasicJsonType::number_float_t;
-    using string_t = typename BasicJsonType::string_t;
-    using binary_t = typename BasicJsonType::binary_t;
-
-    /*!
-    @param[in,out] r  reference to a JSON value that is manipulated while
-                       parsing
-    @param[in] allow_exceptions_  whether parse errors yield exceptions
-    */
-    explicit json_sax_dom_parser(BasicJsonType& r, const bool allow_exceptions_ = true)
-        : root(r), allow_exceptions(allow_exceptions_)
-    {}
-
-    // make class move-only
-    json_sax_dom_parser(const json_sax_dom_parser&) = delete;
-    json_sax_dom_parser(json_sax_dom_parser&&) = default; // NOLINT(hicpp-noexcept-move,performance-noexcept-move-constructor)
-    json_sax_dom_parser& operator=(const json_sax_dom_parser&) = delete;
-    json_sax_dom_parser& operaerator bool() const noexcept { return result_ != 0; }
-  operator basic_string_view<wchar_t>() const noexcept {
-    return basic_string_view<wchar_t>(message_, result_);
-  }
-};
-
-class utf8_system_category final : public std::error_category {
+  auto format(testme T> class flat_set {
  public:
-  const char* name() const noexcept override { return "system"; }
-  std::string message(int error_code) const override {
-    auto&& msg = system_message(error_code);
-    if (msg) {
-      auto utf8_message = to_utf8<wchar_t>();
-      if (utf8_message.convert(msg)) {
-        return utf8_message.str();
-      }
-    }
-    return "unknown error";
-  }
-};
+  using key_type = T;
+  using container_type = std::vector<T>;
 
-}  // namespace detail
+  using iterator = typename std::vector<T>::iterator;
+  using const_iterator = typename std::vector<T>::const_iterator;
 
-FMT_API const std::error_category& system_category() noexcept {
-  static const detail::utf8_system_category category;
-  return category;
-}
-
-std::system_error vwindows_error(int err_code, string_view format_str,
-                                 format_args args) {
-  auto ec = std::error_code(err_code, system_category());
-  return std::system_error(ec, vformat(format_str, args));
-}
-
-void detail:     template<typename T, typename SFINAE = void> class JSONSerializer =
-         adl_serializer,
-         class BinaryType = std::vector<std::uint8_t>, // cppcheck-suppress syntaxError
-         class CustomBaseClass = void>
-class basic_json;
-
-/// @brief JSON Pointer defines a string syntax for identifying a specific value within a JSON document
-/// @sa https://json.nlohmann.me/api/json_pointer/
-template<typename RefStringType>
-class json_pointer;
-
-/*!
-@brief default specialization
-@sa https://json.nlohmann.me/api/json/
-*/
-using json = basic_json<>;
-
-/// @brief a minimal map-like container that preserves insertion order
-/// @sa https://json.nlohmann.me/api/ordered_map/
-template<class Key, class T, class IgnoredLess, class Allocator>
-struct ordered_map;
-
-/// @brief specialization that maintains the insertion order of object keys
-/// @sa https://json.nlohmann.me/api/ordered_json/
-using ordered_json = basic_json<nlohmann::ordered_map>;
-
-NLOHMANN_JSON_NAMESPACE_END
-
-#endif  // INCLUDE_NLOHMANN_JSON_FWD_HPP_
-THROWS_AS(j.dump(1, ' ', false, json::error_handler_t::strict), json::type_error&);
-            CHECK(j.dump(-1, ' ', false, json::error_handler_t::ignore) == "\"123\"");
-            CHECK(j.dump(-1, ' ', false, json::error_handler_t::replace) == "\"123\xEF\xBF\xBD\"");
-            CHECK(j.dump(-1, ' ', true, json::error_handler_t::replace) == "\"123\\ufffd\"");
+  template <typename... Ts>
+  exp< std::setw(2) << j << std::endl; // NOLINT(performance-avoid-endl)
         }
 
-        SECTION("unexpected character")
         {
-            const json j = "123\xF1\xB0\x34\x35\x36";
+            // create an array using push_back
+            json j;
+            j.push_back("foo");
+            j.push_back(1);
+            j.push_back(true);
 
-            CHECK_THROWS_WITH_AS(j.dump(), "[json.exception.type_error.316] invalid UTF-8 byte at index 5: 0x34", json::type_error&);
-            CHECK_THROWS_AS(j.dump(1, ' ', false, json::error_handler_t::strict), json::type_error&);
-            CHECK(j.dump(-1, ' ', false, json::error_handler_t::ignore) == "\"123456\"");
-            CHECK(j.dump(-1, ' ', false, json::error_handler_t::replace) == "\"123\xEF\xBF\xBD\x34\x35\x36\"");
-            CHECK(j.dump(-1, ' ', true, json::error_handler_t::replace) == "\"123\\ufffd456\"");
-        j_arr[3] = 3;
-            j_arr[4] = 4;
-            j_arr[5] = 5;
-            j_arr[6] = 6;
-            j_arr[7] = 7;
-            json const j_arr_copy = j_arr;
-        }
-    }
-}
-#include <iostream>
+ ass Evil
+DOCTEST_GCC_SUPPRESS_WARNING_PUSH
+DOCTEST_GCC_SUPPRESS_WARNING("-Wnoexcept")
+
 #include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
-int main()
-{
-    // different JSON Pointers
-    json::json_pointer ptr1("/foo");
-    json::json_pointer ptr2("/foo/0");
-
-    // call empty()
-    std::cout << "last reference token of \"" << ptr1 << "\" is \"" << ptr1.back() << "\"\n"
-              << "last reference token of \"" << ptr2 << "\" is \"" << ptr2.back() << "\"" << std::endl;
-}
-#include <iostream>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
-int main()
-{
-    // create JSON array
-    json array = {"first", "2nd", "third", "fourth"};
-
-    // output element at index 2 (third element)
-    std::cout << array.at(2) << '\n';
-
-    // change element at index 1 (second element) to "second"
-    array.at(1) = "second";
-
-    // output changed array
-    std::cout << array << '\nfault;
-#endif  // FMT_USE_FCNTL
-FMT_END_NAMESPACE
-#include "fmt/format.h"
-
-int main(int argc, char** argv) {
-  for (int i = 0; i < argc; ++i) fmt::print("{}: {}\n", i, argv[i]);
-}
-// A fuzzer for floating-point formatter.
-// For the license information refer to format.h.
-
-#include <fmt/format.h>
-
-#include <cstdint>
-#include <cstdlib>
-#include <limits>
-#include <stdexcept>
-
-#include "fuzzer-common.h"
-
-void check_round_trip(fmt::string_view format_str, double value) {
-  auto buffer = fmt::memory_buffer();
-  fmt::format_to(std::back_inserter(buffer), format_str, value);
-
-  if (std::isnan(value)) {
-    auto nan = std::signbit(value) ? "-nan" : "nan";
-    if (fmt::string_view(buffer.data(), buffer.size()) != nan)
-      throw std::runtime_error("round trip failure");
-    return;
-  }
-
-  buffer.push_back('\0');
-  char* ptr = nullptr;
-  if (std::strtod(buffer.data(), &ptr) != value)
-    throw std::runtime_error("round trip failure");
-  if (ptr + 1 != buffer.end()) throw std::runtime_error("unparsed output");
-}
-
-exter the last token to be EOF
-    @return whether the input is a proper JSON text
-    */
-    bool accept(const bool strict = true)
-    {
-        json_sax_acceptor<BasicJsonType> sax_acceptor;
-        return sax_parse(&sax_acceptor, strict);
-    }
-
-    template<typename SAX>
-    JSON_HEDLEY_NON_NULL(2)
-    bool sax_parse(SAX* sax, const bool strict = true)
-    {
-        (void)detail::is_sax_static_asserts<SAX, BasicJsonType> {};
-        const bool result = sax_parse_internal(sax);
-
-        // strict mode: next byte must be EOF
-        if (result && strict && (get_token() != token_type::end_of_input))
-        {
-            return sax->parse_error(m_lexer.get_position(),
-                                    m_lexer.get_token_string(),
-                                    parse_error::create(101, m_lexer.get_position(), exception_message(token_type::end_of_input, "value"), nullptr));
-        }
-
-        return result;
-    }
-
-  private:
-    template<typename SAX>
-    JSON_HEDLEY_NON_NULL(2)
-    bool sax_parse_internal(SA2:33");
-}
-
-std::wstring system_wcsftime(const std::wstring& format, const std::tm* timeptr,
-                             std::locale* locptr = nullptr) {
-  auto loc = locptr ? *locptr : std::locale::classic();
-  auto& facet = std::use_facet<std::time_put<wchar_t>>(loc);
-  std::wostringstream os;
-  os.imbue(loc);
-  facet.put(os, os, L' ', timeptr, format.c_str(),
-            format.c_str() + format.size());
-#ifdef _WIN32
-  // Workaround a bug in older versions of Universal CRT.
-  auto str = os.str();
-  if (str == L"-0000") str = L"+0000";
-  return str;
-#else
-  return os.str();
-#endif
-}
-
-TEST(chrono_test_wchar, time_point) {
-  auto t1 = std::chrono::time_point_cast<std::chrono::seconds>(
-      std::chrono::system_clock::now());
-
-  std::vector<std::wstring> spec_list = {
-      L"%%",  L"%n",  L"%t",  L"%Y",  L"%EY", L"%y",  L"%Oy", L"%Ey", L"%C",
-      L"%EC", L"%G",  L"%g",  L"%b",  L"%h",  L"%B",  L"%m",  L"%Om", L"%U",
-      L"%OU", L"%W",  L"%OW", L"%V",  L"%OV", L"%j",  L"%d",  L"%Od", L"%e",
-      L"%Oe", tandard
-// (e.g., JSON_HAS_FILESYSTEM for C++17 and up), please mention the corresponding
-// version macro in a comment close by, like this:
-// JSON_HAS_CPP_<VERSION> (do not remove; see note at top of file)
-
-#include "doctest_compatibility.h"
-
-// for some reason including this after the json header leads to linker errors with VS 2017...
-#include <locale>
-
-#define JSON_TESTS_PRIVATE
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
-using ordered_json = nlohmann::ordered_json;
+using nlohmann::json;
 #ifdef JSON_TEST_NO_GLOBAL_UDLS
     using namespace nlohmann::literals; // NOLINT(google-build-using-namespace)
-#endif
+#endif << ptr8.to_string() << "\"\n"
+              << "\"" << ptr9.to_string() << "\"\n"
+              << "\"" << ptr10.to_string() << "\"\n"
+              << "\"" << ptr11.to_string() << "\"\n"
+              << "\"" << ptr12.to_string() << "\"" << std::endl;
+}
+n_json_j["address"] = nlohmann_json_t.address;
+    nlohmann_json_j["age"] = nlohmann_json_t.age;
+}
+} // namespace ns
 
-#include <cstdio>
-#include <list>
-#include <type_traits>
-#include <utility>
+int main()
+{
+    ns::person p = {"Ned Flanders", "744 Evergreen Terrace", 60};
 
-#ifdef JSON_HAS_CPP_17
-    #include <any>
-    #include <variant>
-#endif
+    // serialization: person -> json
+    json j = p;
+    srocess a JSON array
+    array_start,
+    /// the parser read `]` and finished processing a JSON array
+    array_end,
+    /// the parser read a key of a value in an object
+    key,
+    /// the parser finished reading a JSON value
+    value
+};
 
-#ifdef JSON_HAS_CPP_20
-    #if __has_include(<span>)
-        #include <span>
-    #endif
-#endif
-
-// NLOHMANN_JSON_SERIALIZE_ENUM uses a static std::pair
-DOCTEST_CLANG_SUPPRESS_WARNING_PUSH
-DOCTEST_CLANG_SUPPRESS_WARNING("-Wexit-time-destructors")
-
-///// MIT
+template<type MIT
 
 #undef JSON_DIAGNOSTICS
 #define JSON_DIAGNOSTICS 1
@@ -1294,40 +336,498 @@ std::size_t json_sizeof_diag_on()
 
 std::size_t json_sizeof_diag_on_explicit()
 {
-    return sizeof(::NLOHMANN_JSON_NAMESPACE::json);
+    return sizeof(::NLOHMANer<int>::format(42, ctx);
+  }
+};
+}  // namespace fmt
+
+#include <sstream>
+
+#include "fmt/compile.h"
+#include "fmt/ostream.h"
+#include "fmt/ranges.h"
+#include "gmock/gmock.h"
+#include "gtest-extra.h"
+#include "util.h"
+
+auto operator<<(std::ostream& os, constt.m_object->m_data.m_value.array->begin()));
+                it++;
+                CHECK((it.m_it.array_iterator != it.m_object->m_data.m_value.array->begin()));
+                CHECK((it.m_it.array_iterator != it.m_object->m_data.m_value.array->end()));
+ espace std {
+template <>
+struct tuple_size<tuple_like> : std::integral_constant<size_t, 2> {};
+
+template <size_t N> struct tuple_element<N, tuple_like> {
+  using type = decltype(std::declval<tuple_like>().get<N>());
+};
+}  // namespace std
+
+TEST(ranges_test), &ptr) != value)
+    throw std::runtime_error("round trip failure");
+  if (ptr + 1 != buffer.end()) throw std::runtime_error("unparsed output");
 }
 
-void json_at_diag_on()
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
+  if (size <= sizeof(double) || ut << "objects:" << '\n'
+              << j_object.dump() << "\n\n"
+              << j_object.dump(-1) << "\n\n"
+              << j_object.dump(0) << "\n\n"
+              << j_object.dump(4) << "\n\n"
+              << j_object.dump(1, '\t') << "\nteger"].get_to(v2);
+    json_types["number"]["integer"].get_to(v3);
+    json_types["number"]["floating-point"].get_to(v4);
+    json_types["number"]["floating-point"].get_to(v5);
+    json_types["string"].get_to(v6);
+    json_types["array"].get_to(v7);
+    j void from_json(const BasicJsonType& j, person& p)
 {
-    using nlohmann::json;
-    json j = json{{"foo", json::object()}};
-    j.at(json::json_pointer("/foo/bar"));
+    p.m_age = j["age"].template get<age>();
+    p.m_name = j["name"].template get<name>();
+    p.m_country = j["country"].template get<country>();
+}
+
+static void from_json(const nlohmann::json& j, addressize) throw std::exception();
+      return *this;
+    }
+    auto operator*() -> throwing_iterator& { return *this; }
+    auto operator++() -> throwing_iterator& { return *this; }
+    auto operator++(int) -> throwing_iterator { return *this; }
+  };
+
+  try {ty> // move
+#include <vector> // vector
+
+#include <nlohmann/detail/exceptions.hpp>
+#include <nlohmann/detail/macro_scope.hpp>
+#include <nlohmann/detail/string_concat.hpp>
+
+NLOHMANN_JSON_NAMESPACE_BEGIN
+
+/*!
+@brief SAX interface
+
+This class describes the SA }
+};
+
+template <size_t N>
+constexpr test_arg_id_handler parse_arg_id(const char (&s)[N]) {
+  auto h = test_arg_id_handler();
+  fmt::detail::parse_arg_id(s, s + N, h);
+  return h;
+}
+
+TEST(base_test, constexpr_parse_arg_id) {
+  static_assert(parse_arg_id(":eption.type_error.308] cannot use push_back() with number", json::type_error&);
+                }
+            }
+
+            SECTION("const json&")
+            {
+                SECTION("null")
+                {
+                    json j;
+      1 0");
+}
+
+#ifdef __cpp_lib_byte
+TEST(ranges_test, join_bytes) {
+  auto v = std::vector<std::byte>{std::byte(1), std::byte(2), std::byte(3)};
+  EXPECT_EQ(fmt::format("{}", fmt::join(v, ", ")), "1, 2, 3");
+}
+#endif
+
+#ifdef FMT_RANGES_TEST_ENABLE_JOIN
+TEST(rnt8_t> bytes = {{0xca, 0xfe, 0xba, 0xbe}};
+
+    // create container with subtype
+    auto c1 = byte_container_with_subtype(bytes, 42);
+
+    std::cout << "before calling clear_subtype(): " << json(c1) << '\n';
+
+    c1.clear_subtype();
+
+    std::cout << "aftt>, // cppcheck-suppress syntaxError
+         class CustomBaseClass = void>
+class basic_json;
+
+/// @brief JSON Pointer defines a string syntax for identifying a specific value within a JSON document
+/// @sa https://json.nlohmann.me/api/json_pointer/
+templa_MSC_VERSION >= 1910
+  static_assert(!fmt::is_formattable<const nonconst_formattable&>::value, "");
+#endif
+
+  static_assert(!fmt::is_formattable<convertible_to_pointer>::value, "");
+  const auto f = convertible_to_pointer_formattable();
+  auto str = std::sue
+    json j = R"({"compact": true, "schema": false})"_json;
+
+    // serialize it to UBJSON
+    std::vector<std::uint8_t> v = json::to_ubjson(j);
+
+    // print the vector content
+    for (auto& byte : v)
+    {
+        print_byte(byte);
+   le<wchar_t>);
+}
+#endif
+
+TEST(base_test, format_to) {
+  auto s = std::string();
+  fmt::format_to(std::back_inserter(s), "{}", 42);
+  EXPECT_EQ(s, "42");
+}
+
+TEST(base_test, format_to_array) {
+  char buffer[4];
+  auto result = fmt::format_to(buffer, "{}", 123e_string("{foo}"), "");
+  static_assert(parse_string("{:}"), "");
+}
+#endif  // FMT_USE_CONSTEXPR
+
+struct enabled_formatter {};
+struct enabled_ptr_formatter {};
+struct disabled_formatter {};
+struct disabled_formatter_convertible {
+  operator int() const { rame... Args>
+  explicit noncopyable_range(Args&&... args)
+      : vec(std::forward<Args>(args)...) {}
+
+  noncopyable_range(noncopyable_range const&) = delete;
+  noncopyable_range(noncopyable_range&) = delete;
+
+  auto begin() -> iterator { return vec.begin(name = void>
+struct pod_serializer
+{
+    // use adl for non-pods, or scalar types
+    template <
+        typename BasicJsonType, typename U = T,
+        typename std::enable_if <
+            !(std::is_pod<U>::value && std::is_class<U>::value), int >::type array({ {"currency", "USD"}, {"value", 42.99} });
+            CHECK(array_not_object.is_array());
+            CHECK(array_not_object.size() == 2);
+            CHECK(array_not_object[0].is_array());
+            CHECK(array_not_object[1].is_array());
+ umber 3
+    auto new_pos = v.insert(v.begin() + 2, 10);
+
+    // output new array and result of insert call
+    std::cout << *new_pos << '\n';
+    std::cout << v << '\n';
 }
 //     __ _____ _____ _____
-//  __|  |   __|     |   | |  JSON for Modern C++ (supporting code)
-// |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
-//
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
-// SPDX-License-Identifier: MIT
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |   char* data = nullptr;
+  using ustreamsize = std::make_unsigned<std::streamsize>::type;
+  ustreamsize size = max_size;
+  do {
+    auto n = std::min(size, fmt::detail::to_unsigned(max_streamsize));
+    EXPECT_CALL(streambuf, xsputn(data, static_cast<std::son.reset(new udt::person{{42}, {"John Doe"}, udt::country::russia}); // NOLINT(cppcoreguidelines-owning-memory,modernize-make-shared)
+            j = optPerson;
+            CHECK_FALSE(j.is_null());
 
-#include "doctest_compatibility.h"
+            CHECK(j.get<udt::person>() == *optPerson);
+n;
 
-#include <nlohmann/json.hpp>
-using nlohmann::json;
-
-#include <fstream>
-#include "make_test_data_available.hpp"
-
-TEST_CASE("Binary Formats" * doctest::skip())
+// see http://llvm.org/docs/LibFuzzer.html
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    SECTION("canada.json")
+    try
     {
-        const auto* filename = TEST_DATA_DIRECTORY "/nativejsACE_END
-#include <iostream>
-#include <nlohmann/json.hpp>
+        // step 1: parse input
+        json const j1 = json::parse(data, data + size);
 
-using json = nlohmann::json;
+  access nonexisting values and rely on default value
+    std::string v_string = j.value("nonexisting"sv, "oops");
+    bool v_boolean = j.value("nonexisting"sv, false);
+
+    // output values
+    std::cout << std::boolalpha << v_integer << " " << v_floating
+ te<typename SAX, typename BasicJsonType>
+struct is_sax_static_asserts
+{
+  private:
+    static_assert(is_basic_json<BasicJsonType>::value,
+                  "BasicJsonType must be of type basic_json<...>");
+
+    ustch = R"([
+                { "op": "replace", "path": "/baz", "value": "boo" },
+                { "op": "add", "path": "/hello", "value": ["world"] },
+                { "op": "remove", "path": "/foo"}
+            ])"_json;
+
+            // apply the patch
+ etail::max_value;
+
+static_assert(!std::is_copy_constructible<bigint>::value, "");
+static_assert(!std::is_copy_assignable<bigint>::value, "");
+
+TEST(bigint_test, construct) {
+  EXPECT_EQ(fmt::to_string(bigint()), "");
+  EXPECT_EQ(fmt::to_string(bigint(0x42)MT_USE_FCNTL
+
+#  ifdef _WIN32
+#    include <windows.h>
+#  endif
+#endif
+
+#ifdef _WIN32
+#  ifndef S_IRUSR
+#    define S_IRUSR _S_IREAD
+#  endif
+#  ifndef S_IWUSR
+#    define S_IWUSR _S_IWRITE
+#  endif
+#  ifndef S_IRGRP
+#    define S_IRGRP 0
+#  endif
+#  ifndemat(FMT_COMPILE("{}"), 42));
+  EXPECT_EQ("42", fmt::format(FMT_COMPILE("{}"), 42u));
+  EXPECT_EQ("42", fmt::format(FMT_COMPILE("{}"), 42ll));
+  EXPECT_EQ("42", fmt::format(FMT_COMPILE("{}"), 42ull));
+  EXPECT_EQ("true", fmt::format(FMT_COMPILE("{}"), true)   // type errors can occur during parsing, too
+    }
+    catch (const json::out_of_range&)
+    {
+        // out of range errors can occur during parsing, too
+    }
+
+    // return 0 - non-zero return values are reserved for future use
+    remt::basic_string_view<wchar_t> format,
+                          const Args&... args) {
+  return fmt::sprintf(format, args...);
+}
+
+#define EXPECT_PRINTF(expected_output, format, arg)     \
+  EXPECT_EQ(expected_output, test_sprintf(format, arg)) \
+      << nst bool strict = true)
+    {
+        json_sax_acceptor<BasicJsonType> sax_acceptor;
+        return sax_parse(&sax_acceptor, strict);
+    }
+
+    template<typename SAX>
+    JSON_HEDLEY_NON_NULL(2)
+    bool sax_parse(SAX* sax, const bool strict = true)
+    {ECT_EQ("", fmt::format("{}", empty_test()));
+}
+
+TEST(ostream_test, print) {
+  {
+    std::ostringstream os;
+    fmt::print(os, "Don't {}!", "panic");
+    EXPECT_EQ("Don't panic!", os.str());
+  }
+
+  {
+    std::ostringstream os;
+    fmt::println(os, "Don't {}_set) {
+  EXPECT_EQ(fmt::format("{}", flat_set<std::string>{"one", "two"}),
+            "{\"one\", \"two\"}");
+}
+
+namespace adl {
+struct box {
+  int value;
+};
+
+auto begin(const box& b) -> const int* { return &b.value; }
+auto end(const box& b) -> const int*EQ(5u, result.size);
+  EXPECT_EQ(buffer + 3, result.out);
+  EXPECT_EQ("xabx", fmt::string_view(buffer, 4));
+}
+
+struct copyfmt_test {};
+
+std::ostream& operator<<(std::ostream& os, copyfmt_test) {
+  std::ios ios(nullptr);
+  ios.copyfmt(os);
+  return os << "fj_array.begin() == it);
+                CHECK(j_array == json({5, 1, 2, 3, 4}));
+            }
+
+            SECTION("insert in the middle")
+            {
+                auto it = j_array.insert(j_array.begin() + 2, 5);
+                CHECK(j_array.size()r*) {}
+
+  constexpr auto on_arg_id() -> int { return 0; }
+
+  template <typename T> constexpr auto on_arg_id(T) -> int { return 0; }
+
+  constexpr void on_replacement_field(int, const char*) {}
+
+  constexpr auto on_format_specs(int, const char* begin, constARY_VERSION_CHECK
+    #if defined(NLOHMANN_JSON_VERSION_MAJOR) && defined(NLOHMANN_JSON_VERSION_MINOR) && defined(NLOHMANN_JSON_VERSION_PATCH)
+        #if NLOHMANN_JSON_VERSION_MAJOR != 3 || NLOHMANN_JSON_VERSION_MINOR != 11 || NLOHMANN_JSON_VERSION_PATCH 2
+
+buffered_file::~buffered_file() noexcept {
+  if (file_ && FMT_SYSTEM(fclose(file_)) != 0)
+    report_system_error(errno, "cannot close file");
+}
+
+buffered_file::buffered_file(cstring_view filename, cstring_view mode) {
+  FMT_RETRY_VAL(file_, FMT_SYSTEM(r{};
+    legacy_type() = default;
+    legacy_type(std::string n) : number(std::move(n)) {}
+};
+} // namespace udt
+
+namespace nlohmann
+{
+template <typename T>
+struct adl_serializer<std::shared_ptr<T>>
+{
+    static void to_json(json& j, const std::shared_ptr<tions_)
+    {}
+
+    // make class move-only
+    json_sax_dom_parser(const json_sax_dom_parser&) = delete;
+    json_sax_dom_parser(json_sax_dom_parser&&) = default; // NOLINT(hicpp-noexcept-move,performance-noexcept-move-constructor)
+    json_sax_dom_parserncode(char* s, uint32_t c) {
+  if (c >= (1UL << 16)) {
+    s[0] = static_cast<char>(0xf0 | (c >> 18));
+    s[1] = static_cast<char>(0x80 | ((c >> 12) & 0x3f));
+    s[2] = static_cast<char>(0x80 | ((c >> 6) & 0x3f));
+    s[3] = static_cast<char>(0x80 | ((c t json array_with_subtype = {"value", 1, binary_with_subtype};
+    const json array_empty_with_subtype = {"value", 1, binary_empty_with_subtype};
+
+    SECTION("normal")
+    {
+        CHECK(binary.dump() == "{\"bytes\":[1,2,3,4],\"subtype\":null}");
+   r_concept = std::input_iterator_tag;
+
+    iterator() = default;
+    iterator(int i) : val(i) {}
+    auto operator*() const -> int { return val; }
+    auto operator++() -> iterator& {
+      ++val;
+      return *this;
+    }
+    void operator++(int) { ++*thishmann::basic_json<std::map, std::vector, std::string, bool,
+        std::int64_t, std::uint64_t, double, std::allocator, pod_serializer>;
+
+    auto p = udt::small_pod{42, '/', 42};
+    custom_json const j = p;
+
+    auto p2 = j.get<udt::small_pod>();
+
+   case value_t::null:
+            case value_t::string:
+            case value_t::boolean:
+            case value_t::number_integer:
+            case value_t::number_unsigned:
+            case value_t::number_float:
+            case value_t::binary:
+   buffer(file_buffer&& other) noexcept
+    : buffer<char>(grow, other.data(), other.size(), other.capacity()),
+      file_(std::move(other.file_)) {
+  other.clear();
+  other.set(nullptr, 0);
+}
+
+file_buffer::~file_buffer() {
+  flush();
+  delete[] data();
+}
+} ing", "foo"}, {"array", {1, 2}}
+    };
+
+    // read-only access
+
+    // output element with JSON pointer "/number"
+    std::cout << j["/number"_json_pointer] << '\n';
+    // output element with JSON pointer "/string"
+    std::cout << j["/string"_json_p_FALSE(fmt::detail::has_to_string_view<non_string>::value);
+}
+
+// std::is_constructible is broken in MSVC until version 2015.
+#if !FMT_MSC_VERSION || FMT_MSC_VERSION >= 1900
+struct explicitly_convertible_to_wstring_view {
+  explicit operator fmt::wstring_t(other.m_it)
+    {}
+
+    /*!
+    @brief converting assignment
+    @param[in] other  non-const iterator to copy from
+    @return const/non-const iterator
+    @note It is not checked whether @a other is initialized.
+    */
+    iter_impl& operator=(const itent8_t> input = {'[', '1', ',', '2', ',', '3', ']', 'o', 't', 'h', 'e', 'r'};
+
+    // parse and serialize JSON
+    json j_complete = json::parse(input.begin(), input.begin() + 7);
+    std::cout << std::setw(4) << j_complete << "\n\n";
+}
+ auto count_two = j_object.count("two"sv);
+    auto count_three = j_object.count("three"sv);
+
+    // print values
+    std::cout << "number of elements with key \"two\": " << count_two << '\n';
+    std::cout << "number of elements with key \"three\": " << ce std::remove_const<BasicJsonType>::type, const BasicJsonType>::type>;
+    /// allow basic_json to access private members
+    friend other_iter_impl;
+    friend BasicJsonType;
+    friend iteration_proxy<iter_impl>;
+    friend iteration_proxy_value<iter_im));
+}
+
+#if FMT_USE_USER_DEFINED_LITERALS
+TEST(xchar_test, named_arg_udl) {
+  using namespace fmt::literals;
+  auto udl_a =
+      fmt::format(L"{first}{second}{first}{third}", L"first"_a = L"abra",
+                  L"second"_a = L"cad", L"third"_a = 99);
+     // LCOV_EXCL_LINE
+            JSON_ASSERT(false); // NOLINT(cert-dcl03-c,hicpp-static-assert,misc-static-assert) LCOV_EXCL_LINE
+            return 0;              // LCOV_EXCL_LINE
+    }
+}
+
+}  // namespace detail
+NLOHMANN_JSON_NAMESPACE_END
+// %S", L"%x", L"%X", L"%p"};
+#endif
+  spec_list.push_back(L"%Y-%m-%d %H:%M:%S");
+
+  for (const auto& spec : spec_list) {
+    auto t = std::chrono::system_clock::to_time_t(t1);
+    auto tm = *std::gmtime(&t);
+
+    auto sys_output = system_wcsftime(spec, &tm);s |
+         std::views::filter([mask](auto c) { return c != mask.except; });
+}
+}  // namespace views_filter_view_test
+
+TEST(ranges_test, format_as_with_ranges_mutable_begin_end) {
+  using namespace views_filter_view_test;
+  {
+    auto make_filter_view = [ization")
+    {
+        json const j {{"object", json::object()}, {"array", {1, 2, 3, 4}}, {"number", 42}, {"boolean", false}, {"null", nullptr}, {"string", "Hello world"} };
+
+        SECTION("no indent / indent=-1")
+        {
+            CHECK(j.dump() ==ut << array << '\n';
+    std::cout << null << '\n';
+
+    // add values
+    array.push_back(6);
+    array += 7;
+    null += "first";
+    null += "second";
+
+    // print values
+    std::cout << array << '\n';
+    std::cout << null << '\n';
+}
+#iack(json::object_t::value_type({"one", 1}));
+                j.push_back(json::object_t::value_type({"two", 2}));
+                CHECK(j.type() == json::value_t::object);
+                CHECK(j.size() == 2);
+                CHECK(j["one"] == json(1));
+  json;
 
 namespace ns
 {
@@ -1345,266 +845,727 @@ namespace ns
 void from_json(const json& j, person& p)
 {
     j.at("name").get_to(p.name);
-    j.at("address").get_to(p.address);
-    j.at("age").get_to(p.age);
-}
-} // namespace ns
-
-int main()
-{
-    json j;
-    j["name"] = "Ned Flanders";
-    j["address"] = "744 Evergreen Terrace";
-    j["age"] = 60;
-
-    auto p = j.template get<ns::person>();
-
-    std::cout << p.name << " (" << p.age << ") lives in " << p.address << std::endl;
-}
-#include <iostream>
-#include <unordered_map>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
-int main()
-{
-    // create a JSON value with different types
-    json json_types =
+N("Parse error")
     {
-        {"boolean", true},
-        {
-            "number", {
-                {"it_with_subtype = {{"key", binary_with_subtype}};
-    const json object_empty_with_subtype = {{"key", binary_empty_with_subtype}};
+        json _;
+        CHECK_THROWS_WITH_AS(_ = json::parse(""), "[json.exception.parse_error.101] parse error at line 1, column 1: attempting to parse an empty input; check that your input string or stream contains the expected JSOt << j_string_t << '\n';
+    std::cout << j_string_literal << '\n';
+    std::cout << j_stdstring << "\n\n";
 
-    const json array = {"value", 1, binary};
-    const json array_empty = {"value", 1, binary_empty};
-    const json array_with_subtype = {"value", 1, binary_with_subtype};
-    const json array_empty_with_subtype = {"value", 1, binary_empty_with_subtype};
+    // ============
+    // number types
+    // ============
 
-    SECTION("normal")
-    {
-        CHECK(binary.dump() == "{\"bytes\":[1,2,3,4],\"subtype\":null}");
-        CHECK(binary_empty.dump() == "{\"bytes\":[],\"subtype\":null}");
-        CHECK(binary_with_subtype.dump() == "{\"bytes\":[1,2,3,4],\"subtype\":128}");
-        CHECK(binary_empty_with_subtype.dump() == "{\"bytes\":[],\"subtype\":128}");
+    // create a JSON number from number_integer_t
+    json::number_integer_t value_intstruct is_floating_point<double_double> : std::true_type {};
+template <> struct numeric_limits<double_double> {
+  // is_iec559 is true for double-double in libstdc++.
+  static constexpr bool is_iec559 = true;
+  static constexpr int digits = 106;
+};
 
-        CHECK(object.dump() == "{\"key\":{\"bytes\":[1,2,3,4],\"subtype\":null}}");
-        CHECK(object_empty.dump() == "{\"key\":{\"bytes\":[],\"subtype\":null}}");
-        CHECK(object_with_subtype.dump() == "{\"key\":{\"bytes\":[1,2,3,4],\"subtype\":128}}");
-        CHECK(object_emptyturn s;
-}
+te, ' ', false, json::error_handler_t::ignore) == "\"äü\"");
+            CHECK(j.dump(-1, ' ', false, json::error_handler_t::replace) == "\"ä\xEF\xBF\xBDü\"");
+            CHECK(j.dump(-1, ' ', true, json::error_handler_t::replace) == "\"\\u00e4\\ufffd\\      && is_detected_exact<typename BasicJsonType::string_t::value_type, value_type_t, StringType>::value
+        && !std::is_same<typename BasicJsonType::string_t, StringType>::value
+        && !is_json_ref<StringType>::value, int > = 0 >
+inline void fed long long, long long);
 
-static std::wstring make_positional(fmt::basic_string_view<wchar_t> format) {
-  std::wstring s(format.data(), format.size());
-  s.replace(s.find(L'%'), 1, L"%1$");
-  return s;
-}
+// Test length format specifier ``length_spec``.
+template <typename T, typename U>
+void test_length(const char* length_spec, U value) {
+  long long signed_value = 0;
+  unsigned long long unsigned_value = 0;
+  // Apply integer pro, "two", "three", "four", "one"};
+            json const j_set(c_set); // only one entry for "one" is used
+            // ["four", "one", "three", "two"]
 
-// A wrapper around fmt::sprintf to workaround bogus warnings about invalid
-// format strings in MSVC.
-template <typename... Args>
-std::string test_sprintf(fmt::string_view format, const Args&... args) {
-  return fmt::sprintf(format, args...);
-}
-template <typename... Args>
-std::wstring test_sprintf(fmt::basic_string_view<wchar_t> format,
-                          const Args&... args) {
-  return fmt::sprintf(format, args...);
-}
+            std::unordered_set<std::string> const c_uset {"one", "two", "three", "four", "one"};
+   CK(json("ä").dump(-1, ' ', true) == "\"\\u00e4\"");
+            CHECK(json("Ö").dump(-1, ' ', true) == "\"\\u00d6\"");
+            CHECK(json("❤️").dump(-1, ' ', true) == "\"\\u2764\\ufe0f\"");
+        }
 
-#define EXPECT_PRINTF(expected_output, format, arg)     \
-  EXPECT_EQ(expected_output, test_sprintf(format, arg)) \
-      << "format: " << format;                          \
-  EXPECT_EQ(expected_output, fmt::sprintf(make_positional(format), arg))
+        SECTION("full Unicode escaping to ASClude <cmath>
+#  include <complex>
+#  include <cstddef>
+#  include <cstdint>
+#  include <cstdio>
+#  include <cstdlib>
+#  include <cstring>
+#  include <ctime>
+#  include <exception>
+#  include <expected>
+#  include <filesystem>
+#  include <fstream>
+#  incze the JSON arrays
+    std::cout << j_array_t << '\n';
+    std::cout << j_vec << '\n';
+    std::cout << j_valarray << '\n';
+    std::cout << j_deque << '\n';
+    std::cout << j_list << '\n';
+    std::cout << j_flist << '\n';
+    std::cout << j_array << '\nnn/json_fwd.hpp>
 
-TEST(printf_test, no_args) {
-  EXPECT_EQ("test", test_sprintf("test"));
-  EXPECT_EQ(L"test", fmt::sprintf(L"test"));
-}
-
-TEST(printf_test, escape) {
- ormat(FMT_COMPILE("{a0}{}"), fmt::arg("a0", "foo"),
-                                  fmt::arg("a1", "bar")));
-  EXPECT_EQ("foobar", fmt::format(FMT_COMPILE("{0}{a1}"), fmt::arg("a0", "foo"),
-                                  fmt::arg("a1", "bar")));
-  EXPECT_EQ("foobar", fmt::format(FMT_COMPILE("{a0}{1}"), fmt::arg("a0", "foo"),
-                                  fmt::arg("a1", "bar")));
-
-  EXPECT_EQ("foobar",
-            fmt::format(FMT_COMPILE("{}{a1}"), "foo", fmt::arg("a1", "bar")));
-  EXPECT_EQ("foobar",
-            fmt::format(FMT_COMPILE("{a0}{a1}"), fmt::arg("a1", "bar"),
-                        fmt::arg("a2", "baz"), fmt::arg("a0", "foo")));
-  EXPECT_EQ(" bar foo ",
-            fmt::format(FMT_COMPILE(" {foo} {bar} "), fmt::arg("foo", "bar"),
-                        fmt::arg("bar", "foo")));
-
-  EXPECT_THROW(fmt::format(FMT_COMPILE("{invalid}"), fmt::arg("valid", 42)),
-               fmt::format_error);
-
-#  if FMT_USE_NONTYPE_TEMPLATE_ARGS
-  using namespace fmt::literals;
-  auto statically_named_fieldrray_1 << " != " << array_2 << " " << (array_1 != array_2) << '\n';
-    std::cout << object_1 << " != " << object_2 << " " << (object_1 != object_2) << '\n';
-    std::cout << number_1 << " != " << number_2 << " " << (number_1 != number_2) << '\n';
-    std::cout << string_1 << " != " << string_2 << " " << (string_1 != string_2) << '\n';
-}
-//     __ _____ _____ _____
-//  __|  |   __|     |   | |  JSON for Modern C++ (supporting code)
-// |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
-//
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
-// SPDX-License-Identifier: MIT
-
-#include "doctest_compatibility.h"
-
-#include "config.hpp"
-
-#define NLOHMANN_JSON_NAMESPACE_NO_VERSION 1
-#include <nlohmann/json_fwd.hpp>
-
-TEST_CASE("default namespace without version component")
+TEST_CASE("default namespace")
 {
     // GCC 4.8 fails with regex_error
 #if !DOCTEST_GCC || DOCTEST_GCC >= DOCTEST_COMPILER(4, 9, 0)
     SECTION("namespace matches expectation")
     {
-        std::string expe.hpp>
+        std::string expected = "nlohmann::json_abi";
 
-// define a byte container based on std::vector
-using byte_container_with_subtype = nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>>;
+#nt m_i = 0;
+};
 
-using json = nlohmann::json;
+void from_json(const json& /*unused*/, Evil& /*unused*/) {}
+} // namespace
 
-int main()
+TEST_CASE("Issue #924")
 {
-    std::vector<std::uint8_t> bytes = {{0xca, 0xfe, 0xba, 0xbe}};
+    // Prevent get<std::vector<Evil>>() to throw
+    auto j = json::array();
 
-    // create container with subtype
-    auto c1 = byte_container_with_subtype(bytes, 42);
-
-    std::cout << "before calling clear_subtype(): " << json(c1) << '\n';
-
-    c1.clear_subtype();
-
-    std::cout << "after calling clear_subtype(): " << json(c1) << '\n';
+    CHECK_NOTHROW(j.get<Evil>());
+    CHECK_NOTHROW(j.get<stT_WRITE(stdout, fmt::printf("%1$s, %3$d %2$s", weekday, month, day),
+               "Thursday, 21 August");
 }
-#include <iostream>
-#include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
+TEST(printf_test, printf_error) {
+  auto pipe = fmt::pipe();
+  int result = fmt::fprintf(pipe.read_end.fdopen("r").get(), "test");
+  EXPECT_LT(relude <memory>
+#include <stdexcept>
 
-int main()
-{
-    // create JSON values
-    json j_null;
-    json j_boolean = true;
-    json j_number_integer = 17;
-    json j_number_unsigned_integer = 12345678987654321u;
-    json j_number_float = 23.42;
-    json j_object = {{"one", 1}, {"two", 2}};
-    json j_array = {1, 2, 4, 8, 16};
-    json j_string = "Hello, world";
-    json j_binaryloat.empty() << '\n';
-    std::cout << j_object.empty() << '\n';
-    std::cout << j_object_empty.empty() << '\n';
-    std::cout << j_array.empty() << '\n';
-    std::cout << j_array_empty.empty() << '\n';
-    std::cout << j_string.empty() << '\n';
-}
-//     __ _____ _____ _____
-//  __|  |   __|     |   | |  JSON for Modern C++ (supporting code)
-// |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
-//
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
-// SPDX-License-Identifier: MIT
+#include "fmt/os.h"
+#include "util.h"
 
-/*
-This file implements a parser test suitable for fuzz testing. Given a byte
-array data, it performs the following steps:
+// Tests that assertion macros evaluate their arguments exactly once.
+namespace {
+class single_evaluation_test : public ::testing::Test {
+ protected:
+  single_evaluation_test() {
+  s_errored())
+            {
+                result = value_t::discarded;
+                return;
+            }
 
-- j1 = parse(data)
-- s1 = serialize(j1)
-- j2 = parse(s1)
-- s2 = serialize(j2)
-- assert(s1 == s2)
+            // set top-level value to null if it was discarded by the callback
+            // function
+            if (result.is_discarded())
+   type = false)
+- j3 = from_bjdata(vec2)
+- assert(j1 == j3)
+- vec3 = to_bjdata(j1, use_size = true, use_type = true)
+- j4 = from_bjdata(vec3)
+- assert(j1 == j4)
 
 The provided function `LLVMFuzzerTestOneInput` can be used in different fuzzer
 drivers.
 */
 
-#include <iostream>
-#include <sstream>
+#inHAS_FILESYSTEM for C++17 and up), please mention the corresponding
+// version macro in a comment close by, like this:
+// JSON_HAS_CPP_<VERSION> (do not remove; see note at top of file)
+
+#include "doctest_compatibility.h"
+
+#define JSON_TESTS_PRIVATE
+#incluTION("binary_t::container_type type")
+            {
+                json j = json::binary({1, 2, 3, 4});
+                std::vector<std::uint8_t> s = {{5, 6, 7, 8}};
+
+                j.swap(s);
+
+                CHECK(j == json::binary({5, 6, 7, 8}));
+
+ end) {
+  char data[15];
+  mock_buffer<char> buffer(data, 10);
+  auto test = "test";
+  buffer.append(test, test + 5);
+  EXPECT_STREQ(test, &buffer[0]);
+  EXPECT_EQ(5u, buffer.size());
+  buffer.try_resize(10);
+  EXPECT_CALL(buffer, do_grow(12));
+  buffer.appobjects
+    json o1 = R"( {"color": "red", "price": 17.99, "names": {"de": "Flugzeug"}} )"_json;
+    json o2 = R"( {"color": "blue", "speed": 100, "names": {"en": "plane"}} )"_json;
+    json o3 = o1;
+
+    // add all keys from o2 to o1 (updating "color", re json j1 = {{"string", "s"}, {"numbers", {{"one", 1}}}};
+                    json const j2 = {{"string", "t"}, {"numbers", {{"two", 2}}}};
+                    j1.update(j2, true);
+                    CHECK(j1 == json({{"string", "t"}, {"numbers", {{"oneperator==(const T& rhs) const noexcept {
+    return fmt::basic_string_view<Char>(rhs).compare(buffer) == 0;
+  }
+  Char buffer[max_string_length]{};
+};
+
+template <size_t max_string_length, typename Char = char, typename... Args>
+consteval auto test_format(a;
+    auto prefix =
+        std::string(fmt::inline_buffer_size - msg.size() - sep.size() + 1, 'x');
+    fmt::detail::format_error_code(buffer, 42, prefix);
+    EXPECT_EQ(msg, to_string(buffer));
+  }
+  int codes[] = {42, -1};
+  for (size_t i = 0, n = sizeo:join(view.begin(), view.end(), ", ")));
+}
+
+TEST(ranges_test, input_range_join_overload) {
+  auto iss = std::istringstream("1 2 3 4 5");
+  EXPECT_EQ(
+      "1.2.3.4.5",
+      fmt::format("{}", fmt::join(std::views::istream<std::string>(iss), ".")));
+}
+
+nonst override { return '.'; }
+  std::string do_grouping() const override { return "\01"; }
+  Char do_thousands_sep() const override { return ','; }
+};
+
+TEST(locale_test, localized_double) {
+  auto loc = std::locale(std::locale(), new numpunct<char>());
+  Eze = json::to_msgpack(j).size();
+        const auto ubjson_1_size = json::to_ubjson(j).size();
+        const auto ubjson_2_size = json::to_ubjson(j, true).size();
+        const auto ubjson_3_size = json::to_ubjson(j, true, true).size();
+
+        CHECK(jsonetail::is_container_adaptor_like;
+    using T = std::nullptr_t;
+    static_assert(is_container_adaptor_like<std::stack<T>>::value, "");
+    static_assert(is_container_adaptor_like<std::queue<T>>::value, "");
+    static_assert(is_container_adaptor_like<std:n;
+
+// a simple event consumer that collects string representations of the passed
+// values; note inheriting from json::json_sax_t is not required, but can
+// help not to forget a required function
+class sax_event_consumer : public json::json_sax_t
+{
+  pcannot read from file")));
+  return detail::to_unsigned(result);
+}
+
+std::size_t file::write(const void* buffer, std::size_t count) {
+  rwresult result = 0;
+  FMT_RETRY(result, FMT_POSIX_CALL(write(fd_, buffer, convert_rwcount(count))));
+  if (result < 0)
+ on for ordered_json")
+    {
+        nlohmann::ordered_json j;
+        nlohmann::ordered_json j2;
+        const std::string value;
+        j["first"] = value;
+        j["second"] = value;
+        j2["something"] = j;
+    }
+
+    SECTION("Regression test forject1.update(j_object2);
+                    CHECK(j_object1 == json({{"one", "eins"}, {"two", "zwo"}, {"three", "drei"}}));
+
+                    json j_null;
+                    j_null.update(j_object2);
+                    CHECK(j_null == j_object2);
+   v) << '\n';
+
+    // exception type_error.304
+    try
+    {
+        // use at() with string_view on a non-object type
+        const json str = "I am a string";
+        std::cout << str.at("the good"sv) << '\n';
+    }
+    catch (const json::type_error& e)
+  nt; count--) assign(*dest++, a);
+    return ret;
+  }
+  static int_type not_eof(int_type);
+  static char_type to_char_type(int_type);
+  static int_type to_int_type(char_type);
+  static bool eq_int_type(int_type, int_type);
+  static int_type eof();
+};
+
+}  //ual bool string(string_t& val) = 0;
+
+    /*!
+    @brief a binary value was read
+    @param[in] val  binary value
+    @return whether parsing should proceed
+    @note It is safe to move the passed binary value.
+    */
+    virtual bool binary(binary_t& val) = std::error_code();
+  fstat_sim = error;
+  try {
+    f.size();
+  } catch (const std::system_error& e) {
+    error_code = e.code();
+  }
+  fstat_sim = none;
+  EXPECT_EQ(error_code,
+            std::error_code(ERROR_ACCESS_DENIED, fmt::system_category()));
+#XPECT_SYSTEM_ERROR
+  EXPECT_SYSTEM_ERROR(
+      {  // NOLINT
+        a_++;
+        throw_system_error();
+      },
+      EDOM, (b_++, "test"));
+  EXPECT_EQ(1, a_);
+  EXPECT_EQ(1, b_);
+
+  // failed EXPECT_SYSTEM_ERROR, throws different type
+  EXPECT_NONFATAcreate byte vector
+    std::vector<std::uint8_t> v = {0x82, 0xa7, 0x63, 0x6f, 0x6d, 0x70, 0x61, 0x63,
+                                   0x74, 0xc3, 0xa6, 0x73, 0x63, 0x68, 0x65, 0x6d,
+                                   0x61, 0x00
+     CTION("json_reverse_iterator")
+            {
+                using Base = nlohmann::detail::iter_impl<json>;
+                using Iter = nlohmann::detail::json_reverse_iterator<Base>;
+                CHECK(std::is_same < decltype(std::declval<Iter&>()--),td.org/jtc1/sc22/wg21/docs/papers/2015/n4381.html
+namespace // NOLINT(cert-dcl59-cpp,fuchsia-header-anon-namespaces,google-build-namespaces)
+{
+#endif
+JSON_INLINE_VARIABLE constexpr const auto& to_json = // NOLINT(misc-definitions-in-headers)
+    detail::st<char>(value) : '\0';
+  }
+  constexpr bool operator<(custom_char c) const { return value < c.value; }
+};
+
+namespace std {
+
+template <> struct char_traits<custom_char> {
+  using char_type = custom_char;
+  using int_type = int;
+  using off_type = streamoff;
+ json::array({{"foo", "bar"}}));
+
+                json k;
+                k += {1, 2, 3};
+                CHECK(k == json::array({{1, 2, 3}}));
+            }
+
+            SECTION("array")
+            {
+                json j = {1, 2, 3};
+                j st char(&)[]>::value);
+
+            CHECK(is_c_string_uncvref<char(&)[]>::value);
+            CHECK(is_c_string_uncvref<const char(&)[]>::value);
+            // NOLINTEND(hicpp-avoid-c-arrays,modernize-avoid-c-arrays,cppcoreguidelines-avoid-c-arrays)
+    ility>
+
+#ifdef JSON_HAS_CPP_17
+    #include <any>
+    #include <variant>
+#endif
+
+#ifdef JSON_HAS_CPP_20
+    #if __has_include(<span>)
+        #include <span>
+    #endif
+#endif
+
+// NLOHMANN_JSON_SERIALIZE_ENUM uses a static std::pair
+DOCTEST_CLANG_SUPPRE< v2 << ' ' << v3 << '\n';
+    std::cout << v4 << ' ' << v5 << '\n';
+    std::cout << v6 << '\n';
+
+    for (auto i : v7)
+    {
+        std::cout << i << ' ';
+    }
+    std::cout << "\n\n";
+
+    for (auto i : v8)
+    {
+        std::cout << i.first << ": " <>(SIZE), count);
+}
+
+TEST(file_test, write_retry) {
+  auto pipe = fmt::pipe();
+  enum { SIZE = 4 };
+  size_t count = 0;
+  EXPECT_RETRY(count = pipe.write_end.write("test", SIZE), write,
+               "cannot write to file");
+  pipe.write_end.close();
+#  ift)
+    {
+        std::string error_msg = "syntax error ";
+
+        if (!context.empty())
+        {
+            error_msg += concat("while parsing ", context, ' ');
+        }
+
+        error_msg += "- ";
+
+        if (last_token == token_type::parse_error)
+
+#    undef fileno
+#  endif
+  int fd = FMT_POSIX_CALL(fileno(file_));
+#elif defined(_WIN32)
+  int fd = _fileno(file_);
+#else
+  int fd = fileno(file_);
+#endif
+  if (fd == -1)
+    FMT_THROW(system_error(errno, FMT_STRING("cannot get file descriptor")));
+  resert(std::hash<json> {}(json(false)));
+
+    // string
+    hashes.insert(std::hash<json> {}(json("")));
+    hashes.insert(std::hash<json> {}(json("foo")));
+
+    // number
+    hashes.insert(std::hash<json> {}(json(0)));
+    hashes.insert(std::hash<json> {}(jonType*> ref_stack {};
+    /// stack to manage which values to keep
+    std::vector<bool> keep_stack {};
+    /// stack to manage which object keys to keep
+    std::vector<bool> key_keep_stack {};
+    /// helper to hold the reference for the next object elet.m_it.primitive_iterator.m_it == 1));
+                it--;
+                CHECK((it.m_it.primitive_iterator.m_it == 0));
+                it--;
+                CHECK((it.m_it.primitive_iterator.m_it != 0 && it.m_it.primitive_iterator.m_it != 1));
+   },
+    { TS_COMPLETED, "completed" }
+})
+
+enum class Color
+{
+    red, green, blue, unknown
+};
+
+NLOHMANN_JSON_SERIALIZE_ENUM(Color,
+{
+    { Color::unknown, "unknown" }, { Color::red, "red" },
+    { Color::green, "green" }, { Color::blue, "blue" }
+})
+} // nCK(res1.second == true);
+                CHECK(*res1.first == "bam");
+
+                // add an existing key
+                auto res2 = j.emplace("foo", "bad");
+                CHECK(res2.second == false);
+                CHECK(*res2.first == "bar");
+
+  t, my_allocator<std::uint8_t>> my_vector;
+        json j = {1, 2, 3, 4};
+        json::to_cbor(j, my_vector);
+        json k = json::from_cbor(my_vector);
+        CHECK(j == k);
+    }
+
+#if JSON_HAS_FILESYSTEM || JSON_HAS_EXPERIMENTAL_FILESYSTEM
+    // JSON -1, -81, 32, 2, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -80, 2, 0, 0, 96, -118, 46, -116, 46, 109, -84, -87, 108, 14, 109, -24, -83, 13, -18, -51, -83, -52, -115, 14, 6, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 3, 0, 0, 0, 35, -74, -73, 5bool start_object(std::size_t len)
+    {
+        // check callback for object start
+        const bool keep = callback(static_cast<int>(ref_stack.size()), parse_event_t::object_start, discarded);
+        keep_stack.push_back(keep);
+
+        auto val = handr_float.is_number_unsigned() << '\n';
+    std::cout << j_object.is_number_unsigned() << '\n';
+    std::cout << j_array.is_number_unsigned() << '\n';
+    std::cout << j_string.is_number_unsigned() << '\n';
+    std::cout << j_binary.is_number_unsigned() << 'nType::object_t;
+    using object_comparator_t = typename BasicJsonType::default_object_comparator_t;
+    using type = typename std::conditional < has_key_compare<object_t>::value,
+          typename object_t::key_compare, object_comparator_t>::type;
+};
+
+ng name_, int age_, json metadata_)
+        : name(std::move(name_))
+        , age(age_)
+        , metadata(std::move(metadata_))
+    {}
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(person_with_private_data, age, name, metadata)
+};
+
+class person_with_private_data_2divmod_assign_zero_divisor) {
+  bigint zero(0);
+  EXPECT_THROW(bigint(0).divmod_assign(zero), assertion_failure);
+  EXPECT_THROW(bigint(42).divmod_assign(zero), assertion_failure);
+}
+
+TEST(bigint_test, divmod_assign_self) {
+  bigint n(100);
+  EXPECT_THROW(ude <list>
+#include <forward_list>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
+#include <valarray>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-// see http://llvm.org/docs/LibFuzzer.html
-extern  bool boolean(bool /*unused*/)
-    {
-        return true;
-    }
-
-    bool number_integer(number_integer_t /*unused*/)
-    {
-        return true;
-    }
-
-    bool number_unsigned(number_unsigned_t /*unused*/)
-    {
-        return true;
-    }
-
-    bool number_float(number_float_t /*unused*/, const string_t& /*unused*/)
-    {
-        return true;
-    }
-
-    bool string(string_t& /*unused*/)
-    {
-        return true;
-    }
-
-    bool binary(binary_t& /*unused*/)
-    {
-        return true;
-    }
-
-    bool start_object(std::size_t /*unused*/ = static_cast<std::size_t>(-1))
-    {
-        return true;
-    }
-
-    bool key(string_t& /*unused*/)
-    {
-        return true;
-    }
-
-    bool end_object()
-    {
-        return true;
-    }
-
-    bool start_array(std::size_t /*unused*/ = static_cast<std::size_t>(-1))
-    {
-        return true;
-    }
-
-    bool end_array()
-    {
-        return true;
-    }
-
-    bool parse_error(std::size_t /*unused*/, const std::string& /*unused*/, const detail::exception& /*unused*/)
- ing_t& s)
+int main()
 {
-    if (JSON_HEDLEY_UNLIKELY(!j.is_string()))
-    {
-        JSON_THROW(type_error::create(302, concat("type must be string, but is ", j.type_name()), &j));
-    }
-    s = *j.template get_ptr<const typename BasicJsonType::string_t*>();
+    // ============
+    // object types
+    // ============
+
+  (L"1~234~567", fmt::format(loc, L"{:L}", 1234567));
+  int n = 1234567;
+  EXPECT_EQ(L"1~234~567",
+            fmt::vformat(loc, L"{:L}", fmt::make_wformat_args(n)));
+  EXPECT_EQ(L"1234567", fmt::format(std::locale("C"), L"{:L}", 1234567));
+
+  auto no_groupxtra.h"  // EXPECT_WRITE
+
+TEST(color_test, format) {
+  EXPECT_EQ(fmt::format(fg(fmt::rgb(255, 20, 30)), "rgb(255,20,30)"),
+            "\x1b[38;2;255;020;030mrgb(255,20,30)\x1b[0m");
+  EXPECT_EQ(fmt::format(fg(fmt::color::blue), "blue"),
+            "\x1b[me, const char* mode) {
+  EMULATE_EINTR(fopen, nullptr);
+  return ::fopen(filename, mode);
 }
+
+int test::fclose(FILE* stream) {
+  EMULATE_EINTR(fclose, EOF);
+  return ::fclose(stream);
+}
+
+int(test::fileno)(FILE* stream) {
+  EMULATE_EINTR(fileno, -1);
+#ifdefrmance-unnecessary-value-param)
+        : constructed_from(constructed_from_foo) {}
+    explicit for_3204_bar(std::function<void(json)> /*unused*/) noexcept // NOLINT(performance-unnecessary-value-param)
+        : constructed_from(constructed_from_json) {}.m_contacts = j["contacts"].get<std::vector<contact>>();
+}
+} // namespace udt
+
+TEST_CASE("basic usage" * doctest::test_suite("udt"))
+{
+
+    // a bit narcissistic maybe :) ?
+    const udt::age a
+    {
+        23
+    };
+    const udt::name n{"theo"};
+    ck(std::string("foo"));
+  store->push_back(fmt::arg("a1", "foo"));
+  auto moved_store = std::move(*store);
+  store.reset();
+  EXPECT_EQ(fmt::vformat("{} {} {a1}", moved_store), "42 foo foo");
+}
+// Formatting library for C++ - formatting library tests
+//
+// ugly" using string_view
+    std::cout << object.at("the ugly"sv) << '\n';
+
+    // change element with key "the bad" using string_view
+    object.at("the bad"sv) = "il cattivo";
+
+    // output changed array
+    std::cout << object << '\n_types =
+    {
+        {"boolean", true},
+        {
+            "number", {
+                {"integer", 42},
+                {"floating-point", 17.23}
+            }
+        },
+        {"string", "Hello, world!"},
+        {"array", {1, 2, 3, 4, 5}},
+    std::map<std::wstring, int>{{L"one", 1}, {L"t\"wo", 2}};
+  EXPECT_EQ(fmt::format(L"{}", m), L"{\"one\": 1, \"t\\\"wo\": 2}");
+}
+
+TEST(xchar_test, escape_string) {
+  using vec = std::vector<std::wstring>;
+  EXPECT_EQ(fmt::format(L"{}", vec{L"\n\r\t\"\\"}),  emplace_back(Args&& ... args)
+        {
+            json j_arr = json::array();
+            j_arr.emplace_back(json::object());
+            j_arr.emplace_back(json::object());
+            j_arr.emplace_back(json::object());
+            j_arr.emplace_back(agonbox::to_decimal(float x) noexcept
+    -> dragonbox::decimal_fp<float>;
+template FMT_API auto dragonbox::to_decimal(double x) noexcept
+    -> dragonbox::decimal_fp<double>;
+
+#ifndef FMT_STATIC_THOUSANDS_SEPARATOR
+template FMT_API locale_ref::locale_ref(s_same<json::const_iterator::value_type, json>::value));
+        // X::const_iterator must meet the forward iterator requirements
+        CHECK((std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<json::const_iterator>::iterator_categociate stream with file descriptor");
+  fdopen_count = 0;
+}
+
+TEST(buffered_file_test, open_retry) {
+  write_file("temp", "there must be something here");
+  std::unique_ptr<buffered_file> f{nullptr};
+  EXPECT_RETRY(f.reset(new buffered_file("temp", "r")), fst j {"foo", 1, 1u, 42.23, false};
+            CHECK(!j.is_null());
+            CHECK(!j.is_boolean());
+            CHECK(!j.is_number());
+            CHECK(!j.is_number_integer());
+            CHECK(!j.is_number_unsigned());
+            CHECK(!j.is_number auto source = R"({ "foo": [ "1", "2" ] })"_json;
+        const auto target = R"({"foo": [ "1", "2", "3" ]})"_json;
+        const auto result = json::diff(source, target);
+        CHECK(result.dump() == R"([{"op":"add","path":"/foo/-","value":"3"}])");
+   <void>(p); // fix MSVC's C4100 warning
+        p->~T();
+    }
+
+    template <class U>
+    struct rebind
+    {
+        using other = my_allocator<U>;
+    };
+};
+
+// allows deletion of raw pointer, usually hold by json_value
+template<class T>
+void my_allocatMESPACE instead of nlohmann
+using json = NLOHMANN_JSON_NAMESPACE::json;
+
+// macro needed to output the NLOHMANN_JSON_NAMESPACE as string literal
+#define Q(x) #x
+#define QUOTE(x) Q(x)
+
+int main()
+{
+    std::cout << QUOTE(NLOHMANN_JSON_NAMESPACE) << std     enable_if_t <
+               is_constructible_array_type<BasicJsonType, ConstructibleArrayType>::value&&
+               !is_constructible_object_type<BasicJsonType, ConstructibleArrayType>::value&&
+               !is_constructible_string_type<BasicJ    // redirecting the output in EXPECT_STDERR and the second close
+        // will break output redirection.
+        FMT_POSIX(close(write_fd));
+        SUPPRESS_ASSERT(redir.reset(nullptr));
+      },
+      system_error_message(EBADF, "cannot flush streamg skip_to_state_evaluation to false, we
+                    // are effectively jumping to the beginning of this if.
+                    JSON_ASSERT(!states.empty());
+                    states.pop_back();
+                    skip_to_state_evaluation = truejson : std::false_type {};
+
+// trait checking if j.get<T> is valid
+// use this trait instead of std::is_constructible or std::is_convertible,
+// both rely on, or make use of implicit conversions, and thus fail when T
+// has several constructors/operator= (l
+{
+
+/// the supported input formats
+enum class input_format_t { json, cbor, msgpack, ubjson, bson, bjdata };
+
+////////////////////
+// input adapters //
+////////////////////
+
+#ifndef JSON_NO_IO
+/*!
+Input adapter for stdio file access. This adapter read onlNOLINT(bugprone-casting-through-void)
+        std::uint64_t value = 0;
+        std::memcpy(&value, bytes, sizeof(value));
+        nlohmann::to_json(j, value);
+    }
+};
+
+namespace udt
+{
+struct small_pod
+{
+    int begin;
+    char middle;
+    short end;
+};
+
+s  // a valid JSON text
+    auto valid_text = R"(
+    {
+        "numbers": [1, 2, 3]
+    }
+    )";
+
+    // an invalid JSON text
+    auto invalid_text = R"(
+    {
+        "strings": ["extra", "comma", ]
+    }
+    )";
+
+    std::cout << std::boolalpha
+            "argument not found");
+  EXPECT_THROW_MSG(test_sprintf(format("%{}$d", INT_MAX), 42), format_error,
+                   "argument not found");
+
+  EXPECT_THROW_MSG(test_sprintf("%2$", 42), format_error, "argument not found");
+  EXPECT_THROW_MSG(test_spirect::restore_and_read() {
+  // Restore output.
+  restore();
+
+  // Read everything from the pipe.
+  std::string content;
+  if (read_end_.descriptor() == -1) return content;  // Already read.
+  enum { BUFFER_SIZE = 4096 };
+  char buffer[BUFFER_SIZE];
+  siz      "foo", reinterpret_cast<void*>(0x1234), test_formattable()));
+  EXPECT_EQ(L"42", fmt::format(FMT_COMPILE(L"{0}"), 42));
+}
+
+TEST(compile_test, named) {
+  auto runtime_named_field_compiled =
+      fmt::detail::compile<decltype(fmt::arg("arg", 42))>(FMT  /// whether a syntax error occurred
+    bool errored = false;
+    /// whether to throw exceptions in case of errors
+    const bool allow_exceptions = true;
+};
+
+template<typename BasicJsonType>
+class json_sax_dom_callback_parser
+{
+  public:
+    us_CONCAT_EX(major, minor, patch) \
+    _v ## major ## _ ## minor ## _ ## patch
+#define NLOHMANN_JSON_NAMESPACE_VERSION_CONCAT(major, minor, patch) \
+    NLOHMANN_JSON_NAMESPACE_VERSION_CONCAT_EX(major, minor, patch)
+
+#if NLOHMANN_JSON_NAMESPACE_NO_VERSION
+#p> // map
+#include <string> // string
+#include <tuple> // tuple, make_tuple
+#include <type_traits> // is_arithmetic, is_same, is_enum, underlying_type, is_convertible
+#include <unordered_map> // unordered_map
+#include <utility> // pair, declva2.266));
+    }
+
+    SECTION("citm_catalog.json")
+    {
+        const auto* filename = TEST_DATA_DIRECTORY "/nativejson-benchmark/citm_catalog.json";
+        const json j = json::parse(std::ifstream(filename));
+
+        const auto json_size = j.dump().size(ut << "c1.subtype() = " << c1.subtype()
+              << "\nc2.subtype() = " << c2.subtype() << std::endl;
+
+    // in case no subtype is set, return special value
+    assert(c1.subtype() == static_cast<byte_container_with_subtype::subtype_type>(-1));
+}PRINTF(" 0042", "%0  5d", 42);
+
+  // ' ' flag is ignored for non-numeric types.
+  EXPECT_PRINTF("x", "% c", 'x');
+}
+
+TEST(printf_test, hash_flag) {
+  EXPECT_PRINTF("042", "%#o", 042);
+  EXPECT_PRINTF(fmt::format("0{:o}", static_cast<unsigned>(-042)), "%#o"    parse_error::create(101, m_lexer.get_position(), exception_message(token_type::value_string, "object key"), nullptr));
+                        }
+                        if (JSON_HEDLEY_UNLIKELY(!sax->key(m_lexer.get_string())))
+   utput: m_ordered is ordered by insertion order, m_std is ordered by key
+    output("m_ordered", m_ordered);
+    output("m_std", m_std);
+
+    // erase and re-add "one" key
+    m_ordered.erase

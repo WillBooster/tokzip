@@ -219,8 +219,9 @@ pub fn segments(content: &[u8]) -> Vec<(usize, u8)> {
 /// The alternative costs a full second parse, so above twice `TRIAL_LEN` (where two prefix
 /// parses plus one full parse are cheaper than two full parses) both candidates are only
 /// compared on the document's first `TRIAL_LEN` bytes and the winner codes the whole document:
-/// the second parse then costs a bounded ~2 ms instead of doubling compression time, and the
-/// prefix's choice codes the corpus within 0.03 pp of the full comparison.
+/// the comparison then costs a bounded ~2 ms instead of a full second parse (the winner's full
+/// parse is the one the document needs anyway), and the prefix's choice codes the corpus
+/// within 0.03 pp of the full comparison.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     const TRIAL_LEN: usize = 8 * 1024;
     let (detected, gram_scores) = lang::analyze(content);

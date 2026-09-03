@@ -81,8 +81,9 @@ fn dist_group(base: usize) -> (usize, usize, usize) {
 }
 
 /// Raw serialized model (the trainer's output): both literal class tables, then every node's
-/// initial probability quantized to 8 bits (`p11 = (q << 3) | 4`); `pack.rs` splits it into
-/// the parts the repository holds.
+/// initial probability quantized to 8 bits (`PRIORS_DEFAULT` is exactly `PROB_INIT`, any other
+/// `q` is `p11 = (q << 3) | 4`, see `unquantize`); `pack.rs` splits it into the parts the
+/// repository holds.
 #[cfg_attr(not(feature = "train"), allow(dead_code))]
 pub const PRIORS_SIZE: usize = 512 + MODEL_SIZE;
 /// The quantized value of an untrained node (`PROB_INIT`); the packed literal priors skip

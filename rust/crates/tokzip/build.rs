@@ -105,7 +105,12 @@ fn main() {
         let literal_path = out.join(format!("{}.lit", group.name()));
         std::fs::write(&literal_path, &group_literals[group as usize]).expect("write group priors");
         group_priors.push_str(&format!("    include_bytes!({literal_path:?}),\n"));
-        let part = read_optional(&root.join("dict").join(format!("{}.bin", group.name())));
+        let dict_path = root.join("dict").join(format!("{}.bin", group.name()));
+        let part = if group.shared_budget() > 0 {
+            read_required(&dict_path)
+        } else {
+            read_optional(&dict_path)
+        };
         // Coded with the models of the group's first language (`lang.rs` decodes it so).
         let packed = LANGUAGES
             .iter()

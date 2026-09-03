@@ -56,8 +56,8 @@ the closest one.
   prose + code documents this codes ~4 pp smaller than the best single language. When the
   split is uncertain (several segments, or a single language that is not the strongest
   dictionary match) the encoder also codes the document as one segment of the strongest
-  match and keeps the smaller — comparing the two on the first 8 KB only above that size, so
-  the second parse never costs more than a few milliseconds.
+  match and keeps the smaller — comparing the two on the first 8 KB only above 16 KB, so
+  the comparison never costs more than a few milliseconds.
 - **Storage-grade**: every frame carries a CRC-32 of its content, `compress` decodes
   every coded block it builds and compares the result to the input before accepting it
   (storing the content — or, in a multi-block frame, that block — verbatim otherwise), and a

@@ -61,6 +61,10 @@ pub fn primed(lang: u8) -> &'static Primed {
         let (_, group) = LANGUAGES[lang as usize];
         let models = language_models(lang);
         let shared = SHARED[group as usize].get_or_init(|| {
+            let packed = GROUP_DICTS[group as usize];
+            if packed.is_empty() {
+                return Vec::new();
+            }
             // Packed with the models of the group's first language (`build.rs`).
             let first = LANGUAGES.iter().position(|(_, g)| *g == group).unwrap();
             let models = if first == lang as usize {
@@ -68,7 +72,7 @@ pub fn primed(lang: u8) -> &'static Primed {
             } else {
                 language_models(first as u8)
             };
-            unpack_dictionary(GROUP_DICTS[group as usize], &models, Vec::new())
+            unpack_dictionary(packed, &models, Vec::new())
         });
         let mut bytes = Vec::with_capacity(
             WRAPPER.len() + shared.len() + ASSETS[lang as usize].packed_suffix.len() * 4,
@@ -367,9 +371,12 @@ mod tests {
                 read(format!("priors/{name}.bin")),
                 "{name}"
             );
-            let mut trained = read(format!("dict/{}.bin", group.name()));
-            trained.extend(read(format!("dict/{name}.bin")));
-            assert!(!trained.is_empty(), "{name}");
+            let shared = read(format!("dict/{}.bin", group.name()));
+            assert_eq!(shared.is_empty(), group.shared_budget() == 0, "{group:?}");
+            let suffix = read(format!("dict/{name}.bin"));
+            assert!(!suffix.is_empty(), "{name}");
+            let mut trained = shared;
+            trained.extend(suffix);
             let primed = primed(lang as u8);
             assert_eq!(&primed.bytes[..WRAPPER.len()], WRAPPER, "{name}");
             assert_eq!(&primed.bytes[WRAPPER.len()..], trained, "{name}");

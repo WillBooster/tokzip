@@ -1,25 +1,4 @@
-int r;
-  uv_udp_send_t req;
-  uv_buf_t buf;
-  struct sockaddr_in addr;
-  struct sockaddr_in baddr;
-
-  ASSERT_OK(uv_ip4_addr("239.255.0.1", TEST_PORT, &addr));
-
-  r = uv_udp_init(uv_default_loop(), &server);
-  ASSERT_OK(r);
-
-  ASSERT_OK(uv_ip4_addr("0.0.0.0 sendmsg_x(int s, const struct mmsghdr* msgp, u_int cnt, int flags);
-
-#endif /* UV_DARWIN_SYSCALLS_H_ */
-/* Copyright libuv project contributors. All rights reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of  called");
-}
-
-
-TEST_IMPL(tcp_close_while_connecting) {
+) {
   uv_connect_t connect_req;
   struct sockaddr_in addr;
   uv_loop_t* loop;
@@ -27,96 +6,30 @@ TEST_IMPL(tcp_close_while_connecting) {
 
   loop = uv_default_loop();
   ASSERT_OK(uv_ip4_addr("1.2.3.4", TEST_PORT, &addr));
-  ASSERT_OK(uv_tcp_init(loop, &tcp   int maxfd = -99;
+  ASSERT_OK(uv_tcp_init(loop, &tcp_handle));
+  r = uv_tcp_connect(&connect_req,
+    CHECK_HANDLE(req->handle);
 
-    FD_ZERO(&fdread);
-    FD_ZERO(&fdwrite);
-    FD_ZERO(&fdexcep);
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
+  sv_send_cb_called++;
 
-    multi_fdset(m, &fdread, &fdwrite, &fdexcep, &maxfd);
-    select_test(maxfd + 1, &fdread, &fdwrite, &fdexcep, &test.h"
-
-#include "testutil.h"
-#include "warnless.h"
-#include "memdebug.h"
-
-#define TEST_HANG_TIMEOUT 60 * 1000
-
-CURLcode test(char *URL)
-{
-  CURL *curls = NULL;
-  CURLM *multi = NULL;
-  int still_running;
-  CURLcode i = TEST_ERR_FAILURE;
-  CURRLOPT_UPLOAD, 1L);
-
-  /* init a multi stack */
-  multi_handle = curl_multi_init();
-
-  /* add the individual transfers */
-  for(i = 0; i<HANDLECOUNT; i++)
-    curl_multi_add_handle(multi_handle, handles[i]);
-
-  /* we start some action by calling perform rigvoid uv__fs_event(uv_loop_t* loop, uv__io_t* w, unsigned int fflags);
-
-
-int uv__kqueue_init(uv_loop_t* loop) {
-  loop->backend_fd = kqueue();
-  if (loop->backend_fd == -1)
-    return UV__ERR(errno);
-
-  uv__cloexec(loop->backend_fd, 1);
-
-  return 0;
+  uv_close((uv_handle_t*) req->handle, close_cb);
 }
 
 
-#if_multi_remove_handle(multi_handle, handles[i].h);
-    curl_easy_cleanup(handles[i].h);
-  }
+TEST_IMPL(udp_multicast_interface) {
+/* TODO(gengjiawen): Fix test on QEMU. */
+#if defined(__QEMU__)
+  RETURN_SKIP("Test does not currently work in "uv.h"
+#include "internal.h"
 
+#include <errno.h>
 
-  curl_slist_free_all(resolve);
-  curl_free(host);
-  curl_free(port);
-  curl_url_cleanup(cu);
-  curl_multi_cleanup(multi_handle);
-  curl_global_cleanup();
+int uv_fs_event_init(uv_loop_t* loop, uv_fs_event_t* handle) {
+  return UV_ENOSYS;
+}
 
-  rle; /* not used */
-  (void)userdata;
-
-  if(!curl_easy_getinfo(handle, CURLINFO_XFER_ID, &xfer_id) && xfer_id >= 0) {
-    if(!curl_easy_getinfo(handle, CURLINFO_CONN_ID, &conn_id) &&
-        conn_id >= 0) {
-      curl_msnprintf(idsbuf, sizeof(idsbuf), TRC_Ionly one desired.
- */
-
-#ifdef HTTP_ONLY
-#  ifndef CURL_DISABLE_DICT
-#    define CURL_DISABLE_DICT
-#  endif
-#  ifndef CURL_DISABLE_FILE
-#    define CURL_DISABLE_FILE
-#  endif
-#  ifndef CURL_DISABLE_FTP
-#    define CURL_DISABLE_FTP
-#  endif
-#  ifndef CURL_DI "tool_operate.h"
-#include "tool_libinfo.h"
-
-#include "memdebug.h" /* keep this as LAST include */
-
-static char *parse_filename(const char *ptr, size_t len);
-
-#ifdef _WIN32
-#define BOLD "\x1b[1m"
-#define BOLDOFF "\x1b[22m"
-#else
-#define BOLD "\x1b[1m"
-/* SK(r);
+int uv_fs_event_start(uv_fs_event_t* handle, uv_fs_event_cb cb,
+                      const char* filename, unsigOK(r);
   r = uv_tcp_bind(server, (const struct sockaddr*) &addr, 0);
   ASSERT_OK(r);
 
@@ -126,222 +39,93 @@ static char *parse_filename(const char *ptr, size_t len);
 
 
 static void read_cb(uv_stream_t* tcp, ssize_t nread, const uv_buf_t* buf) {
-  /* The se_called = 0;
-static int write_cb_called = 0;
-static int timer_cb_called = 0;
-static int bytes_received = 0;
-static int shutdown_cb_called = 0;
+  /* Tout();
+  }
 
+  msg = curl_multi_info_read(multi, &still_running);
+  if(msg)
+    /* this should now contain a result code from the easy handle,
+       get it */
+    i = msg->data.result;
 
-static void alloc_cb(uv_handle_t* handle, size_t size, uv_buf_t* buf) {
-  buf->len = size;
-  buf->base = malndif
-#include "urldata.h"
-#include "dynbuf.h"
-#include "sendf.h"
-#include "http.h"
-#include "http1.h"
-#include "http_proxy.h"
-#include "url.h"
-#include "select.h"
-#include "progress.h"
-#include "cfilters.h"
-#include "cf-h1-proxy.h"
-#include "connect.h"
-#imer_cb(uv_timer_t* handle) {
-  ASSERT_PTR_EQ(handle, &timer_handle);
+test_cleanup:
 
-  uv_close((uv_handle_t*) &idle_handle, close_cb);
-  uv_close((uv_handle_t*) &check_handle, close_cb);
-  uv_close((uv_handle_t*) &timer_handle, close_cb);
+  /* undocumented cleanup sequence - type UA */
 
-  timer_cb_called++;
-  fprNITTEST_START
+  curt() return code */
+
+    fd_set fdread;
+    fd_set fdwrite;
+    fd_set fdexcep;
+    int maxfd = -1;
+
+    long curl_timeo = -1;
+
+    FD_ZERO(&fdread);
+    FD_ZERO(&fdwrite);
+    FD_ZERO(&fdexcep);
+
+    /* set a suitable timeout to play around with */
+    tim_OFF_T "] "
+/*
+** callback for CURLOPT_DEBUGFUNCTION
+*/
+static int debug_cb(CURL *handle, curl_infotype type,
+                    char *data, size_t size,
+                    void *userdata)
 {
-  size_t size = 0;
-  unsigned char buffer[256];
-  size_t i;
-  unsigned char *p;
+  FILE *output = stderr;
+  static int newl = 0;
+  static int tr;
+  for(; cf; cf = cf->next) {
+    if(cf->cft == &Curl_cft_http3)
+      return TRUE;
+    if(cf->cft->flags & CF_TYPE_IP_CONNECT)
+      return FALSE;
+  }
+  return FALSE;
+}
 
-  for(i = 0; i < sizeof(req) / sizeof(req[0]); i++) {
-    DOHcode rc = doh_encode(req[i].name, req[i].type,
-                            buffer, sizeof(buffer),ibute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all e)
-{
-  char *buf = Curl_dyn_ptr(&ts->request_data);
-  size_t request_len = Curl_dyn_len(&ts->request_data);
-  size_t blen = request_len;
-  CURLcode result = CURLE_OK;
-  ssize_t nwritten;
+#endif /* USE_MSH3 */
+#ifndef HEADER_CURL_TELNET_H
+#define HEADER_CURL_TELNET_H
+/***E
 
-  if(blen <= ts->nsent)
-    goto out;  /* we are done */
-
-  blen -= sockindex);
-
-/**
- * Tell filters to forget about the socket at sockindex.
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+#ifdef HAVE_NETDB_H
+#include <netdb.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
+#ifdef HAVE_NET_IF_H
+#include <net/if.h>
+#endif
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#eeaders.
  */
-void Curl_conn_forget_socket(struct Curl_easy *data, int sockindex);
 
-/**
- * Adjust the pollset for the filter chain startgin at `cf`.
- */
-void Curl_conn_cf_adjust_pollset(struct     mc = curl_multi_poll(multi_handle, NULL, 0, 1000, NULL);
-    }
-
-    if(mc)
-      break;
-
-    do {
-      int msgq = 0;
-      m = curl_multi_info_read(multi_handle, &msgq);
-      if(m && (m->msg == CURLMSG_DONE)) {
-        CURL *e = m->easy_handle;
-    o out;
-
-  if(!S_ISDIR(statbuf.st_mode)) {
-    while(!result) {
-      ssize_t nread;
-      /* Do not fill a whole buffer if we want less than all data */
-      size_t bytestoread;
-
-      if(size_known) {
-        bytestoread = (expected_size < (curl_off_t)(x_slist_append(list, "X-Amz-Content-Sha256: "
-    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
-  test_setopt(curl, CURLOPT_HTTPHEADER, list);
-  if(libtest_arg2) {
-    connect_to = curl_slist_append(connect_to, libtest_arg2);
-  }
-  teclude <openssl/opensslv.h>
-#  if (!defined(LIBRESSL_VERSION_NUMBER) && \
-        defined(OPENSSL_VERSION_NUMBER) && \
-        (OPENSSL_VERSION_NUMBER >= 0x10101000L)) || \
-      (defined(LIBRESSL_VERSION_NUMBER) && \
-        (LIBRESSL_VERSION_NUMBER >= 0x3up(struct Curl_cfilter *cf,
-                              struct Curl_easy *data)
-{
-  struct cf_msh3_ctx *ctx = cf->ctx;
-  struct stream_ctx *stream = H3_STREAM_CTX(ctx, data);
-
-  if(stream)
-    return CURLE_OK;
-
-  stream = calloc(1, sizeof(*stream));
-  if       1
-#define HAVE_STRICMP           1
-#define HAVE_STRTOLL           1
-#define HAVE_STRUCT_TIMEVAL    1
-#define HAVE_SYS_IOCTL_H       1
-#define HAVE_SYS_SOCKET_H      1
-#define HAVE_SYS_STAT_H        1
-#define HAVE_SYS_TYPES_H       1
-#define HAVE_UNITIMEOUT);
-
-  res = curl_easy_perform(curl);
-  if(res) {
-    fprintf(stderr, "curl_easy_perform() failed %d\n", res);
-    goto test_cleanup;
-  }
-  res = curl_easy_perform(curl);
-  if(res) {
-    fprintf(stderr, "curl_easy_perform() failed %d\n", res);
-   const void *data, unsigned long size)
-{
-  const unsigned char *ptr;
-  MD5_u32plus a, b, c, d;
-
-  ptr = (const unsigned char *)data;
-
-  a = ctx->a;
-  b = ctx->b;
-  c = ctx->c;
-  d = ctx->d;
-
-  do {
-    MD5_u32plus saved_a, saved_b, saved_c, saved_d;
-
-    saontext struct */
-    sizeof(my_md5_ctx),
-    /* Result size */
-    16
-  }
-};
+#ifdef __OS400__
+#  include "setup-os400.h"
+#endif
 
 /*
- * @unittest: 1601
- * Returns CURLE_OK on success.
+ * VMS setup file includes some system headers.
  */
-CURLcode Curl_md5it(unsigned char *outbuffer, const unsigned char *input,
-                    const size_t len)
-{
-  Cntext_t *context = (curl_context_t *) handle->data;
-  free(context);
-}
 
-static void destroy_curl_context(curl_context_t *context)
-{
-  uv_close((uv_handle_t *) &context->poll_handle, curl_close_cb);
-}
+#ifdef __VMS
+#  include "setup-vms.h"
+#endif
 
-static void add_download(const char *url, int num, CURL     fputs("   ", stderr);
-    }
+/*
+ * Windows setup file includes some system headers.
+ */
 
-    for(c = 0; (c < width) && (i + c < size); c++) {
-      /* check for 0D0A; if found, skip past and start a new line of output */
-      if(nohex && (i + c + 1 < size) && ptr[i + c] == 0x0D &&
-         ptr[i + c + 1] == 0struct NameValue setopt_nv_CURL_HTTP_VERSION[] = {
-  NV(CURL_HTTP_VERSION_NONE),
-  NV(CURL_HTTP_VERSION_1_0),
-  NV(CURL_HTTP_VERSION_1_1),
-  NV(CURL_HTTP_VERSION_2_0),
-  NV(CURL_HTTP_VERSION_2TLS),
-  NV(CURL_HTTP_VERSION_3),
-  NV(CURL_HTTP_VERSION_3ONLY),
-dyn_free(&canonical_path);
-  Curl_dyn_free(&canonical_headers);
-  Curl_dyn_free(&signed_headers);
-  free(canonical_request);
-  free(request_type);
-  free(credential_scope);
-  free(str_to_sign);
-  free(secret);
-  free(date_header);
-  return result;
-}
-
-#endi); \
-  } while(0)
-
-#else /* DEBUGBUILD */
-
-#define CF_DATA_SAVE(save, cf, data) \
-  do { \
-    (save) = CF_CTX_CALL_DATA(cf); \
-    CF_CTX_CALL_DATA(cf).data = (struct Curl_easy *)data; \
-  } while(0)
-
-#define CF_DATA_RESTORE(cf, save) \
-  do { \
-    CF_CTpooh.sizeleft);
-
-  /* we want to use our own read function */
-  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
-
-  /* pointer to pass to our read function */
-  test_setopt(curl, CURLOPT_READDATA, &pooh);
-
-  /* get verbose debug output please */
-  tVERIFYPEER and VERIFYHOST are set to 0 in this case because there is
-     no CA certificate */
-
-  curl_easy_setopt(ch, CURLOPT_SSL_VERIFYPEER, 0L);
-  curl_easy_setopt(ch, CURLOPT_SSL_VERIFYHOST, 0L);
-  curl_easy_setopt(ch, CURLOPT_URL, "https://www.example == CURL_SOCKET_BAD) {
+#ifdef _WIN32
+#  include "set == CURL_SOCKET_BAD) {
     if(Curl_socketpair(AF_UNIX, SOCK_STREAM, 0, &ctx->sock[0], FALSE) < 0) {
       ctx->sock[SP_LOCAL] = CURL_SOCKET_BAD;
       ctx->sock[SP_REMOTE] = CURL_SOCKET_BAD;
@@ -350,170 +134,207 @@ dyn_free(&canonical_path);
   }
 
   *done = FALSE;
- ed(USE_CURL_NTLM_CORE) && \
-    (SIZEOF_CURL_OFF_T > 4)
-
-extern const struct Curl_handler Curl_handler_smb;
-extern const struct Curl_handler Curl_handler_smbs;
-
-#endif /* CURL_DISABLE_SMB && USE_CURL_NTLM_CORE &&
-          SIZEOF_CURL_OFF_T > 4 */
-
-#endi bits */
-#define SIZEOF_TIME_T 4
-#endif
-
-#ifndef SIZEOF_CURL_SOCKET_T
-/* configure and cmake check and set the define */
-#  ifdef _WIN64
-#    define SIZEOF_CURL_SOCKET_T 8
-#  else
-/* default guess */
-#    define SIZEOF_CURL_SOCKET_T 4
-#  endif
-#endif
-
-#if e->poll_cb);
+ urn (uint64_t) info;
 }
 
 
-void uv__process_poll_req(uv_loop_t* loop, uv_poll_t* handle, uv_req_t* req) {
-  if (!(handle->flags & UV_HANDLE_POLL_SLOW)) {
-    uv__fast_poll_process_poll_req(loop, handle, req);
-  } else {
-    uv__slow_poll_process_poll_req(loop, handl
-  } blob;
-  DWORD len = 8;
+uint64_t uv_get_constrained_memory(void) {
+  return 0;  /* Memory constraints are unknown. */
+}
 
-  /* Acquire the crypto provider */
-  if(!CryptAcquireContext(&hprov, NULL, NULL, PROV_RSA_FULL,
-                          CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
-    return FALSE;
 
-  /* Setup the key blob structure */
-  memset(&befine Curl_http2_may_switch(a,b,c) FALSE
+uint64_t uv_get_available_memory(void) {
+  return uv_get_free_memory();
+}
 
-#define Curl_http2_request_upgrade(x,y) CURLE_UNSUPPORTED_PROTOCOL
-#define Curl_http2_switch(a,b,c)        CURLE_UNSUPPORTED_PROTOCOL
-#define Curl_http2_upgrade(a,b,c,d,e)   CURLE_UNSUPPORTED_PROTOCOL
-#define Curl_sponse message ready for sending
- * to the recipient.
+
+void uv_loadavg(double avg[3]) {
+  struct loadavg info;
+ fined(__MAC_OS_X_VERSION_MAX_ALLOWED) && \
+              (__MAC_OS_X_VERSION_MAX_ALLOWED >= 1040) && \
+       defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && \
+              (__MAC_OS_X_VERSION_MIN_REQUIRED < 101500)) || \
+      (defined(__IPHONE_OS_VERSION_MAAM_CTX(ctx, data);
+  CURLcode result = CURLE_OK;
+  ssize_t nwritten;
+
+  if(!stream)
+    return CURLE_RECV_ERROR;
+
+  nwritten = Curl_bufq_write(&stream->recvbuf, mem, memlen, &result);
+  if(nwritten < 0) {
+    return result;
+  }
+
+  if((size_t)nwritten < memusec = 0;
+
+    multi_fdset(m, &fdread, &fdwrite, &fdexcep, &maxfd);
+    select_test(maxfd + 1, &fdread, &fdwrite, &fdexcep, &timeout);
+
+    abort_on_test_timeout();
+    multi_perform(m, &still_running);
+
+    abort_on_test_timeout();
+  }
+
+  do {
+    msg =lude "task.h"
+
+#include <string.h>
+#include <unistd.h>
+
+static uv_loop_t loop;
+static uv_signal_t signal_hdl;
+static uv_pipe_t pipe_hdl;
+static uv_write_t write_req;
+static char* buf;
+static int close_cb_called;
+
+
+static void stop_loop_cb(uv_signal_t* signool_cfgable.h"
+#include "tool_doswin.h"
+#include "tool_msgs.h"
+#include "tool_cb_hdr.h"
+#include "tool_cb_wrt.h"
+#include "tool_operate.h"
+#include "tool_libinfo.h"
+
+#include "memdebug.h" /* keep this as LAST include */
+
+static char *parse_filename(const c
+  /* First set the URL that is about to receive our POST. */
+  test_setopt(curl, CURLOPT_URL, URL);
+
+  /* Now specify we want to POST data */
+  test_setopt(curl, CURLOPT_POST, 1L);
+
+  /* Set the expected POST size */
+  test_setopt(curl, CURLOPT_POSTFIELDSconst unsigned char *input,
+                          unsigned int len)
+{
+  (void)MD5_Update(ctx, input, len);
+}
+
+static void my_md5_final(unsigned char *digest, my_md5_ctx *ctx)
+{
+  (void)MD5_Final(digest, ctx);
+}
+
+#elif defined(USE_MBEDTLS)
+
+typedef mbed (void)userdata;
+
+  if(!curl_easy_getinfo(handle, CURLINFO_XFER_ID, &xfer_id) && xfer_id >= 0) {
+    if(!curl_easy_getinfo(handle, CURLINFO_CONN_ID, &conn_id) &&
+        conn_id >= 0) {
+      curl_msnprintf(idsbuf, sizeof(idsbuf), TRC_IDS_FORMAT_IDS_2,
+   LOCK) {
+    *err = CURLE_AGAIN;
+    return -1;
+  }
+  else if(io_error) {
+    char buffer[STRERROR_LEN];
+    failf(data, "reading from socket: %s",
+          Curl_strerror(io_error, buffer, sizeof(buffer)));
+    *err = CURLE_RECV_ERROR;
+    return -1;
+  }
+
+ user's password.
+ * out     [out]    - The result storage.
  *
- * Parameters:
- *
- * data    [in]     - The session handle.
- * userp   [in]     - The username in the format User or Domain\User.
- * passwdp [in]     - The user's password.
- * request [in]     - The c char data[]="mooaaa";
-
-struct WriteThis {
-  size_t sizeleft;
-};
-
-static size_t read_callback(char *ptr, size_t size, size_t nmemb, void *userp)
+ * Returns void.
+ */
+void Curl_auth_create_login_message(const char *valuep, struct bufref *out)
 {
-  struct WriteThis *pooh = (struct WriteThis *)userp;
-  size_t len = strlen(data);
-
-  if(size*nmemb < len)
-  void *stream)
-{
-  fwrite(ptr, size, nmemb, stream);
-  return nmemb * size;
+  Curl_bufref_set(out, valuep, strlen(valuep), NULL);
 }
 
-size_t WriteHeader(void *ptr, size_t size, size_t nmemb, void *stream)
-{
-  (void)ptr;
-  (void)stream;
+/*
+ * Curl_auth_create_external_messaD_PROTOCOL;
+  }
 
-  realHeaderSize += curlx_uztoul(size * nmemb);
+  ts = calloc(1, sizeof(*ts));
+  if(!ts)
+    return CURLE_OUT_OF_MEMORY;
 
-  return nmemb * size;
-}
-ef USE_SPNEGO
-  FEATURE("SPNEGO",      NULL,                CURL_VERSION_SPNEGO),
-#endif
-#ifdef USE_SSL
-  FEATURE("SSL",         NULL,                CURL_VERSION_SSL),
-#endif
-#ifdef USE_WINDOWS_SSPI
-  FEATURE("SSPI",        NULL,                CURL_VERST);
+  infof(data, "allocate connect buffer");
 
-  ASSERT_EQ(1, close_cb_called);
-  ASSERT_EQ(1, connect_cb_called);
+  Curl_dyn_init(&ts->rcvbuf, DYN_PROXY_CONNECT_HEADERS);
+  Curl_dyn_init(&ts->request_data, DYN_HTTP_REQUEST);
+  Curl_httpurn 0;
 
-  MAKE_VALGRIND_HAPPY(uv_default_loop());
+  case CURLINFO_HEADER_OUT:
+    text = "=> Send header";
+    break;
+  case CURLINFO_DATA_OUT:
+    text = "=> Send data";
+    break;
+  case CURLINFO_HEADER_IN:
+    text = "<= Recv header";
+    break;
+  case CURLINFO_DATA_IN:
+    text = "<= Recv data  lfields = uv__get_internal_fields(loop);
+  nevents = 0;
+
+  while (!uv__queue_empty(&loop->watcher_queue)) {
+    q = uv__queue_head(&loop->watcher_queue);
+    uv__queue_remove(q);
+    uv__queue_init(q);
+
+    w = uv__queue_data(q, uv__io_t, watcher_queue);_loop());
   return 0;
 }
 
 
-TEST_IMPL(pipe_connect_to_file) {
-  const char* path = "test/fixtures/empty_file";
-  uv_pipe_t client;
-  uv_connect_t req;EMORY;
-    goto error;
-  }
-  if(data->set.verbose) {
-    char *se = aprintf("CONNECT %s HTTP/1.1\r\n", authority);
-    if(!se) {
-      result = CURLE_OUT_OF_MEMORY;
-      goto error;
-    }
-    Curl_debug(data, CURLINFO_HEADER_OUT, se, strlen(se));
-  r = uv_fs_open(NULL, &req, name, O_RDWR, 0, NULL);
-  ASSERT_GE(r, 0);
-  file = r;
-  uv_fs_req_cleanup(&req);
+TEST_IMPL(tcp_create_early_bad_domain) {
+  uv_tcp_t client;
+  int r;
 
-  buf = uv_buf_init("foo", 4);
-  r = uv_fs_write(NULL, &req, file, &buf, 1, -1, NULL);
-  ASSERT_GE(r, 0);
-  uv_fs_req_cleanup(&req);
+  r = uv_tcp_init_ex(uv_default_loop(), &client, 47);
+  ASSERT_EQ(r, UV_EINVAL);
 
-  r = uv_fs_OK(uv_read_start((uv_stream_t*)&tcp, alloc_cb, read_cb));
+  r = uv_tcp_init_ex(uv_default_loop(), &client, 1024);
+  ASSERT_EQ(r, UV_EINVignored */
+#define CF_CTRL_DATA_DETACH           2  /* 0          NULL     ignored */
+#define CF_CTRL_DATA_SETUP            4  /* 0          NULL     first fail */
+#define CF_CTRL_DATA_IDLE             5  /* 0          NULL     first fail */
+#define CF_CTRdle->submitted_events_1 == 0);
+  assert(handle->submitted_events_2 == 0);
 
-  /* Check error handling. */
-  ASSERT_EQ(UV_EALREADY, uv_read_start((uv_stream_t*)&tcp, alloc_cb, read_cb));
-  ASSERT_EQ(UV_EINVAL, uv_read_start(NULL, alloc_cb, read_cb));
-  ASSERT_EQ(UV_EINVAL, o */
-  char *name = NULL;
-  char *contents = NULL;
-  char *contp;
-  char *data;
-  char *type = NULL;
-  char *filename = NULL;
-  char *encoder = NULL;
-  struct curl_slist *headers = NULL;
-  struct tool_mime *part = NULL;
-  CURLcode res;
-  int err = 1;
-
-  /*(loop);
+  uv__handle_close(handle);
 }
+/* Copyright libuv project contributors. All rights reserved.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of thi_init(m);
 
+  multi_setopt(m, CURLMOPT_SOCKETFUNCTION, curlSocketCallback);
+  multi_setopt(m, CURLMOPT_SOCKETDATA, &sockets);
 
-void uv__platform_loop_delete(uv_loop_t* loop) {
-}
+  multi_setopt(m, CURLMOPT_TIMERFUNCTION, curlTimerCallback);
+  multi_setopt(m, CURLMOPT_TIMERDATA, &timeout);
 
-int uv_exepath(char* buffer, size_t* size) {
-  char abspath[PATH_MAX * 2 + 1];
-  int mib[4];
-  size_t abspath_size;
+  multi_add_handleed(USE_WIN32_CRYPTO) ||              \
+  (defined(USE_WOLFSSL) && defined(HAVE_WOLFSSL_DES_ECB_ENCRYPT))
+#    define USE_CURL_NTLM_CORE
+#  endif
+#  if defined(USE_CURL_NTLM_CORE) || defined(USE_WINDOWS_SSPI)
+#    define USE_NTLM
+#  endif
+#endif
 
-  if (buffer == NULL || size == NULL || *size == 0)
-    return UV_EINVAL;
+#ifdef CURe "connect.h"
+#include "url.h" /* for Curl_safefree() */
+#include "sendf.h"
+#include "sockaddr.h" /* required for Curl_sockaddr_storage */
+#include "multiif.h"
+#include "progress.h"
+#include "select.h"
+#include "warnless.h"
 
- case CURLINFO_HEADER_IN:
-    text = "<= Recv header";
-    break;
-  case CURLINFO_DATA_IN:
-    text = "<= Recv data";
-    break;
-  case CURLINFO_SSL_DATA_IN:
-    text = "<= Recv SSL data";
-    break;
-  default: /* in case a new one is introduced to shock u_OK;
+/* The last 3 #incluULL;
+  CURLcode tmperr = CURLE_OK;
   int result;
   int what;
   bool wants_read;
@@ -525,103 +346,103 @@ int uv_exepath(char* buffer, size_t* size) {
 
   DEBUGASSERT(backend);
 
-  CURL_TRC_CF(data, cf, "cr_connect_common, state=%L);
+  CURL_TRC_CF(data,struct NameValue setopt_nv_CURL_HTTP_VERSION[] = {
+  NV(CURL_HTTP_VERSION_NONE),
+  NV(CURL_HTTP_VERSION_1_0),
+  NV(CURL_HTTP_VERSION_1_1),
+  NV(CURL_HTTP_VERSION_2_0),
+  NV(CURL_HTTP_VERSION_2TLS),
+  NV(CURL_HTTP_VERSION_3),
+  NV(CURL_HTTP_VERSION_3ONLY),
+     fputs("   ", stderr);
+    }
 
-  multi_init(m);
-
-  multi_setopt(m, CURLMOPT_SOCKETFUNCTION, curlSocketCallback);
-  multi_setopt(m, CURLMOPT_SOCKETDATA, &sockets);
-
-  multi_setopt(m, CURLMOPT_TIMERFUNCTION, curlTimerCallback);
-  multi_setopt(m, CURLMOPT_TIMERDATA, &timeout);
-
-  mult  ret = curl_mime_filename(part, filename);
-    if(!ret)
-      ret = curl_mime_type(part, m->type);
-    if(!ret)
-      ret = curl_mime_headers(part, m->headers, 0);
-    if(!ret)
-      ret = curl_mime_encoder(part, m->encoder);
-    if(!ret)
-      ret = curl address */
-    len = 4;
-    break;
-  case 3:
-    /* The first octet of the address field contains the number of octets of
-       name that follow */
-    len = buffer[SOCKS5_DSTADDR];
-    len++;
-    break;
-  case 4:
-    /* 16 bytes IPv6 address */
-    len we only need some defines. */
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
-#include <pthread.h>
-#include <netdb.h>
-#include <qadrt.h>
-#include <errno.h>
-
-#ifdef HAVE_LIBZ
-#t curltime appconnected;
-
-    memset(&connected, 0, sizeof(connected));
-    cf->cft->query(cf, data, CF_QUERY_TIMER_CONNECT, NULL, &connected);
-    if(connected.tv_sec || connected.tv_usec)
-      Curl_pgrsTimeWas(data, TIMER_CONNECT, connected);
-
-    memsezation it can jump
-  ** forward or backward in time.
-  */
-  struct timeval now;
-  (void)gettimeofday(&now, NULL);
-  return now;
+    for(c = 0; (c < width) && (i + c < size); c++) {
+      /* check for 0D0A; if found, skip past and start a new line of output */
+      if(nohex && (i + c + 1 < size) && ptr[i + c] == 0x0D &&
+         ptr[i + c + 1] == 0  }
 }
 
-#else
-
-static struct timeval tvnow(void)
+static void loghex(unsigned char *buffer, ssize_t len)
 {
-  /*
-  ** time() returns the value of time in seconds since the Epoch.
-  */
-  struar *buf, size_t len)
-{
-  const char *p = buf;
+  char data[1200];
+  ssize_t i;
+  unsigned char *ptr = buffer;
+  char *optr = data;
+  ssize_t width = 0;
+  int left = sizeof(data);
 
-  (void) handle;
+  for(i = 0; i<len && (left >= 0); i++) {
+    msnprintf(optode res;
+  int err = 1;
 
-  fprintf(stderr, "0x");
-  while(len-- > 0)
-    fprintf(stderr, "%02.2x", (unsigned int)*p++);
+  /* Allocate the main mime structure if needed. */
+  if(!*mimecurrent) {
+    *mimeroot = tool_mime_new_parts(NULL);
+    if(!*mimeroot)
+      goto fail;
+    *mimecurrent = *mimeroot;
+  }
+
+  /* Make a copy we can overwrite. */
+  con
+  } blob;
+  DWORD len = 8;
+
+  /* Acquire the crypto provider */
+  if(!CryptAcquireContext(&hprov, NULL, NULL, PROV_RSA_FULL,
+                          CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
+    return FALSE;
+
+  /* Setup the key blob structure */
+  memset(&bc int shutdown_cb_called = 0;
+
+
+static void alloc_cb(uv_handle_t* handle, size_t size, uv_buf_t* buf) {
+  buf->len = size;
+  buf->base = malloc(size);
+  ASSERT_NOT_NULL(buf->base);
 }
-#else
-# define DEBUG_OUT(x) Curl_nop_stmt
-#endif
 
-/*
- * ntlm_decode_type2_target()
- *
- truct URLPattern *pat;
-  size_t i;
-  size_t len;
-  size_t buflen = glob->urllen + 1;
-  char *buf = glob->glob_buffer;
 
-  *globbed = NULL;
+static void close_cb(uv_handle_t* handle) {
+  ASSERT(nested == 0 && "clntext)
+{
+  uv_close((uv_handle_t *) &context->poll_handle, curl_close_cb);
+}
 
-  if(!glob->beenhere)
-    glob->beenhere = 1;
-  else {
-    bool carry = TRUE;
+static void add_download(const char *url, int num, CURLM *multi)
+{
+  char filename[50];
+  FILE *file;
+  CURL *handle;
 
-    /* implement a counter over the inRRNO;
+  snprintf(filename, 50, "%d.download", num);
+
+  file =       CURLcode status, bool premature)
+{
+  struct FILEPROTO *file = data->req.p.file;
+  (void)status; /* not used */
+  (void)premature; /* not used */
+
+  if(file) {
+    Curl_safefree(file->freepath);
+    file->path = NULL;
+    if(file->fd != -1)
+      clooop;
+  uv_timer_t timer_handle;
+
+  ASSERT_OK(uv_loop_init(&loop));
+
+  timer_cb_called = 0; /* Reset for the child. */
+
+  ASSERT_OK(uv_timer_init(&loop, &timer_handle));
+  ASSERT_OK(uv_timer_start(&timer_handle, timer_cb, 1, 0));
+  ASSERT_OK(uv_run(&loop, Uoy;         /* destroy resources of this cf */
+  Curl_cft_connect *do_connect;           /* establish connection */
+  Curl_cft_close *do_close;               /* close conn */
+  Curl_cft_shutdown *do_shutdown;         /* shutdown conn */
+  Curl_cft_get_hostRRNO;
     logmsg("listen(%" CURL_FORMAT_SOCKET_T ", 5) failed with error: (%d) %s",
            sock, error, sstrerror(error));
     sclose(sock);
@@ -634,19 +455,97 @@ static struct timeval tvnow(void)
 
 int main(int argc, char *argv[])
 {
-  curl_socket_t sock = Ces libcurl 7.26.0 or above.
+  curl_socket_t sock = C   data->state.aptr.proxyuserpwd);
+    if(result)
+      goto error;
+  }
+
+  if(!Curl_checkProxyheaders(data, conn, STRCONST("User-Agent")) &&
+     data->set.str[STRING_USERAGENT] && *data->set.str[STRING_USERAGENT]) {
+    struct dynbuf ua;
+    CYSOCKET.
+ * Will return CURLE_AGAIN iff blocked on sending.
  */
+CURLcode Curl_conn_send(struct Curl_easy *data, int sockindex,
+                        const void *buf, size_t blen,
+                        size_t *pnwritten);
 
-int main(void)
+
+void Curl_pollset_reset(struc }
+    if(!ret && filename)
+      ret = curl_mime_filename(part, filename);
+    if(!ret)
+      ret = curl_mime_type(part, m->type);
+    if(!ret)
+      ret = curl_mime_headers(part, m->headers, 0);
+    if(!ret)
+      ret = curl_mime_encoder(part, m->encoderdefine TEST_HANG_TIMEOUT 60 * 1000
+#define WAKEUP_NUM 10
+
+CURLcode test(char *URL)
 {
-  CURL *curl;
+  CURLM *multi = NULL;
+  int numfds;
+  int i;
   CURLcode res = CURLE_OK;
+  struct timeval time_before_wait, time_after_wait;
 
-  curl = curl_easy_init();
-  if(curl) {
-    /* Set username and password */
-    curl_easy_setopt(curl, CURLOPT_USERNAME, "user");
-    errno = EEXIST;
+  (void)URL;
+
+  start_test_timing();
+
+  glhe used port number in a file */
+int write_portfile(const char *filename, int port)
+{
+  FILE *portfile = fopen(filename, "wb");
+  if(!portfile) {
+    logmsg("Couldn't write port file: %s %s", filename, strerror(errno));
+    return 0; /* fail */
+  }
+  fprinportions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITN}
+
+  test_setopt(curl, CURLOPT_UPLOAD, 1L);
+  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+  test_setopt(curl, CURLOPT_VERBOSE, 1L);
+  test_setopt(curl, CURLOPT_AWS_SIGV4, "aws:amz:us-east-1:s3");
+  test_setopt(curl, CURLOPT_USERPWD, "xxx");
+  tnect_t req;
+  int r;
+
+  r = uv_pipe_init(uv_default_loop(), &client, 0);
+  ASSERT_OK(r);
+  uv_pipe_connect(&req, &client, BAD_PIPENAME, connect_cb);
+
+  uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+
+  ASSERT_EQ(1, close_cb_called);
+  ASSERT_EQ(1, connetion)
+{
+  int i;
+
+  if(mention)
+    fprintf(stderr, "Remove socket fd %d\n", (int) fd);
+
+  for(i = 0; i < sockets->count; ++i) {
+    if(sockets->sockets[i] == fd) {
+      if(i < sockets->count - 1)
+        memmove(&sockets->sockets[i], &sockets->sockets[i    int still_running; /* keep number of running handles */
+    CURLMcode mc = curl_multi_perform(multi_handle, &still_running);
+
+    if(still_running)
+      /* wait for activity, timeout or "nothing" */
+      mc = curl_multi_poll(multi_handle, NULL,= NULL; /* set return code to NULL */
+    free(buf);
+  }
+#else /* (HAVE_GETADDRINFO && HAVE_GETADDRINFO_THREADSAFE) ||
+          HAVE_GETHOSTBYNAME_R */
+  /*
+   * Here is code for platforms that do not have a thread safe
+   * getaddrinfo() nor gethostbynamrno = EEXIST;
       perror("lstat");
       exit(1);
     }
@@ -660,212 +559,130 @@ int main(void)
   if(sockfd == -1) {
     perror("open");
     exit(1);
-THREADS 2
-
-/* struct containing data of a thread */
-struct Tdata {
-  CURLSH *share;
-  char *url;
-};
-
-struct userdata {
-  const char *text;
-  int counter;
-};
-
-static int locks[3];
-
-/* lock callback */
-static void my_lock(CURL *handle, curl_lock_data data,
- addr("127.0.0.1", TEST_PORT, &addr));
-
-  if (uv_tcp_init(uv_default_loop(), &client)) {
-    FATAL("uv_tcp_init failed");
   }
-
-  puts("Connecting...");
-
-  nested++;
-
-  if (uv_tcp_connect(&connect_req,
-                     &client,
-  uffer));
-    if(msg)
-      msnprintf(buf, buflen, "%s", msg);
-    else
-      msnprintf(buf, buflen, "Unknown error %d", err);
-  }
-#else
+ASSERT(data->conn);
+  conn = data->conn;
+#ifdef DEBUGBUILD
   {
-    /* !checksrc! disable STRERROR 1 */
-    const char *msg = strerror(err);
-    if(msg)
-      msnprintf(buf, bufleptr_s = 0;
-  pat->globindex = -1;
+    /* Allow debug builds to override this logic to force short sends
+    */
+    char *p = getenv("CURL_SMALLSENDS");
+    if(p) {
+      size_t altsize = (size_t)strtoul(p, NULL, 10);
+   cbufs) {
+        pthread_mutex_unlock(&mutex);
+        return (char *) NULL;
+      }
+      else
+        Curl_thread_buffer = buffer_unthreaded;
+    }
 
-  pat->content.Set.elements = malloc(sizeof(char *));
-
-  if(!pat->content.Set.elements)
-    return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
-
-  pat->content.Set.elements[0] = malloc(len + 1);
-  if(!pat->content.LDBLOCK) {
-    *err = CURLE_AGAIN;
-    return -1;
+    atexit(terminate);
   }
-  else if(io_error) {
-    char buffer[STRERROR_LEN];
-    failf(data, "reading from socket: %s",
-          Curl_strerror(io_error, buffer, sizeof(buffer)));
-    *err = CURLE_RECV_ERROR;
+
+  pthread_mutex_unlock(&mutex);
+  return Curl_thread_buffer(key, size);
+}
+
+
+s***/
+
+/* <DESC>
+ * Send SMTP mime emails
+ * </DESC>
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <curl/curl.h>
+
+/* This is a simple example showing how to send mime mail using libcurl's SMTP
+ * capabilities. For an example of using the multi interfg.
+ */
+static int str2scope(const char *p)
+{
+  if(strcasecompare(p, "one"))
+    return LDAP_SCOPE_ONELEVEL;
+  if(strcasecompare(p, "onetree"))
+    return LDAP_SCOPE_ONELEVEL;
+  if(strcasecompare(p, "base"))
+    return LDAP_SCOPE_BASE;
+  if(strcasecompare(pstruct pair *bb = b;
+  /* If one element is empty, the other is always sorted higher */
+  if(aa->len == 0)
     return -1;
-  GLOBAL_DEFAULT);
-
-  curl = curl_easy_init();
-  if(!curl)
+  if(bb->len == 0)
     return 1;
+  return strncmp(aa->p, bb->p, aa->len < bb->len ? aa->len : bb->len);
+}
 
-  mcurl = curl_multi_init();
-  if(!mcurl)
-    return 2;
+#define MAX_QUERYPAIRS 64
 
-  /* This is the URL for your mailserver */
-  curl_easy_setopt(curl, CURLOPT_URL, "smtp://mail.example.com");
+ void *stream)
+{
+  char *data = (char *)ptr;
+  int channel = RTP_PKT_CHANNEL(data);
+  int message_size;
+  int coded_size = RTP_PKT_LENGTH(data);
+  size_t failure = (size && nmemb) ? 0 : 1;
+  int i;
+  (void)stream;
 
-  /* NoteONNECT);
-  req->cb = cb;
-  req->handle = (uv_stream_t*) handle;
-  uv__queue_init(&req->queue);
-  handle->connect_req = req;
-
-  uv__io_start(handle->loop, &handle->io_watcher, POLLOUT);
+  message_size = curlx_uztosi(size * nmem__io_start(handle->loop, &handle->io_watcher, POLLOUT);
 
   if (handle->delayed_error)
-    uv__io_feed(handle->loop, &handle->ioude "fileinfo.h"
-#include "llist.h"
-#include "strtoofft.h"
-#include "ftp.h"
-#include "ftplistparser.h"
-#include "curl_fnmatch.h"
-#include "curl_memory.h"
-#include "multiif.h"
-/* The last #include file should be: */
-#include "memdebug.h"
+    uv__io_feed(handle->loop, &handle->io_watcher);
 
-typedef enum {
-  Ph"
-
-#ifdef HAVE_NETINET_IN_H
-#include <netinet/in.h> /* IPPROTO_TCP */
-#endif
-
-#include "tool_cb_soc.h"
-
-/*
-** callback for CURLOPT_OPENSOCKETFUNCTION
-**
-** Notice that only Linux is supported for the moment.
-*/
-
-curl_socket_t tool_socket_open_mptcp_cb(voiti_timeout((A), (B))) != CURLM_OK) {      \
-    fprintf(stderr, "%s:%d curl_multi_timeout() failed, "    \
-            "with code %d (%s)\n",                           \
-            (Y), (Z), (int)ec, curl_multi_strerror(ec));     \
-    res = TEST_ERR_BAD_imefreq/service/firewall.htm
- *
- * Usage:
- * This software synchronises your computer clock only when you issue
- * it with --synctime. By default, it only display the webserver's clock.
- *
- * Written by: Frank (contributed to libcurl)
- *
- * THE SOFTWARE ISndgame(loop, (uv_handle_t*)handle);
-  } else if (uv__is_active(handle)) {
-    uv__fs_event_queue_readdirchanges(loop, handle);
-  }
+  return 0;
 }
 
 
-void uv__fs_event_close(uv_loop_t* loop, uv_fs_event_t* handle) {
-  uv_fs_event_stop(handle);
+int uv_tcp_open(uv_tcp_t* handle, uv_os_sock_t sock) {
+  int err;
 
-  uv__handle_closing(handly_init(hnd);
-  easy_setopt(hnd, CURLOPT_URL, URL);
-  easy_setopt(hnd, CURLOPT_HSTS, "first-hsts.txt");
-  easy_setopt(hnd, CURLOPT_HSTS, "second-hsts.txt");
+  if (uv__fd_exists(handle->loop, !*pooh->readptr;
 
-  second = curl_easy_duphandle(hnd);
+  if(size*nmemb < 1)
+    return 0;
 
-  curl_easy_cleanup(hnd);
-  curl_easy_cleanup(second);
-  cAPURLDesc *ludp)
-{
-  int rc = LDAP_SUCCESS;
-  char *p;
-  char *path;
-  char *q = NULL;
-  char *query = NULL;
-  size_t i;
+  eof = pooh->sizeleft <= 0;
+  if(!eof)
+    pooh->sizeleft--;
 
-  if(!data ||
-     !data->state.up.path ||
-     data->state.up.path[0] != '/' ||
-     !strncasecompare("LDAP", data->state.up.scheme, sc + 3, 0);
-  start_timer(loop, SIGUSR1, tc + 0);
-  start_timer(loop, SIGUSR2, tc + 1);
-  ASSERT_OK(uv_run(loop, UV_RUN_DEFAULT));
+  if(!eof) {
+    *ptr = *pooh->readptr;           /* copy one single byte */
+    pooh->readptr++;                 /* advance pointer */
+   e rv;
 
-  for (i = 0; i < ARRAY_SIZE(sc); i++)
-    ASSERT_EQ(sc[i].ncalls, NSIGNALS);
+  curl_global_init(CURL_GLOBAL_ALL);
+  ch = curl_easy_init();
+  curl_easy_setopt(ch, CURLOPT_VERBOSE, 0L);
+  curl_easy_setopt(ch, CURLOPT_HEADER, 0L);
+  curl_easy_setopt(ch, CURLOPT_NOPROGRESS, 1L);
+  curl_easy_setopt(ch, CURLOPT_NOSIGNAL, 1L);
+  cu;
 
-  for (i = 0; i < ARRAY_SIZE(tc); i++)
-    AS CURLE_URL_MALFORMAT;
-      goto fail;
-    }
-    len = hostdot - hostname;
-    if(len > MAX_SIGV4_LEN) {
-      failf(data, "aws-sigv4: service too long in hostname");
-      result = CURLE_URL_MALFORMAT;
-      goto fail;
-    }
-    memcpy(service, hostname, nuser = curlx_convert_UTF8_to_tchar((char *) user);
-    inpass = curlx_convert_UTF8_to_tchar((char *) passwd);
+  memcpy(hostname, str, hlen);
+  hostname[hlen] = 0;
 
-    rc = (int)ldap_simple_bind_s(server, inuser, inpass);
+  /* ask to "guess scheme" as then it works without an https:// prefix */
+  rc = curl_url_set(u, CURLUPART_URL, hostname, CURLU_GUESS_SCHEME);
 
-    curlx_unicodefree(inuser);
-    curlx_unicodefree(inpass);
-  }
-#if defined(USE_WINhe hex output, we can fit more on screen */
-    width = 0x40;
+  curl_url_cleanup(u);
+  if(!rc)
+    *skip = hlen;
+  re12_256_ctx ctx;
+  CURLcode res;
 
-  fprintf(stream, "%s, %zu bytes (0x%zx)\n", text, size, size);
+  res = Curl_sha512_256_init(&ctx);
+  if(res != CURLE_OK)
+    return res;
 
-  for(i = 0; i<size; i += width) {
+  res = Curl_sha512_256_update(&ctx, (const void *) input, input_size);
 
-    fprintf(stream, "%04zx: ", i);
-
-    if(!nohex) {
-      /* hex not disabled, show it */
-  char **allocuserpwd;
-
-  /* point to the username, password, service and host */
-  const char *userp;
-  const char *passwdp;
-  const char *service = NULL;
-  const char *hostname = NULL;
-
-  /* point to the correct struct with this */
-  struct ntlmdata *ntlmcks5_gssapi_enctype = socksreq[0];
-  if(socksreq[0] == 0)
-    gss_delete_sec_context(&gss_status, &gss_context, NULL);
-
-  return CURLE_OK;
-}
-
-#endif /* HAVE_GSSAPI && !CURL_DISABLE_PROXY */
-#ifndef HEADER_CURL_TOOL_CB_SEE_H
-#define HEADER_CURL_TOOL_CB_SEE_t Curl_addrinfo *ares2addr(struct ares_addrinfo_node *node)
+  if(res != CURLE_OK) {
+    (void) Curl_sha512_256_finish(output, &ctx);
+  tatic struct Curl_addrinfo *ares2addr(struct ares_addrinfo_node *node)
 {
   /* traverse the ares_addrinfo_node list */
   struct ares_addrinfo_node *ai;
@@ -873,230 +690,8 @@ void uv__fs_event_close(uv_loop_t* loop, uv_fs_event_t* handle) {
   struct Curl_addrinfo *calast = NULL;
   int error = 0;
 
-  for(ai = node; aifined(_MSC_VER) && !defined(__GNUC__) && !defined(__clang__)
-#  if _MSC_VER >= 1400
-#    define MHDX_INLINE __forceinline
-#  endif
-#endif
-
-#if !defined(MHDX_INLINE)
-   /* Assume that 'inline' keyword works or the
-    * macro was already defined correctly. timeout)
-        timeout = -1;
-      else
-        timeout -= timediff;
-      now = now2; /* for next loop */
-    }
-    if(timeout < 0)
-      result = CURLE_OPERATION_TIMEDOUT;
-  }
-  if(result)
-    /* failure, so we cancel the ares operation */
-    ares_can_len] = 0;
-
-  /* Return the response */
-  *outptr = resp;
-  *outlen = output_token_len;
-
-  /* Free the response buffer */
-  free(output_token);
-
-  return CURLE_OK;
-}
-
-/*
- * Curl_auth_digest_cleanup()
- *
- * This is used to clean up the digest specific data. body_remain = in_body? (data->req.size - data->req.bytecount) : 0;
-  DEBUGASSERT(body_remain >= 0);
-  if(body_remain) {
-    if((curl_off_t)blen > body_remain)
-      blen = (size_t)body_remain;
-    return Curl_client_write(data, CLIENTWRITE_BODY, (char *)be, ch->datasize);
-
-      if(0 == ch->datasize)
-        /* end of data this round, we now expect a trailing CRLF */
-        ch->state = CHUNK_POSTLF;
-      break;
-
-    case CHUNK_POSTLF:
-      if(*buf == 0x0a) {
-        /* The last one before we go back to  */
-  {
-    h = NULL; /* set return code to NULL */
-    free(buf);
-  }
-#else /* (HAVE_GETADDRINFO && HAVE_GETADDRINFO_THREADSAFE) ||
-          HAVE_GETHOSTBYNAME_R */
-  /*
-   * Here is code for platforms that do not have a thread safe
-   * getaddrinfo() noze) && (ptr[i + c + 1] == 0x0D) &&
-         (ptr[i + c + 2] == 0x0A)) {
-        i += (c + 3 - width);
-        break;
-      }
-    }
-    fputc('\n', stream); /* newline */
-  }
-  fflush(stream);
-}
-
-int libtest_debug_cb(CURL *handle, curl_infotype type,
- ameter number */
-  int precision; /* precision OR precision parameter number */
-  unsigned int flags;
-  unsigned int input; /* input argument array index */
-  char *start;      /* format string start to output */
-  size_t outlen;     /* number of bytes froOUT, "ERROR: %s returns %s\n", where, s);
-      /* ignore this error */
-      return;
-    }
-    fprintf(MSG_OUT, "ERROR: %s returns %s\n", where, s);
-    exit(code);
-  }
-}
-
-static void timer_cb(GlobalInfo* g, int revents);
-
-/* Update the timer after curl_m;
-#if defined(__APPLE__) || defined(_WIN32)
-static const char file_prefix_in_subdir[] = "subdir";
-static int fs_multievent_cb_called;
-#endif
-static uv_timer_t timer;
-static int timer_cb_called;
-static int close_cb_called;
-static int fs_event_created;
-statierver is not alive, now check if it was actually a socket. */
-#ifdef _WIN32
-      /* Windows does not have lstat function. */
-      rc = curlx_win32_stat(unix_socket, &statbuf);
-#else
-      rc = lstat(unix_socket, &statbuf);
-#endif
-      if(0 != rc) {
-   2)
-  /* Use the multi interface. */
-  multi = curl_multi_init();
-  mres = curl_multi_add_handle(multi, pooh.easy);
-  while(!mres) {
-    struct timeval timeout;
-    int rc = 0;
-    fd_set fdread;
-    fd_set fdwrite;
-    fd_set fdexcept;
-    int maxfd = -1;
-c_shutdown,
-  Curl_cf_def_get_host,
-  cf_hc_adjust_pollset,
-  cf_hc_data_pending,
-  Curl_cf_def_send,
-  Curl_cf_def_recv,
-  Curl_cf_def_cntrl,
-  Curl_cf_def_conn_is_alive,
-  Curl_cf_def_conn_keep_alive,
-  cf_hc_query,
-};
-
-static CURLcode cf_hc_create(struc   /* what this message means */
-  CURL *easy_handle; /* the handle it concerns */
-  union {
-    void *whatever;    /* message-specific data */
-    CURLcode result;   /* return code for transfer */
-  } data;
-};
-typedef struct CURLMsg CURLMsg;
-
-/* Based on
-/* Define if you have the <netinet/in.h> header file. */
-#define HAVE_NETINET_IN_H
-
-/* Define if you have the <net/if.h> header file. */
-#define HAVE_NET_IF_H
-
-/* Define if you have the <pwd.h> header file. */
-#undef HAVE_PWD_H
-
-/* Define if you have the or will be NULL
-  */
-
-  fail_unless(llist.size == 0, "list initial size should be zero");
-  fail_unless(llist.head == NULL, "list head should initiate to NULL");
-  fail_unless(llist.tail == NULL, "list tail should initiate to NULL");
-  fail_unless(llist.dt  if(!running)
-      break; /* done */
-
-    FD_ZERO(&rd);
-    FD_ZERO(&wr);
-    FD_ZERO(&exc);
-
-    multi_fdset(m, &rd, &wr, &exc, &maxfd);
-
-    /* At this point, maxfd is guaranteed to be greater or equal than -1. */
-
-    select_test(maxfd + 1, &rd, &wr, pos)
-{
-  /* Fixed header starts */
-  /* packet type */
-  packet[0] = MQTT_MSG_CONNECT;
-  /* remaining length field */
-  memcpy(&packet[1], remain, remain_pos);
-  /* Fixed header ends */
-
-  /* Variable header starts */
-  /* protocol length */
-  packet[remail
- * @param[out] output the pointer to put the hash
- * @param[in] input the pointer to the data to process
- * @param input_size the size of the data pointed by @a input
- * @return always #CURLE_OK
- */
-CURLcode
-Curl_sha512_256it(unsigned char *output, conste_t*)process, NULL);
-}
-
-
-static void on_alloc(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
-  buf->base = malloc(suggested_size);
-  buf->len = suggested_size;
-}
-
-
-static void close_client_conn_cb(uv_URLOPT_MIMEPOST, mime);
-  easy_setopt(curls, CURLOPT_NOPROGRESS, 1L);
-
-  res = curl_easy_perform(curls);
-  if(res)
-    goto test_cleanup;
-
-  /* Alter form and resubmit. */
-  curl_mime_data(field, "long value for length change", CURL_ZERO_TERMINATED);
-  rest *slist = NULL;
-
-  mod.dwSize = sizeof(MODULEENTRY32);
-
-  do {
-    hnd = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, 0);
-  } while(hnd == INVALID_HANDLE_VALUE && GetLastError() == ERROR_BAD_LENGTH);
-
-  if(hnd == INVALID_HANDLE_VALUE)
-    goto error;
-
-  ifeconds */
-{
-  if(us < 1)
-    return size * 1000000;
-  else if(size < CURL_OFF_T_MAX/1000000)
-    return (size * 1000000) / us;
-  else if(us >= 1000000)
-    return size / (us / 1000000);
-  else
-    return CURL_OFF_T_MAX;
-}
-
-/* returns TRUE if it is time to0;
+  for(ai= NULL)
+    return 0;
 
   err = uv__fsevents_global_init();
   if (err)
@@ -1110,291 +705,756 @@ static void close_client_conn_cb(uv_URLOPT_MIMEPOST, mime);
   if (err)
     goto fail_mutex_init;
 
-  err = uv_sem_init(&loopf) {
-  static char slab[65536];
+  err E_CLEANUP failed, correct\n");
+  }
+
+test_cleanup:
+
+  /* clean up last handle */
+  printf("CLEANUP\n");
+  curl_easy_cleanup(curl);
+  curl_slist_free_all(headers);
+  curl_free(url);
+
+  /* free share */
+  printf("SHARE_CLEANUP\n");
+  scode = curl_share_cleanu size, int nohex)
+{
+  size_t i;
+  size_t c;
+
+  unsigned int width = 0x10;
+
+  if(nohex)
+    /* without the hex output, we can fit more on screen */
+    width = 0x40;
+
+  fprintf(stream, "%s%s, %zu bytes (0x%zx)\n", timebuf, text,
+          size, size);
+
+  fP_CSEQ_ERROR;
+    goto out;
+  }
+  if(Curl_checkheaders(data, STRCONST("Session"))) {
+    failf(data, "Session ID cannot be set as a custom header.");
+    result = CURLE_BAD_FUNCTION_ARGUMENT;
+    goto out;
+  }
+
+  result =
+    Curl_dyn_addf(&req_buffer,
+   d = fork();
+
+  if (*pid == 0) {
+    /* Fork succeeded, in the child process */
+    uv__process_child_init(options, stdio_count, pipes, error_fd);
+    abort();
+  }
+
+  if (pthread_sigmask(SIG_SETMASK, &sigoldset, NULL) != 0)
+    abort();
+
+  if (*pid == -1)
+ n = 0;
+  struct curlx_dynbuf dyn;
+
+  *result = NULL;
+
+  /* We cannot use the glob_buffer for storage since the filename may be
+   * longer than the URL we use.
+   */
+  curlx_dyn_init(&dyn, MAX_OUTPUT_GLOB_LENGTH);
+
+  while(*filename) {
+    if(*filename == _CORE) && \
+    (SIZEOF_CURL_OFF_T > 4)
+
+extern const struct Curl_handler Curl_handler_smb;
+extern const struct Curl_handler Curl_handler_smbs;
+
+#endif /* CURL_DISABLE_SMB && USE_CURL_NTLM_CORE &&
+          SIZEOF_CURL_OFF_T > 4 */
+
+#endieturn size * nmemb;
+}
+
+
+/* CURLOPT_PROGRESSFUNCTION */
+static int prog_cb(void *p, double dltotal, double dlnow, double ult,
+                   double uln)
+{
+  ConnInfo *conn = (ConnInfo *)p;
+  (void)ult;
+  (void)uln;
+
+  fprintf(MSG_OUT, "Progress: %s (%gdefine RECV_TYPE_ARG4 int
+#define RECV_TYPE_RETV int
+
+#define HAVE_SELECT 1
+
+#define HAVE_SEND 1
+#define SEND_TYPE_ARG1 int
+#define SEND_TYPE_ARG2 void *
+#define SEND_QUAL_ARG2
+#define SEND_TYPE_ARG3 int
+#define SEND_TYPE_ARG4 int
+#define SEND_TYPE_RETV inRDWR, 0, NULL);
+  ASSERT_GE(r, 0);
+  file = r;
+  uv_fs_req_cleanup(&req);
+
+  buf = uv_buf_init("foo", 4);
+  r = uv_fs_write(NULL, &req, file, &buf, 1, -1, NULL);
+  ASSERT_GE(r, 0);
+  uv_fs_req_cleanup(&req);
+
+  r = uv_fs_close(NULL, &req, file, NULL);
+  AS
+ * @param buf     the memory location to read to
+ * @param blen    the amount of memory at `buf`
+ * @param nread   on return the number of bytes read into `buf`
+ * @param eos     TRUE iff bytes are the end of data from client
+ * @return CURLE_OK on succesic int exit_cb_called;
+static int read_cb_called;
+static int tcp_write_cb_called;
+static int tcp_read_cb_called;
+static int on_pipe_read_called;
+static int local_conn_accepted;
+static int remote_conn_accepted;
+static int tcp_server_listening;
+stati<curl/mprintf.h>
+
+#include "curl_memory.h"
+/* The last #include file should be: */
+#include "memdebug.h"
+
+/*
+ * If SIZEOF_SIZE_T has not been defined, default to the size of long.
+ */
+
+#ifdef HAVE_LONGLONG
+#  define LONG_LONG_TYPE long long
+#  define HAVE_)) - start_time));
+  fflush(stderr);
+
+  MAKE_VALGRIND_HAPPY(uv_default_loop());
+  return 0;
+}
+/* Copyright Joyent, Inc. and other Node contributors. All rights reserved.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of nup();
+
+  return res;
+}
+
+size_t WriteOutput(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+  fwrite(ptr, size, nmemb, stream);
+  return nmemb * size;
+}
+
+size_t WriteHeader(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+  (void)ptr;
+  (voif
+
+#if !defined(MHDX_INLINE) && \
+  defined(_MSC_VER) && !defined(__GNUC__) && !defined(__clang__)
+#  if _MSC_VER >= 1400
+#    define MHDX_INLINE __forceinline
+#  endif
+#endif
+
+#if !defined(MHDX_INLINE)
+   /* Assume that 'inline' keyword works or the
+ommand with empty sender data. All
+     * autoresponses should have an empty reverse-path, and should be directed
+     * to the address in the reverse-path which triggered them. Otherwise,
+     * they could cause an endless loop. See RFC 5321 Section 4.5.5 and trailers
+ */
+struct httpreq {
+  char method[24];
+  char *scheme;
+  char *authority;
+  char *path;
+  struct dynhds headers;
+  struct dynhds trailers;
+};
+
+/**
+ * Create an HTTP request struct.
+ */
+CURLcode Curl_http_req_make(struct httpreq **preq,
+     
+
+  /* enable uploading */
+  easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+
+  /* specify target */
+  easy_setopt(curl, CURLOPT_URL, URL);
+
+  /* go verbose */
+  easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+  /* now specify which file to upload */
+  easy_se = (int)(now.tv_sec - 1);
+
+  return finaltime;
+}
+
+UNITTEST_START
+  fail_unless(runawhile(41, 41, 40, 0) == 41,
+              "wrong low speed timeout");
+  fail_unless(runawhile(21, 21, 20, 0) == 21,
+              "wrong low speed timeout");
+  fail_unless(rr an HTTP proxy */
+  char **allocuserpwd;
+
+  /* point to the username, password, service and host */
+  const char *userp;
+  const char *passwdp;
+  const char *service = NULL;
+  const char *hostname = NULL;
+
+  /* point to the correct struct with this */
+  sandle->cf_cb == NULL) {
+    err = UV_ENOMEM;
+    goto fail_cf_cb_malloc;
+  }
+
+  handle->cf_cb->data = handle;
+  uv_async_init(handle->loop, handle->cf_cb, uv__fsevents_cb);
+  handle->cf_cb->flags |= UV_HANDLE_INTERNAL;
+  uv_unref((uv_handle_t*) handle->cfe) {
+  uv_fs_event_stop(handle);
+
+  uv__handle_closing(handle);
+
+  if (!handle->req_pending) {
+    uv__want_endgame(loop, (uv_handle_t*)handle);
+  }
+
+}
+
+
+void uv__fs_event_endgame(uv_loop_t* loop, uv_fs_event_t* handle) {
+  if ((handle->flags & UV_HANDLE_Cak; /* done */
+
+    FD_ZERO(&rd);
+    FD_ZERO(&wr);
+    FD_ZERO(&exc);
+
+    multi_fdset(m, &rd, &wr, &exc, &maxfd);
+
+    /* At this point, maxfd is guaranteed to be greater or equal than -1. */
+
+    select_test(maxfd + 1, &rd, &wr, &exc, &interval);
+
+   free(parser);
+  *parserp = NULL;
+}
+
+
+CURLcode Curl_ftp_parselist_geterror(struct ftp_parselist_data *pl_data)
+{
+  return pl_data->error;
+}
+
+
+#define FTP_LP_MALFORMATED_PERM 0x01000000
+
+static unsigned int ftp_pl_get_permission(const char *str)
+{
+  unsi->conn, "Timed out before name resolve started");
+    return CURLE_OPERATION_TIMEDOUT;
+  }
+  if(!timeout)
+    timeout = CURL_TIMEOUT_RESOLVE * 1000; /* default name resolve timeout */
+
+  /* Wait for the name resolve query to complete. */
+  while(!result)   *pport = cf->conn->secondary_port;
+  else if(cf->conn->bits.conn_to_port)
+    *pport = cf->conn->conn_to_port;
+  else
+    *pport = cf->conn->remote_port;
+
+  if(*phostname != cf->conn->host.name)
+    *pipv6_ip = (strchr(*phostname, ':') != NULL);
+  else
+ if(status == SEC_I_COMPLETE_NEEDED ||
+     status == SEC_I_COMPLETE_AND_CONTINUE)
+    s_pSecFn->CompleteAuthToken(&credentials, &resp_desc);
+  else if(status != SEC_E_OK && status != SEC_I_CONTINUE_NEEDED) {
+#if !defined(CURL_DISABLE_VERBOSE_STRINGS)
+    n */
+#if defined(USE_WINDOWS_SSPI) && defined(SECPKG_ATTR_ENDPOINT_BINDINGS)
+  neg_ctx->sslContext = conn->sslContext;
+#endif
+
+  /* Initialize the security context and decode our challenge */
+  result = Curl_auth_decode_spnego_message(data, userp, passwdp,      msnprintf(buf, buflen, "%s", msg);
+    else
+      msnprintf(buf, buflen, "Unknown error %d", err);
+  }
+#else
+  {
+    /* !checksrc! disable STRERROR 1 */
+    const char *msg = strerror(err);
+    if(msg)
+      msnprintf(buf, buflen, "%s", msg);
+    el
   CHECK_HANDLE(handle);
+  recv_cb_called++;
+
+  if (nread < 0) {
+    ASSERT(0 && "unexpected error");
+  } else if (nread == 0) {
+    /* Returning unused buffer */
+    ASSERT_NULL(addr);
+  } else {
+    ASSERT_NOT_NULL(addr);
+  }
+}
+
+
+static void timer_cb(uv_failed");
+
+  fail_unless(!!exp_username == !!userstr, "username expectation failed");
+  fail_unless(!!exp_password == !!passwdstr, "password expectation failed");
+  fail_unless(!!exp_options == !!options, "options expectation failed");
+
+  if(!unitfail) {
+ SIC)) {
+    inuser = curlx_convert_UTF8_to_tchar((char *) user);
+    inpass = curlx_convert_UTF8_to_tchar((char *) passwd);
+
+    rc = (int)ldap_simple_bind_s(server, inuser, inpass);
+
+    curlx_unicodefree(inuser);
+    curlx_unicodefree(inpass);
+  }
+#if derlen);
+
+int uv__udp_recv_start(uv_udp_t* handle, uv_alloc_cb alloccb,
+                       uv_udp_recv_cb recv_cb);
+
+int uv__udp_recv_stop(uv_udp_t* handle);
+
+void uv__fs_poll_close(uv_fs_poll_t* handle);
+
+int uv__getaddrinfo_translate_error(int sys_err)   /* what this message means */
+  CURL *easy_handle; /* the handle it concerns */
+  union {
+    void *whatever;    /* message-specific data */
+    CURLcode result;   /* return code for transfer */
+  } data;
+};
+typedef struct CURLMsg CURLMsg;
+
+/* Based on*
+ * data    [in]     - The session handle.
+ * userp   [in]     - The username in the format User or Domain\User.
+ * passwdp [in]     - The user's password.
+ * service [in]     - The service type such as http, smtp, pop or imap.
+ * host    [in]     - The hst *slist = NULL;
+
+  mod.dwSize = sizeof(MODULEENTRY32);
+
+  do {
+    hnd = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, 0);
+  } while(hnd == INVALID_HANDLE_VALUE && GetLastError() == ERROR_BAD_LENGTH);
+
+  if(hnd == INVALID_HANDLE_VALUE)
+    goto error;
+
+  ic void curl_perform(int fd, short event, void *arg);
+
+static curl_context_t *create_curl_context(curl_socket_t sockfd)
+{
+  curl_context_t *context;
+
+  context = (curl_context_t *) malloc(sizeof(*context));
+
+  context->sockfd = sockfd;
+
+  context->event = eed(USE_OPENSSL)
+
+#include <openssl/opensslv.h>
+
+#if (OPENSSL_VERSION_NUMBER >= 0x0090800fL)
+#define USE_OPENSSL_SHA256
+#endif
+
+#endif /* USE_OPENSSL */
+
+#ifdef USE_MBEDTLS
+#include <mbedtls/version.h>
+
+#if(MBEDTLS_VERSION_NUMBER >= 0x02070000) && \
+   (MBE ping(CURL *curl, const char *send_payload)
+{
+  size_t sent;
+  CURLcode result =
+    curl_ws_send(curl, send_payload, strlen(send_payload), &sent, 0,
+                 CURLWS_PING);
+  return (int)result;
+}
+
+static int recv_pong(CURL *curl, const char *expecng.h>
+
+#define CHECK_HANDLE(handle) \
+  ASSERT_NE((uv_udp_t*)(handle) == &server || (uv_udp_t*)(handle) == &client, 0)
+
+static uv_udp_t server;
+static uv_udp_t client;
+static uv_buf_t buf;
+static struct sockaddr_in6 lo_addr;
+
+static int cl_send_c reader operates at. */
+typedef enum {
+  CURL_CR_NET,  /* data send to the network (connection filters) */
+  CURL_CR_TRANSFER_ENCODE, /* add transfer-encodings */
+  CURL_CR_PROTOCOL, /* before transfer, but after content decoding */
+  CURL_CR_CONTENT_ENCOD {
+  static char slab[65536];
   ASSERT_LE(suggested_size, sizeof(slab));
   buf->base = slab;
   buf->len = sizeof(slab);
 }
 
 
-static void close_cb(uv_handle_t* handle) {
-  CHECK_HANDLE(handle);
-  ASSERT(uv_is_closing(handle));
-  clth empty sender data. All
-     * autoresponses should have an empty reverse-path, and should be directed
-     * to the address in the reverse-path which triggered them. Otherwise,
-     * they could cause an endless loop. See RFC 5321 Section 4.5.5 for moreing.h>
+static void send_cb(uv_udp_send_t* req, int status) {
+  struct sender_state* s;
 
-/* curl stuff */
-#include <curl/curl.h>
+  ASSERT_NOT_NULL(req);
+
+  if (status != 0) ZE, (long)pooh.sizeleft);
+
+  /* we want to use our own read function */
+  test_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+
+  /* send a multi-part formpost */
+  test_setopt(curl, CURLOPT_HTTPPOST, formpost);
+
+  /* get verbose debug output please */
+ee the response buffer */
+  free(output_token);
+
+  return CURLE_OK;
+}
 
 /*
- * Download an HTTP file and upload an FTP file simultaneously.
+ * Curl_auth_digest_cleanup()
+ *
+ * This is used to clean up the digest specific data.
+ *
+ * Parameters:
+ *
+ * digest    [in/out] - The digest data struct being cleaned up.
+ *
  */
+voaft one.
+ */
+int uv_exepath(char* buffer, size_t* size) {
+  int res;
+  char args[PATH_MAX];
+  int pid;
 
-#define HANDLECOUNT 2   /* Number of simultaneous transfers */
-#define HTTP_HANDLE 0   /* Index for the HTTP transfer */
-#define FTP_HAect_cb(uv_connect_t *req, int status) {
-  ASSERT_EQ(status, UV_ECONNREFUSED);
-}
+  if (buffer == NULL || size == NULL || *size == 0)
+    return UV_EINVAL;
 
+  res = getexe(args, sizeof(args));
+  if (res < 0)
+    return UV_EINVAL;
 
-TEST_IMPL(tcp_write_after_connect) {
-/* TODO(gengjiawen): Fix test on QEMU. */
-#if defined(__QEMU__)
-  RETURN_SKIP("Test does not currently work in QEMU");
-#endif
-
-  struurn rl.rlim_cur * 1024 * 1024;
-
-  return 0; /* There is no memory limit set. */
-}
-
-
-uint64_t uv_get_available_memory(void) {
-  return uv_get_free_memory();
-}
-
-
-int uv_resident_set_memory(size_t* rss) {
-  char* ascb;
-  char* rax;
-  size_t nframes;
-
-  ascb  *
-  ** clock_gettime() is granted to be increased monotonically when the
-  ** monotonic clock is queried. Time starting point is unspecified, it
-  ** could be the system start-up time, the Epoch, or something else,
-  ** in any case the time starting point clude "internal.h"
-#include "handle-inl.h"
-#include "req-inl.h"
-
-
-RB_HEAD(uv_signal_tree_s, uv_signal_s);
-
-static struct uv_signal_tree_s uv__signal_tree = RB_INITIALIZER(uv__signal_tree);
-static CRITICAL_SECTION uv__signal_lock;
-
-static BOOL WINAPI uv__simer_cb_watch_twice, 10, 0));
-  ASSERT_OK(uv_run(loop, UV_RUN_DEFAULT));
-
-  MAKE_VALGRIND_HAPPY(loop);
-  return 0;
-}
-
-TEST_IMPL(fs_event_watch_file_current_dir) {
-#if defined(NO_FS_EVENTS)
-  RETURN_SKIP(NO_FS_EVENTS);
-#endif
-  uv_timer_t timer;
-  uvee_all(headers);
-
-  return NULL;
-}
-
-
-/* build request url */
-static char *suburl(const char *base, int i)
-{
-  return curl_maprintf("%s%.4d", base, i);
-}
-
-
-/* test function */
-CURLcode test(char *URL)
-{
-  CURLcode res;
-  CURLSHcode scode = CURLSHE_OK;
-  CURURLOPT_AWS_SIGV4, "aws:amz:us-east-1:s3");
-  test_setopt(curl, CURLOPT_USERPWD, "xxx");
-  test_setopt(curl, CURLOPT_HEADER, 0L);
-  test_setopt(curl, CURLOPT_URL, URL);
-  list = curl_slist_append(list, "Content-Type: application/json");
-  if(!list)
-   _lock(&handle->cf_mutex);
-
-  /* Concatenate two queues */
-  if (events != NULL)
-    uv__queue_add(&handle->cf_events, events);
-
-  /* Propagate error */
-  if (err != 0)
-    handle->cf_error = err;
-  uv_mutex_unlock(&handle->cf_mutex);
-
-  uv_async_send(handl
-  "To: " TO_MAIL "\r\n"
+  r  "To: " TO_MAIL "\r\n"
   "From: " FROM_MAIL "\r\n"
   "Cc: " CC_MAIL "\r\n"
   "Message-ID: <dcd7cb36-11db-487a-9f3a-e652a9458efd@"
   "rfcpedant.example.org>\r\n"
   "Subject: SMTP example message\r\n"
-  "\r\n" /* empty line to divide headers from body, see /* proper cleanup sequence - type PB */
+  "\r\n" /* empty line to divide headers from body, see ple.com/");
 
-  curl_multi_remove_handle(m, curl);
-  curl_easy_cleanup(curl);
-  curl_multi_cleanup(m);
-  curl_global_cleanup();
-
-  /* close the local file */
-  fclose(hd_src);
-
-  /* free local memory */
-  free(sockets.read.sockeus);
-  CHECK_HANDLE(req->handle);
-  send_cb_called++;
-}
-
-static void send_cb_recverr(uv_udp_send_t* req, int status) {
-  ASSERT_PTR_NE(req, NULL);
-  ASSERT(status == 0 || status == UV_ECONNREFUSED);
-  CHECK_HANDLE(req->handle);
-  send_cb_called++;
-}
-
-st  if (!can_ipv6())
-    RETURN_SKIP("IPv6 not supported");
-  tcp_pinger_v6_new(0);
-  return run_ping_pong_test();
-}
-
-
-TEST_IMPL(tcp6_ping_pong_vec) {
-  if (!can_ipv6())
-    RETURN_SKIP("IPv6 not supported");
-  tcp_pinger_v6_new(1);
-  return run_ping_pong_teldsize;
-
-  if(!payload) {
-    DEBUGF(infof(data, "mqtt_publish without payload, return bad arg"));
-    return CURLE_BAD_FUNCTION_ARGUMENT;
-  }
-  if(postfieldsize < 0)
-    payloadlen = strlen(payload);
-  else
-    payloadlen = (size_t)postfieldsize;
-
-  resul "http_negotiate.h"
-#include "vauth/vauth.h"
-
-/* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
-
-CURLcode Curl_input_negotiate(struct Curl_easy *data, structtx {
-  uint32_t stx_mask;
-  uint32_t stx_blksize;
-  uint64_t stx_attributes;
-  uint32_t stx_nlink;
-  uint32_t stx_uid;
-  uint32_t stx_gid;
-  uint16_t stx_mode;
-  uint16_t unused0;
-  uint64_t stx_ino;
-  uint64_t stx_size;
-  uint64_t stx_blocks;
-  uint64_t s break; /* We are done here */
-
-    /* Pass all additional spaces here */
-    while(*chlg && ISBLANK(*chlg))
-      chlg++;
-
-    /* Allow the list to be comma-separated */
-    if(',' == *chlg)
-      chlg++;
-  }
-
-  /* We had a nonce since before, and we got vice = data->set.str[STRING_SERVICE_NAME] ?
-    data->set.str[STRING_SERVICE_NAME] :
-    sasl->params->service;
-#endif
-  const char *oauth_bearer = data->set.str[STRING_BEARER];
-  struct bufref nullmsg;
-
-  Curl_conn_get_host(data, FIRSTSOCKET, &hostname, &input url */
-  if(curl_url_set(uh, CURLUPART_SCHEME, gwscheme, CURLU_URLENCODE) ||
-     curl_url_set(uh, CURLUPART_HOST, gwhost, CURLU_URLENCODE) ||
-     curl_url_set(uh, CURLUPART_PORT, gwport, CURLU_URLENCODE))
-    goto clean;
-
-  /* if the input path is #ifdef DEBUGBUILD
-  int wblock_percent; /* percent of writes doing EAGAIN */
-#endif
-  BIT(got_first_byte); /* if first byte was received */
-  BIT(no_gso); /* do not use gso on sending */
+#ifdef SKIP_PEER_VERIFICATION
+    /*
+     * If you want to connect to a site who is not using a certificate that is
+     * signed by one of the certs in the CA bundle you have, you can skip the
+     * verification of the server's certificate. ds */
+  size_t hds_allc;  /* size of hds allocation */
+  size_t max_entries;   /* size limit number of entries */
+  size_t strs_len; /* length of all strings */
+  size_t max_strs_size; /* max length of all strings */
+  int opts;
 };
 
-CURLcode vquic_ctx_init(struct cf_quic_ctx *qctx);
-void vquic_ctx name is
-   * null-terminated and the last DNS name is double null-terminated. Due to
-   * this encoding, use the length of the buffer to iterate over all names.
-   */
-  result = CURLE_PEER_FAILED_VERIFICATION;
-  while(cert_hostname_buff_index < len &&
-   while (!uv__queue_empty(&loop->cf_signals)) {
-    q = uv__queue_head(&loop->cf_signals);
-    s = uv__queue_data(q, uv__cf_loop_signal_t, member);
-    uv__queue_remove(q);
-    uv__free(s);
+#define DYNHDS_OPT_NONElt: /* in case a new one is introduced to shock us */
+    return 0;
   }
 
-  /* Destroy state */
-  state = loop->cf_state;
-  uv_sem_destrotpwc->parser->file_data = NULL;
-  return CURLE_OK;
+  dump(text, stderr, (unsigned char *)data, size, config->trace_ascii);
+  return 0;
 }
 
-#define MAX_FTPLIST_BUFFER 10000 /* arbitrarily set */
 
-size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
-                          void *connptr)
-{
-  size_t bufflen = size*nmemb;
-  strurn 0;
+static size_t current_offset = 0;
+static char databuf[70000]; /* MUST be more than 64k OR
+     
+    len = Curl_dyn_len(&infop->buf);
+    mem = Curl_dyn_ptr(&infop->buf);
 
-  if(pooh->sizeleft) {
-    *ptr = pooh->readptr[0]; /* copy one single byte */
-    pooh->readptr++;                 /* advance pointer */
-    pooh->sizeleft--;                /* less data left */
-    return 1;                        /* we return 1 define curl_mutex_t           pthread_mutex_t
-#  define curl_thread_t          pthread_t *
-#  define curl_thread_t_null     (pthread_t *)0
-#  define Curl_mutex_init(m)     pthread_mutex_init(m, NULL)
-#  define Curl_mutex_acquire(m)  pthread_mutex_lock(m)
-#ckaddr_storage laddr;
-  int laddrlen = sizeof(laddr);
+    switch(parser->os_type) {
+    case OS_TYPE_UNIX:
+      switch(parser->state.UNIX.main) {
+      case PL_UNIX_TOTALSIZE:
+        switch(parser->state.UNIX.sub.total_dirsize) {
+     /* doing_getsock */
+  ZERO_NULL,                          /* domore_getsock */
+  ZERO_NULL,                          /* perform_getsock */
+  ZERO_NULL,                          /* disconnect */
+  ZERO_NULL,                          /* write_resp */
+  ZEnger_write_ping(pinger);
 
-  if(!fromaddr || !addrlen || *addrlen <= 0)
-    return recvfrom(sd, buffer, buflen, flags, fromaddr, addrlen);
-
-  laddr.ss_family = AF_UNSPEC;          /* To detect if unused. */
-  rcvlen = recvfrom(sum; i++) {
-    short events = 0;
-    if(ps->actions[i] & CURL_POLL_IN)
-      events |= CURL_WAIT_POLLIN;
-    if(ps->actions[i] & CURL_POLL_OUT)
-      events |= CURL_WAIT_POLLOUT;
-    if(events) {
-      if(cwfds_add_sock(cwfds, ps->sockets[i], events))
-    AD_EASY_HANDLE:
-    return "Invalid easy handle";
-
-  case CURLM_OUT_OF_MEMORY:
-    return "Out of memory";
-
-  case CURLM_INTERNAL_ERROR:
-    return "Internal error";
-
-  case CURLM_BAD_SOCKET:
-    return "Invalid socket argument";
-
-  case CURLM_UNKNOWN_OPTIORY;
+  ASSERT_OK(uv_read_start((uv_stream_t*) &pinger->stream.tcp,
+                          alloc_cb,
+                          pinger_read_cb));
+  ASSERT_OK(uv_read_start((uv_stream_t*) ponger,
+                          alloc_cb,
+   d)blocking;
+  if(cf->connected) {
+    *done = TRUE;
+    return CURLE_OK;
   }
-  else
-    *plist = list;
+
+  *done = FALSE;
+  now = Curl_now();
+  switch(ctx->state) {
+  case CF_HC_INIT:
+    DEBUGASSERT(!ctx->h3_baller.cf);
+    DEBUGASSERT(!ctx->h21_baller.cf);
+    DEBUGASSERT(!cf->nex+)
+    handles[i] = curl_easy_init();
+
+  /* set the options (I left out a few, you get the point anyway) */
+  curl_easy_setopt(handles[HTTP_HANDLE], CURLOPT_URL, "https://example.com");
+
+  curl_easy_setopt(handles[FTP_HANDLE], CURLOPT_URL, "ftp://exampleup.h"
+#include "tool_cfgable.h"
+
+void tool_init_stderr(void);
+void tool_set_stderr_file(struct GlobalConfig *global, char *filename);
+
+#endif /* HEADER_CURL_TOOL_STDERR_H */
+#ifndef HEADER_CURL_TOOL_SDECLS_H
+#define HEADER_CURL_TOOL_SDECLS_H
+/***led;
+
+  ASSERT_PTR_EQ(handle, &fs_event);
+  ASSERT_OK(status);
+  ASSERT_EQ(events, UV_CHANGE);
+  #if defined(__APPLE__) || defined(_WIN32) || defined(__linux__)
+  ASSERT_OK(strcmp(filename, "watch_file"));
+  #else
+  ASSERT(filename == NULL || strcmp(filena  /* init a multi stack */
+  multi = curl_multi_init();
+
+  easy = curl_easy_init();
+
+  /* set options */
+  setup(easy);
+
+  /* add the easy transfer */
+  curl_multi_add_handle(multi, easy);
+
+  curl_multi_setopt(multi, CURLMOPT_PIPELINING, CURLPIPE_MULTIPLEtive, 0);
+
+  /* Init idle_2 and make it active */
+  if (!idle_2_is_active && !uv_is_closing((uv_handle_t*)&idle_2_handle)) {
+    r = uv_idle_init(uv_default_loop(), &idle_2_handle);
+    ASSERT_OK(r);
+    r = uv_idle_start(&idle_2_handle, idle_2_cb);
+    ASback)
+    /* only output if we do not use a progress callback and we are not
+     * hidden */
+    fprintf(data->set.err, "\n");
+
+  data->progress.speeder_c = 0; /* reset the progress meter display */
+  return 0;
+}
+
+/* reset the known transfer sizes */
+voilist, "Content-Type: application/json");
+  if(!list)
+    goto test_cleanup;
+  test_setopt(curl, CURLOPT_HTTPHEADER, list);
+  if(libtest_arg2) {
+    connect_to = curl_slist_append(connect_to, libtest_arg2);
+  }
+  test_setopt(curl, CURLOPT_CONNECT_TO, connec.",user);
+  free(user);
+  user = NULL;
+
+  /* Do encryption */
+  socksreq[0] = 1;    /* GSS-API subnegotiation version */
+  socksreq[1] = 2;    /* encryption message type */
+
+  gss_enc = 0; /* no data protection */
+  /* do confidentiality protection if supp CURLE_FAILED_INIT;
+
+    if(!CryptGenRandom(hCryptProv, (DWORD)length, entropy)) {
+      CryptReleaseContext(hCryptProv, 0UL);
+      return CURLE_FAILED_INIT;
+    }
+
+    CryptReleaseContext(hCryptProv, 0UL);
+  }
+  return CURLE_OK;
+#else
+  return CURLE_NOT_lect() is being used
+ * and a file descriptor is too large for FD_SETSIZE.
+ *
+ * A negative timeout value makes this function wait indefinitely,
+ * unless no valid file descriptor is given, when this happens the
+ * negative timeout is ignored and the functss than 'datasize'. Get the smallest piece.
+      */
+      piece = blen;
+      if(ch->datasize < (curl_off_t)blen)
+        piece = curlx_sotouz(ch->datasize);
+
+      /* Write the data portion available */
+      if(!data->set.http_te_skip && !ch->ignore_bod)
+
+#define res_multi_init(A) \
+  exe_multi_init((A), (__FILE__), (__LINE__))
+
+#define chk_multi_init(A,Y,Z) do { \
+  exe_multi_init((A), (Y), (Z));   \
+  if(res)                          \
+    goto test_cleanup;             \
+} while(0)
+
+#define multi_initl_auth_gsasl_cleanup(struct gsasldata *digest);
+#endif
+
+#if defined(USE_NTLM)
+/* This is used to evaluate if NTLM is supported */
+bool Curl_auth_is_ntlm_supported(void);
+
+/* This is used to generate a base64 encoded NTLM type-1 message */
+CURLcode Curl_a   /* Base-36 digits for numbers.  */
+  int done = 0;   /* number of characters written  */
+  int i;
+  int ocount = 0; /* number of output segments */
+  int icount = 0; /* number of input arguments */
+
+  struct outsegment output[MAX_SEGMENTS];
+  struct va_ outlen = sizeof(out);
+  for(j = 0; j < i; j++) {
+    size_t n = strlen(src[j]);
+    /* we need room for a space, the string and the final zero */
+    if(outlen <= (n + 2))
+      break;
+    if(j) {
+      /* prepend a space if not the first */
+      *outp++ char *name, size_t namelen)
+{
+  return !!Curl_dynhds_get(dynhds, name, namelen);
+}
+
+bool Curl_dynhds_ccontains(struct dynhds *dynhds, const char *name)
+{
+  return Curl_dynhds_contains(dynhds, name, strlen(name));
+}
+
+size_t Curl_dynhds_count_name(struct Curl_llist_element case1_list;
+  struct Curl_llist_element case2_list;
+  struct Curl_llist_element case3_list;
+  struct Curl_llist_element case4_list;
+  struct Curl_llist_element *head;
+  struct Curl_llist_element *element_next;
+  struct Curl_llist_elemeAVE_STRUCT_TIMEVAL
+
+/* Define if you have the <io.h> header file. */
+#undef HAVE_IO_H
+
+/* Define if you need the malloc.h header file even with stdlib.h  */
+/* #define NEED_MALLOC_H 1 */
+
+/* Define if you have the <netdb.h> header file. */
+#dize_t suggested_size,
+                          uv_buf_t* buf) {
+  buf->base = malloc(suggested_size);
+  buf->len = suggested_size;
+}
+
+
+static void on_tcp_read(uv_stream_t* tcp, ssize_t nread, const uv_buf_t* buf) {
+  ASSERT_GT(nread, 0);
+  ASSERT_MEM_EQ(rintf
+# undef vaprintf
+# define printf curl_mprintf
+# define fprintf curl_mfprintf
+# define msnprintf curl_msnprintf
+# define vprintf curl_mvprintf
+# define vfprintf curl_mvfprintf
+# define mvsnprintf curl_mvsnprintf
+# define aprintf curl_maprintf
+# definechar *url, *host = NULL, *port = NULL;
+
+  if(argc != 2) {
+    fprintf(stderr, "ERROR: need URL as argument\n");
+    return 2;
+  }
+  url = argv[1];
+
+  curl_global_init(CURL_GLOBAL_DEFAULT);
+  curl_global_trace("ids,time");
+
+  cu = curl_url();
+  if(!cu) {
+  size));
+  if(!result && (is_eos || blen)) {
+    result = Curl_client_write(data, CLIENTWRITE_BODY|
+                               (is_eos? CLIENTWRITE_EOS:0),
+                               (char *)buf, blen);
+  }
+
+out:
+  if((data->set.rtspreq == RTSPREQ_R text, (unsigned long)size, (unsigned long)size);
+
+  for(i = 0; i<size; i += width) {
+
+    fprintf(stream, "%4.4lx: ", (unsigned long)i);
+
+    if(!nohex) {
+      /* hex not disabled, show it */
+      for(c = 0; c < width; c++)
+        if(i + c < size)
+    URLOPT_MAIL_RCPT, recipients);
+
+    /* We are using a callback function to specify the payload (the headers and
+     * body of the message). You could just use the CURLOPT_READDATA option to
+     * specify a FILE pointer to read from. */
+ _t* req;
+
+  req = container_of(w, uv_random_t, work_req);
+  req->status = uv__random(req->buf, req->buflen);
+}
+
+
+static void uv__random_done(struct uv__work* w, int status) {
+  uv_random_t* req;
+
+  req = container_of(w, uv_random_t, work_req);
+  uv__req_unif(curl) {
+    /* Create the form */
+    form = curl_mime_init(curl);
+
+    /* Fill in the file upload field */
+    field = curl_mime_addpart(form);
+    curl_mime_name(field, "sendfile");
+    curl_mime_filedata(field, "postit2.c");
+
+    /* Fill in th    *plist = list;
   return ret;
 }
 
@@ -1407,95 +1467,170 @@ CURLcode easysrc_addf(struct slist_wc **plist, const char *fmt, ...)
   bufp = curlx_mvaprintf(fmt, ap);
   va_end(ap);
   if(!bufp) {
-      /* do_it */
-  rtsp_done,                            /* done */
-  ZERO_NULL,                            /* do_more */
-  rtsp_connect,                         /* connect_it */
-  ZERO_NULL,                            /* connecting */
-  ZERO_NULL,  char *function)
-{
-  if(status != SEC_E_OK &&
-     status != SEC_I_COMPLETE_AND_CONTINUE &&
-     status != SEC_I_COMPLETE_NEEDED &&
-     status != SEC_I_CONTINUE_NEEDED) {
-    char buffer[STRERROR_LEN];
-    failf(data, "SSPI error: %s failed: %s", functE, 1L); /* show verbose for debug */
-  test_setopt(curl, CURLOPT_HEADER, 1L); /* include header */
+    ret = CUR
 
-#ifdef LIB584
-  {
-    curl_mime *mime = curl_mime_init(curl);
-    curl_mimepart *part = curl_mime_addpart(mime);
-    curl_mime_name(part, "fake");
-  ASYNC_SUCCESS CURLE_OK
+  /* Generate our SPN */
+  if(host && realm)
+    spn = aprintf("%s/%s@%s", service, host, realm);
+  else if(host)
+    spn = aprintf("%s/%s", service, host);
+  else if(realm)
+    spn = aprintf("%s@%s", service, realm);
 
-struct addrinfo;
-struct hostent;
-struct Curl_easy;
-struct connectdata;
-
-/*
- * Curl_global_host_cache_init() initializes and sets up a global DNS cache.
- * Global DNS cache is general badness. Do not use. This will be removed in
- * auv__udp_recv_start(uv_udp_t* handle, uv_alloc_cb alloccb,
-                       uv_udp_recv_cb recv_cb);
-
-int uv__udp_recv_stop(uv_udp_t* handle);
-
-void uv__fs_poll_close(uv_fs_poll_t* handle);
-
-int uv__getaddrinfo_translate_error(int sys_err);    /* EAI_ sig_func(uv_signal_t* handle, int signum) {
-  uv_signal_stop(handle);
-}
-
-TEST_IMPL(eintr_handling) {
-  struct thread_ctx ctx;
-  uv_thread_t thread;
-  uv_signal_t signal;
-  int nread;
-
-  iov = uv_buf_init(buf, sizeof(buf));
-  loop = uv_default_loop();
-
-  AptGenRandom(hCryptProv, (DWORD)length, entropy)) {
-      CryptReleaseContext(hCryptProv, 0UL);
-      return CURLE_FAILED_INIT;
-    }
-
-    CryptReleaseContext(hCryptProv, 0UL);
-  }
-  return CURLE_OK;
-#else
-  return CURLE_NOT_BUILT_IN;
-#endif
-}
-#endif
-
-stati      double ulnow)
-{
-  (void)dltotal;
-  (void)dlnow;
-  (void)ultotal;
-  (void)ulnow;
-  (void)clientp;
-#if 0
-  /* Used to unpause on progress, but keeping for now. */
-  {
-    CURL *curl = (CURL *)clientp;
-    curl_easy_pause(curl, CURLPAUSE_CONT);
-      [in/out] - The NTLM data struct being cleaned up.
- *
+  /* Return our newly allocated SPNe it with all the hostnames. Each string
+ * in the host_names is null-terminated and the last string is double
+ * null-terminated. If no DNS names are found, a single null-terminated empty
+ * string is returned.
  */
-void Curl_auth_cleanup_ntlm(struct ntlmdata *ntlm)
+static DWORD cert_get_name_string(structpe type)
 {
-  /* Free the target info */
-  Curl_safefree(ntlm->target_info);
+  /*
+   * This is the trace look that is similar to what libcurl makes on its
+   * own.
+   */
+  static const char * const s_infotype[] = {
+    "* ", "< ", "> ", "{ ", "} ", "{ ", "} "
+  };
+  if(idsbuf && *idsbuf)
+    fprintf(log, "%s%s", idsbuf,IN32
+#define PATHSEP "\\"
+#define IS_SEP(x) (((x) == '/') || ((x) == '\\'))
+#elif defined(MSDOS) || defined(__EMX__) || defined(OS2)
+#define PATHSEP "\\"
+#define IS_SEP(x) ((x) == '\\')
+#else
+#define PATHSEP "/"
+#define IS_SEP(x) ((x) == '/')
+#endif
 
-  /* Reset any variables */
-  ntlm->target_info_len = 0;
+statie[] = {
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0,       /* 0x30 - 0x3f */
+  0, 10, 11, 12, 13, 14, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x40 - 0x4f */
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       /* 0x50 - 0x5f */
+  0, 10, 11, 12, 13, 14, 1 void connect_cb(uv_connect_t *req, int status) {
+  ASSERT_OK(status);
+  ASSERT_PTR_EQ(req, &connect_req);
+
+  /* Start reading from the connection so we receive the RST in uv__read. */
+  ASSERT_OK(uv_read_start((uv_stream_t*) &tcp, alloc_cb, read_cb));
+
+  H_ERROROUT
+ */
+#define CURL_PUSH_OK       0
+#define CURL_PUSH_DENY     1
+#define CURL_PUSH_ERROROUT 2 /* added in 7.72.0 */
+
+struct curl_pushheaders;  /* forward declaration only */
+
+CURL_EXTERN char *curl_pushheader_bynum(struct curl_pushheaders *h,
+     READDATA, hd_src);
+
+  /* and give the size of the upload (optional) */
+  test_setopt(curl, CURLOPT_INFILESIZE_LARGE,
+                   (curl_off_t)file_info.st_size);
+
+  /* Now run off and do what you've been told! */
+  res = curl_easy_perform(curl);
+
+tes Check the sockets for reading / writing */
+    checkFdSet(m, &sockets.read, &readSet, CURL_CSELECT_IN, "read");
+    checkFdSet(m, &sockets.write, &writeSet, CURL_CSELECT_OUT, "write");
+
+    if(timeout.tv_sec != -1 && getMicroSecondTimeout(&timeout) == 0) NT_RESOLVE_HOST
+#define Curl_resolver_duphandle(x,y,z) CURLE_OK
+#define Curl_resolver_init(x,y) CURLE_OK
+#define Curl_resolver_global_init() CURLE_OK
+#define Curl_resolver_global_cleanup() Curl_nop_stmt
+#define Curl_resolver_cleanup(x) Curl_nop_stmt
+#endifill the echo-server. This will not
+   * effect our connection.
+   */
+  uv_write(&write_req, (uv_stream_t*) &tcp, &qbuf, 1, NULL);
+
+  /* Shutdown our end of the connection.  */
+  uv_shutdown(&shutdown_req, (uv_stream_t*) &tcp, shutdown_cb);
+
+  called_connec      (struct sockaddr *)&remote_addr,
+                            &remote_addrlen)) == -1 &&
+          SOCKERRNO == EINTR)
+      ;
+    if(nread == -1) {
+      if(SOCKERRNO == EAGAIN || SOCKERRNO == EWOULDBLOCK) {
+        CURL_TRC_CF(data, cf, "ingress, reps->num; i++) {
+    short events = 0;
+    if(ps->actions[i] & CURL_POLL_IN)
+      events |= CURL_WAIT_POLLIN;
+    if(ps->actions[i] & CURL_POLL_OUT)
+      events |= CURL_WAIT_POLLOUT;
+    if(events) {
+      if(cwfds_add_sock(cwfds, ps->sockets[i], events))   tsi->internals = NULL;
+
+#ifdef USE_SSL
+      if(conn && tsi->backend != CURLSSLBACKEND_NONE) {
+        tsi->internals = Curl_ssl_get_internals(data, FIRSTSOCKET, info, 0);
+      }
+#endif
+    }
+    break;
+  default:
+    return CURLE_UNKNOWN_OPTION;
+  }
+
+ockaddr, sa_family) +
+     sizeof(srcaddr->sa_family) || srclen > sizeof(*dstaddr)) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  memcpy((char *) dstaddr, (char *) srcaddr, srclen);
+
+  switch(srcaddr->sa_family) {
+
+  case AF_UNIX:
+    srcu = (const s;
+  uint8_t msg_ctrl[CMSG_SPACE(sizeof(uint16_t))];
+  size_t gso_size;
+  size_t pktlen;
+  size_t offset, to;
+
+  msg_iov.iov_base = buf;
+  msg_iov.iov_len = (int)sizeof(buf);
+
+  memset(&msg, 0, sizeof(msg));
+  msg.msg_iov = &msg_iov;
+  msg.msg_iovlen = 1;
+   long timeout;
+  struct ev_io ev;
+  int evset;
+  GlobalInfo *global;
+} SockInfo;
+
+static void timer_cb(EV_P_ struct ev_timer *w, int revents);
+
+/* Update the event timer after curl_multi library calls */
+static int multi_timer_cb(CURLM *multi, long timeouRLOPT_RTSP_STREAM_URI, stream_uri);
+  curl_free(stream_uri);
+  stream_uri = NULL;
+
+  sdp = open(libtest_arg2, O_RDONLY);
+  fstat(sdp, &file_info);
+  close(sdp);
+
+  sdpf = fopen(libtest_arg2, "rb");
+  if(!sdpf) {
+    fprintf(stderr, "can't open %s\n", libtet count) {
+  int i;
+  for (i = 0; i < count; ++i)
+    uv__free(addresses[i].name);
+  uv__free(addresses);
 }
 
-#endif /* USE_NTL_t process_title_mutex;
+
+void uv__platform_invalidate_fd(uv_loop_t* loop, int fd) {
+  struct epoll_event* events;
+  struct epoll_event dummy;
+  uintptr_t i;
+  uintptr_t nfrocess_title_mutex;
 static uv_once_t process_title_mutex_once = UV_ONCE_INIT;
 static struct uv__process_title process_title;
 static void* args_mem;
@@ -1506,388 +1641,282 @@ static void init_process_title_mutex_once(void) {
 }
 
 
-char** uvcf->conn->host.name;
+char** uv_setlude "timeval.h"
 
-  if(cf->sockindex == SECONDARYSOCKET)
-    *pport = cf->conn->secondary_port;
-  else if(cf->conn->bits.conn_to_port)
-    *pport = cf->conn->conn_to_port;
-  else
-    *pport = cf->conn->remote_port;
-
-  if(*phostname != cf->conn->host.nas'\n", headp /* skip :path + colon */);
-
-  (*transfers)++; /* one more */
-  return CURL_PUSH_OK;
-}
-
-
-/*
- * Download a file over HTTP/2, take care of server push.
- */
-int main(void)
-{
-  CURL *easy;
-  CURLM *multi;
-  int still_running; /* keep number of runnnch
- * resolver backends.
- */
-
-/*
- * Curl_resolver_global_init()
- *
- * Called from curl_global_init() to initialize global resolver environment.
- * Returning anything else than CURLE_OK fails curl_global_init().
- */
-int Curl_resolver_global_init(void);
-
-/*
- * CURL_CSELECT_IN - first socket is readable
- * CURL_CSELECT_IN2 - second socket is readable
- * CURL_CSELECT_OUT - write socket is writable
- * CURL_CSELECT_ERR - an error condition occurred
- */
-int Curl_socket_check(curl_socket_t readfd0, /* two sockets &running_handles);
-
-  check_multi_info();
-}
-
-static void on_timeout(evutil_socket_t fd, short events, void *arg)
-{
-  int running_handles;
-  curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0,
-                           &running_handles);
-  check_etopt(handle, CURLOPT_PRIVATE, mem);
-
-  /* For completeness */
-  curl_easy_setopt(handle, CURLOPT_ACCEPT_ENCODING, "");
-  curl_easy_setopt(handle, CURLOPT_TIMEOUT, 5L);
-  curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
-  /* only allow redirects to HT(result == CURLE_OK &&
-      (conn_config->CAfile || conn_config->ca_info_blob) &&
-      BACKEND->use_manual_cred_validation) {
-    /*
-     * Create a chain engine that uses the certificates in the CA file as
-     * trusted certificates. This is only su {
-    "* ", "< ", "> ", "{ ", "} ", "{ ", "} "
-  };
-  if(idsbuf && *idsbuf)
-    fprintf(log, "%s%s", idsbuf, s_infotype[type]);
-  else
-    fputs(s_infotype[type], log);
-}
-
-#define TRC_IDS_FORMAT_IDS_1  "[%" CURL_FORMAT_CURL_OFF_T "-x] "
-#define TRC_IDS_FOv_pipe_open(&channel, 0);
-
-  ASSERT_EQ(1, uv_is_readable((uv_stream_t*) &channel));
-  ASSERT_EQ(1, uv_is_writable((uv_stream_t*) &channel));
-  ASSERT_OK(uv_is_closing((uv_handle_t*) &channel));
-
-  r = uv_write(&write_req,
-               (uv_stream_t*)&chanULL) != UV_ENOENT;
-  if (has_shortnames) {
-    r = uv_fs_event_init(loop, &fs_event);
-    ASSERT_OK(r);
-    r = uv_fs_event_start(&fs_event, fs_event_cb_dir, "watch_~1", 0);
-    ASSERT_OK(r);
-    r = uv_timer_init(loop, &timer);
-    ASSERT_OK(r);
-    r = u& "unexpected error");
-  }
-
-  if (nread == 0) {
-    /* Returning unused buffer. Don't count towards cl_recv_cb_called */
-    ASSERT_NULL(addr);
-    return;
-  }
-
-  ASSERT_NOT_NULL(addr);
-  ASSERT_EQ(4, nread);
-  ASSERT(!memcmp("PING", buf->base, nread));
-
-  */
-
-struct getout *new_getout(struct OperationConfig *config)
-{
-  struct getout *node = calloc(1, sizeof(struct getout));
-  struct getout *last = config->url_last;
-  if(node) {
-    static int outnum = 0;
-
-    /* append this new node last in the lindif
-
-#define NW_CHUNK_SIZE     (64 * 1024)
-#define NW_SEND_CHUNKS    2
-
-
-void Curl_quic_ver(char *p, size_t len)
-{
-#if defined(USE_NGTCP2) && defined(USE_NGHTTP3)
-  Curl_ngtcp2_ver(p, len);
-#elif defined(USE_OPENSSL_QUIC) && defined(USE_NGHTTP3)
-  Curl_osING);
-  return (int)result;
-}
-
-static int recv_pong(CURL *curl, const char *expected_payload)
-{
-  size_t rlen;
-  const struct curl_ws_frame *meta;
-  char buffer[256];
-  CURLcode result = curl_ws_recv(curl, buffer, sizeof(buffer), &rlen, &meta);
-  if(!resul_w_token[2].cbBuffer);
-
-    s_pSecFn->FreeContextBuffer(sspi_w_token[0].pvBuffer);
-    sspi_w_token[0].pvBuffer = NULL;
-    sspi_w_token[0].cbBuffer = 0;
-    s_pSecFn->FreeContextBuffer(sspi_w_token[1].pvBuffer);
-    sspi_w_token[1].pvBuffer = NULL;
-    ssta[size - 1] != '\n')) ? 1 : 0;
-    traced_data = 0;
-    break;
-  case CURLINFO_TEXT:
-  case CURLINFO_HEADER_IN:
-    if(!newl)
-      log_line_start(output, idsbuf, type);
-    (void)fwrite(data, size, 1, output);
-    newl = (size && (data[size - 1] != '\n')ree(digest->algorithm);
-
-  digest->nc = 0;
-  digest->algo = ALGO_MD5; /* default algorithm */
-  digest->stale = FALSE; /* default means normal, not stale */
-  digest->userhash = FALSE;
-}
-#endif  /* !USE_WINDOWS_SSPI */
-
-#endif  /* !CURL_DISABLE_DIGEST_AUTH_info = *cpu_infos;
-  idx = 0;
-  while (idx < *count) {
-    cpu_info->speed = *(int*)(info.siv1v2si22v1.si22v1cpucapability);
-    cpu_info->model = uv__malloc(ZOSCPU_MODEL_LENGTH + 1);
-    if (cpu_info->model == NULL) {
-      uv_free_cpu_info(*cpu_infos, inction.
-   */
-  return TRUE;
-}
-
-void *create_thread(void *progress_bar)
-{
-  pthread_t tid[NUMT];
-  int i;
-
-  /* Make sure I do not create more threads than urls. */
-  for(i = 0; i < NUMT && i < num_urls ; i++) {
-    int error = pthread_create(&tid[i],
-    tBody)
-{
-  FILE *outfile;
-  CURLcode res;
-
-  outfile = NULL;
-  if(HttpGetBody == HTTP_COMMAND_HEAD)
-    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
-  else {
-    outfile = fopen(OutFileName, "wb");
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, outfile);
-  }ERT_NE((uv_udp_t*)(handle) == &server || (uv_udp_t*)(handle) == &client, 0)
-
-#define MULTICAST_ADDR "239.255.0.1"
-
-static uv_udp_t server;
-static uv_udp_t client;
-static uv_udp_send_t req;
-static uv_udp_send_t req_ss;
-
-static int cl_recv_cb_called;
-
-statspawn_init_posix_spawn(void) {
-  /* Init handles to all potentially non-defined functions */
-  uv__spawn_init_posix_spawn_fncs();
-
-  /* Init feature detection for POSIX_SPAWN_SETSID flag */
-  uv__spawn_init_can_use_setsid();
-}
-
-
-static int uv__spawn_set_poULL);
-}
-#undef time
-#define time(x) hsts_debugtime(x)
+#ifdef HAVE_GNUTLS_SRP
+/* the function exists */
+#ifdef USE_TLS_SRP
+/* the functionality is not disabled */
+#define USE_GNUTLS_SRP
+#endif
 #endif
 
-struct hsts *Curl_hsts_init(void)
-{
-  struct hsts *h = calloc(1, sizeof(struct hsts));
-  if(h) {
-    Curl_llist_init(&h->list, NULL);
+struct Curl_easy;
+struct Curl_cfilter;
+struct ssl_primary_config;
+struct ssl_config_data;
+st '\0';
+      len = clip - target;
+    }
   }
-  return h;
+
+#ifdef MSDOS
+  sc = msdosify(&p, target, flags);
+  free(target);
+  if(sc)
+    return sc;
+  target = p;
+  len = strlen(target);
+
+  if(len > max_sanitized_len) {
+    free(target);
+    return SANITIZE_ERR_INVALID_PEFAULT));
+
+  MAKE_VALGRIND_HAPPY(loop);
+  return 0;
 }
 
-static void hsts_free(struct stsentry *e)rver;
+TEST_IMPL(fs_event_watch_file_current_dir) {
+#if defined(NO_FS_EVENTS)
+  RETURN_SKIP(NO_FS_EVENTS);
+#endif
+  uv_timer_t timer;
+  uv_loop_t* loop;
   int r;
 
-  r = uv_pipe_init(uv_default_loop(), &server, 0);
-  ASSERT_OK(r);
-  r = uv_pipe_bind(&server, TEST_PIPENAME);
-  ASSERT_OK(r);
-  r = uv_pipe_bind(&server, TEST_PIPENAME_2);
-  ASSERT_EQ(r, UV_EINVAL);
+  loop = uv_default_loop();
 
-  uv_close((uv_handle_t*)&server, close_tcp_t tcp;
-static uv_connect_t connect_req;
-static uv_write_t write_req;
-static uv_shutdown_t shutdown_req;
-static uv_buf_t qbuf;
-static int got_q;
-static int got_eof;
-static int called_connect_cb;
-static int called_shutdown_cb;
-static int called_tcp_clo get
-     * the issuer certificate (or the host certificate if the certificate is
-     * self-signed) and add it to the set of certificates that are known to
-     * libcurl using CURLOPT_CAINFO and/or CURLOPT_CAPATH. See docs/SSLCERTS
-     * for more infor   uv__metrics_set_provider_entry_time(loop);
+  /* Setup */
+ i + c] >= 0x20) && (ptr[i + c]<0x80)?ptr[i + c]:'.');
+      /* check again for 0D0A, to avoid an extra \n if it's at width */
+      if(nohex && (i + c + 2 < size) && ptr[i + c + 1] == 0x0D &&
+         ptr[i + c + 2] == 0x0A) {
+        i += (c + 3 - width);P_NOT_FOUND;
 
-    /* Store the current timeout in a location that's globally accessible so
-     * other locations like uv__work_done() can determine whether the queue
-     * of events in the callback were waiting when poll length.
- * len    [out]    - If not NULL, effective name length.
- *
- * Returns the SASL mechanism token or 0 if no match.
- */
-unsigned short Curl_sasl_decode_mech(const char *ptr, size_t maxlen,
-                                     size_t *len)
-{
-  unsid char hextable[] = {
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0,       /* 0x30 - 0x3f */
-  0, 10, 11, 12, 13, 14, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x40 - 0x4f */
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       /* 0x50 - 0x5f */
-  0, 10, 11,void *cb_data)
-{
-  struct callback_data *data = cb_data;
-  size_t written = 0;
-  if(data->output)
-    written = fwrite(buff, size, nmemb, data->output);
-  else
-    /* listing output */
-    written = fwrite(buff, size, nmemb, stdout);
-  return written;
+  dummy = socket(AF_INET, SOCK_STREAM, 0);
+  if(CURL_SOCKET_BAD == dummy)
+    return IF2IP_NOT_FOUND;
+
+  memset(&req, 0, sizeof(req));
+  memcpy(req.ifr_name, interf, len + 1);
+  req.ifr_addr.sa_family = AF_INET;
+
+  if(ioctl(dummy, SIOCGIFADDRCURLE_ABORTED_BY_CALLBACK;
+    }
+
+    if(delta >= PAUSE_TIME)
+      curl_easy_pause(pooh->easy, CURLPAUSE_CONT);
+  }
+
+  return 0;
 }
-#OPT_PIPELINING, CURLPIPE_MULTIPLEX);
 #endif
 
-  /* sets html start page */
-  curl_multi_add_handle(multi_handle, make_handle(start_page));
+CURLcode test(char *URL)
+{
+#if defined(LIB670) || defined(LIB671)
+  curl_mime *mime = NULL;
+  curl_mimepart *part;
+#   int fd;
+    do {
+      fd = open(fname, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, OPENMODE);
+      /* Keep retrying in the hope that it is not interrupted sometime */
+    } while(fd == -1 && errno == EINTR);
+    if(config->file_clobber_mode == CLOBBER_NEV>req.p.mqtt;
+  size_t rlen = Curl_dyn_len(&mq->recvbuf);
+  CURLcode result;
 
-  int msgs_left;
-  int pending = 0;
-  int complete = 0;
-  int still_running = 1;
-  while(still_running && !pending_in'\0';
+  if(rlen < nbytes) {
+    unsigned char readbuf[1024];
+    ssize_t nread;
+
+    DEBUGASSERT(nbytes - rlen < sizeof(readbuf));
+    result = Curl_xfer_recv(data, (char *)readbuf, nbystruct uv__loop_metrics_s uv__loop_metrics_t;
+typedef struct uv__loop_internal_fields_s uv__loop_internal_fields_t;
+
+struct uv__loop_metrics_s {
+  uv_metrics_t metrics;
+  uint64_t provider_entry_time;
+  uint64_t provider_idle_time;
+  uv_mutex_t lock;
+};
+
+v 1
+#  define CURL_PULL_SYS_SOCKET_H     1
+
+/* ===================================== */
+/*    KEEP MSVC THE PENULTIMATE ENTRY    */
+/* ===================================== */
+
+#elif defined(_MSC_VER)
+#  if (_MSC_VER >= 1800)
+#    include <inttypes.h>
+#    h"
+
+#ifdef USE_SCHANNEL
+#ifndef USE_WINDOWS_SSPI
+#  error "cannot compile SCHANNEL support without SSPI."
+#endif
+
+#include "schannel.h"
+#include "schannel_int.h"
+
+#include "vtls.h"
+#include "vtls_int.h"
+#include "sendf.h"
+#include "strerror.h"
+#ih"
+
+#ifndef HAVE_STRDUP
+char *Curl_strdup(const char *str);
+#endif
+#ifdef _WIN32
+wchar_t* Curl_wcsdup(const wchar_t* src);
+#endif
+void *Curl_memdup(const void *src, size_t buffer_length);
+void *Curl_saferealloc(void *ptr, size_t size);
+void *Curl_memdup0(cop);
+}
+
+
+BENCHMARK_IMPL(tcp_pump100_client) {
+  tcp_pump(100);
+  return 0;
+}
+
+
+BENCHMARK_IMPL(tcp_pump1_client) {
+  tcp_pump(1);
+  return 0;
+}
+
+
+BENCHMARK_IMPL(pipe_pump100_client) {
+  pipe_pump(100);
+  return 0;
+}
+
+
+BENCHMARK_IMPL(pipe_pump1_client) {      (void)fwrite(data + st, i - st + 1, 1, output);
+          st = i + 1;
+          newl = 0;
+        }
+      }
+      if(!newl)
+        log_line_start(output, idsbuf, type);
+      (void)fwrite(data + st, i - st + 1, 1, output);
+    }
+    newl = (sizphase */
+  /* end of READDIR stuff */
+
+  int secondCreateDirs;         /* counter use by the code to see if the
+                                   second attempt has been made to change
+                                   to/create a directory */
+  int orige echo is disabled, print a newline */
+  fputs("\n", tool_stderr);
+  /* if user did not hit ENTER, terminate buffer */
+  if(i == buflen)
+    buffer[buflen-1] = '\0';
 
   return buffer; /* we always return success */
 }
 #define DONE
 #endif /* _WIN32 */
 
-#ifndef DONE /* not previously provided */
-
-#ifdef HAVE_TERMIOS_H
-#  define struct_term  struct termios
-#elif defined(HAVE_TERMIO_H)
-#  define struct_term  struct tedif
-
-/* This is used to test if the user contains a Windows domain name */
-bool Curl_auth_user_contains_domain(const char *user);
-
-/* This is used to generate a PLAIN cleartext message */
-CURLcode Curl_auth_create_plain_message(const char *authzid,
-     ar *interf,
-                          char *buf, size_t buf_size)
-{
-    (void) af;
-#ifdef USE_IPV6
-    (void) remote_scope;
-    (void) local_scope_id;
-#endif
-    (void) interf;
-    (void) buf;
-    (void) buf_size;
-    return IF2IP_NOT_FOUND;
+#ifnd);
 }
 
-#eo_read(g->multi, &msgs_left))) {
-    if(msg->msg == CURLMSG_DONE) {
-      easy = msg->easy_handle;
-      res = msg->data.result;
-      curl_easy_getinfo(easy, CURLINFO_PRIVATE, &conn);
-      curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &eff_url);
- d(USE_WOLFSSL)
-#include <wolfssl/openssl/evp.h>
+#ifdef _MSC_VER
+/* warning C4706: assignment within conditional expression */
+#pragma warning(disable:4706)
 #endif
 
-#elif defined(USE_GNUTLS)
-#include <nettle/sha.h>
-#elif defined(USE_MBEDTLS)
-#include <mbedtls/sha256.h>
-#elif (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && \
-              (__MAC_OS_X_VERSION_MAX_ALLOW * When extended protection is used in IIS server,
-  * we have to pass a second SecBuffer to the SecBufferDesc
-  * otherwise IIS will not pass the authentication (401 response).
-  * Minimum supported version is Windows 7.
-  * https://docs.microsoft.com/en-
-  /* Fail the test if it took too long to remove.  This happens after the fact,
-     and says "it seems that it would have run forever", which isn't true, but
-     it's close enough, and simple to do. */
-  abort_on_test_timeout();
-
-test_cleanup:
-  curl Attempt to find the options separator */
-  osep = strchr(*userpwd, ';');
-
-  if(!psep && **userpwd != ';') {
-    /* no password present, prompt for one */
-    char passwd[2048] = "";
-    char prompt[256];
-    struct curlx_dynbuf dyn;
-
-    curlx_dyn_init(&durn;
-  }
-
-  /* precheck that filename is accessible to lessen the chance that the
-     subsequent freopen will fail. */
-  fp = fopen(filename, FOPEN_WRITETEXT);
-  if(!fp) {
-    warnf(global, "Warning: Failed to open %s", filename);
-    return;
-  }
-  fcloo);
-  int which[] = {CTL_VM, VM_LOADAVG};
-
-  if (sysctl(which, ARRAY_SIZE(which), &info, &size, NULL, 0) == -1) return;
-
-  avg[0] = (double) info.ldavg[0] / info.fscale;
-  avg[1] = (double) info.ldavg[1] / info.fscale;
-  avg[2] = (double) info.ldavg[2] / iefine NUM_TICKS (2 * 1000 * 1000)
-#define NUM_TICKS2 (2 * 1000 * 1000 * 100)
-
-static unsigned long ticks;
-static uv_idle_t idle_handle;
-static uv_timer_t timer_handle;
-
-
-static void idle_cb(uv_idle_t* handle) {
-  if (++ticks == NUM_TICKS)
-    uv_idle_stop(turned pointer is not deallocated until the program ends.
- */
-
-const char *proto_token(const char *proto)
+void headerJSON(FILE *stream, struct per_transfer *per)
 {
-  const char * const *builtin;
+  struct curl_header *header;
+  struct curl_header *prev = NULL;
 
-  if(!proto)
-    return NULL;
-  for(builtin = built_in_protos; *builtin; builtin++)
-    if(curl_strequ
+  fputc('16 - 1 |
+   * +----+------+-----+----------------+
+   */
+
+  /* prepare service name */
+  if(strchr(service, '/')) {
+    service_name = strdup(service);
+    if(!service_name)
+      return CURLE_OUT_OF_MEMORY;
+  }
+  else {
+    service_name = malloc(service_lnsfer_status *)userp;
+  size_t len = size * nmemb;
+  st->counter++;
+  if(st->counter > 1) {
+    /* the first call puts us on pause, so subsequent calls are after
+       unpause */
+    fwrite(ptr, size, nmemb, stdout);
+    return len;
+  }
+  if(len)
+    pr) {
+  close_cb_called++;
+}
+
+static void write_cb(uv_write_t* w, int status) {
+  /* the small write should finish immediately after the big write */
+  ASSERT_OK(uv_stream_get_write_queue_size((uv_stream_t*) &client));
+
+  write_cb_called++;
+
+  if (write_c
+    (0 == clock_gettime(CLOCK_MONOTONIC, &tsnow))) {
+    cnow.tv_sec = tsnow.tv_sec;
+    cnow.tv_usec = (int)(tsnow.tv_nsec / 1000);
+  }
+  /*
+  ** Even when the configure process has truly detected monotonic clock
+  ** availability, it might happen that it_startransfer_set = false;
+
+  info->httpcode = 0;
+  info->httpproxycode = 0;
+  info->httpversion = 0;
+  info->filetime = -1; /* -1 is an illegal time and thus means unknown */
+  info->timecond = FALSE;
+
+  info->header_size = 0;
+  info->request_size = 0;
+ OR: %s returns %s\n", where, s);
+    exit(code);
+  }
+}
+
+/* Check for completed transfers, and remove their easy handles */
+static void check_multi_info(GlobalInfo *g)
+{
+  char *eff_url;
+  CURLMsg *msg;
+  int msgs_left;
+  ConnInfo *conn;
+  CURL *easy;
+  CURT_URL, "imap://imap.example.com");
+
+    /* Set the CREATE command specifying the new folder name */
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "CREATE FOLDER");
+
+    /* Perform the custom request */
+ n.pvBuffer);
+      s_pSecFn->FreeCredentialsHandle(&cred_handle);
+      s_pSecFn->DeleteSecurityContext(&sspi_context);
+      return CURLE_COULDNT_CONNECT;
+    }
+
+    context_handle = &sspi_context;
+  }
+
+  free(service_name);
+
+  /* Everything is good so fa_mutex_destroy(&loop->wq_mutex);
+
+fail_mutex_init:
+  uv_rwlock_destroy(&loop->cloexec_lock);
+
+fail_rwlock_init:
