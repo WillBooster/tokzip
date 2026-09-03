@@ -83,7 +83,7 @@ fn main() {
             .zip(report.iter())
             .map(|(n, c)| format!("{n} {:.1}%", 100.0 * c / total))
             .collect();
-        println!("cost share: {}", line.join("  "));
+        println!("cost share over every parse attempted: {}", line.join("  "));
     }
     let mb = grand.0 as f64 / 1e6;
     println!(

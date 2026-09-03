@@ -385,12 +385,13 @@ fn cluster_contexts(counts: &[[u32; 256]], classes_count: usize) -> [u8; 256] {
     classes
 }
 
-/// Turns on the per-node cost accounting behind `cost_report` and `dist_report`.
+/// Turns on the per-node cost accounting behind `cost_report`.
 pub fn enable_cost_report() {
     crate::lz::COST_ENABLED.store(true, std::sync::atomic::Ordering::Relaxed);
 }
 
-/// Bits coded per model group so far (see `lz::COST_REPORT`).
+/// Bits coded per model group so far, over every parse `encode_doc` ran — including the
+/// alternative segmentations `compress` tries and discards (see `lz::COST_REPORT`).
 pub fn cost_report() -> [f64; 10] {
     *crate::lz::COST_REPORT.lock().unwrap()
 }

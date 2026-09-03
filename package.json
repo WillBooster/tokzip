@@ -20,8 +20,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "workerd": "./src/workers.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "default": "./dist/index.js"
     },
     "./src": {
       "types": "./src/index.ts",
@@ -29,7 +28,6 @@
       "require": "./src/index.ts"
     }
   },
-  "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -39,7 +37,7 @@
   ],
   "scripts": {
     "bench": "bun scripts/bench/bench.ts",
-    "build": "bun run build/wasm && build-ts lib --input src/index.ts",
+    "build": "bun run build/wasm && build-ts lib --input src/index.ts --module-type esm",
     "build/wasm": "cargo build --release --target wasm32-unknown-unknown --manifest-path rust/Cargo.toml -p tokzip-wasm && cp rust/target/wasm32-unknown-unknown/release/tokzip_wasm.wasm wasm/tokzip.wasm",
     "cleanup": "bun wb lint --fix --format",
     "format": "bun wb lint --format",
@@ -61,16 +59,15 @@
     "@willbooster/oxlint-config": "1.4.8",
     "@willbooster/wb": "22.0.1",
     "build-ts": "21.0.9",
+    "conventional-changelog-conventionalcommits": "10.3.0",
     "lefthook": "2.1.10",
     "oxfmt": "0.63.0",
     "oxlint": "1.78.0",
     "oxlint-tsgolint": "7.0.2001",
     "semantic-release": "25.0.9",
     "sort-package-json": "4.0.0",
+    "typescript": "7.0.2",
     "zod": "4.4.3"
-  },
-  "peerDependencies": {
-    "typescript": "7.0.2"
   },
   "publishConfig": {
     "access": "public",

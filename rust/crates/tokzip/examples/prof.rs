@@ -1,4 +1,7 @@
-//! Per-step timing on the small documents of the bench split (codec iteration aid).
+//! Per-step timing on the small documents (at most 1 KiB) of the bench split (codec iteration
+//! aid); the one-time asset decode and every language's match index are built before timing.
+//!
+//!   cargo run --release --features train --example prof -- <corpus root>:<language> ...
 use std::path::Path;
 use std::time::Instant;
 fn main() {
