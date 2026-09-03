@@ -93,9 +93,16 @@ fn main() {
         })
         .collect();
     for size in [1024usize, 4096, 16384, 65536, 262_144, 1 << 20] {
+        // The same take from every share, bounded by the shortest, keeps the shares equal.
+        let take = shares
+            .iter()
+            .map(Vec::len)
+            .min()
+            .unwrap_or(0)
+            .min(size / langs.len());
         let doc: Vec<u8> = shares
             .iter()
-            .flat_map(|share| &share[..(size / langs.len()).min(share.len())])
+            .flat_map(|share| &share[..take])
             .copied()
             .collect();
         let doc = doc.as_slice();
