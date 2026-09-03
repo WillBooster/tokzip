@@ -1,8 +1,10 @@
-//! Offline trainer (cargo feature `train`): builds each language's dictionary suffix
-//! (`dict/<language>.bin`) by COVER-style segment selection, clusters context bytes into
-//! literal classes by their next-byte statistics, then counts the bits coded at every model
-//! node while compressing the language's training documents with its dictionary and turns the
-//! counts into the initial probabilities shipped in `priors/<language>.bin`.
+//! Offline trainer (cargo feature `train`): builds the dictionary parts (a group's shared part,
+//! `dict/<group>.bin`, and each language's suffix, `dict/<language>.bin`) by COVER-style
+//! segment selection, clusters context bytes into literal classes by their next-byte
+//! statistics, then counts the bits coded at every model node while compressing each
+//! language's training documents with its dictionary and turns the counts into the initial
+//! probabilities shipped as each group's packed literal priors (`priors/<group>.bin`) and each
+//! language's own nodes (`priors/<language>.bin`).
 
 pub use crate::languages::Group;
 use crate::lz::{
@@ -225,7 +227,8 @@ fn coded_size(dict: Vec<u8>, lit_classes: LitClasses, docs: &[Vec<u8>]) -> usize
         .sum()
 }
 
-/// A language being trained: its full dictionary (wrapper + suffix) and its priors documents.
+/// A language being trained: its full dictionary (wrapper + group part + suffix) and its
+/// priors documents.
 pub struct Trainee {
     pub name: String,
     pub group: Group,

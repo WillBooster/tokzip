@@ -48,8 +48,13 @@ fn main() {
     }
     let read = |path: &Path| {
         println!("cargo:rerun-if-changed={}", path.display());
-        std::fs::read(path).unwrap_or_default()
+        std::fs::read(path)
     };
+    // Group parts exist only for groups with a shared dictionary budget; everything else is
+    // required, and a missing language dictionary would otherwise ship silently as none.
+    let read_optional = |path: &Path| read(path).unwrap_or_default();
+    let read_required =
+        |path: &Path| read(path).unwrap_or_else(|e| panic!("{}: {e}", path.display()));
     // A model layout change leaves the committed priors stale until the trainer (which needs
     // this build) rewrites them: flat priors stand in meanwhile.
     let flat_raw = pack::flat_raw();
@@ -58,7 +63,7 @@ fn main() {
         .iter()
         .map(|group| {
             let path = root.join("priors").join(format!("{}.bin", group.name()));
-            let part = read(&path);
+            let part = read_optional(&path);
             if lz::Models::try_from_packed(&flat_language, &part).is_some() {
                 part
             } else {
@@ -74,7 +79,7 @@ fn main() {
         .iter()
         .map(|(name, _)| {
             let path = root.join("priors").join(format!("{name}.bin"));
-            let part = read(&path);
+            let part = read_optional(&path);
             if part.len() == lz::LIT {
                 part
             } else {
@@ -100,7 +105,7 @@ fn main() {
         let literal_path = out.join(format!("{}.lit", group.name()));
         std::fs::write(&literal_path, &group_literals[group as usize]).expect("write group priors");
         group_priors.push_str(&format!("    include_bytes!({literal_path:?}),\n"));
-        let part = read(&root.join("dict").join(format!("{}.bin", group.name())));
+        let part = read_optional(&root.join("dict").join(format!("{}.bin", group.name())));
         // Coded with the models of the group's first language (`lang.rs` decodes it so).
         let packed = LANGUAGES
             .iter()
@@ -119,7 +124,7 @@ fn main() {
     let mut trained_dictionaries: Vec<Vec<u8>> = Vec::new();
     let mut assets = String::from("[\n");
     for (i, (name, group)) in LANGUAGES.iter().enumerate() {
-        let suffix = read(&root.join("dict").join(format!("{name}.bin")));
+        let suffix = read_required(&root.join("dict").join(format!("{name}.bin")));
         let priors_path = out.join(format!("{name}.priors"));
         std::fs::write(&priors_path, &language_parts[i]).expect("write packed priors");
         let dict_path = out.join(format!("{name}.dict"));

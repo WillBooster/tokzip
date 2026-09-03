@@ -13,7 +13,7 @@ const codec = createCodec(() => wasmModule);
 
 /**
  * Compresses a string (stored as UTF-8; must be well-formed UTF-16) into a self-describing
- * binary frame. The first call in an isolate builds the detection table and decodes the
+ * binary frame. The first call in an isolate decodes the
  * dictionaries it uses (~10 ms of CPU time); later calls do not.
  */
 export function compress(text: string): Uint8Array {

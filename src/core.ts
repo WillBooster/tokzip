@@ -41,7 +41,7 @@ export interface DecompressOptions {
 export interface Codec {
   /**
    * Compresses a string (stored as UTF-8; must be well-formed UTF-16) into a self-describing
-   * binary frame. The first call in a process builds the detection table and decodes the
+   * binary frame. The first call in a process decodes the
    * dictionaries it uses (~10 ms); later calls do not.
    */
   compress: (text: string) => Uint8Array;

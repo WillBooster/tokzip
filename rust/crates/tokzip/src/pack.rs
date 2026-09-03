@@ -8,7 +8,8 @@
 //! then every 256-node tree from `LIT` on (the plain literal trees, then the two
 //! matched-literal trees) as a depth-first walk with one flag bit per visited node — 1: the
 //! node's value follows in the value stream and its children are walked; 0: the node and its
-//! subtree stay at `PRIORS_DEFAULT` and are skipped. Trained priors leave most literal nodes at
+//! subtree stay at `PRIORS_DEFAULT` (the flat probability) and are skipped. Trained priors
+//! leave most literal nodes at
 //! the default (contexts the training never reached, and nodes pruned for saving too little),
 //! and a default node's subtree is default too.
 //!

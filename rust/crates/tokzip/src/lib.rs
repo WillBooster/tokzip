@@ -216,7 +216,8 @@ pub fn segments(content: &[u8]) -> Vec<(usize, u8)> {
 /// detected than as their best single language, and the winner was always the top gram
 /// candidate (further candidates changed nothing measurable).
 ///
-/// The alternative costs a full second parse, so above `TRIAL_LEN` both candidates are only
+/// The alternative costs a full second parse, so above twice `TRIAL_LEN` (where two prefix
+/// parses plus one full parse are cheaper than two full parses) both candidates are only
 /// compared on the document's first `TRIAL_LEN` bytes and the winner codes the whole document:
 /// the second parse then costs a bounded ~2 ms instead of doubling compression time, and the
 /// prefix's choice codes the corpus within 0.03 pp of the full comparison.
@@ -232,7 +233,7 @@ fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
         end: content.len(),
         lang: top,
     }];
-    if content.len() <= TRIAL_LEN {
+    if content.len() <= 2 * TRIAL_LEN {
         let detected_body = lz::encode_doc(&lang::primed, content, &detected);
         let single_body = lz::encode_doc(&lang::primed, content, &single);
         return if single_body.len() + 1 < detected_body.len() + segment_table_len(&detected) {

@@ -142,8 +142,9 @@ All probabilities of a language live in one flat array (layout in `lz.rs`: `is_m
 pairs × 256 plain-tree nodes; 512 shared matched-literal nodes). The literal context of a
 position is the pair (class of the previous byte, class of the byte before it), each byte
 continuing into the dictionary before the content start and 0 where neither exists. Every
-node's initial probability is quantized to 8 bits (`p11 = (q << 3) | 4`); `PRIORS_DEFAULT`
-(`p11 = 1024`) is the flat value. `priors/<language>.bin` holds the language's own nodes
+node's initial probability is quantized to 8 bits: the value 128 (`PRIORS_DEFAULT`) is the
+flat probability `p11 = 1024`, any other `q` is `p11 = (q << 3) | 4`. `priors/<language>.bin`
+holds the language's own nodes
 (those before the literal trees), one byte each in layout order. `priors/<group>.bin` holds
 the 256-entry previous-byte → class table (values < 128), the 256-entry second-previous-byte →
 class table (values < 32), then every 256-node tree from the literal trees on (the plain
@@ -156,7 +157,7 @@ identity: a retrain changes the coded stream.
 The class tables and the literal trees (everything from the literal context pairs on) are
 shared by the languages of a model group — prose (`text`, `en-US`), Japanese, Chinese, code —
 and trained on the group's pooled literal statistics; a literal node whose trained value would
-have saved fewer than 4 bits on the training data stays at the flat probability 1/2. The nodes
+have saved fewer than 6 bits on the training data stays at the flat probability 1/2. The nodes
 before the literal trees are per language.
 
 The module embeds the priors as committed and the dictionaries in a packed form that is not

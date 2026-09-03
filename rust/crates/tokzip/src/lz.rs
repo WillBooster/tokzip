@@ -87,7 +87,6 @@ fn dist_group(base: usize) -> (usize, usize, usize) {
 pub const PRIORS_SIZE: usize = 512 + MODEL_SIZE;
 /// The quantized value of an untrained node (`PROB_INIT`); the packed literal priors skip
 /// untrained subtrees (see `pack.rs`).
-#[cfg_attr(not(feature = "train"), allow(dead_code))]
 pub const PRIORS_DEFAULT: u8 = (PROB_INIT >> 3) as u8;
 
 /// The two literal class tables: previous-byte value → class (values < `LIT_CLASSES`) and
@@ -149,7 +148,7 @@ impl Models {
     /// module hold): the language's own nodes (those before `LIT`, verbatim) and its group's
     /// literal part — the class tables, then each 256-node tree (plain literal trees, then the
     /// two matched-literal trees) as flag bits followed by the values of the nodes whose subtree
-    /// is not all `PRIORS_DEFAULT`.
+    /// is not all `PRIORS_DEFAULT` (the flat probability).
     pub fn from_packed(language: &[u8], literal: &[u8]) -> Self {
         Self::try_from_packed(language, literal).expect("packed priors match the model layout")
     }
@@ -228,10 +227,15 @@ impl Models {
     }
 }
 
-/// The 11-bit probability of a quantized prior value.
+/// The 11-bit probability of a quantized prior value: `PRIORS_DEFAULT` is exactly the flat
+/// probability (as a node the packed priors skip restores), any other value `(q << 3) | 4`.
 #[inline]
 fn unquantize(q: u8) -> u16 {
-    (u16::from(q) << 3) | 4
+    if q == PRIORS_DEFAULT {
+        PROB_INIT
+    } else {
+        (u16::from(q) << 3) | 4
+    }
 }
 
 const TREES: usize = (MODEL_SIZE - LIT) / 256;
@@ -293,6 +297,31 @@ impl<'p> DocModels<'p> {
             }
         }
         self.slot[t] as usize
+    }
+
+    /// Adds per-node counts recorded at this document's arena indices (`per` values per node)
+    /// to `to` at the nodes' layout positions, clearing `from` (trainer support: the coder
+    /// counts at the indices it codes with, which are arena indices for literal trees).
+    fn scatter<T: Copy + Default + std::ops::AddAssign>(
+        &self,
+        from: &mut [T],
+        to: &mut [T],
+        per: usize,
+    ) {
+        let mut move_run = |at: usize, first: usize, len: usize| {
+            for k in 0..len * per {
+                to[first * per + k] += from[at * per + k];
+                from[at * per + k] = T::default();
+            }
+        };
+        move_run(0, 0, LIT);
+        for (t, &at) in self.slot.iter().enumerate() {
+            if at != UNUSED {
+                let first = LIT + t * 256;
+                let len = if first == LIT_MATCHED { 512 } else { 256 };
+                move_run(at as usize, first, len);
+            }
+        }
     }
 
     /// The fully adapted models (the trainer's starting state).
@@ -1025,7 +1054,11 @@ pub fn encode_doc<'p>(
     encode_doc_with_stats(lookup, doc, segments, None).0
 }
 
-/// [`encode_doc`] that can also count the bits coded at every model node (trainer support).
+/// [`encode_doc`] that can also count the bits coded at every model node (trainer support):
+/// `stats` holds two counts per node in layout order (`[2 * node + bit]`), accumulated across
+/// calls. The coder counts at the indices it codes with — arena indices for the literal trees
+/// — so each segment's counts are gathered in a scratch buffer and scattered to layout
+/// positions through the segment's models.
 pub fn encode_doc_with_stats<'p>(
     lookup: &dyn Fn(u8) -> &'p Primed,
     doc: &[u8],
@@ -1033,11 +1066,14 @@ pub fn encode_doc_with_stats<'p>(
     stats: Option<Vec<u32>>,
 ) -> (Vec<u8>, Option<Vec<u32>>) {
     let mut rc = Encoder::new();
-    rc.stats = stats;
+    let mut stats = stats;
+    let mut scratch_stats = stats.as_ref().map(|_| vec![0u32; 2 * MODEL_SIZE]);
     #[cfg(feature = "train")]
-    if COST_ENABLED.load(std::sync::atomic::Ordering::Relaxed) {
-        rc.cost = Some(vec![0.0; MODEL_SIZE]);
-    }
+    let mut cost = COST_ENABLED
+        .load(std::sync::atomic::Ordering::Relaxed)
+        .then(|| vec![0.0f64; MODEL_SIZE]);
+    #[cfg(feature = "train")]
+    let mut scratch_cost = cost.as_ref().map(|_| vec![0.0f64; MODEL_SIZE]);
     let mut cs = CoderState::new();
     let mut lang_models = LangModels::new(lookup, segments);
     let mut chains = Chains::new(doc.len());
@@ -1058,6 +1094,11 @@ pub fn encode_doc_with_stats<'p>(
             },
         };
         let mut models = lang_models.take(seg.lang);
+        rc.stats = scratch_stats.take();
+        #[cfg(feature = "train")]
+        {
+            rc.cost = scratch_cost.take();
+        }
         run_encode_optimal(
             &mut rc,
             &mut models,
@@ -1072,13 +1113,21 @@ pub fn encode_doc_with_stats<'p>(
             mf.insert(inserted);
             inserted += 1;
         }
+        if let Some(mut scratch) = rc.stats.take() {
+            models.scatter(&mut scratch, stats.as_mut().unwrap(), 2);
+            scratch_stats = Some(scratch);
+        }
+        #[cfg(feature = "train")]
+        if let Some(mut scratch) = rc.cost.take() {
+            models.scatter(&mut scratch, cost.as_mut().unwrap(), 1);
+            scratch_cost = Some(scratch);
+        }
         lang_models.put(seg.lang, models);
         chains = mf.chains;
         start = seg.end;
     }
-    let stats = rc.stats.take();
     #[cfg(feature = "train")]
-    if let Some(cost) = rc.cost.take() {
+    if let Some(cost) = cost {
         let mut report = COST_REPORT.lock().unwrap();
         let groups = [
             ("flags", IS_MATCH, LEN),
@@ -1746,6 +1795,40 @@ mod tests {
             body_mixed.len(),
             body_single.len()
         );
+    }
+
+    /// Packing a model's parts (`pack.rs`) and restoring them must give the raw model back
+    /// node for node; a lossy pair would still round-trip frames and show only as a worse ratio.
+    #[cfg(feature = "train")]
+    #[test]
+    fn packed_priors_restore_the_raw_model() {
+        let mut raw = crate::pack::flat_raw();
+        let mut x = 0x2545_F491u32;
+        for (i, q) in raw.iter_mut().enumerate() {
+            x = x.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+            // Class tables within range; a mix of trained nodes, default nodes, and whole
+            // default trees, including the flat value stored explicitly inside a trained tree.
+            // Slot 0 of a tree is not a node (tree indices start at 1) and stays flat.
+            *q = match i {
+                0..256 => (x >> 24) as u8 % LIT_CLASSES as u8,
+                256..512 => (x >> 24) as u8 % LIT_CLASSES2 as u8,
+                _ if i >= 512 + LIT
+                    && (((i - 512 - LIT) / 256).is_multiple_of(3)
+                        || (i - 512 - LIT).is_multiple_of(256)) =>
+                {
+                    PRIORS_DEFAULT
+                }
+                _ if x & 0x300 == 0 => PRIORS_DEFAULT,
+                _ => (x >> 24) as u8,
+            };
+        }
+        let expected = Models::from_raw_priors(&raw);
+        let restored = Models::from_packed(
+            &crate::pack::language_part(&raw),
+            &crate::pack::literal_part(&raw),
+        );
+        assert_eq!(restored.lit_classes, expected.lit_classes);
+        assert_eq!(restored.dense_probs(), expected.dense_probs());
     }
 
     #[test]
