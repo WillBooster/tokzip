@@ -92,6 +92,18 @@ impl Encoder {
     /// Flushes the coder. The first output byte is the always-zero initial cache byte and is
     /// dropped; trailing zero bytes are trimmed because the decoder feeds zeros past the end.
     pub fn finish(mut self) -> Vec<u8> {
+        // Any value in `[low, low + range)` decodes correctly, so pick the one with the most
+        // trailing zero bytes: those bytes are trimmed below and re-synthesized by the decoder,
+        // which saves one to three bytes per frame.
+        let high = self.low + u64::from(self.range) - 1;
+        for bytes in (1..=4).rev() {
+            let mask = (1u64 << (8 * bytes)) - 1;
+            let rounded = (self.low + mask) & !mask;
+            if rounded <= high {
+                self.low = rounded;
+                break;
+            }
+        }
         for _ in 0..5 {
             self.shift_low();
         }

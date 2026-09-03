@@ -1407,12 +1407,7 @@ pub fn decode_doc<'p>(
             if u64::from(cs.reps[0]) >= (pos + dlen) as u64 || pos + len > seg.end {
                 return Err(DecodeError::Corrupt);
             }
-            let dist = cs.reps[0] as usize + 1;
-            for _ in 0..len {
-                let p = out.len() - base;
-                let b = source_byte(&out[base..], dict, p, dist);
-                out.push(b);
-            }
+            copy_match(out, base, dict, cs.reps[0] as usize + 1, len);
         }
         lang_models.put(seg.lang, models);
     }
@@ -1424,6 +1419,26 @@ pub fn decode_doc<'p>(
         return Err(DecodeError::Corrupt);
     }
     Ok(())
+}
+
+/// Appends the `len` bytes `dist` back from the end of `out[base..]`, whose source may start in
+/// the dictionary, run into the output, and overlap the bytes being appended.
+#[inline]
+fn copy_match(out: &mut Vec<u8>, base: usize, dict: &[u8], dist: usize, mut len: usize) {
+    let pos = out.len() - base;
+    if dist > pos {
+        let start = dict.len() - (dist - pos);
+        let from_dict = (dict.len() - start).min(len);
+        out.extend_from_slice(&dict[start..start + from_dict]);
+        len -= from_dict;
+    }
+    // The source is now inside the output: copy in non-overlapping runs of `dist` bytes.
+    while len > 0 {
+        let src = out.len() - dist;
+        let run = dist.min(len);
+        out.extend_from_within(src..src + run);
+        len -= run;
+    }
 }
 
 #[inline]
