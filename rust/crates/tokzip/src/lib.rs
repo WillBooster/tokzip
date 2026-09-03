@@ -20,6 +20,7 @@
 
 mod error;
 mod lang;
+mod languages;
 mod lz;
 mod rc;
 #[cfg(feature = "train")]
@@ -184,6 +185,12 @@ pub fn frame_len_with_language(content: &[u8], lang: usize) -> usize {
     }];
     let body = lz::encode_doc(&lang::primed, content, &segments);
     body.len() + 1 + varint_len(content.len() as u64) + 4 + 1
+}
+
+/// Embedded language names, in id order (diagnostic use).
+#[doc(hidden)]
+pub fn language_names() -> Vec<&'static str> {
+    languages::LANGUAGES.iter().map(|(name, _)| *name).collect()
 }
 
 /// Detected segments as `(end, language id)` pairs (diagnostic use).

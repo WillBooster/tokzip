@@ -5,30 +5,16 @@
 //! counts into the initial probabilities shipped in `priors/<language>.bin`.
 
 use crate::lz::{
-    encode_doc_with_stats, LitClasses, Models, Primed, Segment, LIT_CLASSES, LIT_CLASSES2,
+    encode_doc_with_stats, LitClasses, Models, Primed, Segment, LIT, LIT_CLASSES, LIT_CLASSES2,
     MODEL_SIZE,
 };
-use crate::lang::Kind;
-use crate::rc::PROB_BITS;
+pub use crate::languages::Group;
+use crate::rc::{PROB_BITS, PROB_INIT};
 use std::path::Path;
 
-/// Language names with their dictionary suffix budgets, in id order.
-pub fn languages() -> Vec<(&'static str, usize)> {
-    crate::lang::LANGUAGES
-        .iter()
-        .map(|language| (language.name, dictionary_budget(language.kind)))
-        .collect()
-}
-
-/// Dictionary suffix budget by language kind. Ratio keeps improving with budget, but every
-/// language ships in the wasm module, so the budget is bounded by the module size target:
-/// halving a prose dictionary costs about 1 pp on its documents, halving a code dictionary
-/// about 0.4 pp, and prompts and answers are mostly prose.
-pub fn dictionary_budget(kind: Kind) -> usize {
-    match kind {
-        Kind::Prose => 128 * 1024,
-        Kind::Code => 64 * 1024,
-    }
+/// The embedded languages with their groups, in id order.
+pub fn languages() -> &'static [(&'static str, Group)] {
+    &crate::languages::LANGUAGES
 }
 
 /// Documents of `lang`'s train split from a tokzip-corpus checkout, in manifest order, skipping
@@ -207,44 +193,116 @@ fn coded_size(dict: Vec<u8>, lit_classes: LitClasses, docs: &[Vec<u8>]) -> usize
         .sum()
 }
 
-/// Trains the literal class tables and priors for a language whose full dictionary is `dict`
-/// from `docs` (each compressed as one segment). The models start from `init` priors when
-/// given — a second round parses the documents the way the shipped models will, so its counts
-/// match the tokens the encoder actually picks — and from the dictionary-primed state
-/// otherwise. Returns the raw serialized model (`PRIORS_SIZE` bytes).
-pub fn train_priors(dict: Vec<u8>, docs: &[Vec<u8>], init: Option<&[u8]>) -> Vec<u8> {
-    let primed = match init {
-        Some(priors) => Primed::new(dict, Models::from_raw_priors(priors)),
-        None => Primed::self_primed(dict, train_lit_classes(docs)),
-    };
-    let lit_classes = primed.models.lit_classes;
-    let lookup = |_: u8| &primed;
-    let mut stats = vec![0u32; 2 * MODEL_SIZE];
-    for doc in docs {
-        if doc.is_empty() {
-            continue;
-        }
-        let segments = [Segment {
-            end: doc.len(),
-            lang: 0,
-        }];
-        let (_, counted) = encode_doc_with_stats(&lookup, doc, &segments, Some(stats));
-        stats = counted.expect("stats");
-    }
+/// A language being trained: its full dictionary (wrapper + suffix) and its priors documents.
+pub struct Trainee {
+    pub name: String,
+    pub group: Group,
+    pub dict: Vec<u8>,
+    pub docs: Vec<Vec<u8>>,
+}
+
+/// Priors rounds: the first parses with dictionary-primed models, each later one with the
+/// previous round's priors, so the counts match the tokens the shipped encoder picks.
+const PRIORS_ROUNDS: usize = 3;
+/// A literal node whose trained value would have saved fewer bits than this over a flat node on
+/// the training bits stays flat: such nodes are many (deep tree nodes of rare contexts) and
+/// worth little, and every flat subtree is skipped by the packed priors (`pack.rs`).
+const PRIORS_MIN_GAIN: f64 = 4.0;
+
+/// Trains the priors of every trainee (each compressed as one segment against its own
+/// dictionary): the literal class tables and literal-tree priors are shared by every language
+/// of a group and trained on the group's pooled literal statistics; the other nodes are per
+/// language. Returns each trainee's raw serialized model (`PRIORS_SIZE` bytes), in order.
+pub fn train_priors(trainees: &[Trainee]) -> Vec<Vec<u8>> {
+    let groups: Vec<Group> = Group::ALL
+        .into_iter()
+        .filter(|g| trainees.iter().any(|t| t.group == *g))
+        .collect();
+    let lit_classes: Vec<LitClasses> = groups
+        .iter()
+        .map(|g| {
+            let docs: Vec<Vec<u8>> = trainees
+                .iter()
+                .filter(|t| t.group == *g)
+                .flat_map(|t| t.docs.iter().cloned())
+                .collect();
+            train_lit_classes(&docs)
+        })
+        .collect();
+    let group_index = |t: &Trainee| groups.iter().position(|g| *g == t.group).unwrap();
     let scale = f64::from(1u32 << PROB_BITS);
-    let mut out = lit_classes.0.to_vec();
-    out.extend_from_slice(&lit_classes.1);
-    out.extend((0..MODEL_SIZE).map(|node| {
-        let (n0, n1) = (f64::from(stats[2 * node]), f64::from(stats[2 * node + 1]));
-        let prob = if n0 + n1 == 0.0 {
-            f64::from(primed.models.probs[node])
-        } else {
-            // Laplace-smoothed P(bit = 0), clamped away from the coder's extremes.
-            ((n0 + 0.5) / (n0 + n1 + 1.0) * scale).clamp(31.0, scale - 31.0)
-        };
-        (prob.round() as u32 >> 3) as u8
-    }));
-    out
+    let mut priors: Vec<Vec<u8>> = Vec::new();
+    for round in 0..PRIORS_ROUNDS {
+        let mut stats: Vec<Vec<u32>> = Vec::new();
+        let mut fallback: Vec<Vec<u16>> = Vec::new();
+        for (i, t) in trainees.iter().enumerate() {
+            let primed = if round == 0 {
+                Primed::self_primed(t.dict.clone(), lit_classes[group_index(t)])
+            } else {
+                Primed::new(t.dict.clone(), Models::from_raw_priors(&priors[i]))
+            };
+            let lookup = |_: u8| &primed;
+            let mut counts = vec![0u32; 2 * MODEL_SIZE];
+            for doc in t.docs.iter().filter(|doc| !doc.is_empty()) {
+                let segments = [Segment {
+                    end: doc.len(),
+                    lang: 0,
+                }];
+                counts = encode_doc_with_stats(&lookup, doc, &segments, Some(counts))
+                    .1
+                    .expect("stats");
+            }
+            stats.push(counts);
+            fallback.push(primed.models.probs.clone());
+        }
+        // Pooled literal statistics per group.
+        let mut pooled: Vec<Vec<u64>> = vec![vec![0u64; 2 * (MODEL_SIZE - LIT)]; groups.len()];
+        for (t, counts) in trainees.iter().zip(&stats) {
+            for (p, &c) in pooled[group_index(t)].iter_mut().zip(&counts[2 * LIT..]) {
+                *p += u64::from(c);
+            }
+        }
+        let quantize = |prob: f64| (prob.round() as u32 >> 3) as u8;
+        // Laplace-smoothed P(bit = 0), clamped away from the coder's extremes.
+        let trained =
+            |n0: f64, n1: f64| ((n0 + 0.5) / (n0 + n1 + 1.0) * scale).clamp(31.0, scale - 31.0);
+        priors = trainees
+            .iter()
+            .enumerate()
+            .map(|(i, t)| {
+                let g = group_index(t);
+                let mut out = lit_classes[g].0.to_vec();
+                out.extend_from_slice(&lit_classes[g].1);
+                out.extend((0..LIT).map(|node| {
+                    let (n0, n1) = (
+                        f64::from(stats[i][2 * node]),
+                        f64::from(stats[i][2 * node + 1]),
+                    );
+                    quantize(if n0 + n1 == 0.0 {
+                        f64::from(fallback[i][node])
+                    } else {
+                        trained(n0, n1)
+                    })
+                }));
+                out.extend((0..MODEL_SIZE - LIT).map(|node| {
+                    let (n0, n1) = (pooled[g][2 * node] as f64, pooled[g][2 * node + 1] as f64);
+                    if n0 + n1 == 0.0 {
+                        return quantize(f64::from(PROB_INIT));
+                    }
+                    let p0 = trained(n0, n1) / scale;
+                    // Bits the trained value saves over a flat node on the training bits.
+                    let gain = n0 * (p0 / 0.5).log2() + n1 * ((1.0 - p0) / 0.5).log2();
+                    quantize(if gain < PRIORS_MIN_GAIN {
+                        f64::from(PROB_INIT)
+                    } else {
+                        p0 * scale
+                    })
+                }));
+                out
+            })
+            .collect();
+    }
+    priors
 }
 
 /// Clusters the previous byte into `LIT_CLASSES` classes and the byte before it into

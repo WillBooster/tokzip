@@ -107,14 +107,16 @@ impl Models {
         }
     }
 
-    /// Restores a packed model (`pack.rs`): the class tables and the nodes before the literal
-    /// trees verbatim, then each 256-node tree (plain literal trees, then the two matched-literal
-    /// trees) as flag bits followed by the values of the nodes whose subtree is not all
-    /// `PRIORS_DEFAULT`.
-    pub fn from_priors(packed: &[u8]) -> Self {
-        let mut raw = packed[..512 + LIT].to_vec();
+    /// Restores a model from its packed parts (`pack.rs`): the language's own nodes (those
+    /// before `LIT`, verbatim) and its group's literal part — the class tables, then each
+    /// 256-node tree (plain literal trees, then the two matched-literal trees) as flag bits
+    /// followed by the values of the nodes whose subtree is not all `PRIORS_DEFAULT`.
+    pub fn from_packed(language: &[u8], literal: &[u8]) -> Self {
+        assert_eq!(language.len(), LIT, "packed priors size mismatch");
+        let mut raw = literal[..512].to_vec();
+        raw.extend_from_slice(language);
         raw.resize(PRIORS_SIZE, PRIORS_DEFAULT);
-        let mut rest = &packed[512 + LIT..];
+        let mut rest = &literal[512..];
         let mut nodes = [0u8; 256];
         for tree in raw[512 + LIT..].as_chunks_mut::<256>().0 {
             // The walk reads only the flags; the values, which start after the tree's flag

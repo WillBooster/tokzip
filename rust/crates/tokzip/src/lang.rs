@@ -7,63 +7,25 @@
 //! a Viterbi pass with a switch penalty turns the window scores into segments. The decoder
 //! never detects anything — it reads the segment table from the frame.
 
-use crate::lz::{Models, Primed, Segment};
+use crate::languages::LANGUAGES;
+pub use crate::languages::LANGUAGE_COUNT;
+use crate::lz::{decode_doc, Models, Primed, Segment};
+use crate::varint::read_varint;
 use std::sync::OnceLock;
 
 const WRAPPER: &[u8] = include_bytes!("../../../../dict/wrapper.bin");
 
-/// A language's embedded assets: its trained dictionary suffix and its priors as packed by the
-/// build script (`build.rs`).
-macro_rules! assets {
-    ($name:literal, $kind:expr) => {
-        Language {
-            name: $name,
-            kind: $kind,
-            suffix: include_bytes!(concat!("../../../../dict/", $name, ".bin")),
-            priors: include_bytes!(concat!(env!("OUT_DIR"), "/", $name, ".priors")),
-        }
-    };
+/// A language's embedded assets as packed by the build script (`build.rs`, see `pack.rs`).
+struct Assets {
+    /// The trained dictionary suffix coded by the codec itself.
+    packed_suffix: &'static [u8],
+    /// The language's own model nodes; the literal part comes from `GROUP_PRIORS`.
+    priors: &'static [u8],
 }
 
-/// What a language's documents are made of; decides its dictionary budget (`train.rs`).
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
-pub enum Kind {
-    Prose,
-    Code,
-}
+// `ASSETS` (per language, in id order) and `GROUP_PRIORS` (per `Group`, in `Group::ALL` order).
+include!(concat!(env!("OUT_DIR"), "/assets.rs"));
 
-pub struct Language {
-    pub name: &'static str,
-    pub kind: Kind,
-    pub suffix: &'static [u8],
-    pub priors: &'static [u8],
-}
-
-/// Language ids are frame-format identity (v0: any change is a format change).
-pub const LANGUAGES: [Language; 21] = [
-    assets!("text", Kind::Prose),
-    assets!("en-US", Kind::Prose),
-    assets!("ja-JP", Kind::Prose),
-    assets!("html", Kind::Code),
-    assets!("css", Kind::Code),
-    assets!("javascript", Kind::Code),
-    assets!("typescript", Kind::Code),
-    assets!("c", Kind::Code),
-    assets!("cpp", Kind::Code),
-    assets!("csharp", Kind::Code),
-    assets!("dart", Kind::Code),
-    assets!("haskell", Kind::Code),
-    assets!("java", Kind::Code),
-    assets!("jsp", Kind::Code),
-    assets!("php", Kind::Code),
-    assets!("python", Kind::Code),
-    assets!("ruby", Kind::Code),
-    assets!("rust", Kind::Code),
-    assets!("zig", Kind::Code),
-    assets!("zh-CN", Kind::Prose),
-    assets!("zh-TW", Kind::Prose),
-];
-pub const LANGUAGE_COUNT: usize = LANGUAGES.len();
 const LANG_HTML: u8 = 3;
 const LANG_CSS: u8 = 4;
 const LANG_JAVASCRIPT: u8 = 5;
@@ -87,12 +49,27 @@ static PRIMED: [OnceLock<Primed>; LANGUAGE_COUNT] = [const { OnceLock::new() }; 
 /// cached for the process; the encoder's match index is built on first encode.
 pub fn primed(lang: u8) -> &'static Primed {
     PRIMED[lang as usize].get_or_init(|| {
-        let language = &LANGUAGES[lang as usize];
-        let mut bytes = Vec::with_capacity(WRAPPER.len() + language.suffix.len());
+        let (_, group) = LANGUAGES[lang as usize];
+        let assets = &ASSETS[lang as usize];
+        let models = Models::from_packed(assets.priors, GROUP_PRIORS[group as usize]);
+        let (len, body) = read_varint(assets.packed_suffix).expect("packed dictionary length");
+        let mut bytes = Vec::with_capacity(WRAPPER.len() + len as usize);
         bytes.extend_from_slice(WRAPPER);
-        bytes.extend_from_slice(language.suffix);
-        Primed::new(bytes, Models::from_priors(language.priors))
+        // The suffix was coded with the language's models and no dictionary (`pack.rs`).
+        let empty = Primed::new(Vec::new(), models.clone());
+        let segments = [Segment {
+            end: len as usize,
+            lang: 0,
+        }];
+        decode_doc(&|_| &empty, body, len as usize, &segments, &mut bytes)
+            .expect("packed dictionary decodes");
+        Primed::new(bytes, models)
     })
+}
+
+/// The trained dictionary suffix of a language (without the wrapper).
+fn suffix(lang: u8) -> &'static [u8] {
+    &primed(lang).bytes[WRAPPER.len()..]
 }
 
 // ---------------------------------------------------------------------------
@@ -134,9 +111,8 @@ fn gram_hash(bytes: &[u8], pos: usize) -> usize {
 fn gram_sets() -> &'static [GramSet] {
     static SETS: OnceLock<Vec<GramSet>> = OnceLock::new();
     SETS.get_or_init(|| {
-        LANGUAGES
-            .iter()
-            .map(|language| GramSet::new(language.suffix))
+        (0..LANGUAGE_COUNT as u8)
+            .map(|lang| GramSet::new(suffix(lang)))
             .collect()
     })
 }
@@ -377,17 +353,20 @@ fn fence_language(label: &[u8]) -> Option<u8> {
 mod tests {
     use super::*;
 
-    /// The packed priors the build embeds must restore exactly the trained values: the packer
+    /// The packed assets the build embeds must restore exactly the trained values: the packer
     /// and the unpacker are symmetric, so a lossy pack would still round-trip frames and show
     /// up only as a worse ratio.
     #[test]
-    fn packed_priors_restore_the_raw_priors() {
-        let priors_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../priors");
-        for Language { name, priors, .. } in &LANGUAGES {
-            let raw = std::fs::read(priors_dir.join(format!("{name}.bin"))).expect("raw priors");
-            let (unpacked, expected) = (Models::from_priors(priors), Models::from_raw_priors(&raw));
-            assert_eq!(unpacked.lit_classes, expected.lit_classes, "{name}");
-            assert_eq!(unpacked.probs, expected.probs, "{name}");
+    fn packed_assets_restore_the_trained_assets() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
+        for (lang, (name, _)) in LANGUAGES.iter().enumerate() {
+            let raw = std::fs::read(root.join(format!("priors/{name}.bin"))).expect("raw priors");
+            let expected = Models::from_raw_priors(&raw);
+            let primed = primed(lang as u8);
+            assert_eq!(primed.models.lit_classes, expected.lit_classes, "{name}");
+            assert_eq!(primed.models.probs, expected.probs, "{name}");
+            let dict = std::fs::read(root.join(format!("dict/{name}.bin"))).expect("dictionary");
+            assert_eq!(suffix(lang as u8), dict, "{name}");
         }
     }
 
