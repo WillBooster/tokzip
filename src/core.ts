@@ -59,6 +59,9 @@ interface Exports {
   tokzip_out_len(): number;
 }
 
+// The UTF-8 length comes from `Buffer.byteLength`: native, exact, and available on every
+// runtime this package targets (Node, Bun, and Workers with `nodejs_compat`). Encoding the
+// string with `TextEncoder` just to count its bytes would encode every document twice.
 import { Buffer } from 'node:buffer';
 
 const textEncoder = new TextEncoder();

@@ -265,6 +265,7 @@ fn clip_segments(segments: &[Segment], len: usize) -> Vec<Segment> {
         .take_while(|s| s.end < len)
         .copied()
         .collect();
+    // The last segment ends at the content length, past `len`, so one segment always remains.
     let lang = segments[clipped.len()].lang;
     clipped.push(Segment { end: len, lang });
     clipped

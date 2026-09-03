@@ -23,7 +23,8 @@ pub fn gram_mask(table: &[u8], h: usize) -> u32 {
     u32::from_le_bytes([table[at], table[at + 1], table[at + 2], 0])
 }
 
-/// The detection table of the given dictionaries, one per language id.
+/// The detection table of the given dictionaries, one per language id (at most
+/// `8 * GRAM_ENTRY_BYTES`; `lang.rs` bounds the language count at compile time).
 // The library only reads the table the build script wrote; its tests recompute it.
 #[cfg_attr(not(test), allow(dead_code))]
 pub fn gram_table(dictionaries: &[Vec<u8>]) -> Vec<u8> {
