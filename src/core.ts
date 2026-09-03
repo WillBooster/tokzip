@@ -59,6 +59,8 @@ interface Exports {
   tokzip_out_len(): number;
 }
 
+import { Buffer } from 'node:buffer';
+
 const textEncoder = new TextEncoder();
 // Fatal decoding: a frame whose content is not valid UTF-8 is corrupt, never U+FFFD.
 const textDecoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
@@ -87,7 +89,7 @@ export function createCodec(loadModule: () => WebAssembly.Module): Codec {
    */
   function withInput<T>(input: string | Uint8Array, run: (exports: Exports, ptr: number, len: number) => T): T {
     const exports = (wasm ??= instantiate());
-    const len = typeof input === 'string' ? utf8Length(input) : input.length;
+    const len = typeof input === 'string' ? Buffer.byteLength(input, 'utf8') : input.length;
     let trapped = false;
     let ptr: number | undefined;
     try {
@@ -136,23 +138,6 @@ export function createCodec(loadModule: () => WebAssembly.Module): Codec {
       });
     },
   };
-}
-
-/** UTF-8 length of a well-formed string. */
-function utf8Length(text: string): number {
-  let length = 0;
-  for (let i = 0; i < text.length; i++) {
-    const codePoint = text.codePointAt(i) ?? 0;
-    if (codePoint < 0x80) length += 1;
-    else if (codePoint < 0x8_00) length += 2;
-    else if (codePoint < 0x1_00_00) length += 3;
-    else {
-      // A supplementary code point occupies two UTF-16 units.
-      length += 4;
-      i++;
-    }
-  }
-  return length;
 }
 
 /** Copies the module-owned output buffer out of wasm memory (it is reused by the next call). */

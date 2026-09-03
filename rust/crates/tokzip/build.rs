@@ -1,9 +1,12 @@
-//! Packs the trained assets the module embeds (`src/pack.rs`): every `priors/<language>.bin`
-//! into the language's own nodes (`$OUT_DIR/<language>.priors`) and, once per model group, the
-//! literal part with its untrained subtrees skipped (`$OUT_DIR/<group>.lit`); every
-//! `dict/<language>.bin` coded by the codec itself (`$OUT_DIR/<language>.dict`). `lang.rs`
-//! includes them through the generated `$OUT_DIR/assets.rs`. The codec sources are compiled
-//! into this script by path, so the packed form always matches the code that unpacks it.
+//! Embeds the trained assets (`src/pack.rs`): every `priors/<language>.bin` (the language's
+//! own model nodes) and `priors/<group>.bin` (the group's packed literal priors) as committed —
+//! flat priors in their place while a model layout change leaves them stale — every
+//! `dict/<language>.bin` and `dict/<group>.bin` coded by the codec itself
+//! (`$OUT_DIR/<language>.dict`, `$OUT_DIR/<group>.dict`), and the detection table of every
+//! language's trained dictionary (its group's shared part and its suffix, `$OUT_DIR/grams`).
+//! `lang.rs` includes
+//! them through the generated `$OUT_DIR/assets.rs`. The codec sources are compiled into this
+//! script by path, so the packed form always matches the code that unpacks it.
 
 #[path = "src/error.rs"]
 mod error;
@@ -43,91 +46,101 @@ fn main() {
     ] {
         println!("cargo:rerun-if-changed={file}");
     }
-    // Every language's raw priors first (flat when stale), then the group literal parts —
-    // the first language's of each group — so every language is packed against exactly the
-    // models `lang::primed` rebuilds: its own nodes plus its group's literal part.
-    let mut raws: Vec<Vec<u8>> = Vec::new();
-    for (name, _) in LANGUAGES {
-        let priors_path = root.join("priors").join(format!("{name}.bin"));
-        println!("cargo:rerun-if-changed={}", priors_path.display());
-        let mut raw = std::fs::read(&priors_path).expect("priors");
-        // A model layout change leaves the committed priors at the old size until the trainer
-        // (which needs this build) rewrites them: embed flat priors meanwhile.
-        if raw.len() != lz::PRIORS_SIZE {
-            println!(
-                "cargo:warning={} has {} bytes, expected {}; embedding flat priors until retrained",
-                priors_path.display(),
-                raw.len(),
-                lz::PRIORS_SIZE
-            );
-            raw = vec![0; 512];
-            raw.resize(lz::PRIORS_SIZE, lz::PRIORS_DEFAULT);
-        }
-        raws.push(raw);
-    }
-    let mut group_first: Vec<Option<usize>> = vec![None; Group::ALL.len()];
-    for (i, (name, group)) in LANGUAGES.iter().enumerate() {
-        match group_first[*group as usize] {
-            None => group_first[*group as usize] = Some(i),
-            Some(first) => {
-                // The trainer gives every language of a group the same literal part; priors
-                // from before a group change differ until retrained, and the first language's
-                // part is embedded meanwhile — for every language of the group, so the packed
-                // dictionaries stay decodable with the embedded models.
-                if pack::literal_part(&raws[i]) != pack::literal_part(&raws[first]) {
-                    println!(
-                        "cargo:warning={name} and {} are both {group:?} but have different literal priors; embedding {}'s until retrained",
-                        LANGUAGES[first].0,
-                        LANGUAGES[first].0
-                    );
-                    // `first` was recorded in an earlier iteration, so `first < i`.
-                    let (earlier, rest) = raws.split_at_mut(i);
-                    let (source, target) = (&earlier[first], &mut rest[0]);
-                    target[..512].copy_from_slice(&source[..512]);
-                    target[512 + lz::LIT..].copy_from_slice(&source[512 + lz::LIT..]);
-                }
+    let read = |path: &Path| {
+        println!("cargo:rerun-if-changed={}", path.display());
+        std::fs::read(path).unwrap_or_default()
+    };
+    // A model layout change leaves the committed priors stale until the trainer (which needs
+    // this build) rewrites them: flat priors stand in meanwhile.
+    let flat_raw = pack::flat_raw();
+    let flat_language = pack::language_part(&flat_raw);
+    let group_literals: Vec<Vec<u8>> = Group::ALL
+        .iter()
+        .map(|group| {
+            let path = root.join("priors").join(format!("{}.bin", group.name()));
+            let part = read(&path);
+            if lz::Models::try_from_packed(&flat_language, &part).is_some() {
+                part
+            } else {
+                println!(
+                    "cargo:warning={} does not match the model layout; embedding flat priors until retrained",
+                    path.display()
+                );
+                pack::literal_part(&flat_raw)
             }
-        }
+        })
+        .collect();
+    let language_parts: Vec<Vec<u8>> = LANGUAGES
+        .iter()
+        .map(|(name, _)| {
+            let path = root.join("priors").join(format!("{name}.bin"));
+            let part = read(&path);
+            if part.len() == lz::LIT {
+                part
+            } else {
+                println!(
+                    "cargo:warning={} has {} bytes, expected {}; embedding flat priors until retrained",
+                    path.display(),
+                    part.len(),
+                    lz::LIT
+                );
+                flat_language.clone()
+            }
+        })
+        .collect();
+    let models: Vec<lz::Models> = LANGUAGES
+        .iter()
+        .zip(&language_parts)
+        .map(|((_, group), part)| lz::Models::from_packed(part, &group_literals[*group as usize]))
+        .collect();
+    let mut shared_parts: Vec<Vec<u8>> = Vec::new();
+    let mut group_priors = String::from("[\n");
+    let mut group_dicts = String::from("[\n");
+    for group in Group::ALL {
+        let literal_path = out.join(format!("{}.lit", group.name()));
+        std::fs::write(&literal_path, &group_literals[group as usize]).expect("write group priors");
+        group_priors.push_str(&format!("    include_bytes!({literal_path:?}),\n"));
+        let part = read(&root.join("dict").join(format!("{}.bin", group.name())));
+        // Coded with the models of the group's first language (`lang.rs` decodes it so).
+        let packed = LANGUAGES
+            .iter()
+            .position(|(_, g)| *g == group)
+            .filter(|_| !part.is_empty())
+            .map_or_else(Vec::new, |first| {
+                pack::pack_dictionary(&part, &models[first])
+            });
+        let dict_path = out.join(format!("{}.dict", group.name()));
+        std::fs::write(&dict_path, packed).expect("write packed shared dictionary");
+        group_dicts.push_str(&format!("    include_bytes!({dict_path:?}),\n"));
+        shared_parts.push(part);
     }
+    group_priors.push(']');
+    group_dicts.push(']');
+    let mut trained_dictionaries: Vec<Vec<u8>> = Vec::new();
     let mut assets = String::from("[\n");
-    for (i, (name, _)) in LANGUAGES.iter().enumerate() {
-        let dict_path = root.join("dict").join(format!("{name}.bin"));
-        println!("cargo:rerun-if-changed={}", dict_path.display());
-        let suffix = std::fs::read(&dict_path).expect("dict");
-        std::fs::write(
-            out.join(format!("{name}.priors")),
-            pack::language_part(&raws[i]),
-        )
-        .expect("write packed priors");
-        std::fs::write(
-            out.join(format!("{name}.dict")),
-            pack::pack_dictionary(&suffix, &raws[i]),
-        )
-        .expect("write packed dictionary");
-        std::fs::write(out.join(format!("{name}.grams")), grams::gram_set(&suffix))
-            .expect("write gram set");
+    for (i, (name, group)) in LANGUAGES.iter().enumerate() {
+        let suffix = read(&root.join("dict").join(format!("{name}.bin")));
+        let priors_path = out.join(format!("{name}.priors"));
+        std::fs::write(&priors_path, &language_parts[i]).expect("write packed priors");
+        let dict_path = out.join(format!("{name}.dict"));
+        std::fs::write(&dict_path, pack::pack_dictionary(&suffix, &models[i]))
+            .expect("write packed dictionary");
+        let mut trained = shared_parts[*group as usize].clone();
+        trained.extend_from_slice(&suffix);
+        trained_dictionaries.push(trained);
         assets.push_str(&format!(
-            "    Assets {{ packed_suffix: include_bytes!({:?}), priors: include_bytes!({:?}), grams: include_bytes!({:?}) }},\n",
-            out.join(format!("{name}.dict")),
-            out.join(format!("{name}.priors")),
-            out.join(format!("{name}.grams"))
+            "    Assets {{ packed_suffix: include_bytes!({dict_path:?}), priors: include_bytes!({priors_path:?}) }},\n"
         ));
     }
     assets.push(']');
-    let mut groups = String::from("[\n");
-    for group in Group::ALL {
-        let part =
-            group_first[group as usize].map_or_else(Vec::new, |i| pack::literal_part(&raws[i]));
-        let path = out.join(format!("{}.lit", group.name()));
-        std::fs::write(&path, part).expect("write packed literal priors");
-        groups.push_str(&format!("    include_bytes!({path:?}),\n"));
-    }
-    groups.push(']');
+    let grams_path = out.join("grams");
+    std::fs::write(&grams_path, grams::gram_table(&trained_dictionaries)).expect("write grams");
     std::fs::write(
         out.join("assets.rs"),
         format!(
-            "static ASSETS: [Assets; {}] = {assets};\nstatic GROUP_PRIORS: [&[u8]; {}] = {groups};\n",
+            "static ASSETS: [Assets; {}] = {assets};\nstatic GROUP_PRIORS: [&[u8]; {}] = {group_priors};\nstatic GROUP_DICTS: [&[u8]; {}] = {group_dicts};\nstatic GRAM_TABLE: &[u8] = include_bytes!({grams_path:?});\n",
             LANGUAGES.len(),
+            Group::ALL.len(),
             Group::ALL.len()
         ),
     )

@@ -68,27 +68,29 @@ Each language belongs to a model group (§5):
 | 0   | text       | prose    | 128 KB            |
 | 1   | en-US      | prose    | 128 KB            |
 | 2   | ja-JP      | japanese | 128 KB            |
-| 3   | html       | code     | 64 KB             |
-| 4   | css        | code     | 64 KB             |
-| 5   | javascript | code     | 64 KB             |
-| 6   | typescript | code     | 64 KB             |
-| 7   | c          | code     | 64 KB             |
-| 8   | cpp        | code     | 64 KB             |
-| 9   | csharp     | code     | 64 KB             |
-| 10  | dart       | code     | 64 KB             |
-| 11  | haskell    | code     | 64 KB             |
-| 12  | java       | code     | 64 KB             |
-| 13  | jsp        | code     | 64 KB             |
-| 14  | php        | code     | 64 KB             |
-| 15  | python     | code     | 64 KB             |
-| 16  | ruby       | code     | 64 KB             |
-| 17  | rust       | code     | 64 KB             |
-| 18  | zig        | code     | 64 KB             |
+| 3   | html       | code     | 48 KB             |
+| 4   | css        | code     | 48 KB             |
+| 5   | javascript | code     | 48 KB             |
+| 6   | typescript | code     | 48 KB             |
+| 7   | c          | code     | 48 KB             |
+| 8   | cpp        | code     | 48 KB             |
+| 9   | csharp     | code     | 48 KB             |
+| 10  | dart       | code     | 48 KB             |
+| 11  | haskell    | code     | 48 KB             |
+| 12  | java       | code     | 48 KB             |
+| 13  | jsp        | code     | 48 KB             |
+| 14  | php        | code     | 48 KB             |
+| 15  | python     | code     | 48 KB             |
+| 16  | ruby       | code     | 48 KB             |
+| 17  | rust       | code     | 48 KB             |
+| 18  | zig        | code     | 48 KB             |
 | 19  | zh-CN      | chinese  | 128 KB            |
 | 20  | zh-TW      | chinese  | 128 KB            |
 
-Each language's dictionary is the shared wrapper (`dict/wrapper.bin`) followed by its trained
-suffix (`dict/<language>.bin`); its models start from `priors/<language>.bin` (§5).
+Each language's dictionary is the shared wrapper (`dict/wrapper.bin`), then its group's shared
+part (`dict/<group>.bin`: 64 KB for `code`, empty for the other groups), then its trained
+suffix (`dict/<language>.bin`); its models start from its group's literal priors
+(`priors/<group>.bin`) and its own nodes (`priors/<language>.bin`) (§5).
 
 ## 3. Window
 
@@ -136,14 +138,20 @@ a 4-bit reverse `align` tree beyond.
 
 All probabilities of a language live in one flat array (layout in `lz.rs`: `is_match`,
 `is_rep`, `is_rep_g0`, `is_rep_g1`, `is_rep_g2`, `is_rep0_long`, `is_dict` × 12 states;
-`LEN`, `REP_LEN`, `DICT_LEN` × 274; `HIST_DIST`, `DICT_OFF` × 386; 128 × 4 literal context
+`LEN`, `REP_LEN`, `DICT_LEN` × 274; `HIST_DIST`, `DICT_OFF` × 386; 128 × 32 literal context
 pairs × 256 plain-tree nodes; 512 shared matched-literal nodes). The literal context of a
 position is the pair (class of the previous byte, class of the byte before it), each byte
-continuing into the dictionary before the content start and 0 where neither exists.
-`priors/<language>.bin` holds the 256-entry previous-byte → class table (values < 128), the
-256-entry second-previous-byte → class table (values < 4), then every node's initial
-probability quantized to 8 bits (`p11 = (q << 3) | 4`). All are trained offline
-(`bun run train`) and are format identity: a retrain changes the coded stream.
+continuing into the dictionary before the content start and 0 where neither exists. Every
+node's initial probability is quantized to 8 bits (`p11 = (q << 3) | 4`); `PRIORS_DEFAULT`
+(`p11 = 1024`) is the flat value. `priors/<language>.bin` holds the language's own nodes
+(those before the literal trees), one byte each in layout order. `priors/<group>.bin` holds
+the 256-entry previous-byte → class table (values < 128), the 256-entry second-previous-byte →
+class table (values < 32), then every 256-node tree from the literal trees on (the plain
+literal trees, then the two matched-literal trees) as a depth-first walk with one flag bit per
+visited node — 1: the node's value follows in the value stream and its children are walked; 0:
+the node and its subtree are flat and skipped — the flag bits of a tree packed LSB-first into
+bytes, followed by its values. All are trained offline (`bun run train`) and are format
+identity: a retrain changes the coded stream.
 
 The class tables and the literal trees (everything from the literal context pairs on) are
 shared by the languages of a model group — prose (`text`, `en-US`), Japanese, Chinese, code —
@@ -151,9 +159,9 @@ and trained on the group's pooled literal statistics; a literal node whose train
 have saved fewer than 4 bits on the training data stays at the flat probability 1/2. The nodes
 before the literal trees are per language.
 
-The module embeds these values in a packed form that is not part of the format (see
-`rust/crates/tokzip/build.rs` and `pack.rs`): each group's literal part once, with every flat
-subtree skipped; each language's own nodes verbatim; each dictionary suffix coded by the
-codec itself as one segment with the language's models and no dictionary, decoded on first
-use; and the bitset of each suffix's 4-gram hashes, which the encoder's language detection
-reads instead of the dictionaries.
+The module embeds the priors as committed and the dictionaries in a packed form that is not
+part of the format (see `rust/crates/tokzip/build.rs` and `pack.rs`): each dictionary part
+coded by the codec itself as one segment with no dictionary and the models of the language
+(for a group's shared part, of the group's first language), decoded on first use; and the
+table of every 4-gram hash's language set, which the encoder's language detection reads
+instead of the dictionaries.

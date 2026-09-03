@@ -66,26 +66,39 @@ fn main() {
         100.0 * oracle as f64 / raw as f64
     );
 
-    // Compression time by input size.
-    let big: Vec<u8> = html
-        .iter()
-        .chain(js.iter())
-        .chain(en.iter())
-        .flat_map(|d| d.iter().copied())
-        .collect();
-    for size in [1024usize, 4096, 16384, 65536, 262_144] {
+    // Compression time and ratio by input size (documents concatenated up to 1 MiB).
+    let mut big: Vec<u8> = Vec::new();
+    for lang in [
+        "html",
+        "javascript",
+        "en-US",
+        "text",
+        "ja-JP",
+        "python",
+        "typescript",
+    ] {
+        for doc in tokzip::train::bench_docs(&corpus, lang) {
+            if big.len() >= 1 << 20 {
+                break;
+            }
+            big.extend_from_slice(&doc);
+        }
+    }
+    for size in [1024usize, 4096, 16384, 65536, 262_144, 1 << 20] {
         let doc = &big[..size.min(big.len())];
         let t = Instant::now();
         let iters = (2_000_000 / size).max(3);
+        let mut coded = 0;
         for _ in 0..iters {
-            std::hint::black_box(tokzip::compress(doc));
+            coded = std::hint::black_box(tokzip::compress(doc)).len();
         }
         let per = t.elapsed().as_secs_f64() * 1000.0 / iters as f64;
         println!(
-            "{:>7} B: {:.2} ms/doc ({:.1} MB/s)",
+            "{:>7} B: {:.2} ms/doc ({:.1} MB/s) {:.2}%",
             doc.len(),
             per,
-            doc.len() as f64 / per / 1000.0
+            doc.len() as f64 / per / 1000.0,
+            100.0 * coded as f64 / doc.len() as f64
         );
     }
 }
