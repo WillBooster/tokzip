@@ -20,6 +20,7 @@
 //! frame is provably recoverable.
 
 mod error;
+mod grams;
 mod lang;
 mod languages;
 mod lz;

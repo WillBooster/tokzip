@@ -8,6 +8,7 @@
 //! the window scores into segments. The decoder never detects anything — it reads the segment
 //! table from the frame.
 
+use crate::grams::{gram_hash, GRAM_BITS, GRAM_SET_BYTES};
 use crate::languages::LANGUAGES;
 pub use crate::languages::LANGUAGE_COUNT;
 use crate::lz::{decode_doc, Models, Primed, Segment};
@@ -22,6 +23,9 @@ struct Assets {
     packed_suffix: &'static [u8],
     /// The language's own model nodes; the literal part comes from `GROUP_PRIORS`.
     priors: &'static [u8],
+    /// The bitset of the 4-gram hashes of the suffix (`grams.rs`), so detection needs no
+    /// decoded dictionary.
+    grams: &'static [u8],
 }
 
 // `ASSETS` (per language, in id order) and `GROUP_PRIORS` (per `Group`, in `Group::ALL` order).
@@ -68,23 +72,19 @@ pub fn primed(lang: u8) -> &'static Primed {
     })
 }
 
-/// The trained dictionary suffix of a language (without the wrapper).
-fn suffix(lang: u8) -> &'static [u8] {
-    &primed(lang).bytes[WRAPPER.len()..]
-}
-
 // ---------------------------------------------------------------------------
 // Detection
 // ---------------------------------------------------------------------------
 
-const GRAM_BITS: u32 = 17;
 const WINDOW: usize = 64;
 /// Cost of switching languages between windows, in window-score units (a window scores at
 /// most `WINDOW` gram hits plus `WINDOW` of fence hint).
 const SWITCH_PENALTY: i32 = 48;
 
 /// For every 4-gram hash, the set of languages whose dictionary contains a gram with that
-/// hash, as a bit per language id: one lookup scores a position for every language.
+/// hash, as a bit per language id: one lookup scores a position for every language. Built
+/// from the precomputed per-language bitsets, so the first `compress` decodes no dictionary
+/// for it.
 struct GramTable {
     masks: Vec<u32>,
 }
@@ -94,20 +94,18 @@ const _: () = assert!(LANGUAGE_COUNT <= 32);
 impl GramTable {
     fn new() -> Self {
         let mut masks = vec![0u32; 1 << GRAM_BITS];
-        for lang in 0..LANGUAGE_COUNT as u8 {
-            let bytes = suffix(lang);
-            for pos in 0..bytes.len().saturating_sub(3) {
-                masks[gram_hash(bytes, pos)] |= 1 << lang;
+        for (lang, assets) in ASSETS.iter().enumerate() {
+            assert_eq!(assets.grams.len(), GRAM_SET_BYTES, "gram set size mismatch");
+            for (byte, &bits) in assets.grams.iter().enumerate() {
+                let mut bits = bits;
+                while bits != 0 {
+                    masks[byte << 3 | bits.trailing_zeros() as usize] |= 1 << lang;
+                    bits &= bits - 1;
+                }
             }
         }
         Self { masks }
     }
-}
-
-#[inline]
-fn gram_hash(bytes: &[u8], pos: usize) -> usize {
-    let v = u32::from_le_bytes([bytes[pos], bytes[pos + 1], bytes[pos + 2], bytes[pos + 3]]);
-    (v.wrapping_mul(0x9E37_79B1) >> (32 - GRAM_BITS)) as usize
 }
 
 fn gram_table() -> &'static GramTable {
@@ -362,7 +360,8 @@ mod tests {
             assert_eq!(primed.models.lit_classes, expected.lit_classes, "{name}");
             assert_eq!(primed.models.probs, expected.probs, "{name}");
             let dict = std::fs::read(root.join(format!("dict/{name}.bin"))).expect("dictionary");
-            assert_eq!(suffix(lang as u8), dict, "{name}");
+            assert_eq!(&primed.bytes[WRAPPER.len()..], dict, "{name}");
+            assert_eq!(ASSETS[lang].grams, crate::grams::gram_set(&dict), "{name}");
         }
     }
 

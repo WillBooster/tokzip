@@ -153,6 +153,7 @@ before the literal trees are per language.
 
 The module embeds these values in a packed form that is not part of the format (see
 `rust/crates/tokzip/build.rs` and `pack.rs`): each group's literal part once, with every flat
-subtree skipped; each language's own nodes verbatim; and each dictionary suffix coded by the
+subtree skipped; each language's own nodes verbatim; each dictionary suffix coded by the
 codec itself as one segment with the language's models and no dictionary, decoded on first
-use.
+use; and the bitset of each suffix's 4-gram hashes, which the encoder's language detection
+reads instead of the dictionaries.
