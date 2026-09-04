@@ -33,10 +33,11 @@ let detectedCorpusDirs: string[] | undefined;
  * the detection; CI without the private checkout is unaffected either way.
  *
  * Detection (and its `git pull` side effect) runs lazily on first call, so importing
- * `CORPUS_DIR` alone — as training does — never touches the private checkout. Training
- * intentionally stays on `CORPUS_DIR` only: generated dictionaries embed literal fragments
- * of their training documents and are committed to this public repository, so private
- * production content must never flow into them.
+ * `CORPUS_DIR` alone never touches the private checkout. Training cuts dictionary content
+ * from `CORPUS_DIR` only: generated dictionaries embed literal fragments of their training
+ * documents and are committed to this public repository, so private production content must
+ * never flow into them. The private checkout only scores the training (see
+ * `scripts/train/train.ts`).
  */
 export function corpusDirs(): string[] {
   detectedCorpusDirs ??= detectCorpusDirs();

@@ -1,14 +1,354 @@
- %}
-	{% assign person = people[forloop.index0] %}
-	<div class="col-sm-6 col-lg-4">
-		{% include "cards/gallery-photo.html" person=person %}
-	</div>
-	{% endfor %}
-</div>
+splay: table-cell;
+      vertical-align: middle;
+      margin: 2em auto;
+    }
 
-<div class="d-flex mt-5">
-   {% include "ui/pagination.html" class="ms-auto" %}
-</div>list">
+    h1 {
+      color: #555;
+      font-size: 2em;
+      font-weight: 400;
+    }
+
+    p {
+      margin: 0 auto;
+      width: 280px;
+    }
+
+    @media only screen and (max-width: 280px) {
+
+      body,
+      p {
+        width: 95%;
+      }
+
+      h1 {
+        font-size: 1.5em;
+        margin: 0 0 0.3em;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Page Not Found</h1>
+  <p>Sorry, but the page you were trying to view does not exisalue').innerText = width + '%';
+
+			if (width >= 100) {
+				progress.querySelector('.progress-bar').classList.add('bg-green');
+			} else {
+				progress.querySelector('.progress-bar').classList.remove('bg-green');
+			}
+		}
+
+		var progress = document.getElementById('progress-animated');
+		
+		var increment = 0;
+		var interval = setInterval(function () {
+			increment = Math.ceil(Math.random() * 10);
+			setWidth(width + increment);
+			
+			if (width >= 100) {
+				clearInterval(interval);
+			}
+		}, 2000);
+
+		docum %}
+
+		function resizeCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+		  console.log(canvas.offsetWidth, canvas.offsetHeight);
+
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        signaturePad.fromData(signaturePad.toData()); 
+      }  
+
+		window.addEventListener("resize", resizeCanvas);
+		resizeCanvas();
+
+		{% if include.extra-js %}
+		{{ include.extra-js }}
+		{% e     </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+  in.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSideooltipEl))
+
+      const tall = document.getElementById('tall')
+      document.getElementById('tall-toggle').addEventListener('click', () => {
+        tall.style.display = tall.style.display === 'none' ? 'block' : 'none'
+      })
+
+      const ffBugInput = document.getElementById('ff-bug-input')
+      const firefoxModal = document.getElementById('firefoxModal')
+      function handlerClickFfBugInput() {
+        firefoxModal.addEventListener('focus', reportFirefoxTestResult.bind(false))
+        ffBugInput.addEv);
+}
+
+document.querySelector("#signature-advanced-color").addEventListener("input", function (e) {
+  signaturePad.penColor = e.target.value;
+});
+
+document.querySelector("#signature-advanced-svg").addEventListener("click", function () {
+  const dataURL = signaturePad.toDataURL('image/svg+xml');
+  download(dataURL, "signature.svg");
+});
+
+document.querySelector("#signature-advanced-png").addEventListener("click", function () {
+  const dataURL = signaturePad.toDataURL();
+  download(dataURL, "signature.png");
+})ollapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Login Screens:</h6>
+                        <a class="collapse-item" href="login.html">Login</a>
+                        <a class="collapse-item" href="register.html">Register</a>
+                        <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
+  ="form-selectgroup-item">
+				<input type="radio" name="report-type" value="1" class="form-selectgroup-input"{% if forloop.index == 1 %} checked{% endif %}>
+				<span class="form-selectgroup-label d-flex align-items-center p-3">
+					<span class="me-3">
+						<span class="form-selectgroup-check"></span>
+					</span>
+					<span class="form-selectgroup-label-content">
+						<span class="form-selectgroup-title strong mb-1">{{ r[0] }}</span>
+						<span class="d-block text-secondary">{{ r[1] }}</span>
+					</spcenter my-auto">
+                        <span>Copyright &copy; Your Website 2020</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabinav-item dropdown no-arrow d-sm-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+       /* global bootstrap: false */
+
+      new bootstrap.Tooltip('#wrapperTriggeredBySelector', {
+        animation: false,
+        selector: '.bs-dynamic-tooltip'
+      })
+
+      /* eslint-disable no-unused-vars */
+      function duplicateButtons() {
+        const buttonsBlock = document.querySelector('.selectorButtonsBlock')// get first
+        const buttonsBlockClone = buttonsBlock.cloneNode(true)
+        buttonsBlockClone.innerHTML += new Date().toLocaleString()
+        document.querySelector('#wrapperTris="btn" id="send">Send Review</button>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Catch The Insect</title>
+  </head>
+  <body>
+    <div class="screen">
+      <h1>Catch The Insect</h1>
+      <button class="btn" id="start-btn">Play Game</button>
+    </div>
+
+    <div class="screen">
+  rus sit amet fermentum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
+              <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</p>
+              <p>Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringillluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-1 text-gray-800">Animation Utilities</h1>
+                    <p class="mb-4">Bootstrap's default utility classes can be found on the official <a
+                            href="https://getbootstrap.com/docs">Bootstrap Documentation</a> page. The custom utilities
+                        below were created to extend this theme past the default utility classes built into Bootstrap's
+                        framework.</p>
+tItem("tabler-" + key, value)
+					url.searchParams.set(key, value)
+				}
+			}
+
+			window.history.pushState({}, "", url)
+		})
+
+		resetButton.addEventListener("click", function () {
+			for (var key in themeConfig) {
+				var value = themeConfig[key]
+				document.documentElement.removeAttribute("data-bs-" + key)
+				window.localStorage.removeItem("tabler-" + key)
+				url.searchParams.delete(key)
+			}
+
+			checkItems()
+
+			window.history.pushState({}, "", url)
+		})
+
+		checkItems()
+	})
+</nt' %}
+		window.tabler_chart = window.tabler_chart || {};
+		{% endif %}
+
+		window.ApexCharts && ({% if environment == 'development' %}window.tabler_chart["chart-{{ include.chart-id }}"] = {% endif %}new ApexCharts(document.getElementById('chart-{{ id }}'), {
+			chart: {
+				type: "{{ chart-type }}",
+				fontFamily: 'inherit',
+				height: {{ height | times: 16 }},
+
+				{% if data.sparkline %}
+				sparkline: {
+					enabled: true
+				},
+				{% else %}
+				parentHeightOffset: 0,
+				toolbar: {
+					show: {% ifr: 1px solid;
+        width: 100px;
+        height: 50px;
+        margin-left: 50px;
+        transform: rotate(270deg);
+        margin-top: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Tooltip <small>Bootstrap Visual Test</small></h1>
+
+      <p class="text-body-secondary">Tight pants next level keffiyeh <a href="#" data-bs-toggle="tooltip" title="Default tooltip">you probably</a> haven't heard of them. Photo booth beard raw denim letterpress vegan messenger bag stumptt>
+	{% endfor -%}
+	{% endif -%}
+	{% endfor -%}
+	
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const elements = document.querySelectorAll('[data-clipboard-text]');
+
+		elements.forEach(function (element) {
+			const clipboard = new ClipboardJS(element, {
+				text: function (trigger) {
+					return element.getAttribute('data-clipboard-text');
+				}
+			});
+
+			clipboard.on('success', function (e) {
+				e.clearSelection();
+				e.trigger.classList.add('btn-success');
+				e.trigger.classL%}">
+	{% for level-1 in menu %}
+		{% assign icon = level-1[1].icon %}
+		<li class="nav-item{% if level-1[0] == current-page[0] or level-1[1].active %} active{% endif %}{% if level-1[1].children %} dropdown{% endif %}">
+			<a class="nav-link{% if level-1[1].children %} dropdown-toggle{% endif %}{% if level-1[1].disabled %} disabled{% endif %}" {% if level-1[1].children %}href="#navbar-{{ level-1[0] }}" data-bs-toggle="dropdown" data-bs-auto-close="{% if include.keep-open %}false{% else %}outside{% endif %}" "{{ per-page[1] }}"),
+			pagination: {
+				item: value => {
+					return `<li class="page-item"><a class="page-link cursor-pointer">${value.page}</a></li>`
+				},
+				innerWindow: 1,
+				outerWindow: 1,
+				left: 0,
+				right: 0,
+			},
+			valueNames: advancedTable.headers.map(header => header['data-sort'])
+		});
+
+		const searchInput = document.querySelector('#{{ table-id }}-search');
+
+		if (searchInput) {
+			searchInput.addEventListener('input', () => {
+				list.search(searchInput.value)
+			})
+		}
+	})
+</scri" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>heck" color="green" class="icon-inline me-1" %}Up to 5 developers
+						</li>
+						<li>
+							{% include "ui/icon.html" icon="check" color="green" class="icon-inline me-1" %}All marketing + app components
+						</li>
+						<li>
+							{% include "ui/icon.html" icon="check" color="green" class="icon-inline me-1" %}Figma UI Kit
+						</li>
+						<li>
+							{% include "ui/icon.html" icon="check" color="green" class="icon-inline me-1" %}Lifetime free updates
+						</li>
+			. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+    == 'preview' %}
+		{% include "layout/analytics.html" %}
+
+		<meta name="msapplication-TileColor" content="{{ site.themeColor }}"/>
+		<meta name="theme-color" content="{{ site.themeColor }}"/>
+
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+		<meta name="apple-mobile-web-app-capable" content="yes"/>
+		<meta name="mobile-web-app-capable" content="yes"/>
+		<meta name="HandheldFriendly" content="True"/>
+		<meta name="MobileOptimized" content="320"/>
+
+		<link rel="icon" href= site.previewUrl }}">{{ site.previewUrl }}</a></code></pre>
+				</div>
+		
+				<h4>Request Timing</h4>
+				<div>
+					<pre>Effective URL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="text-reset" target="_blank" href="{{ site.previewUrl }}">{{ site.previewUrl }}</a><br>Redirect count&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>Name lookup time&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4e-05<br>Connect time&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&DYtMS4zMDIgMS4xMjgtMi4xMzMgMi40MTUtMi40OTQgMy44NjEuOTgzLjkyNiAyLjE1NCAxLjM4OCAzLjUxMyAxLjM4OC43MDkgMCA0LjEwNy0xLjE3MSAxMC4xOTQtMy41MTQgNi4wNzMtMi4zNzIgOS43NDYtMy41NTggMTEuMDE5LTMuNTU4IDEuODY1IDAgMy4yMS40NyA0LjAzNCAxLjQxLjE4OC4yMTcuOTA0IDEuNDkgMi4xNDcgMy44MThhMjEuOTAyIDIxLjkwMiAwIDAgMCAzLjQwNSA0LjczWm02OS44ODQtMTkuNzQydjEuOTUzYy0yLjk5MyAyLjQ1OC01Ljg5OSA1LjIxMy04LjcxOSA4LjI2NS04Ljc2MiA5LjQ1OS0xNC42NjIgMTQuMTg4LTE3LjY5OSAxNC4xODgtMi40NTggMC01LjE5OC0yLjIyLTguMjItNi42NmwtNi41MjgtOS42NTRjLTEuMjQ0LjIwMy0zLjQ5MiAyL					</ul>
+				</div>
+			</div>
+
+			<div class="col-md-auto ms-auto d-print-none">
+				<div class="btn-list">
 					{% include "ui/button.html" text="Configure" icon="settings" %}
 					{% include "ui/button.html" color="primary" text="Pause this monitor" icon="player-pause" %}
 				</div>
@@ -16,50 +356,386 @@
 		</div>
 	</div>
 </div><div class="card">
-	<div       <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
+	<div class="card-body">
+		<div class="d-flex">
+			<h3 class="card-title">Active users</h3>
+			<div class="ms-auto">
+				{% include "parts/dropdown/days.html" id="active-us"col-md">
+			<label class="form-label" for="location">Location</label>
+			<input type="text" class="form-control" id="location" name="location"
+			       value="{{ people[0].city }}, {{ people[0].country }}">
+		</div>
+	</div>
+
+	<h3 class="card-title mt-4">Email</h3>
+	<p class="card-subtitle">This contact will be shown to others publicly, so choose it carefully.</p>
+
+	<div>
+		<div class="row g-2">
+			<div class="col-auto">
+				<label for="email" class="form-label visually-hidden">Email</label>
+				<ind-body ">
+		<div class="row g-4">
+			<div class="col-12 prose">
+				<h1>1/1 Text</h1>
+				<p>I'm not a witch. Now, look here, my good man. Oh! Come and see the violence inherent in the system! Help, help, I'm being repressed! Well, I didn't vote for you. You can't expect to wield supreme power just 'cause some watery tart threw a sword at you! Bring her forward! He hasn't got shit all over him. He hasn't got shit all over him. We shall say 'Ni' again to you, if you do not appease us.</p>
+				<p>Well, condary)',
+					stroke: '#fff',
+					strokeWidth: 1,
+					{% endunless %}
+				}
+			},
+			zoomOnScroll: {% if data.zoom %}true{% else %}false{% endif %},
+			zoomButtons: {% if data.zoom %}true{% else %}false{% endif %},
+			{% if data.values %}
+			series: {
+				regions: [{
+					attribute: "fill",
+					scale: {
+						{% for i in (1..10) %}
+						scale{{ i }}: 'color-mix(in srgb, transparent, var(--tblr-primary) {{ i | times: 10 }}%)',
+						{% endfor %}
+					},
+					values: {{ data.values | json }},
+				}]
+			ed to the details. I love
+        developers who respect each and every aspect of a throughly thought out
+        design and do their best to put it in code. He goes over and beyond and
+        transforms ART into PIXELS - without a glitch, every time.
+      </p>
+      <div class="user">
+        <img
+          src="https://randomuser.me/api/portraits/women/46.jpg"
+          alt="user"
+          class="user-image"
+        />
+        <div class="user-details">
+          <h4 class="username">Miyah Myles</h4>
+      <img class="rounded-circle" src="img/undraw_profile_1.svg"
+                                            alt="...">
+                                        <div class="status-indicator bg-success"></div>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        <div class="text-truncate">Hi there! I am wondering if you can help me with a
+                                            problem I've been having.</div>
+   let t0
+      let t1
+      const carousel = document.getElementById('carousel-example-generic')
+
+      // Test to show that the carousel doesn't slide when the current tab isn't visible
+      // Test to show that transition-duration can be changed with css
+      carousel.addEventListener('slid.bs.carousel', event => {
+        t1 = performance.now()
+        console.log(`transition-duration took ${t1 - t0}ms, slid at ${event.timeStamp}`)
+      })
+      carousel.addEventListener('slide.bs.carousel', () =boriosam minima,
+					nam, nemo nisi nobis, nulla praesentium provident quae quaerat qui quia quibusdam quis quisquam quos repellendus sint suscipit tempora vero vitae! Animi assumenda dolorum eaque, explicabo laborum officia praesentium quia
+					repudiandae. Aliquam asperiores cupiditate deserunt nobis nostrum reprehenderit voluptates? Dolorem doloremque ducimus magni, maxime sint tenetur totam. Accusamus atque beatae consequatur corporis, dignissimos dolore dolores
+					dolorum earum error eum eveniet, fot better. Knights of Ni, we are but simple travelers who seek the enchanter who lives beyond these woods. Found them? In Mercia?! The coconut's tropical! A newt? …Are you suggesting that coconuts migrate?</p>
+			</div>
+
+			<div class="col-md-8 prose">
+				<p>I don't want to talk to you no more, you empty-headed animal food trough water! I fart in your general direction! Your mother was a hamster and your father smelt of elderberries! Now leave before I am forced to taunt you a second time! We want a shruurface-backdrop py-6 w-auto h-auto z-0" modal-id="scrollable" scrollable=true style="max-height: 30rem" inline show %}
+					</div>
+					<div>
+						<h3>Modal with form</h3>
+						{% include "ui/modal.html" class="position-relative rounded d-block bg-surface-backdrop py-6 w-auto h-auto z-0" modal-id="report" size="lg" inline show %}
+					</div>
+					<div>
+						<h3>Success modal</h3>
+						{% include "ui/modal.html" class="position-relative rounded d-block bg-surface-backdrop py-6 w-auto h-auto z-0" modal-inction download(dataURL, filename) {
+  const blob = dataURLToBlob(dataURL);
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.style = "display: none";
+  a.href = url;
+  a.download = filename;
+
+  document.body.appendChild(a);
+  a.click();
+
+  window.URL.revokeObjectURL(url);
+}
+
+function dataURLToBlob(dataURL) {
+  const parts = dataURL.split(';base64,');
+  const contentType = parts[0].split(":")[1];
+  const raw = window.atob(parts[1]);
+  const rawLength = raw.lengths="btn w-100">Choose plan</a>
+					 </td>
+				</tr>
+				</thead>
+				<tbody>
+				<tr class="bg-surface-tertiary">
+					 <th colspan="4" class="subheader">Features</th>
+				</tr>
+				<tr>
+					 <td>Some info about feature</td>
+					 <td class="text-center">{% include "ui/icon.html" icon="check" class="text-green" %}</td>
+					 <td class="text-center">{% include "ui/icon.html" icon="check" class="text-green" %}</td>
+					 <td class="text-center">{% include "ui/icon.html" icon="check" class="text-green" %}</thtml
+page-libs: [tabler-payments, imask]
+---
+
+<div class="bg-dark bg-cover" style="background-image: url({{ page | relative }}/static/bg-cover.jpg)">
+	<div class="bg-dark bg-opacity-75 pt-5 bg-blur">
+		<div class="container container-tight bg-overlay">
+			<img src="{{ page | relative }}/static/bg-cover.jpg" alt="" class="img-fluid rounded-lg rounded-top">
+		</div>
+	</div>
+</div>
+
+<div class="container container-tight">
+
+   <div class="card rounded-top-0 border-top-0">
+      <div class="card-body pt-0">
+    v>
 
 {% capture_script %}
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    {% if environment == 'development' %}
-    window.tabler_player = window.tabler_player || {};
-    {% endif %}
-    window.Plyr && ({% if environment == 'developmge Wrapper -->
-    <div id="wrapper">
+	const emailModal = document.getElementById("email-modal")
+	if (emailModal) {
+		emailModal.addEventListener("show.bs.modal", function (e) {
+			const button = e.relatedTarget
 
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+			const image = button.getAttribute("data-bs-image"),
+				title = button.getAttribute("data-bs-title"),
+				description = button.getAttribute("data-bs-description")
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-njs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
-    integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+			emailModal.querySelector("[data-email-title]").textContent = title
+			emailModal.querySelector("[data-email-description]")te(currentYear, currentMonth, 1, 11, 30),
+				},
+				{
+					title: "Marketing Strategy Call",
+					start: new Date(currentYear, currentMonth, 4, 14, 0),
+					end: new Date(currentYear, currentMonth, 4, 15, 0)
+				},
+				{
+					title: "Design Sprint",
+					start: new Date(currentYear, currentMonth, 7, 9, 0),
+					end: new Date(currentYear, currentMonth, 7, 12, 0)
+				},
+				{
+					title: "Dev Team Check-in",
+					start: new Date(currentYear, currentMonth, 10, 11, 0),
+					end: new Date(currentYear, currentMo%- unless include.hide-logo -%}
+	{%- if include.small-logo -%}
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68 68" width="32" height="32" 
+     aria-label="{{ site.title }}" class="navbar-brand-image{% if include.show-title %} me-3{% endif %}">
+		<path d="M64.6 16.2C63 9.9 58.1 5 51.8 3.4 40 1.5 28 1.5 16.2 3.4 9.9 5 5 9.9 3.4 16.2 1.5 28 1.5 40 3.4 51.8 5 58.1 9.9 63 16.2 64.6c11.8 1.9 23.8 1.9 35.6 0C58.1 63 63 58.1 64.6 51.8c1.9-11.8 1.9-23.8 0-35.6zM33.3 36.3c-2.8 4.4-6.6 8.2-11.1 11-1.5.9-3.3.erlin</option>
+				</select>
+			</div>
+
+			<div class="mt-5">
+				<button class="btn btn-primary w-100">
+					Confirm changes
+				</button>
+				<a href="#" class="btn btn-link w-100">
+					Reset to defaults
+				</a>
+			</div>
+		</form>
+
+	</div>
+	<div class="col-md-9">
+		<div class="row row-cards">
+			<div class="space-y">
+				{% for job in jobs %}
+				<div class="card">
+					<div class="row g-0">
+						<div class="col-auto">
+							<div class="card-body">
+								<div class="avatar avatar-md" style="backgrosts', 'link', 'image', 'charmap', 'preview', 'anchor',
+        'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+      ],
+      toolbar: 'undo redo | formatselect | ' +
+        'bold italic backcolor | alignleft aligncenter ' +
+        'alignright alignjustify | bullist numlist outdent indent | ' +
+        'removeformat',
+      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, HZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
     crossorigin="anonymous" />
   <link rel="stylesheet" href="style.css" />
-  vider -->
-            <hr class="sidebar-divider d-none d-md-block">
+  <title>Netflix Mobile Navigation</title>
+</head>
 
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></butto="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</st | split: ':' %}
-		<div class="col-lg-6">
-			<label class="form-selectgroup-item">
-				<input type="radio" name="report-type" value="1" class="form-selectgroup-input"{% if forloop.index == 1 %} checked{% endif %}>
-				<span class="form-selectgroup-label d" data-bs-offset="0">
-		<div class="card card-lg">
-			<div class="card-body">
-				{% for header in headers %}
-				<h3 id="pills-{{ header | slugify }}">{{ header }}</h3>
-				<p class="mb-6">
-					Lorem ipsum dolor sit amet, consectetur adipisicing elit. A tom fonts for this template-->
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"!-- Core plugin JavaScript-->
+<body>
+  <button class="nav-btn open-btn">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <img
+    src="https://images.ctfassets.net/4cd45et68cgf/7LrExJ6PAj6MSIPkDyCO86/542b1dfabbf3959908f69be546879952/Netflix-Brand-Logo.png?w=684&h=456"
+    alt="Logo" class="logo">
+
+  <p class="text">Mobile Navigation</p>
+
+  <div -brand-text mx-3">SB Admin <sup>2</sup></div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Headin>
+		<th>Name</th>
+		<th>CSS class</th>
+	 </tr>
+  </thead>
+  <tbody>
+	{% for social in socials %}
+	 <tr>
+		<td>
+			<div class="social social-sm social-app-{{ social.file }}"></div>
+		</td>
+		<td>{{ social.name }}</td>
+		<td>
+			<code>.social-app-{{ social.file }}</code><br>
+		</td>
+	 </tr>
+	 {% endfor %}
+  </tbody>
+</table>---
+title: Gallery
+page-header: Gallery
+page-header-description: 1-15 of 241 photos
+page-header-actions: photos
+page-menu: extra.gallery
+layout: default
+permalink: gallery.html
+---
+
+{% assimary" icon="currency-dollar" title="132 Sales" description="12 waiting payments" %}
+			</div>
+			<div class="col-sm-6 col-lg-3">
+				{% include "cards/small-stats.html" color="green" icon="shopping-cart" title="78 Orders" description="32 shipped" %}
+			</div>
+			<div class="col-sm-6 col-lg-3">
+				{% include "cards/small-stats.html" icon="brand-x" color="x" title="623 Shares" description="16 today" %}
+			</div>
+			<div class="col-sm-6 col-lg-3">
+				{% include "cards/small-stats.html" icon="brand-facebook" text-gray-500">December 2, 2019</div>
+                                        Spending Alert: We've noticed unusually high spending for your account.
+                                    </div>
+                                </a>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                            </div>
+                        </li>
+
+                        <!-- Nav Item - Messor = "var({{ skin_color[1].prop }})",
+	   primaryColor = "var({{ color[1].prop }})";
+
+	const illustrations = {
+	{% for illustration in free-illustrations.autodark %}
+		"{{ illustration[0] }}": {
+	      svg: '{{ illustration[1] | replace: '<svg ', '<svg class="w-100 h-auto" ' | replace_regex: "\n", "\n" }}',
+		},
+	{% endfor %}
+	}
+
+	const selectIllustrations = document.querySelectorAll(".js-select-illustration"),
+		currentIllustration = document.getElementById("current-illustration"),
+		currentIllustrationCodc="https://source.unsplash.com/Mv9hjnEUHR4/60x60"
+                                            alt="...">
+                                        <div class="status-indicator bg-success"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-truncate">Am I a good boy? The reason I ask is because someone
+                                            told me that people say this to all dogs, even if they aren't good...<l-12">
+      <div class="card">
+         <div class="card-header">
+            <h3 class="card-title">Product Tour Example</h3>
+            <div class="card-actions">
+               {% include "ui/button.html" id="start-tour" text="Start Tour" icon="play" color="primary" element="button" %}
+            </div>
+         </div>
+         <div class="card-body">
+            <p>
+               Click the "Start Tour" button to begin an interactive tour of this page.
+               The tour will guide you through d<p>The Lady of the Lake, her arm clad in the purest shimmering samite, held aloft Excalibur from the bosom of the water, signifying by divine providence that I, Arthur, was to carry Excalibur. That is why I am your king. Shut up! Will you shut up?!</p>
+		<p>Bring her forward! What do you mean? Listen. Strange women lying in ponds distributing swords is no basis for a system of government. Supreme executive power derives from a mandate from the masses, not from some farcical aquatic ceremony.</p>
+		<p>Who's on>
+			</select>
+		</div>
+		<div class="col-3">
+			<select name="user[day]" class="form-select">
+				<option value="">Day</option>
+				{% for i in (1..31) %}
+				<option value="{{ i }}" {% if i== 20 %} selected{% endif %}>{{ i }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div class="col-4">
+			<select name="user[year]" class="form-select">
+				<option value="">Year</option>
+				{% for i in (1897..2014) reversed %}
+				<option value="{{ i }}" {% if i== 1989 %} selected{% endif %}>{{ i }}</optioscale=1">
+    <link href="../../../dist/css/tabler.min.css" rel="stylesheet">
+    <title>Collapse</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Collapse <small>Bootstrap Visual Test</small></h1>
+
+      <div id="accordion" role="tablist">
+        <div class="card" role="presentation">
+          <div class="card-header" role="tab" id="headingOne">
+            <h5 class="mb-0">
+              <a data-bs-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+  b-3">
+	<label class="form-label">Input group</label>
+	{% include "ui/form/input-group.html" prepend="@" placeholder="username" class="mb-2" %}
+	{% include "ui/form/input-group.html" append=".tabler.io" placeholder="subdomain" class="mb-2" %}
+	{% include "ui/form/input-group.html" prepend="https://" append=".tabler.io" placeholder="subdomain" %}
+</div>
+
+<div class="mb-3">
+	<label class="form-label">Input with checkbox or radios</label>
+	{% include "ui/form/input-group.html" prepend="checkbox" class="mb-2" %}DAtMS4wNjMgMTAuMTk2IDQwNy40OSA0MDcuNDkgMCAwIDEtMS40MzIgMTUuMzM4Yy0uODgyIDEuMTg2LTEuOTg4IDEuNzc5LTMuMzE4IDEuNzc5LjExNSAwIC4xNzMtLjAxNS4xNzMtLjA0NC0uMjAyLS4xMDEtLjg5Ni0uMjgyLTIuMDgyLS41NDJ2LTIuODg1YzAtMi43MDUuMjMxLTUuNDYuNjk0LTguMjY2IDAtLjA1Ny4yNTMtLjc3My43Ni0yLjE0Ny41MDUtMS4zMzEuNzU4LTIuMTQxLjc1OC0yLjQzIDAtMS42MDUtLjI5Ni0zLjI0LS44ODktNC45MDMtLjM5IDEuMTI4LTEuMTEzIDEuODU5LTIuMTY5IDIuMTkxLTEuMjQ0LS43MjMtMS44NjUtMS45ODgtMS44NjUtMy43OTYgMC0uMjAzIDEuMDQ4LTEuNzI5IDMuMTQ1LTQuNTc4IDIuMTQtMi45NjUgMy4zODMtNS4wMDQgMy43Mault: 'Carousel' }}</h3>
+   </div>
+   <div class="card-body">
+      {% include "ui/carousel.html" id=include.id indicators=include.indicators indicators-thumb=include.indicators-thumb indicators-thumb-ratio=include.indicators-thumb-ratio indicators-dot=include.indicators-dot controls=include.controls offset=include.offset fade=include.fade limit=include.limit indicators-vertical=include.indicators-vertical captions=include.captions %}
+   </div>
+</div>
+<!doctype html>
+<html lang="en">
+  <hy: [{{ candle.y | join: ', ' }}]}{% unless forloop.last %}, {% endunless %}{% endfor %}{% else %}{{ serie.data | join: ', ' }}{% endif %}]
+			}{% unless forloop.last %},{% endunless %}{% endfor %}],
+			{% else %}series: [{% for serie in data.series %}{
+				name: "{{ serie.name }}",
+				data: [{{ serie.data | join: ', ' }}]
+			}{% unless forloop.last %},{% endunless %}{% endfor %}],
+			{% endif %}
+			{% endif %}
+
+			tooltip: {
+				theme: 'dark'
+			},
+
+			grid: {
+				{% unless data.sparkline %}
+				padding: {%}">
+	<div class="card-header">
+		<h3 class="card-title">{{ include.title | default: 'Last commits' }}</h3>
+	</div>
+	<div class="list-group list-group-flush{% if hoverable %} list-group-hoverable{% endif %}">
+		{% assign colors = 'green,red,yellow,x,x' | split: ',' %}
+		{% for person in people limit: limit offset: offset %}
+			{% assign color = forloop.index | plus: 5 | random_item: colors %}
+			{% assign index = '' | append: forloop.index %}
+			<div class="list-group-item{% if checked-ids contains index %}otstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
     <!-- Custom scripts for all pages-->
@@ -72,899 +748,116 @@
 
 <head>
 
-    <m id="content-wrapper" class="d-flex flex-column">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" conteit. Adipisci, alias aliquid distinctio dolorem expedita, fugiat hic magni molestiae molestias odit.
+         </p>
+      </div>
+   </div>
+   {% endfor %}
+</div>
+{%- endcapture %}
 
-            <!-- Main Content -->
-            <div id="content">
+<!-- Cards with tabs component -->
+<div class="card-tabs{% if include.borderless %} border-0{% endif %}">
+   {% if include.bottom %}
+      {{ tabs-content-html }}
+      {{ tabs-html }}
+   {% else %}
+      {{ tabs-html }}
+      {{ tabs-content-html }}
+   {% endif %}
+</div>
+---
+title: Tabs
+page-header: Tabs
+page-menu: base.tabs
+layouo">
+			<div class="placeholder col-9 mb-3"></div>
+			<div class="placeholder placeholder-xs col-10"></div>
+		</div>
+	</div>
+</div>---
+title: Card actions
+page-header: Card actions
+page-menu: base.cards.actions
+layout: default
+permalink: card-actions.html
+---
 
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-   av-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-         <span>Pages</span>
-                </a>
-                <div id="collapsePages" class="collapse show" aria-labelledby="headingPages"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rouass="container-fluid">
-
-                    <!-- Page Heading -->
-                    <h1 class="h3 mb-1 text-gray-800">Animation Utilities</h1>
-                    <p class="mb-4">Bootstrap's default utility classes can be found on the official <a
-      class="avatar avatar-md" style="background-image: url({{ page | relative }}/static/jobs/{{ job.image }})"></div>
-							</div>
-						</div>
-						<div class="col">
-							<div class="card-body ps-0">
-								<div class="row">
-									<div class="col"><h3er -->
-
-    </div>
-    <!-- End of Page Wrapper -->
-
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutMo group</label>
-	{% include "ui/form/input-group.html" prepend="@" placeholder="username" class="mb-2" %}
-	{% include "ui/form/input-group.html" append=".tabler.io" placeholder="subdomain" class="mb-2" %}
-	{% include "ui/form/input-group.html" prepend="http<table class="table table-vcenter">
-	<thead>
-	 <tr>
-		<th class="w-1">App</th>
-		<th>Name</th>
-		<th>CSS class</th>
-	 </tr>
-  </thead>
-  <tbody>
-	{% for social in socials %}
-	 <tr>
-		<td>
-			<div class="social social-sm social-app-{{ social.file }}"></divVisitors</th>
-			</tr>
-			</thead>
-			<tbody>
-			{% for url in urls limit: 8 %}
-			<tr>
-				<td>
-					{% include "ui/progressbg.html" value=url.bounce text=url.uri %}
-				</td>
-				<td class="w-1 fw-medium text-end">{{ url.visitors }}</td>
-			</tr>
-			{% e---
-page-header: Horizontal layout
-page-menu: layout.horizontal
-layout: homepage
-permalink: layout-horizontal.html
----<!-- Photo -->
-{% if include.id %}
-{% assign id = include.id | default: 1 %}
-{% if include.horizontal %}
-{% assign filtered-photos = photoelse %}
-					{{ level-1[1].title | replace: '%ICONS_COUNT%', icons-count   }}
-					{% endif %}
-				</span>
-
-				{% if level-1[1].badge %}
-				<span class="badge badge-sm bg-red text-red-fg">{{ level-1[1].badge }}</span>
-				{% endif %}
-			</a>
-
-			{% if letall = document.getElementById('tall')
-      document.getElementById('tall-toggle').addEventListener('click', () => {
-        tall.style.display = tall.style.display === 'none' ? 'block' : 'none'
-      })
-
-      const ffBugInput = document.getElementById('title">Card with action</h3>
-				<div class="card-actions">
-					{% include "ui/button.html" color="primary" icon="plus" text="Add new" %}
-				</div>
+<div class="row row-cards">
+	<div class="col-md-6">
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title">Sample card</h3>
 			</div>
 			{% include "cards/body-placeholder.html" %}
 		</div>
 	</div>
 
 	<div class="col-md-6">
-		opdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="alertsDropdown">
-                                <h6 class="dropdown-header">
-                                    Alerts Center
-   ="text-truncate">Last month's report looks great, I am very happy with
-                                            the progress so far, keep up the good work!</div>
-                                        <div class="small text-gray-500">Morgan Alvarez · pdown" data-bs-auto-close="{% if include.keep-open %}false{% else %}outside{% endif %}" role="button" aria-haspopup="true" aria-expanded="{% if include.auto-open and level-1[0] == current-page[0] %}true{% else %}false{% endif %}" {% else %}href="{{ pageord" %}
-</div>
+		<dtitle>Sound Board</title>
+  </head>
+  <body>
+    <audio id="applause" src="sounds/applause.mp3"></audio>
+    <audio id="boo" src="sounds/boo.mp3"></audio>
+    <audio id="gasp" src="sounds/gasp.mp3"></audio>
+    <audio id="tada" src="sounds/tada.mp3"></audio>
+    <audio id="victory" src="sounds/victory.mp3"></audio>
+    <audio id="wrong" src="sounds/wrong.mp3"></audio>
 
-{% capture html -%}
-<kbd>ctrl + K</kbd>
-{%- endcapture %}
-
-<div class="mb-3">
-	<label class="form-label">Input with appended kbd</label>
-	{% include "ui/form/input-group.html" append-html=html flat=true %}
-</div>
-
-<div class="mb-3">
-	<label
-				<select class="form-select" id="job-location" name="location">
-					<option>Anywhere</option>
-					<option>London</option>
-					<option>San Francisco</option>
-					<option>New York</option>
-					<option>Berlin</option>
-				</select>
-			</div>
-
-			<di</p>
-
-	<div>
-		<div class="row g-2">
-			<div class="col-auto">
-				<label for="email" class="form-label visually-hidden">Email</label>
-				<input type="text" class="form-control w-auto" id="email" name="email" value="{{ people[0].email }}">
-			</div>
-			<dlapse-item" href="utilities-border.html">Borders</a>
-                        <a class="collapse-item active" href="utilities-animation.html">Animations</a>
-                        <a class="collapse-item" href="utilities-other.html">Other</a>
-  ader">
-		<h3 class="card-title">{{ include.title | default: 'Last commits' }}</h3>
-	</div>
-	<div class="list-group list-group-flush{% if hoverable %} list-group-hoverable{% endif %}">
-		{% assign colors = 'green,red,yellow,x,x' | split: ',' %}
-		{% fo"modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</buttocheck">
-						<input class="form-check-input" type="radio" value="client" id="use-client">
-						<label class="form-check-label" for="use-client">
-							Client work
-						</label>
-					</div>
-					<div class="form-check">
-						<input class="form-check-in     color="primary" id="chart1" class="card-gradient card-gradient-end card-gradient-primary" %}
-         </div>
-         <div class="col-12">
-            {% include "cards/small-stats.html" id="sales" icon="arrow-up" color="green" title="$5,256.99"
-     -image mr-3">
-                                        <img class="rounded-circle" src="img/undraw_profile_1.svg"
-                                            alt="...">
-                                        <div class="status-indicator bg-success"></div>
-      <form class="form-inline mr-auto w-100 navbar-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small"
-     
-    </header>
-
-    <main id="main"></main>
+    <div id="buttons"></div>
 
     <script src="script.js"></script>
   </body>
 </html>
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  lugins: marketing
----
-<!-- BEGIN NAVBAR  -->
-<header role="banner">
-{% include "marketing/navbar.html" %}
-</header>
-<!-- END NAVBAR  -->
-
-<!-- BEGIN PAGE BODY -->
-<main id="content">
-{{ content }}
-</main>
-<!-- END PAGE BODY -->
-
-<!-- BEGIN FOOTER -->
-<foot <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>SB Admin 2 - Border U"cards/welcome.html" %}
-	</div>
-	<div class="col-sm-6 col-lg-3">
-		{% include "cards/charts/total-users.html" %}
-	</div>
-	<div class="col-sm-6 col-lg-3">
-		{% include "cards/charts/active-users-2.html" %}
-	</div>
-	<div class="col-sm-6 col-lg-3">
-		{%  <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2020</span>v>
-
-
----
-page-header: Combo layout
-page-menu: layout.combo
-layout-sidebar: true
-layout-sidebar-dark: true
-layout-navbar-hide-brand: true
-layout-navbar-hide-page-menu: true
-layout-navbar-class: "d-none d-lg-flex"
-layout-navbar-condensed: true
-layout3 people
-page-menu: extra.users
-permalink: users.html
----
-
-<div class="row row-cards">
-	{% for person in people limit: 18 %}
-	{% assign progress = forloop.index | random_number: 4, 95 %}
-	{% assign online_counter = forloop.index | random_number: 1, 10 %}
-	  <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link" href="index.html">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
-            </li>
-
-      <div>
-                                        <div class="text-truncate">Am I a good boy? The reason I ask is because someone
-                                            told me that people say this to all dogs, even if they aren't good...</div>
-v>
-		</label>
-		{% endfor %}
-	</div>
-</div>
-{% include "parts/form/input-radios.html" %}
-{% include "parts/form/input-radios-inline.html" %}
-
-{% include "parts/form/input-checkboxes.html" %}
-{% include "parts/form/input-checkboxes-inline.html" %}
-
-<drds/user-card-bg.html" person-id=26 %}</div>
-	<div class="col-md-6 col-xl-3">{% include "cards/user-card-bg.html" person-id=27 blurred=true %}</div>
-	<div class="col-md-6 col-xl-3">{% include "cards/user-card-bg.html" person-id=28 blurred=true %}</div>
-
-
-	></li>
-								<li><a class="link-secondary" href="{{ site.base }}">Blog</a></li>
-								<li><a class="link-secondary" href="{{ site.base }}">Changelog</a></li>
-								<li>
-									<a
-										href="{{ site.githubUrl }}"
-										class="link-secondnavbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>ass="fa fa-bars"></i>
-                    </button>
-
-                    <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 nts
-page-menu: extra.widgets
-page-libs: [apexcharts]
-layout: default
-permalink: widgets.html
----
-
-<div class="row row-cards">
-	<div class="col-12 col-md-6 col-xxl-3 mb-4 mb-xxl-0">
-		{% include "cards/stat-card.html" title="Earned" value="$2,847" icon="creded %}
-					fill: 'var(--tblr-bg-surface-secondary)',
-					stroke: 'var(--tblr-border-color)',
-					strokeWidth: 2,
-					{% else %}
-					fill: 'var(--tblr-bg-surface-secondary)',
-					stroke: '#fff',
-					strokeWidth: 1,
-					{% endunless %}
-				}
-			},
-			heck-input m-0 align-middle table-selectable-check" type="checkbox" aria-label="Select invoice" value="true">
-								</td>
-								<td class="{{ headers[0].data-sort }}">
-									{% include "ui/avatar.html" person=person size="xs" class="me-2" %}
-		n=icon %}
-{%- endif -%}
-{%- if include.person-id -%}
-    {%- assign person-id = include.person-id | minus: 1 -%}
-    {%- assign person = people[person-id] -%}
-    {%- assign src = person.photo -%}
-    {%- unless src -%}
-        {%- assign placeholder = per							{% include "ui/avatar.html" person=person %}
-						</div>
-						<div class="col">
-							<div class="card-title">{{ person.full_name }}</div>
-							<div class="card-subtitle">{{ person.job_title }}</div>
-ncate">I have the photos that you ordered last month, how
-                                            would you like them sent to you?</div>
-                                        <div class="small text-gray-500">Jae Chun · 1d</div>
-w.bootstrap = window.tabler && window.tabler.bootstrap || {};</script>
-  </body>
-</html>
----
-layout: default
----
-
-<div class="card">
-	<div class="card-body">
-		{{ content }}
-	</div>
-</div>{% include "ui/modal/header.html" title="Scrollable modal" %}
-<div cncate">Hi there! I am wondering if you can help me with a
-                                            problem I've been having.</div>
-                                        <div class="small text-gray-500">Emily Fowler · 58m</div>
-icon = include.icon | default: "user" %}
-{% if include.growth > 0 %}
-	{% assign color="green" %}
-	{% assign arrow="arrow-up" %}
-{% elsif include.growth < 0 %}
-	{% assign color="red" %}
-	{% assign arrow="arrow-down" %}
-{% else %}
-	{% assign color="grey" %}
->
-		{% endfor %}
-	</div>
-</div>
----
-layout: base
-title: Onboarding
-permalink: onboarding.html
----
-
-<nav class="navbar">
-	<div class="container">
-		<div class="row w-100 align-items-center">
-			<div class="col me-auto">
-				{% include "layout/navbar-logo.htfas fa-envelope fa-fw"></i>
-                                <!-- Counter - Messages -->
-                                <span class="badge badge-danger badge-counter">7</span>
-                            </a>
-                            <!-- Dropdown - Mes      placeholder="Search for..." aria-label="Search"
+<!DOCTopdown">
+                                <form class="form-inline mr-auto w-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small"
+                                            placeholder="Search for..." aria-label="Search"
                                             aria-describedby="basic-addon2">
                                         <div class="input-group-append">
-    ss="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
-                                <img class="img-profile rounded-circle"
-                                    src="img/undraw_profile.svg">
-    tModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-  .html">Login</a>
-                        <a class="collapse-item" href="register.html">Register</a>
-                        <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
-                        <div class="collapse-divider"></div				{% assign icon = level-2[1].icon %}
-							{% include "ui/icon.html" icon=icon class="icon-inline me-1" %}
-						{% endif %}
+   ed, the first/last radio button should receive focus (depending on whether you navigated "forward" to the group with <kbd>Tab</kbd> or "backwards" using <kbd><kbd>Shift</kbd> + <kbd>Tab</kbd></kbd>). If a radio button was already selected, navigating with the keyboard should set focus to that particular radio button. Only one radio button in a group should receive focus at any given time.  Ensure that the selected radio button can be changed by using the <kbd>←</kbd> and <kbd>→</kbd> arrow keys. Click o     title: 'Settings Card',
+                  description: 'This card demonstrates how the tour works with smaller, centered elements.',
+                  side: 'top',
+                  align: 'center'
+               }
+            },
+            {
+               element: '#tour-card-5',
+               popover: {
+                  title: 'Users Card',
+                  description: 'Another example card showing user management features.',
+                  side: 'top',
+                  align: 'center'
+    /div>
 
-						{{ level-2[1].title }}
-
-						{% if level-2[1].badge %}
-						<span class="badge badge-sm bg-green-lt text-uppercase ms-s in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
-              <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</p>
-     ="{{ description | default: site.description | escape }}"/>
-
-		{% include "layout/og.html" %}
-	{% elsif environment == 'development' %}
-		<link rel="icon" href="{{ page | relative }}/favicon-dev.ico" type="image/x-icon" />
-		<link rel="shortcut icon" href=avbar-transparent: true
-layout-hide-topbar: true
-layout: homepage
-permalink: layout-vertical-transparent.html
----
-{% assign limit = include.limit | default: 10 %}
-{% assign offset = include.offset | default: 0 %}
-<div class="card{% if i     <h4>Tooltips in a modal</h4>
-              <p><a href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top">This link</a> and <a href="#" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tooltip on bottom">that link</a>>
-				<button href="#tab-card" class="nav-link active" data-bs-toggle="tab" role="tab" aria-controls="tab-card"
-					aria-selected="true">
-					{% include "ui/icon.html" icon="credit-card" %}
-					<span>Pay With Card</span>
-				</button>
-				<button href="center gap-2">
-					<span class="legend bg-secondary"></span>
-					<span class="text-secondary">Last year</span>
-				</div>
-			</div>
-		</div>
-
-		{% include "ui/chart.html" chart-id="crm-mrr-overview" height=15 %}
-	</div>
-</div>
----
-title: Pricing table
-pag-6">
-
-                            <div class="card position-relative">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Fade In Animation Utilty</h6>
-     div>
-</section>
----
-title: SVG Illustrations
-page-header: SVG Illustrations
-page-menu: addons.illustrations
-layout: default
-permalink: illustrations.html
----
-
-{% assign first-illustration = '' %}
-{% for illustration in free-illustrations.autodark %}
-	{%tml" divider=include.divider %}
-	<div class="container">
-		<div class="section-header mb-6">
-			<h2 class="section-title text-secondary">Trusted by over 3,000 companies</h2>
-		</div>
-		<div class="row g-lg-8 align-
-      {% include "ui/form/check.html" type="checkbox" %}
-      {% include "ui/form/check.html" type="checkbox" disabled=true %}
-      {% include "ui/form/check.html" type="checkbox" checked=true %}
-   </div>
-</div>
-{% assign product-id = include.product-idy">
-		<h4 class="card-title">{{ include.title }}</h4>
-
-		{% include "ui/chart-heatmap.html" chart-id=include.id id=include.id colors=include.colors scale=include.scale labels=include.labels no-shades=include.no-shades count=include.count color=includee-id = include.id | default: "advanced-table" %}
+{% assign table-id = include.id | default: "advanced-table" %}
 {% assign statuses = 'Active,Inactive,Requested' | split: ',' %}
 {% assign per-page = '10,20,50,100' | split: "," %}
 {% assign categories = 'Agencies,Individual,Event,Ticket' | split: "," %}
-{% assign tags =icon="check" class="text-green" %}</td>
-					 <td class="text-center">{% include "ui/icon.html" icon="check" class="text-green" %}</td>
-				</tr>
-				<tr class="bg-surface-tertiary">
-					 <th colspan="4" class="subheader">Support</th>
-				</tr>
-				<tr>center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-ontent-center" href="index.html">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-laugh-wink"></i>
-                </div>
-                <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>      Spending Alert: We've noticed unusually high spending for your account.
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href=title: Forgot password
-layout: single
-page-menu: base.authentication.auth-lock
-permalink: auth-lock.html
----
-
-{% include "cards/auth-lock.html" show-header="1" %}
-<section class="section{% if include.background %} section-{{ include.background }}{% ement-provider-{{ payment.logo }}-dark"></div>
-		</td>
-		<td>{{ payment.name }}</td>
-		<td>
-			<code>.payment-provider-{{ payment.logo }}</code><br>
-			<code>.payment-provider-{{ payment.logo }}-dark</code>
-		</td>
-	 </tr>
-	 {% endfor %}
-  </tbody>
-</table>lor in site.colors %}
-				window.getComputedStyle(document.body).getPropertyValue('{{ color[1].prop }}'),
-				{% endfor %}
-			],
-		}))
-	})
-</script>
-{% endcapture_script %}
----
-title: Signatures
-layout: default
-permalink: signatures.html
-page-header: Signa-markers %}
-			markers: {
-				size: 2
-			},
-			{% endif %}
-		})).render();
-	});
-</script>
-{% endremoveemptylines %}
-{%- endcapture %}
-
-{% capture_script %}
-{{ script }}
-{% endcapture_script %}
-
-{% endif %}
-{% endremoveemptylines %}{% assign breadcrumb-pageive }}/dist/js/tabler-theme{% if environment != 'development' %}.min{% endif %}.js{% if environment != 'development' %}?{{ 'now' | date: '%s' }}{% endif %}"{% if environment == 'preview' %} integrity="{{ sri.js-theme }}"{% endif %}></script>
-	<!-- END GLOBoggle="modal" data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-         </form>
-
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
- html" chart-type="bar" chart-data="20,40,30,10,40,60,80,70"
-				color="red" icon="heart" %}</div>
-			<div class="col-12">{% include "cards/small-stats.html" chart-type="bar"
-				chart-data="20,40,20,-10,-30,10,40,60,80,70" color="green" icon="brand-github"static/emails/{{ email[0] }}.jpg"
-				>
-					<img src="{{ page | relative }}/static/emails/{{ email[0] }}.jpg" class="img-fluid rounded" alt="{{ email[1].descriptionShort }}" width="{{ email[1].width }}" height="{{ email[1].height }}" />
-				</a>
-			</rset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-	{% if environment == 'production' %}
-	
-	{% assign pageSection = "" %}
-	{% if page.url contains "/ui/" %}
-	{% assign pageSection = "UI" %}
-	{% elsif page.url contains "/ent' %}window.tabler_chart["chart-{{ include.chart-id }}"] = {% endif %}new ApexCharts(document.getElementById('chart-{{ id }}'), {
-			chart: {
-				type: "{{ chart-type }}",
-				fontFamily: 'inherit',
-				height: {{ height | times: 16 }},
-
-				{% if data.sner rounded">
-                        <h6 class="collapse-header">Custom Components:</h6>
-                        <a class="collapse-item" href="buttons.html">Buttons</a>
-                        <a class="collapse-item" href="cards.html">Cards</a>
-      Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a by-500">December 7, 2019</div>
-                                        $290.29 has been deposited into your account!
-      con-a-color | default: 'muted' %}
-{% assign icon-b-color = include.icon-b-color | default: 'red' %}
-
-{% if icon == 'star' or icon == 'heart' %}
-	{% assign icon-b-class = 'icon-filled' %}
-{% else %}
-	{% assign icon-b-class = include.icon-b-class %}
-{% enditps://getbootstrap.com/docs">Bootstrap Documentation</a> page. The custom utilities
-                        below were created to extend this theme past the default utility classes built into Bootstrap's
-                        framework.</p>
-
-iner">
-      <h1>Collapse <small>Bootstrap Visual Test</small></h1>
-
-      <div id="accordion" role="tablist">
-        <div class="card" role="presentation">
-          <div class="card-header" role="tab" id="headingOne">
-            <h5 class="mb-0">
-    parts/dropdown/days.html" id="revenue" label="Select time range for revenue" %}
-			</div>
-		</div>
-		<div class="d-flex align-items-baseline">
-			<div class="h1 mb-0 me-2">$4,300</div>
-			<div class="me-auto">
-				{% include "ui/trending.html" value=8 %}
-e | escape }}'
-				}
-				{% endif %}
-				{% if data.y-tooltip %}
-				tooltip: {
-					enabled: true
-				}
-				{% endif %}
-			},
-			{% endunless %}
-
-			{% if data.datetime %}
-			{% assign date = data.start-date | default: '2020-06-20' | date: "%s" %}
-			{% aeader">Other Pages:</h6>
-                        <a class="collapse-item" href="404.html">404 Page</a>
-                        <a class="collapse-item active" href="blank.html">Blank Page</a>
-  nclude.width | default: 400 %}
-{% assign height = include.height | default: 200 %}
-<div class="card-body{% if include.class %} {{ include.class }}{% endif %}">
-	{% include "ui/svg.html" width=width height=height ratio=include.ratio class="w-100 border roun with icons</h3>
-            <div class="badges-list">
-              {% for color in colors %}
-              <span class="badge bg-{{ color }} text-{{ color }}-fg"> {% include "ui/icon.html" icon="star"
-                type="filled" %} {{ color | uc_first t" />
-	{% endfor %}
-
-	{% if docs-libs -%}
-	{% for lib in libs -%}
-	{% if docs-libs contains lib[0] -%}
-	{% for file in lib[1].css -%}
-	<link
-		href="{% if file contains 'http://' or file contains 'https://' %}{{ file }}{% else %}/dist/libs/{{ lib[1].npm }}n-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60"
-     </p>
-			</div>
-
-
-			<div class="col-md-4 prose">
-				<h3>1/3 Text</h3>
-				<p>Knights of Ni, we are but simple travelers who seek the enchanter who lives beyond these woods. Why? Well, what do you want? …Are you suggesting that coconuts migrate?</p>
-			<8Array], { type: contentType });
-}
-
-document.querySelector("#signature-advanced-color").addEventListener("input", function (e) {
-  signaturePad.penColor = e.target.value;
-});
-
-document.querySelector("#signature-advanced-svg").addEventListener("click", funcif -%}
-	{%- unless include.hide-logo -%}
-	{%- if include.small-logo -%}
-	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68 68" width="32" height="32" 
-     aria-label="{{ site.title }}" class="navbar-brand-image{% if include.show-title %} me-3{% endi card-md" action="{{ page | relative }}/" method="get" autocomplete="off" novalidate>
-	<div class="card-body">
-		<h2 class="card-title text-center mb-4">Forgot password</h2>
-
-		<p class="text-secondary mb-4">Enter your email address and your password will ss="col">
-                                                    <div class="progress progress-sm mr-2">
-                                                        <div class="progress-bar bg-info" role="progressbar"
-     if %}" id="colorpicker-{{ id }}" value="{{ include.value }}" />
-
-{% capture_script %}
-<script>
-	document.addEventListener("DOMContentLoaded", function () {
-		{% if environment == 'development' %}
-		window.tabler_colorpicker = window.tabler_colorpicker || {light" %}
-
-{% include "marketing/sections/cta.html" %}
-
-{% include "marketing/sections/features-3.html" background="light" %}
-
-{% include "marketing/sections/testimonials.html" limit=9 %}
-
-{% include "marketing/sections/counters.html" background="light" %}="text-reset">{{ task.name }}</a>
-				</td>
-				<td class="text-nowrap text-secondary">
-					{% include "ui/icon.html" icon="calendar" %}
+{% assign tags = 'QTA,Event,Tickets,TODO|Event,Tickets|QTA,Event|Tickets' | split: "|" %}
+<!--{% include "js/tabler-list.html", parameters="[ 'sort-name', 'sort-content', 'sort-status', 'sort-date', 'sort-tags', 'sort-category']" %}-->
+<div endar" %}
 					{{ forloop.index | random_date | date: '%B %d, %Y' }}
 				</td>
 				<td class="text-nowrap">
-				tgroup-boxes d-flex flex-column">
-		{% for person in people limit: 5 %}
-		<label class="form-selectgroup-item flex-fill">
-			<input type="checkbox" name="form-project-manager[]" value="{{ person.id }}" class="form-selectgroup-input" {%
-			       if forraft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-    0,900i"
-        rel="stylesheet">
-
-    <!-- Custom styles for this template-->
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
-
-</head>
-
-<body id="page-top">
-
-    <!-- Page Wtype == 'donut' or chart-type == 'radialBar' %}
-			series: [{% for serie in data.series %}{{ serie.data }}{% unless forloop.last %}, {% endunless %}{% endfor %}],
-			labels: [{% for serie in data.series %}"{{ serie.name }}"{% unless forloop.last %}, {% end/{{ product.image }}" alt="{{ product.name }}" class="img-fluid">
-		</div>
-		<h4 class="card-title"><a href="#">{{ product.name }}</a></h4>
-		<div class="mt-5 d-flex align-items-center">
-			<div class="h3 mb-0">
-				<strong>{{ product.price }}</strong>
-			 don't want to talk to you no more, you empty-headed animal food trough water! I fart in your general direction! Your mother was a hamster and your father smelt of elderberries! Now leave before I am forced to taunt you a second time! The nose?</p>
-					<fuam quos
-					reiciendis tempora tempore ut velit vitae voluptas voluptatem! Accusantium adipisci architecto assumenda atque aut consectetur consequuntur cum, deserunt doloribus ea excepturi exercitationem expedita explicabo facere fuga fugit
-					impedit -header-description %}
-{% assign actions = page-header-actions | default: layout.page-header-actions %}
-{% assign pretitle = page-header-pretitle | default: layout.page-header-pretitle %}
-{% assign class = page-header-class | default: layout.page-header-cla-label'] %} aria-label="{{ include['aria-label'] }}" {% endif %}>{% for i in (1..count) %}{% assign default = 'Step ' | append: i %}{% assign label = labels[forloop.index0] | default: default %}
-   <li class="progress-steps-item{% if i <= active %} bg-{{ ef="#">Read More Messages</a>
-                            </div>
-                        </li>
-
-                        <div class="topbar-divider d-none d-sm-block"></div>
-
-                        <!-- Nav Item - User Information -->
- dif %} autocomplete="off"{% if include.id %} id="{{ include.id }}"{% endif %}>
-	{% if include.append %}
-	<span class="input-group-text">
-		{% if include.append == "checkbox" or include.append == "radio" %}
-			<input class="form-check-input m-0" type="{{ i-mask.html" mask="(00) 0000-0000" visible=true %}
-						</div>
-						<div class="mb-3">
-							<label class="form-label">IP Address</label>
-							{% include "ui/form/input-mask.html" mask="099.099.099.099" placeholder="000.000.000.000" visible=true %}
-		olestias fugiat commodi omnis. Asperiores quia tenetur nemo ipsa.</p>
-
-        <h3>My Dog</h3>
-        <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2100&q=80" alt="do%}
-			<div class="card-status-top bg-{{ include.status-top | default: 'blue' }}"></div>
-		{% elsif include.status-bottom %}
-			<div class="card-status-bottom bg-{{ include.status-bottom | default: 'blue' }}"></div>
-		{% elsif include.status-start %}
-			<di						<ul class="list-inline list-inline-dots">
-								<li class="list-inline-item">
-									<a class="link-secondary" href="/terms-of-service"
-										>Terms of service</a
-									>
-								</li>
-								<li class="list-inline-item"title: Crypto Dashboard
-page-header: Crypto Dashboard
-page-menu: dashboards.crypto
-page-libs: [apexcharts]
-layout: default
-permalink: dashboard-crypto.html
----
-
-{% assign btc = crypto-currencies | where: "symbol", "BTC" | first %}
-{% assign ltc = crypto-cuJR5oJcLj+Nr9mvzk8nJVkVXgQvlLGZ9SIFEJF"
-	crossorigin="anonymous"
-></script>
-
-<script>
-	Sentry.init({
-		dsn: "https://8e4ad02f495946f888620f9fb99fd495@o484108.ingest.sentry.io/5536918",
-		release: "tabler@{{ package.version }}",
-		integrations: [
-			new Senr various projects. Effortlessly customize any illustration to align perfectly with your chosen color scheme!
-						</div>
-						<div class="mt-3">
-							<a href="{{ site.illustrations.buy_link }}" class="btn btn-primary" target="_blank" rel="noopener">
-	ibus et magnis dis parturient montes, nascetur ridiculus mus. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Donec sed odio dui. Nullam quis risus eget urna mollis ornare vel eu leo. Nulla vitae elit liberome-2" ' }}
-			{{ manager.name }}
-		</button>
-	</li>
-	{%- endfor -%}
-</ul>
-<div class="tab-content">
-{%- for manager in package-managers -%}
-<div class="tab-pane{% if forloop.index == 1 %} show active{% endif %}" id="{{ manager.name }}" role="tabpanel" ariadiv>
-		{% include "ui/chart.html" chart-id="development-activity" height=12 %}
-	</div>
-
-	<div class="card-table table-responsive">
-		<table class="table table-vcenter">
-			<thead>
-			<tr>
-				<th>User</th>
-				<th>Commit</th>
-				<th>Date</th>
-dary m-0">
-									Having in mind what it takes to write high-quality code, we want to help you speed up the development process and keep your code clean. Based on Bootstrap 5, Tabler is a cutting-edge solution, compatible with all modern
-									browser						<option value="HAS_VALUE">Has value</option>
-											<option value="NOT_HAS_VALUE">Not has value</option>
-											<option value="IS_EMPTY">Is empty</option>
-											<option value="NOT_EMPTY">Is not empty</option>
-											<option value="GR     <h3 class="card-title">Navigation Example</h3>
-         </div>
-         <div class="card-body">
-            <p>This is a full-width card that demonstrates how the tour works with larger elements.</p>
-            <div class="table-responsive">
- se visit the <a
-                            target="_blank" href="https://www.chartjs.org/docs/latest/">official Chart.js
-                            documentation</a>.</p>
-
-                    <!-- Content Row -->
-                    <div class="row">
-
- header class="hero pb-0">
-	<div class="container">
-		<h1 class="hero-title">Develop beautiful web apps with&nbsp;Tabler</h1>
-		<p class="hero-description mt-4">
-			Tabler is a free and open source web application UI kit based on Bootstrap&nbsp;5, with hundntrol" readonly="" value="23,077.05">
-                     <label class="input-group-text">$</label>
-                  </div>
-      
-                  <div class="input-group mb-3">
-                     <label class="input-group-text">Total</label>
-    %}">
-			{% assign class = "w-100 h-100 object-cover" %}
-			{% if include.right %}{% assign class = class | append: " card-img-end" %}{% else %}{% assign class = class | append: " card-img-start" %}{% endif %}
-			{% include "ui/photo.html" id=img-id class=ctle">Badge sizes</h3>
-
-            <div class="space-y">
-              {% assign sizes = "sm,md,lg" | split: "," %} {% for size in sizes %}
-              <div class="badges-list">
-                <span class="badge{% if size != 'md' %} badge-{{ size }}{% eup?!</p>
-		<p>Bring her forward! What do you mean? Listen. Strange women lying in ponds distributing swords is no basis for a system of government. Supreme executive power derives from a mandate from the masses, not from some farcical aquatic ceremony.</p>cember 12, 2019</div>
-                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>-block" modal-id="report" %}
-	{% include "ui/button.html" icon="plus" icon-only=true color="primary" class="d-sm-none" text="Create new report" modal-id="report" %}
-</div>
-
-{% include "ui/modal.html" modal-id="report" size="lg" top=true %}
-<!doctype html>
-ectetur. Praesent commodo cursus magna, vel scelerisque nisl
-		consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla.</p>
-	<p>Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis in, eollapseUtilities">
-                    <i class="fas fa-fw fa-wrench"></i>
-                    <span>Utilities</span>
-                </a>
-                <div id="collapseUtilities" class="collapse show" aria-labelledby="headingUtilities"
-   l be charged $253, including $48 for VAT in
-                  Poland</div>
-            </div>
-         </div>
-      </div>
-   </div>
-
-
-</div><div class="shape{% if include['size'] %} shape-{{ include['size'] }}{% endif %}{% if include.color %} shape-{{ incs="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <ol>
-                <li>Ensure you're using Firefox.</li>
-                <li>Open a new tab and then switch back to tlabel">Bio</label>
-							<textarea class="form-control"
-							          rows="5">Big belly rude boy, million dollar hustler. Unemployed.</textarea>
-						</div>
-						<div class="mb-3">
-							<label class="form-label">Email-Addreslabel">Loader input</label>
-	{% include "ui/form/input-icon.html" loader=true class="mb-3" placeholder="Loading…" %}
-	{% include "ui/form/input-icon.html" loader=true class="mb-3" icon="user" prepend=true placeholder="Loading…" %}
-</clude.data %}
-{% if include.percentage %}
-	{% assign data = include.percentage %}
-{% endif %}
-
-{% if id %}
-	<div class="chart-sparkline{% if type == 'pie' or type == 'donut' %} chart-sparkline-square{% endif %}{% if include.wide %} chart-sparkline-wide{% e Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3 icon=include.small-icon color=include.color class="icon-sm ms-1" %}
-					{% endif %}
-					{% if include.description-value %}
-					<span class="float-end fw-medium text-{{ include.description-value-color | default: 'green' }}">{{ include.description-value ssign toc = content | toc %}
-{% if toc.size > 0 %}
-<h3>
-	Table of Contents
-</h3>
-<div class="nav nav-vertical" id="toc">
-	{% for item in toc %}
-	<a href="#{{ item.id }}" class="nav-link{% if item.level == 3 %} ms-3{% endif %}">
-		{{ item.text }}
-	</a>
-	{t the signature and initials will be the electronic representation of my signature and initials for all
-					purposes when I (or my agent) use
-					them on documents, including legally binding contracts - just the same as a pen-and-paper signature or initii, commodi cupiditate debitis deserunt
-				expedita hic incidunt iste modi molestiae nesciunt non nostrum perferendis perspiciatis placeat praesentium
-				quaerat quo repellendus, voluptates.
-			</td>
-			{% endif %}
-
-			<td>
-				{% if include.buttons %}
-		John Doe</td>
-                        <td>{% include "ui/badge.html" text="Active" color="success" %}</td>
-                        <td>Developer</td>
-                        <td>
-                           {% include "ui/button.html" text="Edit" size="sm" d-body text-center">
-		<div class="mb-3">
-         {% include "ui/avatar-list.html" stacked %}
-		</div>
-		<h3 class="card-title">No Team Members</h3>
-		<p class="text-secondary">Invite your team to<br>collaborate on this project.</p>
-		<div class="mt-4">
-	/staticmap?center=47.620057,-122.3362675&size=640x120&scale=2&zoom=13&markers=color:blue|47.620057,-122.3362675&key={{ site.googleMapsKey }});"></div>
-
-            <hr>
-
-            <h5 class="mb-4">Recent News</h5>
-
-            <ul class="list-unstyled">
-Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Tables</span></a>
-            </li>
-
-            <!-- Divider - icon="dots" %}</a></td>
-		</tr>
-		{% endfor %}
-	</table>
-</div>
-<span class="status-dot{% if include.color %} status-{{ include.color }}{% endif %}{% if include.animated %} status-dot-animated{% endif %}"></span>{% assign config = include.config %}
-<di -%}
-</div>
-{% assign article-id = include.article-id | default: 2 %}
-{% assign article = include.article | default: articles[article-id] %}
-{% assign type = include.type | default: 'none' %}
-{% assign author = people[article.author] %}
-{%  modern browsers. Thanks to its modern, user-friendly design you can create a fully functional interface that users will love. Every UI element has been created with
-									attention to detail to make your interface beautiful!
-								</p>
-		 type="password" append-button="eye:Show password" flat=true placeholder="Your password" %}
-	</div>
-	<div class="mb-2">
-		<label class="form-check">
-			<input type="checkbox" class="form-check-input"/>
-			<span class="form-check-label">Remember me on th </li>
-                                        </ul>
-                                    </nav>
-                                    <p class="mb-0 small">Note: This utility animates the CSS transform property,
-                                        meanin						from: 0,
+					<a href="#" class="text-secondary">
+						{% include "ui/icon.html" icon="check" %}
+						{{ forloop.index | random_number: 0, 6 }}/{{ forloop.index | random_number: 5, 10 }}
+					</a>
+				</td>
+				<td class="text-nowrap">
+					<a href="#" class="text-secondary">
+						{% include "ui/icon.html" icon="message" %} {{ forloop.index | random_number: 0, 12 }}</a>
+				</td>
+				<td>
+ess %},
+				colorScale: {
+					ranges: [{
+						from: 0,
 						to: 20,
 						name: "Low",
 						color: "var(--tblr-green)"
@@ -977,146 +870,284 @@ Item - Tables -->
 						from: 51,
 						to: 75,
 						name: "High",
-						color: "var(--tform-colorinput">
-													<input name="skin-color" type="radio" value="{{ color[1].hex }}" class="form-colorinput-input js-select-skin-color" {% if forloop.first %} checked{% endif %} />
-													<span class="form-colorinput-color" stylss="fw-medium">{{ item.company }}</div>
-							<div class="small text-secondary">{{ item.contact }}</div>
-						</td>
-						<td><span class="badge bg-{{ item.stage_color }}-lt text-{{ item.stage_color }}">{{ item.stage }}</span></td>
-	t ribbon</h3>
-		<p class="text-secondary">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Architecto at consectetur culpa ducimus eum fuga fugiat, ipsa iusto, modi nostrum recusandae reiciendis saepe.</p>
-	</div>
-</div>
-
----
-page-header: Placeholdge bg-purple me-2"></div> Promotions
-							</a>
+						color: "var(--tblr-yellow)"
+					}, {
+						from: 76,
+						to: 100,
+						name: "Extreme",
+						color: "var(--tblr-red)"
+					}]
+				}
+			}
+		},
+		{% else %}
+		colors: [{% if include.color %}'{{ include.color }}'{% else %}{% fofas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Activity Log
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+     dary m-0">You can easily customize the UI elements to make them fit the needs of your project. And don’t worry if you don’t have much experience - Tabler is easy to get started!</p>
+							</div>
 						</div>
 					</div>
-
-					<div class="mt-5">
-						<h6 class="subheader">Storage</h6>
-						{% include "ui/progress.html" value=46 max=100 class="my-2" %}
-
-						<p class="text-muted font-13 mb-0">7.02 value=percentage class="progressbg-progress" color=color %}
-	{% if include.text %}<div class="progressbg-text">{% if include.flag %}{% include "ui/flag.html" flag=include.flag class="me-2" size="xs" %}{% endif %}{{ include.text }}</div>{% endif %}
-	{%ows="5" class="form-control" placeholder="Here can be your description"
-									          value="Mike">Oh so, your weak rhyme
-You doubt I'll bother, reading into it
-I'll probably won't, left to my own devices
-But that's the difference in our opinions.</telude.indicators-thumb indicators-thumb-ratio=include.indicators-thumb-ratio indicators-dot=include.indicators-dot controls=include.controls offset=include.offset fade=include.fade limit=include.limit indicators-vertical=include.indicators-vertical captionscontrol{% if include.light %} form-control-light{% endif %}{% if include.rounded %} form-control-rounded{% endif %}{% if include.input-class %} {{ include.input-class }}{% endif %}" placeholder="{{ include.placeholder | default: 'Search…' }}"{% ifl" price="49" users=10 category="Premium" features="1100" featured-color="green" %}
+				</div>
+			</div>
+			<div class="col-lg-6 mt-3 mt-lg-0">{% include "ui/svg.html" width=500 height=400 border=true %}</div>
 		</div>
-		<div class="col-lg-4">
-			{% include "cards/pricing-card.html" price="99" category="Enterprise" users=100 features="1110" %}
+	</div>
+</section>
+<script
+	src="https://browser.sentry-cdn.com/5.27.6/bundle.tracing.min.js"
+	integrity="sha384-9Z8PxByVWP+gIm/rTMPn9BWwknuJR5oJcLj+Nr9-check-label" for="ref-blog">
+							Blog or article
+						</label>
+					</div>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" name="referral" value="other" id="ref-other">
+						<label class="form-check-label" for="ref-other">
+							Other
+						</label>
+					</div>
+				</div>
+				<div>
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" id="notifications" checked>
+						<label class="form-check-label" for="notifications">"p-3 bg-gray-400">.bg-gray-400</div>
+                                    <div class="p-3 bg-gray-500 text-white">.bg-gray-500</div>
+                                    <div class="p-3 bg-gray-600 text-white">.bg-gray-600</div>
+                                    <div class="p-3 bg-gray-700 text-white">.bg-gray-700</div>
+                                    <div class="p-3 bg-gray-800 text-white">.bg-gray-800</div>
+                                    <div class="p-3 bg-gray-900 text-white">.bg-gray-900</div>
+.html" dismiss=true text="Cancel" block=true %}</div>
+			<div class="col">
+				<button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal" id="confirm-delete-button" disabled>
+					Delete
+				</button>
+			</div>
 		</div>
-		<div class="col-12">
-			{lass="h2 mb-2">Fully customizable</h3>
-								<p class="text-secondary m-0">You can easily customize the UI elements to make them fit the needs of your project. And don’t worry if you don’t have much experience - Tabler is easy to get started!</p>
-	 not strangers to our land.</p>
 	</div>
 </div>
 
-<section class="section pt-0">
-	<div class="container container-narrow">
-		<div class="prose">
-			<p>Why? Be quiet! <strong> We shall say 'Ni' again to you, if you do not appease us.</strong> <em> The Lady ofogress-description.html" label="Storage usage" description="2.4GB of 5GB" value="48" color="blue" %}
-					{% include "ui/progress-description.html" label="Download progress" value="75" color="yellow" %}
-					{% include "ui/progress-description.html" labele-end and day <= range-end %} calendar-range{% if day == range-start %} range-start{% endif %}{% if day == range-end %} range-end{% endif %}{% endif %}">
-               <a href="#" class="date-item{% if day == today %} date-today{% endif %}">{{ d }}</a>
-  html" size="xxs" %}
-							{% include "ui/avatar.html" size="xs" %}
-							{% include "ui/avatar.html" size="sm" %}
-							{% include "ui/avatar.html" size="md" %}
-							{% include "ui/avatar.html" size="lg" %}
-							{% include "ui/avatar.html" sizep = new bootstrap.Tooltip('#target', {
-        placement: 'top',
-        trigger: 'manual'
-      })
-      targetTooltip.show()
-
-      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltipEl => new bootstrap.Tooltip(tooltipEl))
-    </scrips: [{
-					color: 'var(--tblr-{{ color }})',
-					data: [{{ data }}]
-				}],
-				{% endif %}
-			})).render();
-		});
-	</script>
-	{% endcapture_script %}
-{% endif %}---
-title: Page 500
-layout: error
-page-error: 500
-page-menu: base.error.500
-permalink: error-re JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Coressbar" style="width: 75%"
-                                            aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+{% capture_script %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	const checkbox = document.getElementById("confirm-delete-checkbox");
+	const deleteButton = document.getElementById("confirm-delete-button");
+	
+	if (checkbox && deleteBcember 7, 2019</div>
+                                        $290.29 has been deposited into your account!
                                     </div>
-                                    Use the <code>.progress-sm</code> class alon (element) {
-			const clipboard = new ClipboardJS(element, {
-				text: function (trigger) {
-					return element.getAttribute('data-clipboard-text');
-				}
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-exclamation-triangle text-white"></i>
+abel="Extra large" value="90" size="xl" color="purple" %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% capture_script -%}
+<!-- BEGIN SCRIPT OF ANIMATION -->
+<script>
+	/*
+	This script is for animation of the last progress bar
+	It increases the progress bar value by a random amount every 2 seconds until it reaches 100%
+	When it reaches 100%, it changes the color to green and stops the animation
+
+	This is just a demo script to show how to animate the progress bar. You can modify it as needed.
+	*/
+	docume%}
+	<link rel="canonical" href="{{ page.url | absolute_url }}">
+
+	<!-- Open Graph / Social Media Meta Tags -->
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="{{ metaTitle }}">
+	{% if metaDescription %}<meta property="og:description" content="{{ metaDescription }}">{% endif %}
+	<meta property="og:site_name" content="{{ siteName }}">
+
+	<!-- Twitter Card data -->
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:title" content="{{ metaTitle }}">
+	{% if metaDes96-ef05306b995a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2100&q=80" alt="doggy" />
+        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sit libero deleniti rerum quo, incidunt vel consequatur culpa ullam. Magnam facere earum unde harum. Ea culpa veritatis magnam at aliquid. Perferendis totam placeat molestias illo laudantium? Minus id minima doloribus dolorum fugit deserunt qui vero voluptas, ut quia cum amet temporibus veniam ad ea ab perspiciatis, enim accusamus aspe-0" size="sm" %}
+</span>
+---
+title: Text
+layout: marketing
+permalink: marketing/text.html
+---
+
+<div class="hero">
+	<div class="container">
+		<h1 class="hero-title">Who's that then?</h1>
+		<p class="hero-description hero-description-wide">Why do you think that she is a witch? How do you know she is a witch? And the hat. She's a witch! The swallow may fly south with the sun, and the house martin or the plover may seek warmer climes in winter, yet these are not strangers to our land.</p>
+	</div>
+</div>
+
+<sectienter g-2">
+				<div class="col">
+					<div class="fw-medium">{{ item.company }}</div>
+					<div class="small text-secondary">Last contact: {{ item.last_contact }}</div>
+				</div>
+				<div class="col-auto"><span class="badge bg-{{ item.level_color }}-lt">{{ item.level }}</span></div>
+				<div class="col-auto fw-semibold">{{ item.amount }}</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div><div class="modal-header">
+	<h4 class="modal-title" id="task-modal-label">New task</h4>
+	 meet{% else %}none{% endif %}" width="{{ width }}" height="{{ height }}" viewBox="0 0 {{ width }} {{ height }}" fill="transparent" stroke="var(--tblr-border-color, #b8cef1)"{% if include.border %} style="width: 100%; height: auto"{% endif %}>
+	{% if include.border %}<rect x=".5" y=".5" width="{{ width | minus: 1 }}" height="{{ height | minus: 1 }}" rx="2"></rect>{% endif %}
+	<line x1="0" y1="0" x2="{{ width }}" y2="{{ height }}"></line>
+	<line x1="0" y1="{{ height }}" x2="{{ width }}" y2="0"></line>
+</svg>h3 mb-1">How do I get notified of new Tabler versions?</div>
+						<div class="text-secondary">You may watch the releases on GitHub or follow me on Twitter.</div>
+					</div>
+					<div>
+						<div class="h3 mb-1">Can Tabler be used with WordPress?</div>
+						<div class="text-secondary">
+							Tabler is an HTML template that can be used for any purpose. However, it is not made to be easily installed on WordPress. It will require some effort and enough knowledge of the WordPress script to do so.
+					av-segmented.html" items="List,Kanban,Calendar,Files" icons="list,layout,calendar,files" disabled="3,5" size="sm" %}</div>
+					<div>{% include "ui/nav-segmented.html" items="List,Kanban,Calendar,Files" icons="list,layout,calendar,files" disabled="3,5" %}</div>
+					<div>{% include "ui/nav-segmented.html" items="List,Kanban,Calendar,Files" icons="list,layout,calendar,files" disabled="3,5" size="lg" %}</div>
+					
+					<div>{% include "ui/nav-segmented.html" icons="list,layout,calendar,files" disabled="3,5" ="col-10">
+				<h3 class="h1">Tabler Icons</h3>
+				<div class="prose">
+					All icons come from the Tabler Icons set and are MIT-licensed. Visit
+					<a href="{{ site.icons.link }}" target="_blank" rel="noopener">Tabler Icons Website</a>,
+					download any of the {{ icons-count }} icons in SVG, PNG or&nbsp;React and use them in your favourite design tools.
+				</div>
+				<div class="mt-3">
+					<a href="{{ site.icons.link }}" class="btn btn-primary" target="_blank" rel="noopener">
+	ess %}</{{ el }}>
+{%- endif -%}
+{%- if include.text -%}
+    {{ include.text }}
+{%- else -%}
+    {{ person.full_name }}
+{%- endif -%}
+{% if include.addon %}<{{ el }} class="badge-addon {% if include.addon-color%}bg-{{ include.addon-color }}{% endif %}">{{ include.addon }}</{{ el }}>{% endif -%}
+</{{ el }}>
+---
+title: Badges
+page-header: Badges
+page-menu: base.badges
+layout: default
+permalink: badges.html
+---
+
+{% assign colors = "" | split: "," %} {% assign colors = colors | push: "default" %} {% for umber: 1000, 9999 }}</strong>
+					{% endif %}
+				</div>
+			</div>
+		</label>
+		{% endfor %}
+	</div>
+</div>
+{% assign button-items = include.items | split: ',' %}
+{% assign button-icons = include.icons | split: ',' %}
+
+{% assign id = include.id %}
+
+<div class="btn-group{% if include.vertical %}-vertical{% endif %}{% if include.fluid %} w-100{% endif %}"role="group">
+
+	{% for item in button-items %}
+	{% if include.radio %}
+	<input type="radio" class="btn-check" name="btn-radio-{{ id }}" id="btn-radio-{{ id ="bg-gray-700 flex justify-center items-center min-h-screen">
+    <div class="bg-gray-900 p-16 rounded-2xl shadow w-full max-w-sm">
+      <h1 class="text-4xl text-center text-white">Timer</h1>
+
+      <!-- Create the circle -->
+      <div
+        id="conic"
+        class="bg-conic flex items-center justify-center w-60 h-60 mx-auto my-10 rounded-full relative"
+      >
+        <p id="timer" class="text-blue-200 relative text-5xl z-10">00:00</p>
+
+        <!-- Create the inner cirlce and line -->
+   body-class or body-class %} class="{% if layout.body-class %} {{ layout.body-class }}{% endif %}{% if body-class %} {{ body-class }}{% endif %}"{% endif %}>
+	{% include "layout/skip-link.html" %}
+	<!-- BEGIN GLOBAL THEME SCRIPT -->
+	<script src="{{ page | relative }}/dist/js/tabler-theme{% if environment != 'development' %}.min{% endif %}.js{% if environment != 'development' %}?{{ 'now' | date: '%s' }}{% endif %}"{% if environment == 'preview' %} integrity="{{ sri.js-theme }}"{% endif %}></script>
+	<!-- EN = '{{ site.mapboxKey }}';
+			var map = new mapboxgl.Map({
+				container: 'map-{{ id }}',
+				style: 'mapbox://styles/mapbox/{{ data.style | default: "streets-v11" }}',
+				zoom: {{ data.zoom | default: 13 }},
+				{% if data.center %}
+				center: [{{ data.center[1] }}, {{ data.center[0] }}],
+				{% else %}
+				center: [13.404900, 52.518827],
+				{% endif %}
 			});
 
-			clipboard.on('success', function (e) {
-				e.clearSelection();
-				e.trigger.classList.a="col">{% include "ui/button.html"  block=true icon="brand-github" icon-color="github" text="Login with Github" %}</div>
-			<div class="col">{% include "ui/button.html"  block=true icon="brand-x" icon-color="x" text="Login with X" %}</dt: 'line' %}
-{% assign chart-position = include.chart-position | default: 'right' %}
-{% assign chart-color = include.color | default: 'primary' %}
-<div class="card card-sm{% if include.class %} {{ include.class }}{% endif %}">
-	<div class="card-body">
-		<d="linkedin.com/in/username">
-					</div>
-				</div>
+			{% for marker in data.markers %}
+
+			new mapboxgl.Marker({ color: "var(--tblr-primary)" }).setLngLat([{{ marker.center[1] }}, {{ marker.centeol" name="example-disabled-input" placeholder="Readonly..."
+	       value="Well, how'd you become king, then?" readonly>
+</div>
+<div class="mb-3">
+	<label class="form-label required">Required</label>
+	<input type="text" class="form-control" name="example-required-input" placeholder="Required..." >
+</div>
+<div class="mb-3">
+	<label class="form-label">Textarea <span class="form-label-description">56/100</span></label>
+	<textarea class="form-control" name="example-textarea-input" rows="6" placeholder="Content.uired">Signature</label>
+			<div class="position-relative select-none">
+				{% include "ui/signature.html" sample clear width=684 height=400 %}
 			</div>
 		</div>
-
-		{% include "ui/button.html" type="submit" text="Save changes" color="primary" block=true class="mt-4" %}
 	</form>
-</div>
+	<div class="text-secondary fs-5">
+		I agree that the signature and initials will be the electronic representation of my signature and initials for
+		all purposes when I (or my agent) use
+		them on documents, including legally binding contracts - just the same as a pen-and-paper signature or initial.
+	</dive-2" %}{{ invoice.client }}
+				</td>
+				<td>
+					{{ invoice.vat-no }}
+				</td>
+				<td>
+					{{ invoice.date }}
+				</td>
+				<td>
+					<span class="badge bg-{{ invoice.status }} me-1"></span> {{ invoice.status-name }}
+				</td>
+				<td>{{ invoice.price }}</td>
 
----
-page-header: Vertical layout
-page-menu: layout.vertical
-col-xl-12">{% include "forms/form-elements-6.html" %}</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="card-footer text-end">
-				<div class="d-flex">
-					<a href="#" class="btn btn-link">Cancel</a>
-					<button type="submit" clasavatar bg-{{ color[0] }}{% if light %}-lt{% else %} text-white{% endif %}">{{ color[0] | capitalize | first_letter }}</div>
-         </div>
-         <div class="col">
-            <span class="fw-semibold">{{ color[1].title }}</span><br/>
-            <code>					<small class="float-end text-secondary">4 min</small>
-						<h4>{{ people[4].first_name }} {{ people[4].last_name }}</h4>
-					</div>
+				<td class="text-end">
+					<span class="dropdown">
+						<button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
+						{% include "ui/dropdown-menu.html" right=true minus: days %}
+            {% else %}
+            {% assign d = day %}
+            {% endif %}
 
-					<div>
-						Aenean lacinia bibendum nulla sed consectetur. Vestibulum id ligula porta felis euismod semper. MorItem - Charts -->
+            <div class="calendar-date{% if day <= 0 %} prev-month{% elsif day > days %} next-month{% endif %}{% if range-start and day >= range-start and range-end and day <= range-end %} calendar-range{% if day == range-start %} range-start{% endif %}{% if day == range-end %} range-end{% endif %}{% endif %}">
+               <a href="#" class="date-item{% if day == today %} date-today{% endif %}">{{ d }}</a>
+  l" id="orders" icon="arrow-down" color="red" lt=true
+		title="342" description="Sales last 30 days" description-value="-4.3%" description-value-color="red" %}
+	</div>
+	<div class="col-md-6 col-xl-3">{% include "cards/small-stats.html" id="members" icon="arrow-up" color="green" lt=true
+		title="132" description="Customers last 30 days" description-value="+6.8%" %}
+	</div>
+	<div class="col-md-6 col-xl-3">{% include "cards/small-stats.html" id="comments" icon="arrow-down" color="red"
+		lt=true title="78" descreader">Other Pages:</h6>
+                        <a class="collapse-item" href="404.html">404 Page</a>
+                        <a class="collapse-item" href="blank.html">Blank Page</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Charts -->
             <li class="nav-item">
                 <a class="nav-link" href="charts.html">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Charts</spa
-
-	<h3 id="confirm-delete-title">Are you sure?</h3>
-	<div class="text-secondary mb-4">
-		<p id="confirm-delete-message">Do you really want to delete this item? This action cannot be undone.</p>
-		<div id="confirm-delete-items" class="text-start d-none">
-		navbar-overlap and layout-navbar-dark %}
-		{% include "ui/button.html" text="New view" color="dark" %}
-		{% else %}
-		{% include "ui/button.html" text="New view"  %}
-		{% endif %}
-	</span>
-	{% include "ui/button.html" icon="plus" text="Create new report" calue == 5 %} selected{% endif %}>Excellent</option>
-	<option value="4"{% if value == 4 %} selected{% endif %}>Very Good</option>
-	<option value="3"{% if va
+                    <span>Charts</spa1].columns %}</div></div>{% endif

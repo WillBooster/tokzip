@@ -1,15 +1,109 @@
-public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-      final TypeAdapter<T> delegate = gson.getDelegateAdapter(this, type);
-      return new TypeAdapter<T>() {
-        @Override
-        public void write(JsonWriter out, T value) throwon.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-impotoJson(null, JsonNull.class)).isEqualTo("null");
+he.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See ethods);
+  }
+}
+/*
+ * Copyright (C) 2008 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apacheo.Writer;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.Test;
+
+@SuppressWarnings("resource")
+public final class JsonTreeWriterTest {
+  @Test
+  public void testArray() throws IOException {
+    JsonTreeWriter writer = new JsonTreeWriter()flect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+ See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.gson.internal.bind;
+
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+Test;
+
+/**
+ * Functional test for Json serialization and deserialization for Maps
+ *
+ * @author Inderjeet Singh
+ * @author Joel Leitch
+ */
+public class MapTest {
+  private Gson gson;
+
+  @Before
+  public void setUp() throws Exception {
+    gson = new Gson()le.gson;
+
+import static com.google.common.truth.Truth.assertThat;
+
+import com.google.errorprone.annotations.Keep;
+import com.google.gson.annotations.Since;
+import com.google.gson.annotations.Until;
+import com.google.gson.internal.Excluder;
+im  testNullSerializationAndDeserialization(Class.class);
+  }
+
+  private void testNullSerializationAndDeserialization(Class<?> c) {
+    testNullSerializationAndDeserialization(gson, c);
+  }
+
+  public static void testNullSerializationAndDeserialization(Gson g.Nullable;
+import okhttp3.Response;
+import okhttp3.internal.platform.Platform;
+import okhttp3.sse.EventSource;
+import okhttp3.sse.EventSourceListener;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
+
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWritic int hashCode() {
+      return x * 37 + y;
+    }
+
+    @Override
+    public String toString() {
+      return x + "," + y;
+    }
+  }
+
+  static final class MapClass {
+    private final Map<String, TestTypes.Base> bases = new HashMap<>();
+    private final ilder.setVersion(Double.NaN);
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertThat(e).hasMessageThat().isEqualTo("Invalid version: NaN");
+    }
+
+    try {
+      builder.setVersion(-0.1);
+      fail();
+    } catch (IllegalArgumentExceptt(gson.toJson(null, JsonNull.class)).isEqualTo("null");
   }
 
   @Test
@@ -17,42 +111,15 @@ impotoJson(null, JsonNull.class)).isEqualTo("null");
     JsonArray array = new JsonArray();
     array.add(new JsonPrimitive(1));
     array.add(new JsonPrimitive(2));
-    array.add(new JsonPrimitive(3));  IllegalStateException e = assertThrows(IllegalStateException.class, () -> writer.name("hello"));
-    assertThat(e).hasMessageThat().isEqualTo("Please begin an object before writing a name.");
+    array.add(new JsonPrimitirtThat(json).contains("year");
+    assertThat(json).contains("month");
+    assertThat(json).contains("dayOfMonth");
+    assertThat(json).contains("hourOfDay");
+    assertThat(json).contains("minute");
+    assertThat(json).contains("second");
+  }
 
-    writer.value(12);
-    e = assertThrows(IllegalStateExcept.gson.common.TestTypes;
-import com.google.gson.internal.$Gson$Types;
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-impor
-      out.value(value.toString());
-    }
-
-    @Override
-    public Number read(JsonReader in) throws IOException {
-      try {
-        return constructor.newInstance(in.nextString());
-      } catch (Exception e) {
-        throw new AssertionError(e);
-   /main/Troubleshooting.md#java-lang-class-unsupported");
-
-    // Override with a custom type adapter for class.
-    gson = new GsonBuilder().registerTypeAdapter(Class.class, new MyClassTypeAdapter()).create();
-    assertThat(gson.toJson(String.class)).isEquied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.google.gson.internal;
-
-import com.google.gson.InstanceCreator;
-import com.google.gson.JsonIOException;
-import com.google.gson.Reflass GetExample {
+  @Teslass GetExample {
   OkHttpClient client = new OkHttpClient();
 
   String run(String url) throws IOException {
@@ -61,15 +128,30 @@ import com.google.gson.Reflass GetExample {
         .build();
 
     try (Response response = client.newCall(request).execute()) {
- false)).isFalse();
+fMap);
+    assertThat(map).isEmpty();
   }
 
-  private static void assertExcludesClass(Excluder excluder, Class<?> c) {
-    assertThat(excluder.excludeClass(c, true)).isTrue();
-    assertThat(excluder.excludeClass(c, false)).isTrue();
+  @Test
+  public void testMapSerializationWithNullValue() {
+    Map<String, Integer> map = new LinkedHashMap<>();
+    map.put("abc", null);
+    Type typeOfMap = new TypeToken<Map<String, Integer>>() {}.getType();
+
+
+  /** Created in response to http://code.google.com/p/google-gson/issues/detail?id=99 */
+  private static class ClassWithAMap {
+    Map<String, String> map = new TreeMap<>();
   }
 
-  private static void assertIncludest {
+  /** Created in response to http://code.google.com/p/google-gson/issues/dMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.Ct {
   @Rule public PlatformRule platform = new PlatformRule();
 
   @Rule public final MockWebServer server = new MockWebServer();
@@ -77,72 +159,12 @@ import com.google.gson.Reflass GetExample {
   @Rule public Timeout globalTimeout = Timeout.seconds(30);
 
   @Before public void checkPlatforms() {
-    platform.assumeNotBo";
-
-    JsonSerializer<TestTypes.Base> baseTypeAdapter =
-        new JsonSerializer<TestTypes.Base>() {
-          @Override
-          public JsonElement serialize(
-              TestTypes.Base src, Type typeOfSrc, JsonSerializationContext context) {
-  ackage okhttp3;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-import okhttp3.testing.PlatformRule;
-impid testBigIntegerFieldSerialization() {
-    ClassWithBigInteger target = new ClassWithBigInteger("23232323215323234234324324324324324324");
-    String json = gson.toJson(target);
-    assertThat(json).isEqualTo(target.getExpectedJson());
-  }
-id testCollectionOfBagOfPrimitivesSerialization() {
-    List<BagOfPrimitives> target = new ArrayList<>();
-    BagOfPrimitives objA = new BagOfPrimitives(3L, 1, true, "blah");
-    BagOfPrimitives objB = new BagOfPrimitives(2L, 6, false, "blahB");
-    targe{
+    platform.assumeNotB{
     server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
     server.enqueue(new MockResponse()); // The jdk's HttpUrlConnection is a bastard.
     server.enqueue(new MockResponse());
     try {
-      server.url("/a").url().(json).contains("dayOfMonth");
-    assertThat(json).contains("hourOfDay");
-    assertThat(json).contains("minute");
-    assertThat(json).contains("second");
-  }
-
-  @Test
-  public void testDefaultCalendarDeserialization() {
-    Gson gson =instantiated! Adjust the R8 configuration or register"
-          + " an InstanceCreator or a TypeAdapter for this type. Class name: "
-          + c.getName()
-          + "\nSee "
-          + TroubleshootingGuide.createUrl("r8-abstract-class");
-    }
-    re
-
-  /** Created in response to http://code.google.com/p/google-gson/issues/detail?id=99 */
-  private static class ClassWithAMap {
-    Map<String, String> map = new TreeMap<>();
-  }
-
-  /** Created in response to http://code.google.com/p/google-gson/issues/don(json, Date.class).getTime())
-          .isEqualTo(date.getTime());
-    }
-  }
-
-  /**
-   * Using {@link GsonBuilder#setDateFormat(int, int)} should overwrite previous patterns set with
-   * {@link GsonBuilder#setDateFormat(String)}
-   */
-  @TesizationWithNullValue() {
-    Type typeOfMap = new TypeToken<Map<String, Integer>>() {}.getType();
-    Map<String, Integer> map = gson.fromJson("{\"abc\":null}", typeOfMap);
-    assertThat(map).hasSize(1);
-    assertThat(map.get("abc")).isNull();
-  }.get("test")).isEqualTo(123L);
+      server.url("/a").url().hat(map.get("test")).isEqualTo(123L);
   }
 
   private static class MyMap extends LinkedHashMap<String, String> {
@@ -152,30 +174,66 @@ id testCollectionOfBagOfPrimitivesSerialization() {
     int foo = 10;
   }
 
-  /** From bug report http:wNullValues);
+  /** From bug report http:/omJson(json, Date.class).getTime())
+          .isEqualTo(date.getTime());
+    }
+  }
+
+  /**
+   * Using {@link GsonBuilder#setDateFormat(int, int)} should overwrite previous patterns set with
+   * {@link GsonBuilder#setDateFormat(String)}
+   */
+  @Tese.gson.common.TestTypes.ClassOverridingEquals;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * Functional tests related to circular reference detection and erro     throw new JsonIOException("Invalid EnumSet type: " + type.toString());
+            }
+          } else {
+            throw new JsonIOException("Invalid EnumSet type: " + type.toString());
+          }
+        }
+      };
+    }
+    // Only support creatiotext.serialize(fieldPair.getValue()));
+      }
+    }
+    return ret;
   }
 
   @Override
-  public int size() {
-    return size;
+  public Message deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+      throws JsonParseException {
+    try {
+      JsonObject jsonObject =ackage okhttp3;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import okhttp3.testing.PlatformRule;
+im);
+    jsonWriter.nullValue();
+    jsonWriter.name("<test2");
+    jsonWriter.value(true);
+    jsonWriter.endObject();
+
+    // Additional top-level value
+    IllegalStateException e = assertThrows(IllegalStateException.class, () -> jsonWriter.value(1));
+(int.class, new TestTypeAdapter()).create();
+
+    assertThat(clone.factories).hasSize(original.factories.size() + 1);
   }
 
-  @Override
-  public V get(Object key) {
-    Node<K, V> node = findByObject(key);
-    return node != null ? node.value : null;
-  }
-
-  @Override
-  public boolean containsKey(Object katingMoreThanOnce() {
-    GsonBuilder builder = new GsonBuilder();
-    Gson gson = builder.create();
-    assertThat(gson).isNotNull();
-    assertThat(builder.create()).isNotNull();
-
-    builder.setFieldNamingStrategy(
-        new FieldNamingStrategy() {
-  ng getExpectedJson() {
+  private static final class TestTypeAdapter extends TypeAdapter<Object> {
+    @Override
+    public void write(JsonWriter out, ObjectString getExpectedJson() {
       StringBuilder sb = new StringBuilder("{");
       if (a != null) {
         sb.append("\"a\":").append(a).append(",");
@@ -183,100 +241,66 @@ id testCollectionOfBagOfPrimitivesSerialization() {
       sb.append("\"d\":").append(d);
       sb.append("}");
       return sb.toString();
-   stEqualsAndHashcode() {
-    MoreAsserts.assertEqualsAndHashCode(new JsonNull(), new JsonNull());
-    MoreAsserts.assertEqualsAndHashCode(new JsonNull(), JsonNull.INSTANCE);
-    MoreAsserts.assertEqualsAndHashCode(JsonNull.INSTANCE, JsonNull.INSTANCE);
-  }
-util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Stack;
-import java.util.Vector;
-import org.junit.Before;
-import org.junit.Test;
+   zationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializergson.InstanceCreator;
+import com.google.gson.JsonIOException;
+import com.google.gson.ReflectionAccessFilter;
+import com.google.gson.ReflectionAccessFilter.FilterResult;
+import com.google.gson.internal.reflect.ReflectionHelper;
+import com.google.gson.reflec     + "' with no args",
+              e);
+        } catch (InvocationTargetException e) {
+          // TODO: don't wrap if cause is unchecked?
+          // TODO: JsonParseException ?
+          throw new RuntimeException(
+              "Failed to invoke co  HandshakeCertificates serverHandshakeCertificates = new HandshakeCertificates.Builder()
+        .addTrustedCertificate(clientCa.certificate())
+        .heldCertificate(serverCertificate)
+        .build();
 
-/**
- * Functional tests for Json serialurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import org.junit.Test;
+    server.useHttps(serverHandshakeCertificates.);
+    gsonBuilder.registerTypeHierarchyAdapter(
+        CustomClass2.class,
+        new JsonSerializer<CustomClass2>() {
+          @Override
+          public JsonElement serialize(
+              CustomClass2 src, Type typeOfSrc, JsonSerr out, T value) throws IOException {
+        throw new AssertionError("not needed for this test");
+      }
 
-/**
- * Unit tests for {@link Gson}.
- *
- * @author Ryan Harter
- */
-public final class GsonTest {
+      @Override
+      public T read(JsonReader in) throws IOException {
+        throw new AssertionError("not needed for this test");
+  
+   * @throws UnsupportedOperationException if the string value of this primitive is empty.
+   * @deprecated This method is misleading, as it does not get this element as a char but rather as
+   *     a string's first character.
+   */
+  @Deprecated
+  @Oveanceof Class<?>) {
+      // type is a normal class.
+      return (Class<?>) type;
 
-  priObject jsonObject = json.getAsJsonObject();
-      @SuppressWarnings("unchecked")
-      Class<? extends Message> protoClass = (Class<? extends Message>) typeOfT;
+    } else if (type instanceof ParameterizedType) {
+      ParameterizedType parameterizedType = (ParameterizedType) type;
 
-      if (DynamicMessage.class.isAssignableFrom(protoClass)) {
-        throw new Illega     delegate.write(out, value);
-    }
+      // getRawType() returns Type instead of Clasclass CustomClass1 {}
 
-    @Override
-    public T read(JsonReader in) throws IOException {
-      T result = delegate.read(in);
-      postDeserializer.postDeserialize(result);
-      return result;
-    }
-  }
-}
-/*
- * Copyright (C) 2008 Googlic int hashCode() {
-      return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
-    }
+  private static class CustomClass2 {}
 
-    @Override
-    public String toString() {
-      return key + "=" + value;
-    }
+  private static class CustomClass3 {
+    static final String NO_ARG_CONSTRUCTOR_VALUE = "default instance";
 
-    /** Returns the first node in this subtree. */
-  uestBody;
-import okhttp3.Response;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.SocketPolicy;
-import okhttp3.tls.HandshakeCertificates;
-import org.junit.Before;
-import org.junit.Rule;
-iclass RtmStartResponse {
-  HttpUrl url;
-  Object self;
-  Object team;
-  List<Object> users;
-  List<Object> channels;
-  List<Object> groups;
-  List<Object> mpims;
-  List<Object> ims;
-  List<Object> bots;
-}
-/*
- * Copyright (C) 2018 Square, Inc.
- ion {
- *     // implement write: combine firstName and lastName into name
- *     out.beginObject();
- *     out.name("name");
- *     out.value(user.firstName + " " + user.lastName);
- *     out.endObject();
- *   }
- *
- *   &#64;Override public User readxtends Integer> target = gson.fromJson(json, collectionType);
-    assertThat(target.size()).isEqualTo(9);
-    assertThat(target).contains(1);
-    assertThat(target).contains(2);
-  }
+    final String s;
 
-  @Test
-  public void testWildcardCollectionField() {
-    Collection<BagOimeUnit;
-import okhttp3.Headers;
+    public CustomClass3(String s) {
+      this.s = s;
+    }khttp3.Headers;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -285,138 +309,192 @@ import okhttp3.internal.concurrent.TaskRunner;
 import okio.ByteString;
 import okio.Okio;
 import okio.Pipe;
-imprivate String formattedColon;
-  private String formattedComma;
-  private boolean usesEmptyNewlineAndIndent;
+import org.junit.After;
+im   Collection<String> target = gson.fromJson(json, collectionType);
 
-  private Strictness strictness = Strictness.LEGACY_STRICT;
-
-  private boolean htmlSafe;
-
-  private String deferredName;
-
-  private boolean seriaqualTo(
-            "Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1"
-                + " column 1 path $\n"
-                + "See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json");
-
-    e =
- assWithUnreferencedHasArgsConstructor {
-  @SerializedName("myField")
-  public int i;
-
-  // Specify explicit constructor with args to remove implicit no-args default constructor
-  public ClassWithUnreferencedHasArgsConstructor(int i) {
-    this.i = i;
+    assertThat(target).containsExactly("Hello", "World").inOrder();
   }
-} event of a race.
-    }
-    return method;
+
+  @Test
+  public void testRawCollectionOfIntegersSerialization() {
+    Collection<Integer> target = Arrays.asList(oid Open Source Project
+ * Copyright (C) 2012 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http:/id testWildcardCollectionField() {
+    Collection<BagOfPrimitives> collection = new ArrayList<>();
+    BagOfPrimitives objA = new BagOfPrimitives(3L, 1, true, "blah");
+    BagOfPrimitives objB = new BagOfPrimitives(2L, 6, false, "blahB");
+    collection.adpublic boolean removeAll(Collection<?> c) {
+    return delegate.removeAll(c);
   }
-}
-package com.example;
 
-import com.google.gson.annotations.Expose;
+  @Override
+  public boolean retainAll(Collection<?> c) {
+    return delegate.retainAll(c);
+  }
 
-/** Uses {@link Expose} annotation. */
-public class ClassWithExposeAnnotation {
-  @Expose int i;
-
-  int i2;
-}
-/*
- * Copyright (C) 2011 Googlel.Arrays;
-import java.util.Collections;
-import java.util.List;
-import org.junit.Test;
-
-/** Functional tests for the {@link JsonAdapter} annotation on fields. */
+  @Override
+  public boolean contains(Object o) {
+    return delegate.contai tests for the {@link JsonAdapter} annotation on fields. */
 public final class JsonAdapterAnnotationOnFieldsTest {
   @Test
-  public void testClassAnnotat      FieldNamingPolicy.UPPER_CASE_WITH_UNDERSCORES,
+  public void testClassAnnotationAdapterTakesPrecedenceOverDefault() {
+    Gson gson = new Gson();
+    String json = gson.toJson(new stEqualsAndHashcode() {
+    MoreAsserts.assertEqualsAndHashCode(new JsonNull(), new JsonNull());
+    MoreAsserts.assertEqualsAndHashCode(new JsonNull(), JsonNull.INSTANCE);
+    MoreAsserts.assertEqualsAndHashCode(JsonNull.INSTANCE, JsonNull.INSTANCE);
+  }
+re meant for internal use in Gson. These classes
+ * will very likely change incompatibly in future versions. You have been warned.
+ *
+ * @author Inderjeet Singh, Joel Leitch, Jesse Wilson
+ */
+package com.google.gson.internal;
+/*
+ * Copyright (C) 2012 Googleturn new LinkedHashMap<>(this);
+  }
+
+  private void readObject(ObjectInputStream in) throws IOException {
+    // Don't permit directly deserializing this class; writeReplace() should have written a
+    // replacement
+    throw new InvalidObjectExceptd[i]);
+    }
+  }
+
+  @Test
+  @SuppressWarnings("JdkObsolete")
+  public void testLinkedListSerialization() {
+    List<String> list = new LinkedList<>();
+    list.add("a1");
+    list.add("a2");
+    Type linkedListType = new TypeToken<LinkedList<String>>() {}e.
+ */
+package com.google.gson.functional;
+
+import static com.google.common.truth.Truth.assertThat;
+
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
+import org.junit.Test;
+
+public final class SerializedNameTest {
+ization.
+     *
+     * <p>Note that you need to set the enum serialization of this adapter to {@link
+     * EnumSerialization#NAME}, otherwise these annotations will be ignored.
+     */
+    @CanIgnoreReturnValue
+    public Builder addSerializedEnumValueExt  FieldNamingPolicy.LOWER_CASE_WITH_DASHES,
+      FieldNamingPolicy.LOWER_CASE_WITH_DOTS,
+      FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES,
     };
 
-    Field field = Dummy.class.getDeclaredField("i");
+    Field field = Dummy.class.getDeclaredField("I");
     String name = field.getName();
-    String expected = name.toUpperCase(Locale.ROOT);
-
-    Locale oldLocale = Locale.getDefault();
-    // Sect() {
-          if (type instanceof ParameterizedType) {
-            Type elementType = ((ParameterizedType) type).getActualTypeArguments()[0];
-            if (elementType instanceof Class) {
-              @SuppressWarnings({"unchecked", "rawtypes"})
-    tatic okhttp3.internal.http2.Http2.FLAG_END_HEADERS;
+    String expectn("key == null");
+    }
+    if (value == null && !allowNullValues) {
+      throw new NullPointerException("value == null");
+    }
+    Node<K, V> created = find(key, true);
+    V result = created.value;
+    created.value = value;
+    return result;
+  }
+estBody;
+import okhttp3.Response;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
+import okhttp3.tls.HandshakeCertificates;
+import org.junit.Before;
+import org.junit.Rule;
+itatic okhttp3.internal.http2.Http2.FLAG_END_HEADERS;
 import static okhttp3.internal.http2.Http2.FLAG_END_STREAM;
 import static okhttp3.internal.http2.Http2.FLAG_NONE;
 import static okhttp3.internal.http2.Http2.FLAG_PADDED;
-import static okhttp3.internal.htava.io.StringReader;
-import java.math.BigDecimal;
-import org.junit.Test;
-
-public class ToNumberPolicyTest {
-  @Test
-  public void testDouble() throws IOException {
-    ToNumberStrategy strategy = ToNumberPolicy.DOUBLE;
-    assertThat(strategy.readNumber(fr Gson will first use factory2, then factory1
-            .registerTypeAdapterFactory(factory1)
-            .registerTypeAdapterFactory(factory2)
-            .create();
-
-    TypeToken<?> type = TypeToken.get(Number.class);
-
-    assertThrows(NullPointerExcep();
-  @Rule public final OkHttpClientTestRule clientTestRule = new OkHttpClientTestRule();
-
-  private final EventSourceRecorder listener = new EventSourceRecorder();
-  private OkHttpClient client = clientTestRule.newClient();
-
-  @After public void after() id testExcludeFieldsWithModifiers() {
-    Gson gson =
-        new GsonBuilder().excludeFieldsWithModifiers(Modifier.VOLATILE, Modifier.PRIVATE).create();
-    assertThat(gson.toJson(new HasModifiers())).isEqualTo("{\"d\":\"d\"}");
-  }nings("JavaUtilDate")
-    Date date = new Date(0);
-    String originalFormatted = builder.create().toJson(date);
-
-    String customFormatted = builder.setDateFormat("yyyy-MM-dd").create().toJson(date);
-    assertThat(customFormatted).isNotEqualTo(originalF if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
-      System.out.println(response.body().string());
+import static okhttp3.internal.htr object
+   * to be equal if it is an instance of {@code JsonPrimitive} and has an equal value.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+ apter<Timestamp> {
+  static final TypeAdapterFactory FACTORY =
+      new TypeAdapterFactory() {
+        @SuppressWarnings("unchecked") // we use a runtime check to make sure the 'T's equal
+        @Override
+        public <T> TypeAdapter<T> class LogRecorder extends HttpLoggingInterceptorTest.LogRecorder {
+    @Override LogRecorder assertLogMatch(String pattern) {
+      return (LogRecorder) super.assertLogMatch("\\[\\d+ ms] " + pattern);
     }
   }
-
-  private void streamPrimesToSinkAsynchronously(final BufferedSink sink) {
-    Thread thread = new Thread("json = "test"; // String without quotes
-    JsonReader jsonReader =
-        new GsonBuilder().setLenient().create().newJsonReader(new StringReader(json));
-    assertThat(jsonReader.nextString()).isEqualTo("test");
-    jsonReader.close();
+}
+/*
+ * Copyright (C) 2014 Square, Inc.
+ qualTo(
+            "Expected a string but was NULL at line 1 column 5 path $\n"
+                + "See https://github.com/google/gson/blob/main/Troubleshooting.md#adapter-not-null-safe");
   }
 
-  /**
-   * Moow new RuntimeException(
-              "Failed to invoke constructor '"
-                  + ReflectionHelper.constructorToString(constructor)
-                  + "' with no args",
-              e.getCause());
-        } catch (IllegalAccessExceptier.endObject();
-    assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+  private static JsonReader fromString(String json) {
+ turns the generic form of {@code supertype}. For example, if this is {@code
+   * ArrayList<String>}, this returns {@code Iterable<String>} given the input {@code
+   * Iterable.class}.
+   *
+   * @param supertype a superclass of, or interface implemented by,s with no-args constructor and with field annotated with {@link SerializedName}. The
+ * constructor should not be used in the code, but this shouldn't lead to R8 concluding that values
+ * of the type are not constructible and therefore must be null.
+ */
+pua.util.Map;
+
+/** Type adapter that reflects over the fields and methods of a class. */
+public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
+  private final ConstructorConstructor constructorConstructor;
+  private final FieldN   writer.beginArray();
+ *   for (Double value : doubles) {
+ *     writer.value(value);
+ *   }
+ *   writer.endArray();
+ * }
+ * }</pre>
+ *
+ * <p>Each {@code JsonWriter} may be used to write a single JSON stream. Instances of this class are
+ * not thread safialized =
+        gson.fromJson("{\"f\":1,\"f2\":2,\"f3\":3}", DelegatingAndOverwriting.class);
+    assertThat(deserialized.f).isEqualTo(Integer.valueOf(1));
+    assertThat(deserialized.f2).isEqualTo(new JsonPrimitive(2));
+    // Verify that for deserirtThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
 
     assertThat(reader.getPath()).isEqualTo("$");
     reader.skipValue();
     assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-    assertThat(reader.getPath()).isE(entry.getKey());
-    boolean valuesEqual = mine != null && equal(mine.value, entry.getValue());
-    return valuesEqual ? mine : null;
-  }
+    assertThat(reader.getPath()).isEqualTo("$");
+  }ermit making it"
+                  + " accessible. Register a TypeAdapter for the declaring type, adjust the access"
+                  + " filter or increase the visibility of the element and its declaring type.");
+    }
 
-  private static boolean equal(Object a, Object b) {
-    return Objects.equals(a, b);
-  }
-
-  /**
-   * Removes {@codet java.net.InetAddress;
+    gson =
+        gson.newBuilderc void assertEqualsAndHashCode(Object a, Object b) {
+    Assert.assertTrue(a.equals(b));
+    Assert.assertTrue(b.equals(a));
+    Assert.assertEquals(a.hashCode(), b.hashCode());
+    Assert.assertFalse(a.equals(null));
+    Assert.assertFalse(a.equals(new Ob    // Serialization should fail for classes with non-public fields
+    try {
+      gson.toJson(new File("a"));
+      fail("Expected exception; test needs to be run with Java >= 9");
+    } catch (JsonIOException expected) {
+      // Note: This test is ratht java.net.InetAddress;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -425,159 +503,145 @@ import org.junit.Test;
  *
  * @author Joel Leitch
  */
-public class DefaultInetAddressTypeAdapterTest {
-Request request = server.takeRequest();
+public class DefaultInetAddressTypeAdapterTes  if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+      System.out.println(response.body().string());
+    }
+  }
+
+  private void streamPrimesToSinkAsynchronously(final BufferedSink sink) {
+    Thread thread = new Thread(;
+
+    RecordedRequest request = server.takeRequest();
     assertThat(request.getBody().readUtf8()).isEqualTo("request");
   }
 
   @Test public void testH2PriorKnowledgeServerFallback() {
     try {
-      server.setProtocols(asList(Protocol.H2_PRIOR_KNOWLEDGE, Protocol.HTTPains(Object o) {
-    return delegate.contains(o);
+      server.setProtocols(asList(Protocol.H2_PRIOR_KNOWLEDGEmJson(new StringReader(json), type));
+    }
+
+    {
+      JsonReader reader = new JsonReader(new StringReader(json));
+      assertCorrectlyDeserialized(gson.fromJson(reader, typeToken));
+
+      reader = new JsonReader(new StringReader(json));
+      assertCoer which always returns `true`
+    assertThat(json).isEqualTo("{\"f\":true}");
   }
 
-  @Override
-  public int indexOf(Object o) {
-    return delegate.indexOf(o);
-  }
+  private static class WithJsonSerializer {
+    @JsonAdapter(Serializer.class)
+    List<Integer> f = Collections.emptyList();
 
-  @Override
-  public int lastIndexOf(Object o) {
-    return delegate.lastIndexOf(o);
-  }
+    static class Serializer implements JsonSer();
+  @Rule public final OkHttpClientTestRule clientTestRule = new OkHttpClientTestRule();
 
-  @Override
-  public Object[]toTypeAdapter} builder, defaulting enum serialization to {@link
-   * EnumSerialization#NAME} and converting field serialization from {@link
-   * CaseFormat#LOWER_UNDERSCORE} to {@link CaseFormat#LOWER_CAMEL}.
-   */
-  public static Builder newBuilder() {
-  t java.text.DateFormat;
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-imped as a simplified version of the {@code
-     * ReflectiveTypeAdapterFactory$Adapter}.
-     */
-    class WrappingAdapter<T> extends TypeAdapter<T> {
-      final TypeAdapter<?> wrapped;
-      boolean isFirstCall = true;
+  private final EventSourceRecorder listener = new EventSourceRecorder();
+  private OkHttpClient client = clientTestRule.newClient();
 
-      WrappingAdapter(TypeAdapter<?>khttp3.recipes;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.security.GeneralSecurityException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.NoSuchAlgorith }
-
-  // The tests to measure serialization and deserialization performance of Gson
-  // Based on the discussion at
-  // http://groups.google.com/group/google-gson/browse_thread/thread/7a50b17a390dfaeb
-  // Test results: 10/19/2009
-  // Serialize classes aatingFactory<T> {
-    // suppress Error Prone warning; should be clear that `Factory` refers to nested class
-    @SuppressWarnings("SameNameButDifferent")
-    @JsonAdapter(Factory.class)
-    T f;
-
-    static class Factory implements TypeAdapterFactory {
-  rtThat(deserialized.f).isEqualTo(Integer.valueOf(1));
-    assertThat(deserialized.f2).isEqualTo(new JsonPrimitive(2));
-    // Verify that for deserialization type adapter specified by @JsonAdapter is used
-    assertThat(deserialized.f3).isEqualTo(JsonElle.gson;
-
-import com.google.gson.internal.LazilyParsedNumber;
-import com.google.gson.internal.NumberLimits;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Objects;
-
-/**
- * A class representing a JSON primitive value. A primit{
-    final User user;
-
-    Computer(User user) {
-      this.user = user;
+  @After public void after()return gson.getDelegateAdapter(this, type);
+      }
     }
   }
 
-  @JsonAdapter(UserClassAnnotationAdapter.class)
-  private static class User {
-    public final String name;
+  /**
+   * Verifies that {@link TypeAdapterFactory} specified by {@code @JsonAdapter} can call {@link
+   * Gson#getDelegateAdapter} without any issues, despite the factory not being directly reif (in.peek() == JsonToken.NULL) {
+        in.nextNull();
+        return null;
+      }
 
-    private User(String name) {
-      this.name = name;
- sFilter;
-import com.google.gson.ReflectionAccessFilter.FilterResult;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.annotations.SerializedName;
-impo  @Test public void shutdownWithoutEnqueue() throws IOException {
-    MockWebServer server = new MockWebServer();
-    server.start();
-    server.shutdown();
+      A accumulator = createAccumulator();
+      Map<String, BoundField> deserializedFields = fieldsData.deserializedFields;
+
+      try {
+        in.beginObjecte} must be specified when
+   * constructing a {@link ParameterizedType} for {@code rawType}.
+   *
+   * <p>Note that this method might not require an owner type for all cases where Java reflection
+   * would create parameterized types with owner type.
+   */Gson} with a {@code
+ * GsonBuilder} and invoke the {@link GsonBuilder#setVersion(double)} method.
+ *
+ * <p>Here is an example of how this annotation is meant to be used:
+ *
+ * <pre>
+ * public class User {
+ *   private String firstName;
+ *   privor
+ * {@link ToNumberPolicy#BIG_DECIMAL}.
+ *
+ * @see ToNumberPolicy
+ * @see GsonBuilder#setObjectToNumberStrategy(ToNumberStrategy)
+ * @see GsonBuilder#setNumberToNumberStrategy(ToNumberStrategy)
+ * @since 2.8.9
+ */
+public interface ToNumberStrategy {
+
+  /eturns whether the {@code toString()} of {@code c} can be trusted to return a valid JSON
+   * number.
+   */
+  private static boolean isTrustedNumberType(Class<? extends Number> c) {
+    // Note: Don't consider LazilyParsedNumber trusted because it could col Type LIST_TYPE = LIST_TYPE_TOKEN.getType();
+  private Gson gson;
+  private String json;
+
+  public static void main(String[] args) {
+    NonUploadingCaliperRunner.run(CollectionsDeserializationBenchmark.class, args);
   }
 
-  @Test public void portImplicitlyStarts() {
-    assertThat(server.getPort()).isGreaterThan(0)types
-    if (!rawType.isInterface()) {
-      while (rawType != Object.class) {
-        Class<?> rawSupertype = rawType.getSuperclass();
-        if (rawSupertype == supertype) {
-          return rawType.getGenericSuperclass();
-        } else if (supertype.;
-    list.add(4);
-    list.add(5);
+  @BeforeExperiment
+  void s, Serializable {
+    @SuppressWarnings("serial")
+    private final Type ownerType;
 
-    Type typeOfSrc = new TypeToken<ObjectWithTypeVariables<Integer>>() {}.getType();
-    ObjectWithTypeVariables<Integer> objToSerialize =
-        new ObjectWithTypeVariables<>(null, null, list, null, null, null); HeldCertificate.Builder()
-        .certificateAuthority(0)
+    @SuppressWarnings("serial")
+    private final Type rawType;
+
+    @SuppressWarnings("serial")
+    private final Type[] typeArguments;
+
+    public ParameterizedTypeImpl(T
+    ConnectionSpec allCipherSuites = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+        .allEnabledCipherSuites()
         .build();
-    HeldCertificate serverCa = new HeldCertificate.Builder()
-        .certificateAuthority(0)
-        .build();
-    HeldCertificate serverCertificate = new HeldCertificate.Builde
+    ConnectionSpec allTlsVersions = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+        .allEnabledTlshrows InterruptedException {
+    final CountDownLatch startLatch = new CountDownLatch(1);
+    final CountDownLatch finishedLatch = new CountDownLatch(10);
+    final AtomicBoolean failed = new AtomicBoolean(false);
+    ExecutorService executor = Executors.nommon.base.Objects;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.ParameterizedTypeFixtures.MyParameterizedType;
+import com.google.gson.Parametcord(int i) {}
 
-    Interceptor interceptor = chain -> {
-      Request originalRequest = chain.request();
-      MediaType mediaType = MediaType.get("text/plain");
-      RequestBody body = RequestBody.create("abc", mediaType);
-      return chain.proceed(originalRequest.nild();
+    TypeAdapter<LocalRecord> adapter = gson.getAdapter(LocalRecord.class);
+    assertThat(adapter.toJson(null)).isEqualTo("null");
+    assertThat(adapter.fromJson("null")).isNull();
+  }
 
-    SSLSocket socket = (SSLSocket) SSLSocketFactory.getDefault().createSocket();
-    socket.setEnabledProtocols(new String[] {
-        TlsVersion.TLS_1_2.javaName(),
-        TlsVersion.TLS_1_1.javaName(),
-    });
+  @Test
+  public void testPrimitiveDefaultValues() {
+tring>> listOfSetOfString = null;
+  List<Set<?>> listOfSetOfUnknown = null;
 
-    socket.setEnabledCipherSuites('java.io.Reader#lock' is not accessible and ReflectionAccessFilter does not"
-                  + " permit making it accessible. Register a TypeAdapter for the declaring type,"
-                  + " adjust the access filter or increase the visibility of ths not get this element as a char but rather as
-   *     a string's first character.
-   */
-  @Deprecated
-  @Override
-  public char getAsCharacter() {
-    String s = getAsString();
-    if (s.isEmpty()) {
-      throw new UnsupportedOperationException("String lect.AccessibleObject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-impserver.RecordedRequest;
+  @SuppressWarnings({"deprecation"})
+  @Test
+  public void testIsAssignableFromRawTypes() {
+    assertThat(TypeToken.get(Object.class).isAssignableFrom(String.class)).isTrue();
+      })
+            .create();
+
+    ClassWithoutDefaultConstructor c =
+        gson.fromJson("{\"i\":1}", ClassWithoutDefaultConstructor.class);
+    assertThat(c.i).isEqualTo(1);
+
+    c = gson.fromJson("{}", ClassWithoutDefaultConstructor.class);
+    // Usserver.RecordedRequest;
 import okhttp3.mockwebserver.SocketPolicy;
 import okio.Buffer;
 import okio.BufferedSink;
@@ -586,50 +650,127 @@ import okio.ForwardingSource;
 import okio.GzipSink;
 import okio.Okio;
 import okio.Sink;
-import okio.Source;itch
- * @see GsonBuilder#setVersion(double)
- * @see Since
- * @since 1.3
- */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.TYPE})
-public @interface Until {
+import okio.Source;ctionalTest {
+
+  private final Gson gson = new Gson();
 
   /**
-   * The value indicating a version number until a.util.TimeZone;
+   * This test also ensures that {@link TypeAdapterFactory} registered through {@link JsonAdapter}
+   * work correctly for {@link Gson#getDelegateAdapter(TypeAdapterFactory, TypeToken)}.
+   */String unused = in.nextString();
+      return new User("UserClassAnnotationAdapter");
+    }
+  }
+
+  private static final class Computer2 {
+    // overrides the JsonAdapter annotation of User with this
+    @JsonAdapter(UserFieldAnnotationAdapter.class)
+    toJson(src, typeOfSrc);
+    String expected =
+        "{\"a\":10,\"b\":1.0,\"c\":2.1,\"d\":\"abc\","
+            + "\"e\":{\"longValue\":0,\"intValue\":0,\"booleanValue\":false,\"stringValue\":\"\"}}";
+    assertThat(json).isEqualTo(expected);
+  }
+json = "{\"bag\":5,\"value\":25}";
+    ClassWithCustomTypeConverter target = gson.fromJson(json, ClassWithCustomTypeConverter.class);
+    assertThat(target.getBag().getIntValue()).isEqualTo(5);
+  }
+
+  @Test
+  @Ignore
+  public void disable_testCustomSerialed for serialization, might be {@code this} or another adapter. That
+   * other adapter might itself also be a {@code SerializationDelegatingTypeAdapter}.
+   */
+  public abstract TypeAdapter<T> getSerializationDelegate();
+}
+/*
+ * Copyright (C) 2011 Googlese());
+
+    Interceptor interceptor = chain -> {
+      Request originalRequest = chain.request();
+      MediaType mediaType = MediaType.get("text/plain");
+      RequestBody body = RequestBody.create("abc", mediaType);
+      return chain.proceed(originalReq  @Test public void shutdownWithoutEnqueue() throws IOException {
+    MockWebServer server = new MockWebServer();
+    server.start();
+    server.shutdown();
+  }
+
+  @Test public void portImplicitlyStarts() {
+    assertThat(server.getPort()).isGreatere. */
+  public final Class<? super T> getRawType() {
+    return rawType;
+  }
+
+  /** Gets underlying {@code Type} instance. */
+  public final Type getType() {
+    return type;
+  }
+
+  /**
+   * Check if this type is assignable from the given class object.
+   eger = listOfNumber; // doesn't compile; must be false
+    assertThat(TypeToken.get(a).isAssignableFrom(b)).isFalse();
+    // listOfNumber = listOfInteger; // doesn't compile; must be false
+    assertThat(TypeToken.get(b).isAssignableFrom(a)).isFalse();
+  t java.text.DateFormat;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+impoZone originalTimeZone = dateFormat.getTimeZone();
+        try {
+          return dateFormat.parse(s);
+        } catch (ParseException ignored) {
+          // OK: try the next format
+        } finally {
+          dateFormat.setTimeZone(originalTimeZone);
+  s} and {@link Double#isInfinite() infinities}. It also allows writing
+   *       multiple top level values.
+   * </dl>
+   *
+   * @param strictness the new strictness of this writer. May not be {@code null}.
+   * @see #getStrictness()
+   * @since 2.11.0
+   (stackTrace);
+        String json = "{\"message\":\"Error message.\"," + "\"stackTrace\":\"" + stackTrace + "\"}";
+        parseLongJson(json);
+        System.out.println("Gson could handle a string of size: " + stackTrace.length());
+      } catch (JsonParrializeNulls = serializeNulls;
+  }
+
+  /**
+   * Returns true if object members are serialized when their value is null. This has no impact on
+   * array elements. The default is true.
+   */
+  public final boolean getSerializeNulls() {
+    return serializeNun.JsonPrimitive;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * Adapter for java.sql.Time. Although this class appears stateless, it is not. DateFormat captures
- * its time zone and locale when it is created, which gives this class state. DateFormat isn't
- * thread safe either, so this class haceof BigInteger)
-          ? this.getAsBigInteger().equals(other.getAsBigInteger())
-          : this.getAsNumber().longValue() == other.getAsNumber().longValue();
+ * Performs some functa");
+      if (jsonElement == null || jsonElement.isJsonNull()) {
+        return new DataHolder(null);
+      }
+      return new DataHolder(jsonElement.getAsString());
     }
-    if (value instanceof Number && other.value instanceof Number) {
-      if (value insassWithCustomDefaultConstructor c =
-        gson.fromJson("{\"i\":2}", ClassWithCustomDefaultConstructor.class);
-    assertThat(c.i).isEqualTo(2);
-
-    c = gson.fromJson("{}", ClassWithCustomDefaultConstructor.class);
-    assertThat(c.i).isEqualTo(1);
-  }
-c void main(String[] args) throws Exception {
-    NonUploadingCaliperRunner.run(ParseBenchmark.class, args);
   }
 
-  interface Parser {
-    void parse(char[] data, Document document) throws Exception;
-  }
+  @SuppressWarnings("JavaUtilDate")
+  private static class DateTypeAdapter impmitive("b");
+    JsonElement oldValue = array.set(0, b);
+    assertThat(oldValue).isEqualTo(a);
+    assertThat(array.get(0).getAsString()).isEqualTo("b");
 
-  private static class GsonStreamParser impl    // Uses `Gson.getAdapter` instead of `Gson.getDelegateAdapter`
-        TypeAdapter<String> delegate = (TypeAdapter<String>) gson.getAdapter(type);
-
-        return (TypeAdapter<T>)
-            new TypeAdapter<String>() {
-   * <p>This is a convenience method which overwrites any previously {@linkplain
-   * #setFormattingStyle(FormattingStyle) set formatting style} with either {@link
-   * FormattingStyle#COMPACT} if the given indent string is empty, or {@link FormattingStyle#.Test;
+    oldValue = array.set(0, null);
+    assertThat(oldValue).isEqualTo(b);
+    assertThat(array.get(0.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -639,56 +780,28 @@ public final class Java17RecordTest {
 
   @Test
   public void testFirstNameIsChosenForSerialization() {
-    RecordWithCuuthor Jesse Wilson
- */
-// Suppress because these classes are only needed for this test, but must be top-level classes
-// to not have an enclosing type
-@SuppressWarnings("MultipleTopLevelClasses")
-public final class TypeTokenTest {
-  // These fields are accclient.listener.assertClosing(1000, "Hello!");
-    server.listener.assertClosing(1000, "Hi!");
-    client.listener.assertClosed(1000, "Hello!");
-    server.listener.assertClosed(1000, "Hi!");
-    client.webSocket.awaitTermination(5, TimeUnit.SECONDS);
-    a {@link ParameterizedType} for {@code rawType}.
-   *
-   * <p>Note that this method might not require an owner type for all cases where Java reflection
-   * would create parameterized types with owner type.
+    RecordWithCu@param buffer buffer to use for padding
+   * @param value the integer value to pad if necessary.
+   * @param length the length of the string we should zero pad
    */
-  public static boolean requiresOwnerType(blic Type getRawType() {
-      return rawType;
-    }
+  private static void padInt(StringBuilder buffer, int value, int length) {
+    String strtLeft != null ? pivotLeft.height : 0) + 1;
+  }
 
-    @Override
-    public Type getOwnerType() {
-      return ownerType;
-    }
+  private EntrySet entrySet;
+  private KeySet keySet;
 
-    @Override
-    public boolean equals(Object other) {
-      return other instanceof ParameterizedType
-          && $Gson$Trmatted, calendar.get(Calendar.HOUR_OF_DAY), "hh".length());
-    formatted.append(':');
-    padInt(formatted, calendar.get(Calendar.MINUTE), "mm".length());
-    formatted.append(':');
-    padInt(formatted, calendar.get(Calendar.SECOND), "ss".length());
-  lder().url(url).build();
-    Call call = client.newCall(request);
-    Response response = new Response.Builder().request(request).code(200).message("").protocol(HTTP_2).build();
-
-    EventListener listener = loggingEventListenerFactory.create(call);
-
-    lrrayType ga = (GenericArrayType) a;
-      GenericArrayType gb = (GenericArrayType) b;
-      return equals(ga.getGenericComponentType(), gb.getGenericComponentType());
-
-    } else if (a instanceof WildcardType) {
-      if (!(b instanceof WildcardType)) {
-   json =
-        "{\"a\":10,\"b\":1.0,\"c\":2.1,\"d\":\"abc\","
-            + "\"e\":{\"longValue\":0,\"intValue\":0,\"booleanValue\":false,\"stringValue\":\"\"}}";
-    MultiParameters<Integer, Float, Double, String, BagOfPrimitives> target =
-    eup.moshi.FromJson;
+  @Override
+  public Set<Entry<K, V>> entrySet() {
+    EntrySet result = entrySet;
+    return result != null ? result : (entrySet = new EntrySet());
+  }
+r out, User user) throws IOException {
+      // implement write: combine firstName and lastName into name
+      out.beginObject();
+      out.name("name");
+      out.value(user.firstName + " " + user.lastName);
+      out.endObjeup.moshi.FromJson;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.ToJson;
@@ -697,180 +810,330 @@ import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.WebSocket;
 import okhttp3.OkHttpClient;
-im if (in.peek() == JsonToken.NULL) {
-        in.nextNull();
-        return null;
-      }
-
-      A accumulator = createAccumulator();
-      Map<String, BoundField> deserializedFields = fieldsData.deserializedFields;
-
-      try {
-        in.beginObon.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.common.TestTypes.BagOfPrimitives;
-import com.google.gson.common.TestTypes.ClassWi  DateFormat dateFormat = dateFormats.get(0);
-    String dateFormatAsString;
-    // Needs to be synchronized since JDK DateFormat classes are not thread-safe
-    synchronized (dateFormats) {
-      dateFormatAsString = dateFormat.format(value);
-    }
-    ou = new int[32];
-
-  public JsonTreeReader(JsonElement element) {
-    super(UNREADABLE_READER);
-    push(element);
+imnings("NonFinalStaticField")
+    static String s = "initial";
   }
 
-  @Override
-  public void beginArray() throws IOException {
-    expect(JsonToken.BEGIN_ARRAY);
-    JsonArray array = (JsonArray) peekStackizationAndDeserialization() throws Exception {
-    @SuppressWarnings("AddressSelection") // we really do want this method
+  @Test
+  public void testExposeAnnotation() {
+    record RecordWithExpose(@Expose int a, int b) {}
+
+    Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().creatter.write(gson.toJson(expectedOne).toCharArray());
+    BagOfPrimitives expectedTwo = new BagOfPrimitives(2, 2, false, "two");
+    writer.write(gson.toJson(expectedTwo).toCharArray());
+    CharArrayReader reader = new CharArrayReader(writer.toCharArray());
+tring format(Date date, boolean millis, TimeZone tz) {
+    Calendar calendar = new GregorianCalendar(tz, Locale.US);
+    calendar.setTime(date);
+
+    // estimate capacity of buffer as close as we can (yeah, that's pedantic ;)
+    int capacity = "yyyy-MM-ddp<>();
+
+    Class<?> originalRaw = raw;
+    while (raw != Object.class) {
+      Field[] fields = raw.getDeclaredFields();
+
+      // For inherited fields, check if access to their declaring class is allowed
+      if (raw != originalRaw && fields.length > 0) final List<? extends T>[] arrayOfListOfWildcardTypeParameters;
+
+    // For use by Gson
+    @SuppressWarnings("unused")
+    private ObjectWithTypeVariables() {
+      this(null, null, null, null, null, null);
+    }
+
+    public ObjectWithTypeVariables(
+    e of a direct subclass of TypeToken and returns the
+   * type argument for {@code T} in {@link $Gson$Types#canonicalize canonical form}.
+   */
+  private Type getTypeTokenTypeArgument() {
+    Type superclass = getClass().getGenericSuperclass();
+    if (superequires static com.google.errorprone.annotations;
+
+  // Optional dependency on java.sql
+  requires static java.sql;
+
+  // Optional dependency on jdk.unsupported for JDK's sun.misc.Unsafe
+  requires static jdk.unsupported;
+}
+/*
+ * Copyright (C) 2022 GooglThat(o.size()).isEqualTo(0);
+
+    o.add("Hello", new JsonPrimitive(1));
+    assertThat(o.size()).isEqualTo(1);
+
+    o.add("Hi", new JsonPrimitive(1));
+    assertThat(o.size()).isEqualTo(2);
+
+    o.remove("Hello");
+    assertThat(o.size()).isEqualTo(1);
+  }Token.NAME);
+    Iterator<?> i = (Iterator<?>) peekStack();
+    Map.Entry<?, ?> entry = (Map.Entry<?, ?>) i.next();
+    String result = (String) entry.getKey();
+    pathNames[stackSize - 1] = skipName ? "<skipped>" : result;
+    push(entry.getValue());
+ really do want this method
     InetAddress address = InetAddress.getByName("8.8.8.8");
     String jsonAddress = gson.toJson(address);
-    assertThat(jsonAddress) final WebSocketRecorder listener;
+    assertThat(jsonAddress).isEqualTo("\"8.8.8.8\"");
+
+    InetAddress value = gson.fromJson(jsonAddress, InetAddress.clasite(Buffer source, long byteCount) throws IOException {
+        original.writeUtf8(source.readUtf8(byteCount).toUpperCase(Locale.US));
+      }
+    };
+  }
+
+  static ResponseBody uppercase(ResponseBody original) throws IOException {
+    return ResponseBody.c(X509TrustManager trustManager)
+      throws NoSuchAlgorithmException, KeyManagementException {
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+    sslContext.init(null, new TrustManager[] { trustManager }, null);
+
+    return sslContext.getSocke.isNotNull();
+    assertThat(SqlTypesSupport.TIMESTAMP_DATE_TYPE).isNotNull();
+
+    assertThat(SqlTypesSupport.DATE_FACTORY).isNotNull();
+    assertThat(SqlTypesSupport.TIME_FACTORY).isNotNull();
+    assertThat(SqlTypesSupport.TIMESTAMP_FACTORY).isNotNull(.
+ */
+
+/**
+ * This package provides the {@link com.google.gson.Gson} class to convert Json to Java and
+ * vice-versa.
+ *
+ * <p>The primary class to use is {@link com.google.gson.Gson} which can be constructed with {@code
+ * new Gson()} (using default settitp://example.com/websocket";
+      Response response = new Response.Builder()
+          .code(101)
+          .message("OK")
+          .request(new Request.Builder().url(url).build())
+          .headers(responseHeaders)
+          .protocol(Protocol.HTTP_1_1 %d ms\n", avg);
+  }
+
+  @Test
+  @Ignore
+  public void testDeserializeExposedClasses() {
+    String json = buildJsonForClassWithList();
+    ClassWithListOfObjects[] target = new ClassWithListOfObjects[NUM_ITERATIONS];
+    long t1 = System.currentTimeMillis(r<T> {
+
+  /**
+   * Gson invokes this call-back method during deserialization to create an instance of the
+   * specified type. The fields of the returned instance are overwritten with the data present in
+   * the JSON. Since the prior contents of the objec new NumberFormatException(value);
+    }
+    // use same logic as in Integer.parseInt() but less generic we're not supporting negative values
+    int i = beginIndex;
+    int result = 0;
+    int digit;
+    if (i < endIndex) {
+      digit = Character.digit(ve.gson.protobuf.generated.Annotations;
+import com.google.gson.protobuf.generated.Bag.OuterMessage;
+import com.google.gson.protobuf.generated.Bag.ProtoWithAnnotations;
+import com.google.gson.protobuf.generated.Bag.ProtoWithAnnotations.InnerMessage;
+impo final WebSocketRecorder listener;
     private RealWebSocket webSocket;
     boolean closeThrows;
     boolean closed;
 
     public TestStreams(boolean client, Pipe source, Pipe sink) {
-      super(client, Okio.buffer(source.source()), Okio.buffer(sink.sink()ord(int i) {}
-
-    TypeAdapter<LocalRecord> adapter = gson.getAdapter(LocalRecord.class);
-    assertThat(adapter.toJson(null)).isEqualTo("null");
-    assertThat(adapter.fromJson("null")).isNull();
+      super(client, Okio.buffer(source.source()), Okio.buffer(sink.sink()Foo.class, new FooTypeAdapter()).create();
   }
 
-  @Test
-  public void testPrimitiveDefaultValues() {
-  this.oldTimeZone = TimeZone.getDefault();
-    TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"));
-    this.oldLocale = Locale.getDefault();
-    Locale.setDefault(Locale.US);
-    gson = new Gson();
-  }
+  public static class Foo {
+    private final int key;
+    private final long value;
 
-  @After
-  public void tearDown() thr0,b:'c'}");
-    JsonElement e = JsonParser.parseReader(reader);
-    assertThat(e.isJsonObject()).isTrue();
-    assertThat(e.getAsJsonObject().get("a").getAsInt()).isEqualTo(10);
-    assertThat(e.getAsJsonObject().get("b").getAsString()).isEqualTo("c");
-  }f the JSON document is incomplete.
-   */
-  @Override
-  public void close() throws IOException {
-    out.close();
-
-    int size = stackSize;
-    if (size > 1 || (size == 1 && stack[size - 1] != NONEMPTY_DOCUMENT)) {
-      throw new IOException("Incomplete d
- * <pre>
- * public class Id&lt;T&gt; {
- *   private final Class&lt;T&gt; clazz;
- *   private final long value;
- *   public Id(Class&lt;T&gt; clazz, long value) {
- *     this.clazz = clazz;
- *     this.value = value;
- *   }
- * }
- * </pre>
- *
- * <p>If Gson       "CallStart", "ProxySelectStart", "ProxySelectEnd", "DnsStart", "DnsEnd", "ConnectStart",
-        "SecureConnectStart", "SecureConnectEnd", "ConnectEnd", "ConnectionAcquired",
-        "RequestHeadersStart", "RequestHeadersEnd", "RequestBodyStart", "Reddress(host, port));
-    return result;
-  }
-
-  @Override public Socket createSocket(
-      InetAddress host, int port, InetAddress localAddress, int localPort) throws IOException {
-    return createSocket(host, port);
-  }
-}
-/*
- * Copyright (C) 2014 Square("{\"s\":\"custom\"}", RecordWithStaticField.class);
-      assertThat(obj).isNotNull();
-      // Currently record deserialization always ignores static fields
-      assertThat(RecordWithStaticField.s).isEqualTo("initial");
-    } finally {
-      RecordWithString firstName;
-    final String lastName;
-
-    User(String firstName, String lastName) {
-      this.firstName = firstName;
-      this.lastName = lastName;
+    public Foo() {
+      this(0, 0L);
     }
-  }
 
-  private static class UserJsonAdapter extends TypeAdapter<User> {
-    @Ot = InetAddress.getLoopbackAddress();
+    public Foo(int key, long value) {
+      this.key = key;
+      this.value d be stateless and thread-safe, otherwise the thread-safety guarantees of
+ * {@link Gson} might not apply.
+ *
+ * <p>To use a custom type adapter with Gson, you must <i>register</i> it with a {@link
+ * GsonBuilder}:
+ *
+ * <pre>{@code
+ * GsonBuilder builder ackAddress();
     ServerSocket serverSocket = new ServerSocket(0, 1, localhost);
     // Fill backlog queue with this request so subsequent requests will be blocked.
     new Socket().connect(serverSocket.getLocalSocketAddress());
 
-    Base b = new Base();
-    String json = gson.toJson(b);
-    assertThat(json).contains("value");
-    b = new Derived();
-    json = gson.toJson(b, Base.class);
-    assertThat(json).contains("value");
-    assertThat(json).doesNotContain("derivedValue");
-  }*
-   * Tests deserializing a class without default constructor.
-   *
-   * <p>This should use JDK Unsafe, and would normally require specifying {@code "unsafeAllocated":
-   * true} in the reflection metadata for GraalVM, though for some reason it also seemss.type = getTypeTokenTypeArgument();
-    this.rawType = (Class<? super T>) $Gson$Types.getRawType(type);
-    this.hashCode = type.hashCode();
+    client = client.newBuillis();
+    HeldCertificate heldCertificate = new HeldCertificate.Builder().build();
+
+    X509Certificate certificate = heldCertificate.certificate();
+    assertThat(certificate.getSubjectX500Principal().getName()).overridingErrorMessage(
+        "self-siow new UnsupportedOperationException();
   }
 
-  /** Unsafe. Constructs a type literal manually. */
+  @Override
+  public void flush() throws IOException {}
+
+  @Override
+  public void close() throws IOException {
+    if (!stack.isEmpty()) {
+      throw new IOException("Incomplete document");
+    }
+    stack.add     stringBuilder.append(s);
+    }
+    return stringBuilder.toString();
+  }
+
+  /** Deeply nested JSON arrays should not cause {@link StackOverflowError} */
   @SuppressWarnings("unchecked")
-  private TypeAdapter
-      implements JsonSerializer<StringHolder>,
-          JsonDeserializer<StringHolder>,
-          InstanceCreator<StringHolder> {
-
-    @Override
-    public StringHolder createInstance(Type type) {
-      // Fill up with objects that will be thrownjsonObj = json.getAsJsonObject();
-      JsonElement jsonElement = jsonObj.get("data");
-      if (jsonElement == null || jsonElement.isJsonNull()) {
-        return new DataHolder(null);
-      }
-      return new DataHolder(jsonElement.getAsStight : 0, pivotLeft != null ? pivotLeft.height : 0) + 1;
-    pivot.height = Math.max(root.height, pivotRight != null ? pivotRight.height : 0) + 1;
-  }
-
-  /** Rotates the subtree so that its root's left child is the new root. */
-  private void rotateRight(N String[] {"1", null, "3"});
+  @Test
+  public void testDeserializeDeeplyNestedArrays() thro String[] {"1", null, "3"});
     assertThat(result).isEqualTo("[\"1\",null,\"3\"]");
 
     gson = gsonBuilder.serializeNulls().create();
     result = gson.toJson(new String[] {"1", null, "3"});
     assertThat(result).isEqualTo("[\"1\",null,\"3\"]");
-  } final boolean serialize,
-      final boolean blockInaccessible) {
+  }rn new GsonBuilder().setFieldNamingPolicy(fieldNamingPolicy).create();
+  }
 
-    final boolean isPrimitive = Primitives.isPrimitive(fieldType.getRawType());
+  // Suppress because fields are used reflectively, and the names are intentionally unconventional
+  @SuppressWarnings({"unused", "MemberName", "ConstantField"})
+  prieflect.Field;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
 
-    int modifiers = field.getModifiers();
-    final boolean isStaticFinalField = Modifier.isStatic(modifierg>>>>() {};
-    Type listOfString = TypeToken.getParameterized(List.class, String.class).getType();
-    Type listOfListOfString = TypeToken.getParameterized(List.class, listOfString).getType();
-    assertThat(TypeToken.getParameterized(List.class, listOfLiertOverridesMethods(
-      Class<?> baseClass, Class<?> subClass, List<String> ignoredMethods) {
-    Set<String> requiredOverriddenMethods = new LinkedHashSet<>();
-    for (Method method : baseClass.getDeclaredMethods()) {
-      // Note: Do not filter out oundField> deserializedFields = new LinkedHashMap<>();
-    // For serialized fields use a Map to track duplicate field names; otherwise this could be a
-    // List<BoundField> instead
-    Map<String, BoundField> serializedFields = new LinkedHashMap<>();
+/**
+ * A data object that stores attributes of a field.
+ *
+ * <p>This class is immutable; therefore, it can be safely shared acrodapter(Foo.class, newSerializer("hierarchical"))
+            .registerTypeHierarchyAdapter(Foo.class, newDeserializer("hierarchical"))
+            .registerTypeAdapter(Foo.class, newSerializer("non hierarchical"))
+            .registerTypeAdapter(Foo.cladapter =
+          jsonAdapterPresent
+              ? typeAdapter
+              : new TypeAdapterRuntimeTypeWrapper<>(context, typeAdapter, fieldType.getType());
+    } else {
+      // Will never actually be used, but we set it to avoid confusing nullness-atring translateName(Field f) {
+      return upperCaseFirstLetter(f.getName());
+    }
+  },
 
- va.io.CharArrayReader;
+  /**
+   * Using this naming policy with Gson will ensure that the first "letter" of the Java field name
+   * is capitalized when serialized to its JSON form and th?, ?, ?, ?>) o;
+      return Objects.equal(a, that.a)
+          && Objects.equal(b, that.b)
+          && Objects.equal(c, that.c)
+          && Objects.equal(d, that.d)
+          && Objects.equal(e, that.e);
+    }
+  }
+
+  // Begin: tests to reproduce issue 1rtThat(nestedParameterizedType.getRawType()).isEqualTo(NestedGeneric.class);
+    assertThat(nestedParameterizedType.getActualTypeArguments())
+        .asList()
+        .containsExactly(Integer.class);
+
+    class LocalGenericClass<T> {}
+    TypeToken<?> expt, Collections.singletonList(new JsonPrimitive(1)));
+    assertThat(list.equals(Collections.emptyList())).isFalse();
+    assertThat(list.equals(Collections.singletonList(new JsonPrimitive(2)))).isFalse();
+  }
+
+  /** Verify that {@code JsonArray} updates ar.setPrettyPrinting().create() : new Gson();
+    this.bag = new BagOfPrimitives(10L, 1, false, "foo");
+  }
+
+  public void timeObjectSerialization(int reps) {
+    for (int i = 0; i < reps; ++i) {
+      gson.toJson(bag);
+    }
+  }
+}
+package com.example;
+
+impoable() {
+    new TypeToken<M>() {};
+  }
+
+  /**
+   * TypeToken type argument must not contain a type variable because, due to type erasure, at
+   * runtime only the bound of the type variable is available which is likely not what the user
+   * wanted.
+   *
+lized = gson.fromJson("[1.0]", LinkedList.class);
+    assertThat(deserialized.get(0)).isEqualTo(1.0);
+  }
+
+  /**
+   * When trying to deserialize interface an exception for that should be thrown, even if {@link
+   * FilterResult#BLOCK_INACCESSIBLE} is used
+blic Socket createSocket(
+      String host, int port, InetAddress localHost, int localPort) throws IOException {
+    return createSocket(host, port);
+  }
+
+  @Override public Socket createSocket(InetAddress host, int port) throws IOException {
+    Socket rTo("{}");
+
+    var exception = assertThrows(JsonIOException.class, () -> gson.fromJson("{}", Record.class));
+    assertThat(exception)
+        .hasMessageThat()
+        .isEqualTo(
+            "Abstract classes can't be instantiated! Adjust the R8 configurtains("\"b\":" + B);
+
+    gson = gsonWithVersion(1.3);
+    json = gson.toJson(target);
+    assertThat(json).doesNotContain("\"b\":" + B);
+
+    gson = gsonWithVersion(1.4);
+    json = gson.toJson(target);
+    assertThat(json).doesNotContain("\"b\":" + B);
+ );
+    Gson gson = gsonBuilder.create();
+    String json = "'0123456789'";
+    byte[] actual = gson.fromJson(json, byte[].class);
+    byte[] expected = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    for (int i = 0; i < actual.length; ++i) {
+      assertThat(actual[i]().getAsInt();
+  }
+
+  /**
+   * Convenience method to get this array as a primitive byte if it contains a single element. This
+   * method calls {@link JsonElement#getAsByte()} on the element, therefore any of the exceptions
+   * declared by that method canboolean.class)).isEqualTo("1");
+    assertThat(gson.toJson(true, Boolean.class)).isEqualTo("true");
+    assertThat(gson.fromJson("1", boolean.class)).isEqualTo(Boolean.TRUE);
+    assertThat(gson.fromJson("true", Boolean.class)).isEqualTo(Boolean.TRUE);
+   );
+    queue.add(0L);
+    queue.add(1L);
+    queue.add(2L);
+    queue.add(3L);
+    Set<Float> set = new TreeSet<>();
+    set.add(0.1F);
+    set.add(0.2F);
+    set.add(0.3F);
+    set.add(0.4F);
+    SortedSet<Character> sortedSet = new TreeSet<>();
+    sorteeturn mutable {@code List} view
+   * @since 2.10
+   */
+  public List<JsonElement> asList() {
+    return new NonNullElementWrapperList<>(elements);
+  }
+
+  /**
+   * Returns whether the other object is equal to this. This method only considers the other objecarget;
+
+/**
+ * An annotation that indicates the version number since a member or a type has been present. This
+ * annotation is useful to manage versioning of your JSON classes for a web-service.
+ *
+ * <p>This annotation has no effect unless you build {@liava.io.CharArrayReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -878,480 +1141,230 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-impismatch
-class GenericWithBound<T extends Number> {}
-
-class GenericWithMultiBound<T extends Number & CharSequence> {}
-
-@SuppressWarnings("serial")
-abstract class ClassSatisfyingBounds extends Number implements CharSequence {}
-/*
- * Copyright (C) 2022 Googled testEnumClassWithObfuscated() {
-    for (Gender enumConstant : Gender.class.getEnumConstants()) {
-      try {
-        Gender.class.getField(enumConstant.name());
-        fail("Enum is not obfuscated");
-      } catch (NoSuchFieldException ignore) {
-  ch
- */
-@SuppressWarnings("SystemOut") // allow System.out because test is for manual execution anyway
-public class PerformanceTest {
-  private static final int COLLECTION_SIZE = 5000;
-
-  private static final int NUM_ITERATIONS = 100;
-
-  pr.deepCopy();
-    original.add(new JsonPrimitive("y"));
-
-    assertThat(copy).hasSize(1);
-    firstEntry.add(new JsonPrimitive("z"));
-
-    assertThat(original.get(0).getAsJsonArray()).hasSize(1);
-    assertThat(copy.get(0).getAsJsonArray()).hasSize(0);
-  }
- if (name.equals("longValue")) {
-            longValue = jr.nextLong();
-          } else if (name.equals("intValue")) {
-            intValue = jr.nextInt();
-          } else if (name.equals("booleanValue")) {
-            booleanValue = jr.nextBoolean();
-  on(new Foo("foo"))).isEqualTo("\"foo via type adapter 2\"");
-    assertThat(gson.fromJson("foo", Foo.class).name).isEqualTo("foo via type adapter 2");
-  }
-
-  @Test
-  public void testSerializeNonstreamingTypeAdapterFollowedByStreamingTypeAdapter() {ublic List<JsonElement> asList() {
-    return new NonNullElementWrapperList<>(elements);
-  }
-
-  /**
-   * Returns whether the other object is equal to this. This method only considers the other object
-   * to be equal if it is an instance of {@code JsonArg value, int beginIndex, int endIndex)
-      throws NumberFormatException {
-    if (beginIndex < 0 || endIndex > value.length() || beginIndex > endIndex) {
-      throw new NumberFormatException(value);
+impypes
+    if (!(rawType instanceof Class)) {
+      // See also https://bugs.openjdk.org/browse/JDK-8250659
+      throw new IllegalArgumentException("rawType must be of type Class, but was " + rawType);
     }
-    // use same logic as in Integer.parseInt() bvides the {@link com.google.gson.Gson} class to convert Json to Java and
- * vice-versa.
- *
- * <p>The primary class to use is {@link com.google.gson.Gson} which can be constructed with {@code
- * new Gson()} (using default settings) or by using {@link com.goa.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import org.junit.Before;
-import org.junit.Test;
-
-/**
- * Performs some functional tests when Gson is instantiated with some common user defined {@link
- * ExclusionStrategy} objects.
- *
- hrows InterruptedException {
-    final CountDownLatch startLatch = new CountDownLatch(1);
-    final CountDownLatch finishedLatch = new CountDownLatch(10);
-    final AtomicBoolean failed = new AtomicBoolean(false);
-    ExecutorService executor = Executors.nrtThat(nestedParameterizedType.getRawType()).isEqualTo(NestedGeneric.class);
-    assertThat(nestedParameterizedType.getActualTypeArguments())
-        .asList()
-        .containsExactly(Integer.class);
-
-    class LocalGenericClass<T> {}
-    TypeToken<?> exp*
-   * Verifies that passing an {@link Appendable} which is not an instance of {@link Writer} to
-   * {@code Gson.toJson} works correctly.
-   */
-  @Test
-  public void testToJsonAppendable() {
-    class CustomAppendable implements Appendable {
-      // Should use both factories, and therefore have `{"custom": ... }` once for class and once for
-    // the field, and for field also properly delegate to custom String adapter defined above
-    WithDelegatingFactoryOnClassAndField deserialized =
-    ppend(',');
-
-    writer.write('a');
-    writer.write('\u1234');
-    // Should only consider the 16 low-order bits
-    writer.write(0x4321_1234);
-    writer.append(',');
-
-    writer.write("chars".toCharArray());
-    try {
-      writer.write((char[]) null);
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    ObjectOutputStream objOut = new ObjectOutputStream(out);
-    objOut.writeObject(new LazilyParsedNumber("123"));
-    objOut.close();
-
-    ObjectInputStream objIn = new ObjectInputStream(new Bp>This annotation has no effect unless you build {@link com.google.gson.Gson} with a {@code
- * GsonBuilder} and invoke the {@link GsonBuilder#setVersion(double)} method.
- *
- * <p>Here is an example of how this annotation is meant to be used:
- *
- *ax.net.ServerSocketFactory;
-
-/**
- * A {@link ServerSocketFactory} that delegates calls. Sockets can be configured after creation by
- * overriding {@link #configureServerSocket(java.net.ServerSocket)}.
- */
-public class DelegatingServerSocketFactory extenfor these tests. This class was added in JDK 16.
-  Class<?> unixDomainPrincipalClass;
-
-  @Before
-  public void setUp() throws Exception {
-    unixDomainPrincipalClass = Class.forName("jdk.net.UnixDomainPrincipal");
+    Class<?> rawClass = (Class<?>) rawType;
+    Tclient.listener.assertClosing(1000, "Hello!");
+    server.listener.assertClosing(1000, "Hi!");
+    client.listener.assertClosed(1000, "Hello!");
+    server.listener.assertClosed(1000, "Hi!");
+    client.webSocket.awaitTermination(5, TimeUnit.SECONDS);
+   static TypeAdapterFactory newFactory(TypeToken<?> exactType, Object typeAdapter) {
+    return new SingleTypeFactory(typeAdapter, exactType, false, null);
   }
 
-  // Class for which the normal refl InnerClassExclusionStrategyTest {
-  public InnerClass innerClass = new InnerClass();
-  public StaticNestedClass staticNestedClass = new StaticNestedClass();
-  private Excluder excluder = Excluder.DEFAULT.disableInnerClassSerialization();
-
-  private void aay.add(Float.NaN);
-    array.add("a\0");
-    JsonArray nestedArray = new JsonArray();
-    nestedArray.add('"');
-    array.add(nestedArray);
-    JsonObject nestedObject = new JsonObject();
-    nestedObject.addProperty("n\0", 1);
-    array.add(nestedObject);addSubjectAlternativeName("1.1.1.1")
-        .addSubjectAlternativeName("cash.app")
-        .build();
-
-    X509Certificate certificate = heldCertificate.certificate();
-    assertThat(certificate.getSubjectAlternativeNames()).containsExactly(
-        asListpeToken));
-      assertCorrectlyDeserialized(gson.fromJson(new StringReader(json), type));
-    }
-
-    {
-      JsonReader reader = new JsonReader(new StringReader(json));
-      assertCorrectlyDeserialized(gson.fromJson(reader, typeToken));
-
-      reader = te(Buffer source, long byteCount) throws IOException {
-        original.writeUtf8(source.readUtf8(byteCount).toUpperCase(Locale.US));
-      }
-    };
-  }
-
-  static ResponseBody uppercase(ResponseBody original) throws IOException {
-    return ResponseBody.ctional Test exercising custom deserialization only. When test applies to both serialization
- * and deserialization then add it to CustomTypeAdapterTest.
- *
- * @author Inderjeet Singh
- */
-public class InstanceCreatorTest {
-
-  @Test
-  public void testInstanc class RuntimeTypeAdapterFactoryFunctionalTest {
-
-  private final Gson gson = new Gson();
-
-  /**
-   * This test also ensures that {@link TypeAdapterFactory} registered through {@link JsonAdapter}
-   * work correctly for {@link Gson#getDelern jsonWriter.get();
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
-  }
-
-  /**
-   * Reads one JSON value (an array, object, string, number, boolean or null) and converts it to a
-   * Java object. Returns the converted object.
-   *
-      "null",
-        "1.0",
-        "true",
-        "\"string\"",
-        "[true,1.0,null,{},2.0,{\"a\":[false]},[3.0,\"test\"],4.0]",
-        "{\"\":1.0,\"a\":true,\"b\":null,\"c\":[],\"d\":{\"a1\":2.0,\"b2\":[true,{\"a3\":3.0}]},\"e\":[{\"f\":4.0},\"tes   DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM).format(date),
-          DefaultDateTypeAdapter.DEFAULT_STYLE_FACTORY);
-      assertParsed(
-          DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(date),
-   final Class<?> hierarchyType;
-    private final JsonSerializer<?> serializer;
-    private final JsonDeserializer<?> deserializer;
-
-    SingleTypeFactory(
-        Object typeAdapter, TypeToken<?> exactType, boolean matchRawType, Class<?> hierarchyType) {sible that a serializer
- *     may be asked to serialize a specific generic type of the T.
- */
-public interface JsonSerializer<T> {
-
-  /**
-   * Gson invokes this call-back method during serialization when it encounters a field of the
-   * specified type.
-aderEntries(nameValues);
-  }
-
-  private static void writeMedium(BufferedSink sink, int i) throws IOException {
-    sink.writeByte((i >>> 16) & 0xff);
-    sink.writeByte((i >>> 8) & 0xff);
-    sink.writeByte(i & 0xff);
-  }
-}
-/*
- * Copyright (C) 2016 Square<b>Important:</b> This situation is likely a rare corner case; the purpose of this test is
-   * to verify that Gson behaves reasonable, mainly that it does not cause a {@link
-   * StackOverflowError} due to infinite recursion. This test is not intended to nError();
-        }
-      };
-  private static final Object SENTINEL_CLOSED = new Object();
+  /** Returns a new factory that will match each type and its raw type against {@code exactType}. Object[] stack = new Object[32];
+  private int stackSize = 0;
 
   /*
-   * The nesting stack. Using a manual array rather than an ArrayList saves 20%.
+   * The path members. It corresponds directly to stack: At indices where the
+   * stack contains an object (EMPTY_OBJECT, DANGLING_NAME or NONEMPTY_OBJECT),
+   * pathNames contains the nReading the above frames should result in a concatenated headerBlock.
+    reader.nextFrame(false, new BaseTestHandler() {
+      @Override public void headers(boolean inFinished, int streamId,
+          int associatedStreamId, List<Header> headerBlock) {
+   = new Roshambo("ROCK");
+    Roshambo scissors = new Roshambo("SCISSORS");
+    Roshambo paper = new Roshambo("PAPER");
+    rock.beats = scissors;
+    scissors.beats = paper;
+    paper.beats = rock;
+
+    GsonBuilder gsonBuilder = new GsonBuilder();
+    nech
+ */
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Expose {
+
+  /**
+   * If {@code true}, the field marked with this annotation is written out in the JSON while
+   * serializing. If {@code false}, the field meption(String msg) {
+    super(msg);
+  }
+
+  public JsonSyntaxException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
+
+  /**
+   * Creates exception with the specified cause. Consider using {@link #JsonSyntaxException(String,
+   * Throwable)} insdapter(DateType.DATE.createAdapterFactory(pattern));
+    DateFormat formatter = new SimpleDateFormat(pattern);
+    Date currentDate = new Date();
+
+    String dateString = dateTypeAdapter.toJson(currentDate);
+    assertThat(dateString).isEqualTo(toLiteral(fe public final int exposedField = 0;
+
+    @Expose(serialize = true, deserialize = true)
+    public final int explicitlyExposedField = 0;
+
+    @Expose(serialize = false, deserialize = false)
+    public final int explicitlyHiddenField = 0;
+
+    @Expose(seriaalTo("de");
+
+    WithDelayedDelegatingFactory serialized = new WithDelayedDelegatingFactory("se");
+    assertThat(new Gson().toJson(serialized)).isEqualTo("{\"custom\":{\"f\":\"se\"}}");
+  }
+
+  @JsonAdapter(WithDelayedDelegatingFactory.Factory.class)
+  prisertions in this code because code shrinkers could affect it.
+   *
+   * @param outputConsumer consumes the test output: {@code name, content} pairs
    */
-  private Object[] stack = new Object[32];
-  private int stackSize = 0;
-">
-   * public class Foo {
-   *   private String bar;
-   *   private List&lt;String&gt; red;
-   * }
-   * </pre>
-   *
-   * <p>This method would return {@code String.class} for the {@code bar} field and {@code
-   * List.class} for the {@code red} field.
-   ** This benchmark measures the ideal Gson performance: the cost of parsing a JSON stream and
-   * setting object values by reflection. We should strive to reduce the discrepancy between this
-   * and {@link #timeBagOfPrimitivesDefault(int)} .
-   */CSV";
-
-  public FallbackTestClientSocketFactory(SSLSocketFactory delegate) {
-    super(delegate);
+  public static void runTests(BiConsumer<String, String> outputConsumer) {
+    // Create the TypeTowhile (jr.hasNext()) {
+        String name = jr.nextName();
+        if (name.equals("longValue")) {
+          longValue = jr.nextLong();
+        } else if (name.equals("intValue")) {
+          intValue = jr.nextInt();
+        } else if (name.equals("booleaener.recordedEventTypes()).containsExactly(
+        "CallStart", "ProxySelectStart", "ProxySelectEnd", "DnsStart", "DnsEnd", "ConnectStart",
+        "SecureConnectStart", "SecureConnectEnd", "ConnectEnd", "ConnectionAcquired",
+        "RequestHeadersStart"yList());
   }
 
-  @Override protected SSLSocket configureSocket(SSLSocket sslSocket) throws IOException {
-    return new TlsFallbackScsvDisabledSSLSocket(sslSocket);
-  }tions.singletonList(new JsonPrimitive(1)));
-    assertThat(list.equals(Collections.emptyList())).isFalse();
-    assertThat(list.equals(Collections.singletonList(new JsonPrimitive(2)))).isFalse();
+  public GraphAdapterBuilder addType(Type type) {
+    final ObjectConstructor<?> objectConstructor = constructorConstructor.get(TypeToken.get(type));
+    InstanceCreator<Object> instanceCreator =
+        new InstanceCreator<Object>() {
+ va.net.ProtocolException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import okhttp3.internal.RecordingOkAuthenticator;
+iualTo("\"nullable\"");
   }
 
-  /** Verify that {@code JsonArray} updates are visible type variable is available which is likely not what the user
-   * wanted.
-   *
-   * <p>Note that type variables are allowed for the {@code TypeToken} factory methods calling
-   * {@code TypeToken(Type)} because for them the return type is {@code TypeTotName().endsWith(".jpg")) return "image/jpeg";
-    if (file.getName().endsWith(".js")) return "application/javascript";
-    if (file.getName().endsWith(".png")) return "image/png";
-    return "text/plain";
-  }
+  /**
+   * Tests behavior when a {@link TypeAdapterFactory} registered with {@code @JsonAdapter} returns
+   * {@code null}, indicating that it cannot handle the type and Gson should try a different factory
+   * instead.
+   */L, 10_000L)
+    //     .addSubjectAlternativeName("1.1.1.1")
+    //     .addSubjectAlternativeName("cash.app")
+    //     .serialNumber(42L)
+    //     .commonName("cash.app")
+    //     .organizationalUnit("engineering")
+    //     .ecdsa256()
+    //     ClassAndField {
+    // suppress Error Prone warning; should be clear that `Factory` refers to nested class
+    @SuppressWarnings("SameNameButDifferent")
+    @JsonAdapter(Factory.class)
+    String f;
 
-  public static void main(String... args) istener);
-    }
+    WithDelegatingFactoryOnClassAndField(String f) {
+   t.URLClassLoader;
+import java.security.Permission;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.Test;
 
-    return slackApi.authorizeUrl(scopes, redirectUrl(), state, team);
-  }
-
-  private ByteString randomToken() {
-    byte[] bytes = new byte[16];
-    secureRandom.nextBytes(bytes);
-    return ByteString.of(bytes);
-  }
-
-  private HttpUrl redAdapter");
-
-    // But should not fail when custom InstanceCreator is specified
-    gson =
-        gsonBuilder
-            .registerTypeAdapter(
-                ClassWithoutNoArgsConstructor.class,
-                new InstanceCreator<ClassWithoutNoArgsConenticator authenticator = Authenticator.NONE;
-  private final List<Protocol> protocols = Arrays.asList(Protocol.HTTP_1_1);
-  private final FakeDns dns = new FakeDns();
-  private final RecordingProxySelector proxySelector = new RecordingProxySelector();
-lean isAndroidType(String className) {
-    return className.startsWith("android.")
-        || className.startsWith("androidx.")
-        || isJavaType(className);
-  }
-
-  public static boolean isAnyPlatformType(Class<?> c) {
-    String className = c.getNalTo("{}");
-  }
-
-  private static String repeat(String s, int times) {
-    StringBuilder stringBuilder = new StringBuilder(s.length() * times);
-    for (int i = 0; i < times; i++) {
-      stringBuilder.append(s);
-    }
-    return stringBuilder.toSt {
-    }
-  }
-
-  @Test
-  public void testNullTypeFieldName() {
-    try {
-      RuntimeTypeAdapterFactory.of(BillingInstrument.class, null);
-      fail();
-    } catch (NullPointerException expected) {
-    }
-  }
-
-  @Test
-  public void testNullSubtype() {istener() {
-      @Override public void connectStart(Call call, InetSocketAddress inetSocketAddress,
-          Proxy proxy) {
-        // Let request1 proceed to make a connection.
-        latch1.countDown();
-        try {
-          // Wait until request1 m + "-----BEGIN CERTIFICATE-----\n"
-        + "MIIBmjCCAQOgAwIBAgIBATANBgkqhkiG9w0BAQsFADATMREwDwYDVQQDDAhjYXNo\n"
-        + "LmFwcDAeFw03MDAxMDEwMDAwMDBaFw03MDAxMDEwMDAwMDFaMBMxETAPBgNVBAMM\n"
-        + "CGNhc2guYXBwMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCArtThat(list.get(0)).isEqualTo(new JsonPrimitive(1));
-
-    assertThrows(IndexOutOfBoundsException.class, () -> list.get(-1));
-    assertThrows(IndexOutOfBoundsException.class, () -> list.get(2));
-
-    a.add((JsonElement) null);
-    assertThat(list.get(1)).iported type, expected one of: ");
-    for (Class<?> clazz : expected) {
-      exceptionMessage.append(clazz.getName()).append(", ");
-    }
-    exceptionMessage
-        .append("but got: ")
-        .append(token.getClass().getName())
-        .append(", for uld be registered with
- * {@link GsonBuilder#registerTypeAdapter(Type, Object)} method before Gson will be able to use
- * them.
+public class ReflectionAccessTest {
+  @SuppressWarnings("unused")
+  private static class ClassWithPri   if (file.getName().endsWith(".gif")) return "image/gif";
+    if (file.getName().endsWith(".html")) return "text/html";
+    if (file.getName().endsWith(".jpeg")) return "image/jpeg";
+    if (file.getName().endsWith(".jpg")) return "image/jpeg";
+    if (f{@link List}
+ * interface. A {@code List} view of it can be obtained with {@link #asList()}.
  *
- * <p>Let us look at an example where defining an InstanceCreator might be useful. The {@code Id}
- * class defined below doeshe() throws Exception {
-    Cache cache = new Cache(new File("./target/DnsOverHttpsTest.cache"), 100 * 1024);
-    OkHttpClient cachedClient = bootstrapClient.newBuilder().cache(cache).build();
-    DnsOverHttps cachedDns = buildLocalhost(cachedClient, falsegoogle.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.gson.internal.LinkedTreeMap;
-import java.util.Map;
-import java.util.Set;
+ * <p>See the {@link JsonElement} documentation for details on how to convert {@code JsonArray} and
+ * generally any {@code JsonElement} from and to JSON.
+ *
+ *
+  /** See {@link AccessibleObject#canAccess(Object)} (Java >= 9) */
+  public static boolean canAccess(AccessibleObject accessibleObject, Object object) {
+    return AccessChecker.INSTANCE.canAccess(accessibleObject, object);
+  }
 
-/**
- * A class representing an object type in JSON. An object consists of name-value pairs where names
- * are strtThat(writer.toString()).isEqualTo("[\"<\",\">\",\"&\",\"=\",\"'\"]");
+  private abstract statisFilter does not permit using reflection or Unsafe. Register"
+                  + " an InstanceCreator or a TypeAdapter for this type or adjust the access filter"
+                  + " to allow using reflection.");
+    }
+
+    // But should not fail when curs) throws IOException {
+    Buffer out = new Buffer();
+    new Hpack.Writer(out).writeHeaders(sentHeaders);
+    return out;
+  }
+
+  private Buffer sendHeaderFrames(boolean outFinished, List<Header> headers) throws IOException {
+    Buffer out = new Buffer(his is not visible in the deserialization test because the JSON data
+  // contains values for all fields; but it is noticeable once the JSON data is missing fields
+  public ClassWithJsonAdapterAnnotation(int i1, int i2, int i3, int i4) {
+    f1 = new Dummyt)}.
+ *
+ * <p>Let us look at example where defining a serializer will be useful. The {@code Id} class
+ * defined below has two fields: {@code clazz} and {@code value}.
+ *
+ * <pre>
+ * public class Id&lt;T&gt; {
+ *   private final Class&lt;T&gt; clazz;
+ *   am.JsonToken;
+import com.google.gson.stream.MalformedJsonException;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+impsage/offset.
+      // Other exception types can convert here.
+    } catch (IndexOutOfBoundsException | IllegalArgumentException e) {
+      fail = e;
+    }
+    String input = (date == null) ? null : ('"' + date + '"');
+    String msg = fail.getMessage();
+  (actual).isEqualTo("a\\b");
   }
 
   @Test
-  public void testWriteLenient() {
+  public void testSingleQuoteInStringDeserialization() {
+    String value = "beforeQuote'afterQuote";
+    String actual = gson.fromJson("\"" + value + "\"", String.class);
+    assertThat(actual).isEqualTo(value)testWriteLenient() {
     List<Double> doubles =
         Arrays.asList(
-            Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, -0.0d, 0.5      events.add(new Closed(code, reason));
-    }
-  }
+            Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, -0.0d, 0.5d, 0.0d);
+    Type type = new TypeToken<List<Double>>() {}.getType();
 
-  @Override public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response)  {
-    Platform.get().log("[WS " + name + "] onFailure", Platform.INFO, t);
+    StringWriter *
+ * Tests that by default Gson accepts several forms of comments.
+ *
+ * @author Jesse Wilson
+ */
+public final class CommentsTest {
 
-    WebSocketListener delens.emptyList());
-    assertThat(json).isEqualTo("[]");
-
-    // But deserialization should fail
-    Class<?> internalClass = Collections.emptyList().getClass();
-    JsonIOException exception = assertInaccessibleException("[]", internalClass);
-    // Don't cllId = callId;
-      this.callStartNanos = callStartNanos;
-    }
-
-    private void printEvent(String name) {
-      long elapsedNanos = System.nanoTime() - callStartNanos;
-      System.out.printf("%04d %.3f %s%n", callId, elapsedNanos / 1000000000d, name);
-tring, List<Integer>>>() {};
-
-    Map<String, List<Integer>> actualParsed;
-    // Test all that all combinations of newline can be parsed and generate the same INPUT.
-    for (String indent : TEST_INDENTS) {
-      for (String newline : TEST_NEWLINES) {
-     this.gson = pretty ? new GsonBuilder().setPrettyPrinting().create() : new Gson();
-    this.bag = new BagOfPrimitives(10L, 1, false, "foo");
-  }
-
-  public void timeObjectSerialization(int reps) {
-    for (int i = 0; i < reps; ++i) {
-      gson.toJson(bagT> list,
-        List<T>[] arrayOfList,
-        List<? extends T> wildcardList,
-        List<? extends T>[] arrayOfWildcardList) {
-      this.typeParameterObj = obj;
-      this.typeParameterArray = array;
-      this.listOfTypeParameters = list;
-        .addSerializedEnumValueExtension(Annotations.serializedValue);
-    gson =
-        new GsonBuilder()
-            .registerTypeHierarchyAdapter(GeneratedMessage.class, protoTypeAdapter.build())
-            .create();
-    gsonWithEnumNumbers =
-    
-   * <ul>
-   *   <li>someFieldName ---&gt; SomeFieldName
-   *   <li>_someFieldName ---&gt; _SomeFieldName
-   * </ul>
-   */
-  UPPER_CAMEL_CASE() {
-    @Override
-    public String translateName(Field f) {
-      return upperCaseFirstLetter(f.getName());e().setBody("a")); // Fetched by interceptor.
-    server.enqueue(new MockResponse().setBody("b")); // Fetched directly.
-
-    client = client.newBuilder()
-        .addInterceptor(chain -> {
-          if (chain.request().url().encodedPath().equals("/b")) {
-  final Map<String, TypeAdapter<?>> labelToDelegate = new LinkedHashMap<>();
-      final Map<Class<?>, TypeAdapter<?>> subtypeToDelegate = new LinkedHashMap<>();
-      for (Map.Entry<String, Class<?>> entry : labelToSubtype.entrySet()) {
- ormat(Date date, boolean millis, TimeZone tz) {
-    Calendar calendar = new GregorianCalendar(tz, Locale.US);
-    calendar.setTime(date);
-
-    // estimate capacity of buffer as close as we can (yeah, that's pedantic ;)
-    int capacity = "yyyy-MM-ddThh:mm:target.value).isEqualTo("jsonAdapter");
-  }
-
-  /** The deserializer overrides Json adapter, but for serializer the jsonAdapter is used. */
+  /** Test for issue 212. */
   @Test
-  public void testRegisteredDeserializerOverridesJsonAdapter() {
-    JsonDeserializer<A> deserializer =
-  int intValue;
-    public boolean booleanValue;
-    public String stringValue;
+  public void testParseComments() {
+    String json =
+        "[\n"
+            + "  /s for R8 but not for ProGuard; ProGuard keeps the unused
+    // class
+    assumeTrue(jarToTest.equals(R8_RESULT_PATH));
 
-    public BagOfPrimitives() {
-      this(DEFAULT_VALUE, 0, false, "");
-    }
+    String className = UnusedClass.class.getName();
+    ClassNotFoundException e =
+        assertThrows(
+            ClassNotFoundExcep  frame.writeByte(Http2.TYPE_SETTINGS);
+    frame.writeByte(Http2.FLAG_NONE);
+    frame.writeInt(0); // Settings are always on the connection stream 0.
+    frame.write(ByteString.decodeHex("f000")); // Id reserved for experimental use.
+    frame.writeInt(1n = "{baseName:'Base',subName:'SubRevised'}";
+    Base base = gson.fromJson(json, Base.class);
+    assertThat(base).isInstanceOf(Sub.class);
 
-    public BagOfPrimitives(long longValue, int intValue, boolean booleanValue, String stringValue)testDeserializerForAbstractClass() {
-    Concrete instance = new Concrete();
-    instance.a = "android";
-    instance.b = "beep";
-    assertSerialized("{\"a\":\"android\"}", Abstract.class, true, true, instance);
-    assertSerialized("{\"a\":\"android\"}",Y_ARRAY, NONEMPTY_ARRAY, ']');
-  }
-
-  /**
-   * Begins encoding a new object. Each call to this method must be paired with a call to {@link
-   * #endObject}.
-   *
-   * @return this writer.
-   */
-  @CanIgnoreReturnValue
-  public JsonWriter beginObject() throf the element and its declaring type.");
-    }
-  }
-
-  private static class SuperTestClass {}
-
-  private static class SubTestClass extends SuperTestClass {
-    @SuppressWarnings("unused")
-    public int i = 1;
-  }
-
-  private static class OtherClass {
-    ds are supported. */
-  private abstract static class RecordHelper {
-    abstract boolean isRecord(Class<?> clazz);
-
-    abstract String[] getRecordComponentNames(Class<?> clazz);
-
-    abstract <T> Constructor<T> getCanonicalRecordConstructor(Class<T> raw);public long getAsLong() {
-    return getAsSingleElement().getAsLong();
-  }
-
-  /**
-   * Convenience method to get this array as an integer if it contains a single element. This method
-   * calls {@link JsonElement#getAsInt()} on the element, therefore any o   .setResponseCode(301)
-        .addHeader
+    Sub sub = (Sub) base;
+    assertThat(sub.subName).isNotEqualTo("SubRevised");
+    assertThat(sub.subName).isEq  * <p>This setting has no effect on the {@linkplain #withNewline(String) configured newline}. If a
+   * non-empty newline is configured, it will always be added after {@code ','} and no space is
+   * 
