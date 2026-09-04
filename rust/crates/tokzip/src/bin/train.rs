@@ -104,16 +104,14 @@ fn main() {
             .collect();
         let mut part = Vec::new();
         if group.shared_budget() > 0 && !members.is_empty() {
-            let pooled = pool(&members, |i| Some(&docs_by_language[i]));
+            let pooled = pool(&members, |i| &docs_by_language[i]);
             // Every member weighs in on the shared part's statistics: its scoring blend when
             // it has one, its own documents otherwise.
             let scoring_pool = scoring_corpus.as_ref().map(|_| {
                 pool(&members, |i| {
-                    Some(
-                        scoring_by_language[i]
-                            .as_ref()
-                            .unwrap_or(&docs_by_language[i]),
-                    )
+                    scoring_by_language[i]
+                        .as_ref()
+                        .unwrap_or(&docs_by_language[i])
                 })
             });
             part = tokzip::train::train_dictionary(
@@ -202,21 +200,14 @@ fn main() {
 /// The members' documents interleaved (the member order rotating per round, so the trainer's
 /// fixed-stride held-out selection does not land on the same members every round), up to the
 /// trainer's input bound, which is all it reads.
-fn pool<'a>(
-    members: &[usize],
-    docs_of: impl Fn(usize) -> Option<&'a Vec<Vec<u8>>>,
-) -> Vec<Vec<u8>> {
-    let longest = members
-        .iter()
-        .filter_map(|&i| docs_of(i).map(Vec::len))
-        .max()
-        .unwrap_or(0);
+fn pool<'a>(members: &[usize], docs_of: impl Fn(usize) -> &'a Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+    let longest = members.iter().map(|&i| docs_of(i).len()).max().unwrap_or(0);
     let mut pooled: Vec<Vec<u8>> = Vec::new();
     let mut pooled_bytes = 0usize;
     'pool: for round in 0..longest {
         for m in 0..members.len() {
             let i = members[(round + m) % members.len()];
-            if let Some(doc) = docs_of(i).and_then(|docs| docs.get(round)) {
+            if let Some(doc) = docs_of(i).get(round) {
                 pooled.push(doc.clone());
                 pooled_bytes += doc.len();
                 if pooled_bytes >= tokzip::train::MAX_DICT_TRAIN_BYTES {

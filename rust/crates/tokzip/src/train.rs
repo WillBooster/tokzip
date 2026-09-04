@@ -105,12 +105,14 @@ pub fn train_dictionary(
     let sample = scored.as_deref().unwrap_or(&content);
     let mut validation = Vec::new();
     let mut validation_bytes = 0usize;
+    let mut held_out: std::collections::HashSet<&[u8]> = std::collections::HashSet::new();
     let mut fit: Vec<&[u8]> = Vec::new();
     for (i, doc) in sample.iter().enumerate() {
         if i % 10 == 0 && validation_bytes < MAX_VALIDATION_BYTES {
             let take = doc.len().min(MAX_VALIDATION_BYTES - validation_bytes);
             validation.push(doc[..take].to_vec());
             validation_bytes += take;
+            held_out.insert(doc);
         } else {
             fit.push(doc);
         }
@@ -118,24 +120,21 @@ pub fn train_dictionary(
     let lit_classes = train_lit_classes(validation.iter().map(Vec::as_slice));
     let (fit_data, fit_lens) = concat(&fit);
     let (content_data, content_lens) = concat(&content);
-    // The sweep's candidates exclude the held-out documents (scoring documents may include
-    // content documents), so no candidate dictionary is cut from a document it is scored on.
-    let held_out: std::collections::HashSet<&[u8]> = validation.iter().map(Vec::as_slice).collect();
-    let candidates: Vec<&[u8]> = content
-        .iter()
-        .copied()
-        .filter(|doc| !held_out.contains(doc))
-        .collect();
-    let (candidate_data, candidate_lens) = concat(&candidates);
+    // With scoring documents (which may include content documents) the sweep's candidates
+    // exclude the held-out documents, so no candidate dictionary is cut from a document it
+    // is scored on; without them the fit documents already leave the held-out ones out.
+    let candidates = scored.as_ref().map(|_| {
+        let candidates: Vec<&[u8]> = content
+            .iter()
+            .copied()
+            .filter(|doc| !held_out.contains(doc))
+            .collect();
+        concat(&candidates)
+    });
     let (sweep_data, sweep_lens, sweep_scoring): (&[u8], &[usize], Option<Corpus>) =
-        if scored.is_some() {
-            (
-                &candidate_data,
-                &candidate_lens,
-                Some((&fit_data, &fit_lens)),
-            )
-        } else {
-            (&fit_data, &fit_lens, None)
+        match &candidates {
+            Some((data, lens)) => (data, lens, Some((&fit_data, &fit_lens))),
+            None => (&fit_data, &fit_lens, None),
         };
     let mut best: Option<(usize, usize)> = None; // (cost, k)
     for k in SEGMENT_SIZES {
