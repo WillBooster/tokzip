@@ -89,10 +89,16 @@ fn main() {
             Some(blended)
         })
         .collect();
-    if scoring_corpus.is_some() {
-        assert!(
-            scoring_by_language.iter().any(Option::is_some),
-            "the scoring corpus holds no language with at least {MIN_SCORING_BYTES} bytes"
+    // A scoring corpus too small to score any language (a fresh or partial checkout, which
+    // the train script passes automatically) is a warning, not an error: training then
+    // proceeds on public statistics alone, as without one.
+    if let Some(dir) = scoring_corpus
+        .as_ref()
+        .filter(|_| scoring_by_language.iter().all(Option::is_none))
+    {
+        eprintln!(
+            "warning: {} holds no language with at least {MIN_SCORING_BYTES} bytes; training on public statistics only",
+            dir.display()
         );
     }
     // A group's shared part is trained on its languages' documents interleaved, so every
