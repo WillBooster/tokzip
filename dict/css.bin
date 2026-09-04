@@ -1,43 +1,8 @@
-adding-right: calc(var(--#{$prefix}gutter-x) * .5); // stylelint-disable-line function-disallowed-list
-  padding-left: calc(var(--#{$prefix}gutter-x) * .5); // stylelint-disable-line function-disallowed-list
-  margin-right: auto;
-  margin-left: auto;
-}
-eight: var(--#{$prefix}badge-font-weight);
-  line-height: 1;
-  color: var(--#{$prefix}badge-color);
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  @include border-radius(var(--#{$prefix}badge-border-radius));
-  @include gradie};
-  --#{$prefix}list-group-active-color: #{$list-group-active-color};
-  --#{$prefix}list-group-active-bg: #{$list-group-active-bg};
-  --#{$prefix}list-group-active-border-color: #{$list-group-active-border-color};
-  // scss-docs-end list-group-css-vars
-
-  horizontal.
-
-@each $breakpoint in map-keys($grid-breakpoints) {
-  @include media-breakpoint-up($breakpoint) {
-    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-
-    .list-group-horizontal#{$infix} {
-      flex-direction: row;
-
-      > .list-gr-bg);
-  border: var(--#{$prefix}list-group-border-width) solid var(--#{$prefix}list-group-border-color);
-
-  &:first-child {
-    @include border-top-radius(inherit);
-  }
-
-  &:last-child {
-    @include border-bottom-radius(inherit);
-  }
-
-  &.disabled,
-  &:divar(--bulma-text-strong);
+r};
+  --#{$prefix}gutter-y: 0;
+  width: 100%;
+  padding-right: calc(var(--#{$prefix}gutter-x) * .5); // stylelint-disable-line function-disallowed-list
+  padding-left: calc(var(--#{$prefix}gutter-x) * .5); // stylelint-disable-line function-disallowed-listlma-text-strong);
     }
   }
 
@@ -53,38 +18,37 @@ $delay: 0.2s;
 
 .bd-home-intro {
   --scale: 1;
-  align-items: stret*/
-@charset "utf-8";
+  align-items: stretch;
+  dist group items from vertical (default) to horizontal.
 
-@forward "aspect-ratio";
-@forward "border";
-@forward "color";
-@forward "flexbox";
-@forward "float";
-@forward "gap";
-@forward "overflow";
-@forward "position";
-@forward "spacing";
-@forward "typography";
-@forward "visibility";
-@forward " {
-    z-index: 2;
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .list-group-horizontal#{$infix} {
+    -bg);
+  border: var(--#{$prefix}list-group-border-width) solid var(--#{$prefix}list-group-border-color);
+
+  &:first-child {
+    @include border-top-radius(inherit);
   }
 
-  &:focus {
-    z-index: 3;
-    outline: 0;
-    box-shadow: var(--#{$prefix}accordion-btn-focus-box-shadow);
+  &:last-child {
+    @include border-bottom-radius(inherit);
   }
-}
 
-.accordion-header {
-  margin-bottom: 0;
-}
+  &.disabled,
+  &:di// scss-docs-end badge-css-vars
 
-.accordion-item {
-  color: var(--#{$prefix}accordion-color);
-  backgfault;
+  display: inline-block;
+  padding: var(--#{$prefix}badge-padding-y) var(--#{$prefix}badge-padding-x);
+  @include font-size(var(--#{$prefix}badge-font-size));
+  font-weight: var(--#{$prefix}badge-font-weight);
+  line-heightd-bg: #{$list-group-disabled-bg};
+  --#{$prefix}list-group-active-color: #{$list-group-active-color};
+  --#{$prefix}list-group-active-bg: #{$list-group-active-bg};
+  --#{$prefix}list-group-active-border-color: #{$list-group-active-border-color};
+  // scssault;
 
 @import "functions";
 @import "variables";
@@ -99,103 +63,55 @@ $delay: 0.2s;
 @import "vendor/rfs";
 
 @import "containers";
-@import e) {
-  @if $enable-rounded {
-    border-radius: valid-radius($radius);
-  }
-  @else if $fallback-border-radius != false {
-    border-radius: $fallback-border-radius;
-  }
+@import "or: hsl(
+    cv.getVar("text-h"),
+    cv.getVar("text-s"),
+    cv.getVar("text-title-l")
+  );
+  font-size: calc(var(--scale) * 4rem);
+  font-weight: 800;
+  line-height: 1.125;
+  transform-origin: bottom center;
 }
 
-@mixin border-top-radius($radius: $border-radius) {
-  @if $enable-rounded {
-    borion-mixin
-@mixin pagination-size($padding-y, $padding-x, $font-size, $border-radius) {
-  --#{$prefix}pagination-padding-x: #{$padding-x};
-  --#{$prefix}pagination-padding-y: #{$padding-y};
-  @include rfs($font-size, --#{$prefix}pagination-font-size);
-  --#ttom-start-radius(0);
-        }
+.bd-home-tagline {
+  @extend %anim-3d;
+  avbar-s": #{cv.getVar($name, "", "-s")},
+          "navbar-l": #{cv.getVar($name, "", "-l")},
+          "burger-h": #{cv.getVar($name, "", "-h")},
+          "burger-s": #{cv.getVar($name, "", "-s")},
+          "burger-l": #{cv.getVar($name, "", "-invert*/
+@charset "utf-8";
 
-        &.active {
-          margin-top: 0;
-        }
-
-        + .list-group-item {
-          border-top-width: var(--#{$prefix}list-group-border-width);
-          border-left-width: 0;
-
-          &.active {
-            marwn-boxed-radius: cv.getVar("radius-large") !default;
-$navbar-dropdown-boxed-shadow:
-  0 0.5em 0.5em
-    hsla(
-      #{cv.getVar("scheme-h")},
+@forward "aspect-ratio";
+@forward "border";
+@forward "color";
+@forward "flexbox";
+@forward "float";
+@forward "gap";
+@forward "overflow";
+@forward "position";
+@forward "spacing";
+@forward "typography";
+@forward "visibility";
+@forward "eme-h")},
       #{cv.getVar("scheme-s")},
       #{cv.getVar("scheme-invert-l")},
       0.1
     ),
   0 0 0 1px
     hsla(
-    avbar-s": #{cv.getVar($name, "", "-s")},
-          "navbar-l": #{cv.getVar($name, "", "-l")},
-          "burger-h": #{cv.getVar($name, "", "-h")},
-          "burger-s": #{cv.getVar($name, "", "-s")},
-          "burger-l": #{cv.getVar($name, "", "-invertcordion-css-vars
-}
+      #{cv.getVar("scheme-h")},
+      #{cv.getVar("scheme-s")},
+      #{cv.getVar("scheme-invert-l")},
+      0.1
+    ) !default;
 
-.accordion-button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: var(--#{$prefix}accordion-btn-padding-y) var(--#{$prefix}accordion-btn-padding-x);
-  @include font-size($font-size-base);
-  colprefix}#{$state}-text-emphasis);
-  }
-}
-// scss-docs-end list-group-modifiers
-// Utilities
-
-$utilities: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
-$utilities: map-merge(
-  (
-    // scss-docs-start utils-vertical-align
-    "aligsplay: grid;
-    grid-template-rows: repeat(var(--#{$prefix}rows, 1), 1fr);
-    grid-template-columns: repeat(var(--#{$prefix}columns, #{$grid-columns}), 1fr);
-    gap: var(--#{$prefix}gap, #{$grid-gutter-width});
-
-    @include make-cssgrid();
-  }
-}
-
-
-// Cnavbar-item-selected-h: cv.getVar("link-h");
-$navbar-item-selected-s: cv.getVar("link-s");
-$navbar-item-selected-l: cv.getVar("link-l");
-$navbar-item-selected-background-l: cv.getVar("link-l");
-$navbar-item-selected-color-l: cv.getVar("link-invert-l");
-$xtend %bd-animated;
-  animation-name: anim-grow;
-  animation-duration: 1s;
-  border: 1px dashed cv.getVar("border");
-  // box-shadow:
-  //   0 0 4em hsla(var(--h), var(--s), var(--l), var(--a)),
-  //   inset 0 0 4em hsla(var(--h), var(--s), var(--l), var(hover-border: if($color == $color-contrast-light, shade-color($border, $btn-hover-border-shade-amount), tint-color($border, $btn-hover-border-tint-amount)),
-  $hover-color: color-contrast($hover-background),
-  $active-background: if($color == $color-contra utils-shadow
-    "shadow": (
-      property: box-shadow,
-      class: shadow,
-      values: (
-        null: var(--#{$prefix}box-shadow),
-        sm: var(--#{$prefix}box-shadow-sm),
-        lg: var(--#{$prefix}box-shadow-lg),
-        none: none,
-  uto;
+$naing-y, $padding-x, $font-size, $border-radius) {
+  --#{$prefix}pagination-padding-x: #{$padding-x};
+  --#{$prefix}pagination-padding-y: #{$padding-y};
+  @include rfs($font-size, --#{$prefix}pagination-font-size);
+  --#{$prefix}pagination-border-radius: #{$uto;
   flex-direction: column;
   align-self: stretch;
 }
@@ -229,7 +145,178 @@ $xtend %bd-animated;
 
 
 .lead {
-  @i }
+  @i-item-background-l-delta: 0%;
+$navbar-item-hover-background-l-delta: cv.getVar("hover-background-l-delta");
+$navbar-item-active-background-l-delta: cv.getVar("active-background-l-delta");
+$navbar-item-color-l: cv.getVar("text-l");
+$navbar-item-selected-h: width: 0 0 var(--#{$prefix}list-group-border-width);
+
+    &:last-child {
+      border-bottom-width: 0;
+    }
+  }
+}
+
+
+// scss-docs-start list-group-modifiers
+// List group contextual variants
+//
+// Add modifier classes to change text and background color onover-border: if($color == $color-contrast-light, shade-color($border, $btn-hover-border-shade-amount), tint-color($border, $btn-hover-border-tint-amount)),
+  $hover-color: color-contrast($hover-background),
+  $active-background: if($color == $color-contras}
+
+  &:hover {
+    z-index: 2;
+  }
+
+  &:focus {
+    z-index: 3;
+    outline: 0;
+    box-shadow: var(--#{$prefix}accordion-btn-focus-box-shadow);
+  }
+}
+
+.accordion-header {
+  margin-bottom: 0;
+}
+
+.accordion-item {
+  color: var(--#{$prefix}accordion-color)xtend %bd-animated;
+  animation-name: anim-grow;
+  animation-duration: 1s;
+  border: 1px dashed cv.getVar("border");
+  // box-shadow:
+  //   0 0 4em hsla(var(--h), var(--s), var(--l), var(--a)),
+  //   inset 0 0 4em hsla(var(--h), var(--s), var(--l), var(olor": #{$navbar-background-color},
+      "navbar-box-shadow-size": #{$navbar-box-shadow-size},
+      "navbar-box-shadow-color": #{$navbar-box-shadow-color},
+      "navbar-padding-vertical": #{$navbar-padding-vertical},
+      "navbar-padding-horizontal": #{
+    @extend .bs-tooltip-top;
+  }
+  &[data-popper-placement^="right"] {
+    @extend .bs-tooltip-end;
+  }
+  &[data-popper-placement^="bottom"] {
+    @extend .bs-tooltip-bottom;
+  }
+  &[data-popper-placement^="left"] {
+    @extend .bs-tooltip-start;
+  }
+}y $input-padding-x;
+    margin: (-$input-padding-y) (-$input-padding-x);
+    margin-inline-end: $input-padding-x;
+    color: $form-file-button-color;
+    @include gradient-bg($form-file-button-bg);
+    pointer-events: none;
+    border-color: inherit;
+    bude mx.mobile {
+    @include cell-properties("-mobile");
+  }
+
+  @include mx.tablet {
+    @include cell-properties("-tablet");
+  }
+
+  @include mx.tablet-only {
+    @include cell-properties("-tablet-only");
+  }
+
+  @include mx.desktop {
+    @include cell-prop.
+  flex: 1 1 auto;
+  padding: var(--#{$prefix}modal-padding);
+}
+
+// Footer (for actions)
+.modal-footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center; // vertically center
+  justify-content: flex-end; // Right align buttons 
+}
+// scss-docs-end list-group-modifiers
+// Utilities
+
+$utilities: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$utilities: map-merge(
+  (
+    // scss-docs-start utils-vertical-align
+    "align": (
+      property: vertical-align{
+    ol,
+    ul {
+      justify-content: flex-end;
+    }
+  }
+
+  // Sizes
+  &.#{iv.$class-prefix}is-small {
+    font-size: cv.getVar("size-small");
+  }
+
+  &.#{iv.$class-prefix}is-medium {
+    foh 0
+@function valid-radius($radius) {
+  $return: ();
+  @each $value in $radius {
+    @if type-of($value) == number {
+      $return: append($return, max($value, 0));
+    } @else {
+      $return: append($return, $value);
+    }
+  }
+  @return $return;
+}
+
+// sc;
+
+.#{iv.$helpers-prefix}display-none,
+.#{iv.$helpers-prefix}hidden {
+  display: none !important;
+}
+
+$displays: block flex inline inline-block inline-flex grid;
+
+@each $display in $displays {
+  .#{iv.$helpers-prefix}display-#{$display},
+  .#{iv.$helpers-prow-span": 1,
+    )
+  );
+
+  @extend %block;
+  display: grid;
+  gap: cv.getVar("grid-gap");
+  column-gap: #{cv.getVarWithBackup("grid-column-gap", "grid-gap")};
+  row-gap: #{cv.getVarWithBackup("grid-row-gap", "grid-gap")};
+  grid-template-columns: repeat(
+   @if $enable-rounded {
+    border-top-left-radius: valid-radius($radius);
+    border-bottom-left-radius: valid-radius($radius);
+  }
+}
+
+@mixin border-top-start-radius($radius: $border-radius) {
+  @if $enable-rounded {
+    border-top-left-radius: valid-jgthms/bulma */
+@forward "../sass/utilities";
+@forward "../sass/base";
+@forward "../sass/elements";
+@forward "../sass/form";
+@forward "../sass/components";
+@forward "../sass/grid";
+@forward "../sass/layout";
+@forward "../sass/base/skeleton";
+@lities/derived-variables" as dv;
+@use "../utilities/extends";
+@use "../utilities/mixins" as mx;
+
+$navbar-h: cv.getVar("scheme-h");
+$navbar-s: cv.getVar("scheme-s");
+$navbar-l: cv.getVar("scheme-main-l");
+$navbar- }
   50% {
     opacity: 1;
     transform: none;
@@ -241,57 +328,71 @@ $xtend %bd-animated;
   // scss-docs-start spinner-grow-css-vars
   --#{$prefix}spinner-width: #{$spinner-width};
   --#{$prefix}spinner-height: #{$spinner-height};
-  --dding: $input-padding-y $input-padding-x;
-  font-family: $input-font-family;
-  @include font-size($input-font-size);
-  font-weight: $input-font-weight;
+  --t: $input-font-weight;
   line-height: $input-line-height;
   color: $input-color;
-  appearance: none; // Fix appearance for date mx;
+  appearance: none; // Fix appearance for date inputs in Safari
+  background-color: $input-bg;
+  background-clip: padding-box;
+  border: $input-border-width solid $input-borde      lighter: $font-weight-lighter,
+        light: $font-weight-light,
+        normal: $font-weight-normal,
+        medium: $font-weight-medium,
+        semibold: $font-weight-semibold,
+        bold: $font-weight-bold,
+        bolder: $font-weight-bolder
+mn;
+  min-width: 0; // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
+  height: var(--#{$prefix}card-height);
+  color: var(--#{$prefix}body-color);
+  word-wrap: break-word;
+  background-color: var(--#{$prefix}card-bg);
+  bac      "section-padding": #{$section-padding},
+      "section-padding-desktop": #{$section-padding-desktop},
+      "section-padding-medium": #{$section-padding-medium},
+      "section-padding-large": #{$section-padding-large},
+    )
+  );
+  padding: cv.gehrough 12 {
+    .#{iv.$class-prefix}columns.#{iv.$class-prefix}is-mobile
+      > &.#{iv.$class-prefix}is-#{$i} {
+      flex: none;
+      width: calc(
+        math.percentage(math.div($i, 12)) - calc(#{cv.getVar("column-gap")} / 2)
+      );
+    }
 
-$navbar-h: cv.getVar("scheme-h");
-$navbar-s: cv.getVar("scheme-s");
-$navbar-l: cv.getVar("scheme-main-l");
-$navbar-lities/derived-variables" as dv;
-@use "../utilities/initial-variables" as iv;
-@use "../utilities/extends";
-@use "../utilities/mixins" as mx;
+    .#{ivflow-anchor: none;
+  @include transition(var(--#{$prefix}accordion-transition));
 
-$column-gap: 0.75rem !default;
+  &:not(.collapsed) {
+    color: var(--#{$prefix}accordion-active-color);
+    background-color: var(--#{$prefix}accordion-active-bg);
+    box-shadow: inset 0 calc(-1 * var(--}
 
-:root {
-  @include cv.register-vars(
-    (
-      "column-gap": #{$column-gap},
-   rfix
-@mixin clearfix() {
-  &::after {
-    display: block;
-    clear: both;
-    content: "";
+  &.is-modern {
+    --h: 220;
+    --bg: var(--grad-blue);
+    --icon: #{cv.getVar("info-50")};
   }
+
+  &.is-easy {
+    --h: 160;
+    --bg: var(--grad-green);
+    --icon: #{cv.getVar("success")};
+  }
+
+  &.is-free {
+    --h: 348;
+    --s: 6%;
+    --bg: varn-active-shadow: #{$btn-active-box-shadow};
+  --#{$prefix}btn-disabled-color: #{$disabled-color};
+  --#{$prefix}btn-disabled-bg: #{$disabled-background};
+  --#{$prefix}btn-disabled-border-color: #{$disabled-border};
 }
-// scss-docs-end clearfix
-//
-// Rotating border
-//
+// scss-docs-end btn-variant-mixin
 
-.spinner-grow,
-.spinner-border {
-  display: inline-block;
-  width: var(--#{$prefix}spinner-width);
-  heigh;
-
-.#{iv.$helpers-prefix}display-none,
-.#{iv.$helpers-prefix}hidden {
-  display: none !important;
-}
-
-$displays: block flex inline inline-block inline-flex grid;
-
-@each $display in $displays {
-  .#{iv.$helpers-prefix}display-#{$display},
-  .#{iv.$helpers-prheight-sm};
+//height-sm};
 }
 
 @if $enable-reduced-motion {
@@ -307,58 +408,50 @@ $displays: block flex inline inline-block inline-flex grid;
 //
 
 .accordion {
-  //or: hsl(
-    cv.getVar("text-h"),
-    cv.getVar("text-s"),
-    cv.getVar("text-title-l")
-  );
-  font-size: calc(var(--scale) * 4rem);
-  font-weight: 800;
-  line-height: 1.125;
-  transform-origin: bottom center;
+  //s-one-quarter {
+    flex: none;
+    width: 25%;
+  }
+
+  .#{iv.$class-prefix}columns.#{iv.$class-prefix}is-mobile
+    > &.#{iv.$class-prefix}is-one-fifth {
+    flex: none;
+    width: 20%;
+  }
+
+  .#{iv.$class-prefix}columns.#{iv.$class-prefix}is-mobile
+    >    @if $enable-rounded {
+        &:not(:last-child) {
+          @include border-end-radius(0);
+
+          .card-img-top,
+          .card-header {
+            // stylelint-disable-next-line property-disallowed-list
+            border-top-right-radius: 0;
+  .bd-tw-action {
+  margin-right: 1.25em;
 }
 
-.bd-home-tagline {
-  @extend %anim-3d;
-  ke up as much space as possible
-  // when there should be a fixed height on `.modal-dialog`.
-  flex: 1 1 auto;
-  padding: var(--#{$prefix}modal-padding);
-}
-
-// Footer (for actions)
-.modal-footer {
+.bd-tw-action-link {
+  align-items: center;
+  color: var(--bulma-text);
   display: flex;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  ali] {
-    @extend .bs-tooltip-top;
-  }
-  &[data-popper-placement^="right"] {
-    @extend .bs-tooltip-end;
-  }
-  &[data-popper-placement^="bottom"] {
-    @extend .bs-tooltip-bottom;
-  }
-  &[data-popper-placement^="left"] {
-    @extend .bs-tooltip-start;
-  }
-}}
+  height: 1.25em;
+  min-width: 1.25em;
 }
 
-.#{iv.$class-prefix}grid {
-  @include cv.register-vars(
-    (
-      "grid-gap": $grip-gap,
-      "grid-column-min": 9rem,
-      "grid-cell-column-span": 1,
-      "grid-cell-row-span": 1,
-    )
-  );
+.bd-tw-icon {
+  background-size: contain;
+  height: 1.25em;
+  width: 1.25em;
+}
 
-  @extend %block;
-  display: grid;
-  gap: cv.geal-sm {
+.bl-width);
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .modal-sm {
     --#{$prefix}modal-width: #{$modal-sm};
   }
 }
@@ -370,141 +463,56 @@ $displays: block flex inline inline-block inline-flex grid;
   }
 }
 
-@include media-breakpoint-up(xl) {
-  .modal-xl {
-    --#{$prefix}modal-width: #{$modalable {
-  height: calc(100% - var(--#{$prefix}modal-margin) * 2);
-
-  .modal-content {
-    max-height: 100%;
-    overflow: hidden;
+@includ("size-medium");
   }
 
-  .modal-body {
-    overflow-y: auto;
+  &.#{iv.$class-prefix}is-large {
+    font-size: cv.getVar("size-large");
+  }
+
+  // Colors
+  @each $name, $components in $message-colors {
+    &.#{iv.$class-prefix}is-#{$namrs: dv.$colors !default;
+
+.#{iv.$class-prefix}message {
+  @include cv.register-vars(
+    (
+      "message-border-l-delta": #{$message-border-l-delta},
+      "message-radius": #{$message-radius},
+      "message-header-weight": #{$message-header-weight},
+   as mx;
+
+$max-column-count: 12;
+$grip-gap: 0.75rem;
+$column-min-base: 1.5rem;
+
+@mixin fixed-grid-properties($suffix: "") {
+  @for $i from 1 through $max-column-count {
+    &.#{iv.$class-prefix}has-#{$i}-cols#{$suffix} {
+      > .#{iv.$class-prefix}grid {
+  -radius};
+}
+// scss-docs-end btn-size-mixin
+// scss-docs-start clearfix
+@mixin clearfix() {
+  &::after {
+    display: block;
+    clear: both;
+    content: "";
   }
 }
+// scss-docs-end clearfix
+//
+// Rotating border
+//
 
-.modal-dialog-centered {
-  display: flex;
-  align-items: center;
-  min-height1rem !important;
-        }
-
-        .font-size-large {
-          font-size: 1.25rem !important;
-        }
-
-        @media (min-width: 333px) {
-          .padding-sm-1rem {
-            padding: 1rem !important;
-          }
-        }
-
-        @media (min-widjgthms/bulma */
-@forward "../sass/utilities";
-@forward "../sass/base";
-@forward "../sass/elements";
-@forward "../sass/form";
-@forward "../sass/components";
-@forward "../sass/grid";
-@forward "../sass/layout";
-@forward "../sass/base/skeleton";
-@rse column-reverse
-    ),
-    "flex-grow": (
-      responsive: true,
-      property: flex-grow,
-      class: flex,
-      values: (
-        grow-0: 0,
-        grow-1: 1,
-      )
-    ),
-    "flex-shrink": (
-      responsive: true,
-      property: flex-shrink{
-    ol,
-    ul {
-      justify-content: flex-end;
-    }
-  }
-
-  // Sizes
-  &.#{iv.$class-prefix}is-small {
-    font-size: cv.getVar("size-small");
-  }
-
-  &.#{iv.$class-prefix}is-medium vars
-
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: var(--#{$prefix}modal-zindex);
-  display: none;
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  // Prevent Chrome on Windows from adding a focus outline. For details, see
-       "section-padding": #{$section-padding},
-      "section-padding-desktop": #{$section-padding-desktop},
-      "section-padding-medium": #{$section-padding-medium},
-      "section-padding-large": #{$section-padding-large},
-    )
-  );
-  padding: cv.geugs#flexbug-4
-      flex: 1 0 0%;
-      margin-bottom: 0;
-
-      + .card {
-        margin-left: 0;
-        border-left: 0;
-      }
-
-      // Handle rounded corners
-      @if $enable-rounded {
-        &:not(:last-child) {
-          @include border-end-radiut-#{$name} {
-      @include cv.register-var("grid-cell-column-start", #{$i});
-    }
-
-    &.#{iv.$class-prefix}is-col-end-#{$name} {
-      @include cv.register-var("grid-cell-column-end", #{$i});
-    }
-
-    &.#{iv.$class-prefix}is-col-from-end-#{$name} {
-  s: map-get($utility, values);
-
-  // If the values are a list or string, convert it into a map
-  @if type-of($values) == "string" or type-of(nth($values, 1)) != "list" {
-    $values: zip($values, $values);
-  }
-
-  @each $key, $value in $values {
-    $propertr-style: solid;
-    }
-  }
+.spinner-grow,
+.spinner-border {
+  dispolor);
 }
 
-.bs-tooltip-top .tooltip-arrow {
-  bottom: calc(-1 * var(--#{$prefix}tooltip-arrow-height)); // stylelint-disable-line function-disallowed-list
-
-  &::before {
-    top: -1px;
-    border-width: var(--#{$prefix}tooltip-arrow-heigh"-tablet");
-  }
-
-  @include mx.container-from($grid-container-name, iv.$desktop) {
-    @include fixed-grid-properties("-desktop");
-  }
-
-  @include mx.container-from($grid-container-name, iv.$widescreen) {
-    @include fixed-grid-properties("-widescreen");ius));
-
-  .btn-close {
-    padding: calc(var(--#{$prefix}modal-header-padding-y) * .5) calc(var(--#{$prefix}modal-header-padding-x) * .5);
-    margin: calc(-.5 * var(--#{$prefix}modal-header-padding-y)) calc(-.5 * var(--#{$prefix}modal-header-padding-x)) c0;
+.card-text:last-child {
+  margin-bottom: 0;
 }
 
 .card-link {
@@ -518,11 +526,525 @@ $displays: block flex inline inline-block inline-flex grid;
 }
 
 //
-// Optional textual caps
+// Optional textuallass: padding-x,
+            property: padding-inline-start padding-inline-end,
+            values: 1rem
+          )
+        ) {
+          .padding-x-1rem {
+            padding-inline-start: 1rem;
+            padding-inline-end: 1rem;
+     mport "../../mixins";
+// Row
+//
+// Rows contain your columns.
+
+:root {
+  @each $name, $value in $grid-breakpoints {
+    --#{$prefix}breakpoint-#{$name}: #{$value};
+  }
+}
+
+@if $enable-grid-classes {
+  .row {
+    @include make-row();
+
+    > * {
+    dal-scale-transform;
+  }
+}
+
+.modal-dialog-scrollable {
+  height: calc(100% - var(--#{$prefix}modal-margin) * 2);
+
+  .modal-content {
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  .modal-body {
+    overflow-y: auto;
+  }
+}
+
+.modal-dialog-centered {
+  diidth": #{$navbar-dropdown-border-width},
+      "navbar-dropdown-offset": #{$navbar-dropdown-offset},
+      "navbar-dropdown-arrow": #{$navbar-dropdown-arrow},
+      "navbar-dropdown-radius": #{$navbar-dropdown-radius},
+      "navbar-dropdown-z": #{$nderline,
+        (
+          null: rgba(var(--#{$prefix}link-color-rgb), var(--#{$prefix}link-underline-opacity, 1)),
+        )
+      )
+    ),
+    "link-underline-opacity": (
+      css-var: true,
+      class: link-underline-opacity,
+      state: hover,
+   -image;
+}
+
+$d: 2.5rem;
+
+.bd-header-control {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.bd-cycle {
+  --h: #{cv.getVar("sun-h")};
+  --s: #{cv.getVar("sun-s")};
+  --l: #{cv.getVar("sun-l")};
+
+  border-radius: 0.5em;
+  color: hsl(var(--llapsed {
+        @include border-bottom-radius(var(--#{$prefix}accordion-inner-border-radius));
+      }
+    }
+
+    > .accordion-collapse {
+      @include border-bottom-radius(var(--#{$prefix}accordion-border-radius));
+    }
+  }
+}
+
+.accordion-body {
+  padddient(
+    0deg,
+    hsla(
+        var(--bulma-scheme-h),
+        var(--bulma-scheme-s),
+        var(--bulma-scheme-main-l),
+        1
+      )
+      0%,
+    hsla(
+        var(--bulma-scheme-h),
+        var(--bulma-scheme-s),
+        var(--bulma-schemev.system-theme($name: "light") {
+  @include light.light-theme;
+}
+
+// prefers-color-scheme: dark
+@include cv.system-theme($name: "dark") {
+  @include dark.dark-theme;
+}
+
+// :root, [data-theme=light], .theme-light
+@include cv.bulma-theme($name: "light") {
+  round-l: cv.getVar("dark-l");
+$message-header-color-l: cv.getVar("text-dark-invert-l");
+$message-radius: cv.getVar("radius") !default;
+
+$message-header-weight: cv.getVar("weight-semibold") !default;
+$message-header-padding: 1em 1.25em !default;
+$message-heor: #{$table-active-color};
+  --#{$prefix}table-active-bg: #{$table-active-bg};
+  --#{$prefix}table-hover-color: #{$table-hover-color};
+  --#{$prefix}table-hover-bg: #{$table-hover-bg};
+
+  width: 100%;
+  margin-bottom: $spacer;
+  vertical-align: $table-cground-size: 100% 100%;
+}
+
+.carousel-control-prev-icon {
+  background-image: escape-svg($carousel-control-prev-icon-bg) #{"/*rtl:" + escape-svg($carousel-control-next-icon-bg) + "*/"};
+}
+.carousel-control-next-icon {
+  background-image: escape-svg($carouslities-colors,
+  (
+    "black": to-rgb($black),
+    "white": to-rgb($white),
+    "body": to-rgb($body-color)
+  )
+) !default;
+$utilities-text-colors: map-loop($utilities-text, rgba-css-var, "$key", "text") !default;
+
+$utilities-text-emphasis-colors: (
+  "ute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: var(--#{$prefix}card-img-overlay-padding);
+  @include border-radius(var(--#{$prefix}card-inner-border-radius));
+}
+
+.card-img,
+.card-img-top,
+.card-img-bottom {
+  width: 100%; // Required becausmport "helpers/focus-ring";
+@import "helpers/icon-link";
+@import "helpers/ratio";
+@import "helpers/position";
+@import "helpers/stacks";
+@import "helpers/visually-hidden";
+@import "helpers/stretched-link";
+@import "helpers/text-truncation";
+@import "helpersal-header-padding-x) * .5);
+    margin: calc(-.5 * var(--#{$prefix}modal-header-padding-y)) calc(-.5 * var(--#{$prefix}modal-header-padding-x)) calc(-.5 * var(--#{$prefix}modal-header-padding-y)) auto;
+  }
+}
+
+// Title text within header
+.modal-title {
+  mant-size-large {
+          font-size: 1.25rem !important;
+        }
+
+        @media (min-width: 333px) {
+          .padding-sm-1rem {
+            padding: 1rem !important;
+          }
+        }
+
+        @media (min-width: 666px) {
+          .padding-md-1remprefix}card-spacer-y: #{$card-spacer-y};
+  --#{$prefix}card-spacer-x: #{$card-spacer-x};
+  --#{$prefix}card-title-spacer-y: #{$card-title-spacer-y};
+  --#{$prefix}card-title-color: #{$card-title-color};
+  --#{$prefix}card-subtitle-color: #{$card-subtitle-ccolor-l")}
+  );
+  display: block;
+  line-height: 1.5;
+  padding: 0.5rem 0.75rem;
+  position: relative;
+
+  .#{iv.$class-prefix}icon {
+    &:only-child {
+      margin-left: -0.25rem;
+      margin-right: -0.25rem;
+    }
+  }
+}
+
+a.#{iv.$class-prefix}navbar-class: px,
+      values: $spacers
+    ),
+    "padding-y": (
+      responsive: true,
+      property: padding-top padding-bottom,
+      class: py,
+      values: $spacers
+    ),
+    "padding-top": (
+      responsive: true,
+      property: padding-top,
+ 1.5 !default;
+
+$code-family: cv.getVar("family-code") !default;
+$code-padding: 0.25em 0.5em 0.25em !default;
+$code-weight: normal !default;
+$code-size: 0.875em !default;
+
+$small-font-size: 0.875em !default;
+
+$hr-background-color: cv.getVar("background") !dc(100% + (#{cv.getVar("navbar-dropdown-offset")}));
+      transform: translateY(-5px);
+      transition-duration: cv.getVar("duration");
+      transition-property: opacity, transform;
+    }
+
+    &.#{iv.$class-prefix}is-right {
+      left: auto;
+      rigs mx;
+
+.bd-tws {
+  --tws-spacing: #{var(--bulma-block-spacing)};
+  --column-min-width: 100%;
+  padding: 0 var(--tws-spacing) var(--tws-spacing);
+}
+
+@include mx.tablet {
+  .bd-tws {
+    --column-min-width: 24rem;
+  }
+}
+
+@include mx.widescreen {
+  .bd-tws {
+,
+    "text-decoration": (
+      property: text-decoration,
+      values: none underline line-through
+    ),
+    "text-transform": (
+      property: text-transform,
+      class: text,
+      values: lowercase uppercase capitalize
+    ),
+    "white-space": (%;
+    height: 100%;
+  }
+}
+
+@each $key, $ratio in $aspect-ratios {
+  .ratio-#{$key} {
+    --#{$prefix}aspect-ratio: #{$ratio};
+  }
+}
+.form-floating {
+  position: relative;
+
+  > .form-control,
+  > .form-control-plaintext,
+  > .form-select {
+    heiissues/18842
+
+::-webkit-datetime-edit-fields-wrapper,
+::-webkit-datetime-edit-text,
+::-webkit-datetime-edit-minute,
+::-webkit-datetime-edit-hour-field,
+::-webkit-datetime-edit-day-field,
+::-webkit-datetime-edit-month-field,
+::-webkit-datetime-edit-year-fieround-l")} + #{cv.getVar(
+          "navbar-item-background-l-delta"
+        )}
+    ),
+    #{cv.getVar("navbar-item-background-a")}
+  );
+  cursor: pointer;
+
+  &:focus,
+  &:focus-within,
+  &:hoer-wave {
+  mask-image: linear-gradient(130deg, $black 55%, rgba(0, 0, 0, (1 - $placeholder-opacity-min)) 75%, $black 95%);
+  mask-size: 200% 100%;
+  animation: placeholder-wave 2s linear infinite;
+}
+
+@keyframes placeholder-wave {
+  100% {
+    mask-positiogrounds, border colors
+// and the colors of the striped, hovered & active tables
+
+@each $color, $value in $table-variants {
+  @include table-variant($color, $value);
+}
+
+// Responsive tables
+//
+// Generate series of `.table-responsive-*` classes for confi   // `$columns - 1` because offsetting by the width of an entire row isn't possible
+        @for $i from 0 through ($columns - 1) {
+          @if not ($infix == "" and $i == 0) { // Avoid emitting useless .offset-0
+            .offset#{$infix}-#{$i} {
+   //
+// Forms
 //
 
-.card-header {
-  paddottom-color: currentcolor;
+$form-select-indicator-color-dark:  $body-color-dark !default;
+$form-select-indicator-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color-bles
+$primary-text-emphasis-dark:        tint-color($primary, 40%) !default;
+$secondary-text-emphasis-dark:      tint-color($secondary, 40%) !default;
+$success-text-emphasis-dark:        tint-color($success, 40%) !default;
+$info-text-emphasis-dark:      order,
+      local-vars: (
+        "border-opacity": 1
+      ),
+      values: $utilities-border-colors
+    ),
+    "subtle-border-color": (
+      property: border-color,
+      class: border,
+      values: $utilities-border-subtle
+    ),
+    "border-width": ars
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--#{$prefix}modal-zindex);
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  // Prevent Chrome on Windows from adding a focus outline. For details, see
+  {$name} {
+      @include cv.register-var("grid-cell-column-start", #{$i});
+    }
+
+    &.#{iv.$class-prefix}is-col-end-#{$name} {
+      @include cv.register-var("grid-cell-column-end", #{$i});
+    }
+
+    &.#{iv.$class-prefix}is-col-from-end-#{$name} {
+  : -0.375em;
+    inset-inline-end: 1.125em;
+  }
+}
+
+.#{iv.$class-prefix}navbar-dropdown {
+  font-size: 0.875rem;
+  padding-bottom: 0.75rem;
+  padding-top: 0.5rem;
+
+  .#{iv.$class-prefix}navbar-item {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+
+    ult;
+$breadcrumb-item-hover-color: cv.getVar("link-text-hover") !default;
+$breadcrumb-item-active-color: cv.getVar("link-text-active") !default;
+
+$breadcrumb-item-padding-vertical: 0 !default;
+$breadcrumb-item-padding-horizontal: 0.75em !default;
+
+$breadcrprefix}modal-zindex: #{$zindex-modal};
+  --#{$prefix}modal-width: #{$modal-md};
+  --#{$prefix}modal-padding: #{$modal-inner-padding};
+  --#{$prefix}modal-margin: #{$modal-dialog-margin};
+  --#{$prefix}modal-color: #{$modal-content-color};
+  --#{$prefix}modf this Sass bug: https://github.com/sass/node-sass/issues/2251
+@each $color, $value in $theme-colors {
+  .link-#{$color} {
+    color: RGBA(var(--#{$prefix}#{$color}-rgb), var(--#{$prefix}link-opacity, 1)) if($enable-important-utilities, !important, null)le-bg-type, var(--#{$prefix}table-accent-bg)));
+  }
+
+  > tbody {
+    vertical-align: inherit;
+  }
+
+  > thead {
+    vertical-align: bottom;
+  }
+}
+
+.table-group-divider {
+  border-top: calc(#{$table-border-width} * 2) solid $table-group-separator-color; // smixin make-col-auto() {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+@mixin make-col-offset($size, $columns: $grid-columns) {
+  $num: divide($size, $columns);
+  margin-left: if($num == 0, 0, percentage($num));
+}
+
+// Row columns
+//
+// Specify on a parent element(e.gubtle-background-color": (
+      property: background-color,
+      class: bg,
+      values: $utilities-bg-subtle
+    ),
+    // scss-docs-end utils-bg-color
+    "gradient": (
+      property: background-image,
+      class: bg,
+      values: (gradient: var(close-white-filter);
+}
+
+.btn-close-white {
+  @include btn-close-white();
+}
+
+@if $enable-dark-mode {
+  @include color-mode(dark) {
+    .btn-close {
+      @include btn-close-white();
+    }
+  }
+}
+// Notes on the classes:
+//
+// 1. .carousel.pointer-event shoule-main-bis") !default;
+$modal-card-foot-radius: cv.getVar("radius-large") !default;
+
+$modal-card-body-background-color: cv.getVar("scheme-main") !default;
+$modal-card-body-padding: 2rem !default;
+
+$modal-breakpoint: iv.$tablet !defau-subtle: (
+  "primary": $primary-bg-subtle,
+  "secondary": $secondary-bg-subtle,
+  "success": $success-bg-subtle,
+  "info": $info-bg-subtle,
+  "warning": $warning-bg-subtle,
+  "danger": $danger-bg-subtle,
+  "light": $light-bg-subtle,
+  "dark": $dark-bg-subem;
+  --px: 1rem;
+  background-color: var(--hl-gray-09);
+  border-radius: var(--hl-radius);
+  color: var(--hl-gray-01);
+  padding-bottom: calc(2 * var(--py));
+
+  table {
+    width: 100%;
+
+    td,
+    th {
+      padding: var(--py) var(--px);
+    }
+
+    th {height and font-size of form controls.
+//
+// Repeated in `_input_group.scss` to avoid Sass extend issues.
+
+.form-control-sm {
+  min-height: $input-height-sm;
+  padding: $input-padding-y-sm $input-padding-x-sm;
+  @include font-size($input-font-size-sm);
+  @kpoint and narrower.
+@mixin media-breakpoint-down($name, $breakpoints: $grid-breakpoints) {
+  $max: breakpoint-max($name, $breakpoints);
+  @if $max {
+    @media (max-width: $max) {
+      @content;
+    }
+  } @else {
+    @content;
+  }
+}
+
+// Media that spans ity, rtl);
+
+    @if $value != null {
+      @if $is-rtl == false {
+        /* rtl:begin:remove */
+      }
+
+      @if $is-css-var {
+        .#{$property-class + $infix + $property-class-modifier} {
+          --#{$prefix}#{$css-variable-name}: #{$value};
+    l-card-head-background-color");
+  border-start-start-radius: cv.getVar("modal-card-head-radius");
+  border-start-end-radius: cv.getVar("modal-card-head-radius");
+  box-shadow: cv.getVar("shadow");
+}
+
+.#{iv.$class-prefix}modal-card-title {
+  co}
+
+  > :not(:first-child) {
+    border-top-width: 0;
+  }
+}
+
+// Zebra-striping
+//
+// Default zebra-stripe styles (alternating gray and transparent backgrounds)
+
+// For rows
+.table-striped {
+  > tbody > tr:nth-of-type(#{$table-striped-order}) > * {
+lelint-enable selector-no-qualifying-type
+
+.form-control-color {
+  width: $form-color-width;
+  height: $input-height;
+  padding: $input-padding-y;
+
+  &:not(:disabled):not([readonly]) {
+    cursor: pointer;
+  }
+
+  &::-moz-color-swatch {
+    border: 0 !impore-link-active-color);
+    border-bottom-color: currentcolor;
   }
 }
 
@@ -543,9 +1065,42 @@ $displays: block flex inline inline-block inline-flex grid;
   > .nav-link,
   .nav-item {
     flex-basis: 0;
-    flex-grow: 1;
-  f;
+ ($values) == "string" or type-of(nth($values, 1)) != "list" {
+    $values: zip($values, $values);
+  }
 
+  @each $key, $value in $values {
+    $properties: map-get($utility, property);
+
+    // Multiple properties are possible, for example with vertical or hoprefix}heading-color);
+}
+
+h1 {
+  @extend %heading;
+  @include font-size($h1-font-size);
+}
+
+h2 {
+  @extend %heading;
+  @include font-size($h2-font-size);
+}
+
+h3 {
+  @extend %heading;
+  @include font-size($h3-font-size);
+}
+
+h4 {
+  @extend %heading;
+  @inhadow") !default;
+$card-radius: 0.75rem !default;
+
+$card-header-background-color: transparent !default;
+$card-header-color: cv.getVar("text-strong") !default;
+$card-header-padding: 0.75rem 1rem !default;
+$card-header-shadow: 0 0.125em 0.25em
+  hsla(
+    #
 $purple: #8A4D76;
 $pink: #FA7C91;
 $brown: #757763;
@@ -559,497 +1114,7 @@ $link: $pink;
 
 $orange: #f60;
 $orange-invert: findColorInvert($orange);
-$orange-light:  lighter: $font-weight-lighter,
-        light: $font-weight-light,
-        normal: $font-weight-normal,
-        medium: $font-weight-medium,
-        semibold: $font-weight-semibold,
-        bold: $font-weight-bold,
-        bolder: $font-weight-bolder
-   bar-colors: dv.$colors !default;
-
-@mixin navbar-fixed {
-  left: 0;
-  position: fixed;
-  right: 0;
-  z-index: cv.getVar("navbar-fixed-z");
-}
-
-:root {
-  @include cv.register-vars(
-    (
-      "navbar-height": #{$navbar-height},
-    )
-  );
-}
-
-.#{prefix}card-border-radius: #{$card-border-radius};
-  --#{$prefix}card-box-shadow: #{$card-box-shadow};
-  --#{$prefix}card-inner-border-radius: #{$card-inner-border-radius};
-  --#{$prefix}card-cap-padding-y: #{$card-cap-padding-y};
-  --#{$prefix}card-cap-paude mx.mobile {
-    &.#{iv.$class-prefix}is-narrow-mobile {
-      flex: none;
-      width: unset;
-    }
-
-    &.#{iv.$class-prefix}is-full-mobile {
-      flex: none;
-      width: 100%;
-    }
-
-    &.#{iv.$class-prefix}is-three-quarters-mobile {
-  tion($input-transition);
-
-  &[type="file"] {
-    overflow: hidden; // prevent pseudo element button overlap
-
-    &:not(:disabled):not([readonly]) {
-      cursor: pointer;
-    }
-  }
-
-  // Customize the `:focus` state to imitate native WebKit styles.
-  &:fonvas-body {
-          display: flex;
-          flex-grow: 0;
-          padding: 0;
-          overflow-y: visible;
-          // Reset `background-color` in case `.bg-*` classes are used in offcanvas
-          background-color: transparent !important; // st: calc(-.5 * var(--#{$prefix}card-cap-padding-x)); // stylelint-disable-line function-disallowed-list
-}
-
-// Card image
-.card-img-overlay {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: var(--#{$prefix}card-img-overlay-padditive-shadow: #{$btn-active-box-shadow};
-  --#{$prefix}btn-disabled-color: #{$disabled-color};
-  --#{$prefix}btn-disabled-bg: #{$disabled-background};
-  --#{$prefix}btn-disabled-border-color: #{$disabled-border};
-}
-// scss-docs-end btn-variant-mixin
-
-// scsk-position: -200% 0%;
-  }
-}
-@import "../../functions";
-@import "../../variables";
-@import "../../variables-dark";
-@import "../../maps";
-@import "../../mixins";
-
-$utilities: ();
-
-@include describe("utilities/api") {
-  @include it("generates utilities for ealateY(-1em);
-  }
-
-  &.is-modern {
-    --h: 220;
-    --bg: var(--grad-blue);
-    --icon: #{cv.getVar("info-50")};
-  }
-
-  &.is-easy {
-    --h: 160;
-    --bg: var(--grad-green);
-    --icon: #{cv.getVar("success")};
-  }
-
-  &.is-free {
-    --h: 348;
-    --s: 6%x}progress-height);
-}
-
-.progress-stacked > .progress {
-  overflow: visible;
-}
-
-.progress-stacked > .progress > .progress-bar {
-  width: 100%;
-}
-
-@if $enable-transitions {
-  .progress-bar-animated {
-    animation: $progress-bar-animation-timing progress-bar,
-    "text-decoration": (
-      property: text-decoration,
-      values: none underline line-through
-    ),
-    "text-transform": (
-      property: text-transform,
-      class: text,
-      values: lowercase uppercase capitalize
-    ),
-    "white-space": (efix}border-style) var(--#{$prefix}border-color),
-        0: 0,
-      )
-    ),
-    "border-end": (
-      property: border-right,
-      class: border-end,
-      values: (
-        null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--v.system-theme($name: "light") {
-  @include light.light-theme;
-}
-
-// prefers-color-scheme: dark
-@include cv.system-theme($name: "dark") {
-  @include dark.dark-theme;
-}
-
-// :root, [data-theme=light], .theme-light
-@include cv.bulma-theme($name: "light") {
-  : -0.375em;
-    inset-inline-end: 1.125em;
-  }
-}
-
-.#{iv.$class-prefix}navbar-dropdown {
-  font-size: 0.875rem;
-  padding-bottom: 0.75rem;
-  padding-top: 0.5rem;
-
-  .#{iv.$class-prefix}navbar-item {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-
-    dient(
-    0deg,
-    hsla(
-        var(--bulma-scheme-h),
-        var(--bulma-scheme-s),
-        var(--bulma-scheme-main-l),
-        1
-      )
-      0%,
-    hsla(
-        var(--bulma-scheme-h),
-        var(--bulma-scheme-s),
-        var(--bulma-schemei, 12)) - calc(
-              #{cv.getVar("column-gap")} / 2
-            )
-        );
-      }
-
-      &.#{iv.$class-prefix}is-offset-#{$i}-mobile {
-        margin-inline-start: math.percentage(math.div($i, 12));
-      }
-    }
-  }
-
-  @include mx.tablet {
-   age: if($enable-gradients, linear-gradient(90deg, rgba($black, .25), rgba($black, .001)), null);
-}
-.carousel-control-next {
-  right: 0;
-  background-image: if($enable-gradients, linear-gradient(270deg, rgba($black, .25), rgba($black, .001)), null);
-}
-
-// Ibg-type, var(--#{$prefix}table-accent-bg)));
-  }
-
-  > tbody {
-    vertical-align: inherit;
-  }
-
-  > thead {
-    vertical-align: bottom;
-  }
-}
-
-.table-group-divider {
-  border-top: calc(#{$table-border-width} * 2) solid $table-group-separator-color; // stn-icon: #{escape-svg($accordion-button-icon-dark)};
-      --#{$prefix}accordion-btn-active-icon: #{escape-svg($accordion-button-active-icon-dark)};
-    }
-  }
-}
-.fade {
-  @include transition($transition-fade);
-
-  &:not(.show) {
-    opacity: 0;
-  }
-}
-
-// scclass: px,
-      values: $spacers
-    ),
-    "padding-y": (
-      responsive: true,
-      property: padding-top padding-bottom,
-      class: py,
-      values: $spacers
-    ),
-    "padding-top": (
-      responsive: true,
-      property: padding-top,
-    lities-colors,
-  (
-    "black": to-rgb($black),
-    "white": to-rgb($white),
-    "body": to-rgb($body-color)
-  )
-) !default;
-$utilities-text-colors: map-loop($utilities-text, rgba-css-var, "$key", "text") !default;
-
-$utilities-text-emphasis-colors: (
-  "mport "helpers/ratio";
-@import "helpers/position";
-@import "helpers/stacks";
-@import "helpers/visually-hidden";
-@import "helpers/stretched-link";
-@import "helpers/text-truncation";
-@import "helpers/vr";
-@import "mixins/banner";
-@include bsBanner("");
-
-
-//      "breadcrumb-item-active-color": #{$breadcrumb-item-active-color},
-      "breadcrumb-item-padding-vertical": #{$breadcrumb-item-padding-vertical},
-      "breadcrumb-item-padding-horizontal": #{$breadcrumb-item-padding-horizontal},
-      "breadcrumb-ites.#{iv.$class-prefix}is-mobile
-    > &.#{iv.$class-prefix}is-two-thirds {
-    flex: none;
-    width: 66.6666%;
-  }
-
-  .#{iv.$class-prefix}columns.#{iv.$class-prefix}is-mobile
-    > &.#{iv.$class-prefix}is-half {
-    flex: none;
-    width: 50%;
-  }
-
-  .#{ivdth: 0; // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
-  height: var(--#{$prefix}card-height);
-  color: var(--#{$prefix}body-color);
-  word-wrap: break-word;
-  background-color: var(--#{$prefix}card-bg);
-  background-clip: borde
-// Forms
-//
-
-$form-select-indicator-color-dark:  $body-color-dark !default;
-$form-select-indicator-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color-dafix}#{$local-var}: #{$variable};
-                }
-              }
-              #{$property}: $value if($enable-important-utilities, !important, null);
-            }
-          }
-        }
-      }
-
-      @if $is-rtl == false {
-        /* rtl:end:remove */
-refix}table-color-type: initial;
-  --#{$prefix}table-bg-type: initial;
-  --#{$prefix}table-color-state: initial;
-  --#{$prefix}table-bg-state: initial;
-  // End of reset
-  --#{$prefix}table-color: #{$table-color};
-  --#{$prefix}table-bg: #{$table-bg};
-g-x;
-    margin: (-$input-padding-y) (-$input-padding-x);
-    margin-inline-end: $input-padding-x;
-    color: $form-file-button-color;
-    @include gradient-bg($form-file-button-bg);
-    pointer-events: none;
-    border-color: inherit;
-    b
-
-.bd-header-control {
-  align-items: center;
-  display: flex;
-  gap: 0.75rem;
-}
-
-.bd-cycle {
-  --h: #{cv.getVar("sun-h")};
-  --s: #{cv.getVar("sun-s")};
-  --l: #{cv.getVar("sun-l")};
-
-  border-radius: 0.5em;
-  color: hsl(var(--h), var(--s), var(--l));
-  d$card-content-padding: 1.5rem !default;
-
-$card-footer-background-color: transparent !default;
-$card-footer-border-top: 1px solid cv.getVar("border-weak") !default;
-$card-footer-padding: 0.75rem !default;
-
-$card-media-margin: cv.getVar("block-spacing") !defly center contents
-  justify-content: center; // 3. horizontally center contents
-  width: $carousel-control-width;
-  padding: 0;
-  color: $carousel-control-color;
-  text-align: center;
-  background: none;
-  border: 0;
-  opacity: $carousel-control-opacity;
-r-item-color-l")}
-  );
-  display: block;
-  line-height: 1.5;
-  padding: 0.5rem 0.75rem;
-  position: relative;
-
-  .#{iv.$class-prefix}icon {
-    &:only-child {
-      margin-left: -0.25rem;
-      margin-right: -0.25rem;
-    }
-  }
-}
-
-a.#{iv.$class-prefix}navb      "hr-margin": #{$hr-margin},
-      "strong-color": #{$strong-color},
-      "strong-weight": #{$strong-weight},
-      "pre-font-size": #{$pre-font-size},
-      "pre-padding": #{$pre-padding},
-      "pre-code-font-size": #{$pre-code-font-size},
-   round-l")} + #{cv.getVar(
-          "navbar-item-background-l-delta"
-        )}
-    ),
-    #{cv.getVar("navbar-item-background-a")}
-  );
-  cursor: pointer;
-
-  &:focus,
-  &:focus-within,
-  &:ho     color: var(--#{$prefix}offcanvas-color);
-      visibility: hidden;
-      background-color: var(--#{$prefix}offcanvas-bg);
-      background-clip: padding-box;
-      outline: 0;
-      @include box-shadow(var(--#{$prefix}offcanvas-box-shadow));
-   ("size-normal");
-
-  strong {
-    color: currentColor;
-  }
-
-  a:not(.#{iv.$class-prefix}button):not(.#{iv.$class-prefix}tag):not(
-      .#{iv.$class-prefix}dropdown-item
-    ) {
-    color: currentColor;
-    text-decoration: underline;
-  }start: flex-start,
-        end: flex-end,
-        center: center,
-        between: space-between,
-        around: space-around,
-        stretch: stretch,
-      )
-    ),
-    "align-self": (
-      responsive: true,
-      property: align-self,
- adding-inline-start: 1rem;
-            padding-inline-end: 1rem;
-          }
-        }
-      }
-
-      @include it("uses the first property as class name") {
-        @include test-generate-utility(
-          (
-            property: padding-inline-start paddntainer {
-    align-items: stretch;
-    display: flex;
-    min-height: cv.getVar("navbar-height");
-    width: 100%;
-  }
-
-  &.#{iv.$class-prefix}has-shadow {
-    box-shadow: cv.getVar("navbar-box-shadow-size")
-      cv.getVar("navbar-box-shadow-color");
-  } {
-  background-image: linear-gradient($deg, $start-color, $end-color);
-}
-
-@mixin gradient-x-three-colors($start-color: $blue, $mid-color: $purple, $color-stop: 50%, $end-color: $red) {
-  background-image: linear-gradient(to right, $start-color, $mid-coloround-l": #{$message-background-l},
-      "message-border-l": #{$message-border-l},
-      "message-border-style": #{$message-border-style},
-      "message-border-width": #{$message-border-width},
-      "message-color-l": #{$message-color-l},
-      "message}
-
-
-// Table variants
-//
-// Table variants set the table cell backgrounds, border colors
-// and the colors of the striped, hovered & active tables
-
-@each $color, $value in $table-variants {
-  @include table-variant($color, $value);
-}
-
-// Responsive tables
-idth": #{$navbar-dropdown-border-width},
-      "navbar-dropdown-offset": #{$navbar-dropdown-offset},
-      "navbar-dropdown-arrow": #{$navbar-dropdown-arrow},
-      "navbar-dropdown-radius": #{$navbar-dropdown-radius},
-      "navbar-dropdown-z": #{$normal") !default;
-$body-line-height: 1.5 !default;
-
-$code-family: cv.getVar("family-code") !default;
-$code-padding: 0.25em 0.5em 0.25em !default;
-$code-weight: normal !default;
-$code-size: 0.875em !default;
-
-$small-font-size: 0.875em !default;
-
-$hr-backgues: (null: 1rem, small: .5rem, large: 2rem)
-          ),
-        ) {
-          .padding {
-            padding: 1rem;
-          }
-
-          .padding-small {
-            padding: .5rem;
-          }
-
-          .padding-large {
-            padding: 2rem;
-   rsal
-  > :not(caption) > * > * {
-    border-bottom-width: 0;
-  }
-
-  > :not(:first-child) {
-    border-top-width: 0;
-  }
-}
-
-// Zebra-striping
-//
-// Default zebra-stripe styles (alternating gray and transparent backgrounds)
-
-// For rows
-.table-striped {
-  > ude mx.desktop {
-    &.#{iv.$class-prefix}is-narrow-desktop {
-      flex: none;
-      width: unset;
-    }
-
-    &.#{iv.$class-prefix}is-full-desktop {
-      flex: none;
-      width: 100%;
-    }
-
-    &.#{iv.$class-prefix}is-three-quarters-desktop {
-  color($info, 40%) !default;
-$warning-text-emphasis-dark:        tint-color($warning, 40%) !default;
-$danger-text-emphasis-dark:         tint-color($danger, 40%) !default;
-$light-text-emphasis-dark:          $gray-100 !default;
-$dark-text-emphasis-dark:    ght: $dt-font-weight;
+$orange-light: hsght: $dt-font-weight;
 }
 
 // 1. Undo browser default
@@ -1073,60 +1138,25 @@ blockquote {
 
 b,
 strong {
-  fonte(" + ") + $value2);
-}
-
-@function subtract($value1, $value2, $return-calc: true) {
-  @if $value1 == null and $value2 == null {
-    @return null;
+  font calc(1.5rem - #{$column-gap});
   }
 
-  @if $value1 == null {
-    @return -$value2;
+  // Modifiers
+  &.#{iv.$class-prefix}is-centered {
+    justify-content: center;
   }
 
-  @if $value2 == null {
-    @return $value1;
-  }
+  &.#{iv.$class-prefix}is-gapless {
+    margin-inline-start: 0;
+    margin-inline-end: 0;
 
-  @ifn: start;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    pointer-events: none;
-    border: $input-border-width solid transparent; // Required for aligning label's text with the input as it affects inner box model
-    transform-origin: 0 0;
-    @cs-end border-radius-mixins
-//
-// Text truncation
-//
+    margin-top: 0;
 
-.text-truncate {
-  @include text-truncate();
-}
-// stylelint-disable property-disallowed-list
-@mixin transition($transition...) {
-  @if length($transition) == 0 {
-   @for $i from 1 through $columns {
-          .col#{$infix}-#{$i} {
-            @include make-col($i, $columns);
-          }
-        }
-
-        // `$columns - 1` because offsetting by the width of an entire row isn't possible
-        @for $i from 0 througlarge");
-    padding: 1.5rem;
-  }
-
-  img {
-    // box-shadow: 0 0 0 0.25rem cv.getVar("border");
-    border-radius: cv.getVar("radius-medium");
-  }
-
-  figcaption {
-    color: cv.getVar("text-weak");
-    font-style: italic;
-  }
-}ed-link-z-index + 1;
+    & > .#{il put a leading zero so we want to keep that one
+            // stylelint-disable-next-line @stylistic/number-leading-zero
+            --bs-color-saturation: 0.25;
+            color: hsla(192deg, var(--bs-color-saturation), 0, var(--bs-color-opacity));
+   ed-link-z-index + 1;
     padding: $alert-padding-y * 1.25 $alert-padding-x;
   }
 }
@@ -1136,245 +1166,24 @@ strong {
 // Generate contextual modifier classes for colorizing the alert
 @each $state in map-keys($theme-colors) {
   .alert-#{$state} {
-   ints);
-  @if $max {
-    @media (max-width: $max) {
-      @content;
-    }
-  } @else {
-    @content;
-  }
-}
-
-// Media that spans multiple breakpoint widths.
-// Makes the @content apply between the min and max breakpoints
-@mixin media-breakpoint-between($lowertVar("background-l");
-$message-border-l: cv.getVar("border-l");
-$message-border-l-delta: -20% !default;
-$message-border-style: solid;
-$message-border-width: 0.25em;
-$message-color-l: cv.getVar("text-l");
-$message-header-background-l: cv.getVar("dark-l");eader-weight");
-  justify-content: space-between;
-  line-height: 1.25;
-  padding: cv.getVar("message-header-padding");
-  position: relative;
-
-  .#{iv.$class-prefix}delete {
-    flex-grow: 0;
-    flex-shrink: 0;
-    margin-inline-start: 0.75em;
-  }
-
-  & + .#{$value};
-          }
-        }
-      } @else {
-        .#{$property-class + $infix + $property-class-modifier} {
-          @each $property in $properties {
-            @if $is-local-vars {
-              @each $local-var, $variable in $is-local-vars {
-   ensions-large");
-  }
-}
-
-.#{iv.$class-prefix}icon-text {
-  align-items: flex-start;
-  color: inherit;
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: cv.getVar("icon-text-spacing");
-  line-height: cv.getVar("icon-dimensions");
-  vertical-align: top;
-
-  .#}
-
-
-// Images and content
-
-img,
-svg {
-  vertical-align: middle;
-}
-
-
-// Tables
-//
-// Prevent double borders
-
-table {
-  caption-side: bottom;
-  border-collapse: collapse;
-}
-
-caption {
-  padding-top: $table-cell-padding-y;
-  padding-bottom: $table-cell-paddiderline,
-        (
-          null: rgba(var(--#{$prefix}link-color-rgb), var(--#{$prefix}link-underline-opacity, 1)),
-        )
-      )
-    ),
-    "link-underline-opacity": (
-      css-var: true,
-      class: link-underline-opacity,
-      state: hover,
-   mixin make-col-auto() {
-  flex: 0 0 auto;
-  width: auto;
-}
-
-@mixin make-col-offset($size, $columns: $grid-columns) {
-  $num: divide($size, $columns);
-  margin-left: if($num == 0, 0, percentage($num));
-}
-
-// Row columns
-//
-// Specify on a parent element(e.gminance($color) {
-  $rgb: (
-    "r": red($color),
-    "g": green($color),
-    "b": blue($color)
-  );
-
-  @each $name, $value in $rgb {
-    $value: if(divide($value, 255) < .04045, divide(divide($value, 255), 12.92), nth($_luminance-list, $value + 1));
-    $ 0 var(--tws-spacing) var(--tws-spacing);
-}
-
-@include mx.tablet {
-  .bd-tws {
-    --column-min-width: 24rem;
-  }
-}
-
-@include mx.widescreen {
-  .bd-tws {
-    font-size: 1.125rem;
-  }
-}
-
-.bd-tws-list {
-  display: grid;
-  grid-gap: var(--tws-spacing);
-  grid-l put a leading zero so we want to keep that one
-            // stylelint-disable-next-line @stylistic/number-leading-zero
-            --bs-color-saturation: 0.25;
-            color: hsla(192deg, var(--bs-color-saturation), 0, var(--bs-color-opacity));
-   css` to avoid Sass extend issues.
-
-.form-control-sm {
-  min-height: $input-height-sm;
-  padding: $input-padding-y-sm $input-padding-x-sm;
-  @include font-size($input-font-size-sm);
-  @include border-radius($input-border-radius-sm);
-
-  &::file-selector-buttponsive-container-#{$breakpoint} {
-        max-width: $container-max-width;
-      }
-
-      // Extend each breakpoint which is smaller or equal to the current breakpoint
-      $extend-breakpoint: true;
-
-      @each $name, $width in $grid-breakpoints {
-   }
-}
-
-@each $key, $ratio in $aspect-ratios {
-  .ratio-#{$key} {
-    --#{$prefix}aspect-ratio: #{$ratio};
-  }
-}
-.form-floating {
-  position: relative;
-
-  > .form-control,
-  > .form-control-plaintext,
-  > .form-select {
-    height: $form-floating-height;
-    ude mx.overflow-touch;
-
-  background-color: cv.getVar("pre-background");
-  color: cv.getVar("pre");
-  font-size: cv.getVar("pre-font-size");
-  overflow-x: auto;
-  padding: cv.getVar("pre-padding");
-  white-space: pre;
-  word-wrap: normal;
-
-  codlint-enable selector-no-qualifying-type
-
-.form-control-color {
-  width: $form-color-width;
-  height: $input-height;
-  padding: $input-padding-y;
-
-  &:not(:disabled):not([readonly]) {
-    cursor: pointer;
-  }
-
-  &::-moz-color-swatch {
-    border: 0 !imporr");
-  border-start-start-radius: cv.getVar("modal-card-head-radius");
-  border-start-end-radius: cv.getVar("modal-card-head-radius");
-  box-shadow: cv.getVar("shadow");
-}
-
-.#{iv.$class-prefix}modal-card-title {
-  color: cv.getVar("modal-card-title-colo, "-s");
+   sions": #{$icon-dimensions},
+      "icon-dimensions-small": #{$icon-dimensions-small},
+      "icon-dimensions-medium": #{$icon-dimensions-medium},
+      "icon-dimensions-large": #{$icon-dimensions-large},
+      "icon-text-spacing": #{$icon-text-spacing},
+ -grow: 0;
+          padding: 0;
+          overflow-y: visible;
+          // Reset `background-color` in case `.bg-*` classes are used in offcanvas
+          background-color: transparent !important; // stylelint-disable-line declaration-no-important
+    $value)), "", "-s");
   @include register-var($name, round(lightness($value)), "", "-l");
 }
 
 @mixin generate-on-scheme-colors($name, $base, $scheme-main) {
   // Accessibility Contrast System
   $scheme-main-brightness: fn.bulmaColorBrightness($scheme-main);
-  $on-schttps://stackoverflow.com/a/54997118
-
-[list]:not([type="date"]):not([type="datetime-local"]):not([type="month"]):not([type="week"]):not([type="time"])::-webkit-calendar-picker-indicator {
-  display: none !important;
-}
-
-// 1. Prevent a WebKit bug where (2) d-subtle: (
-  "primary": $primary-bg-subtle,
-  "secondary": $secondary-bg-subtle,
-  "success": $success-bg-subtle,
-  "info": $info-bg-subtle,
-  "warning": $warning-bg-subtle,
-  "danger": $danger-bg-subtle,
-  "light": $light-bg-subtle,
-  "dark": $dark-bg-sublex;
-  line-height: 1.2;
-
-  &:hover {
-    .bd-tw-fullname {
-      text-decoration: underline;
-    }
-  }
-}
-
-.bd-tw-avatar {
-  flex-shrink: 0;
-  height: 2.25em;
-  margin-right: 0.5em;
-  width: 2.25em;
-
-  img {
-    border-radius: var(--bulma-radius-rounded);
-
-// Placeholders
-
-@mixin unselectable {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-@mixin loader {
-  animation: spinAround 500ms infinite linear;
-  border: 2px solill {
+ll {
   @extend small;
 }
 
@@ -1397,200 +1206,97 @@ caption {
 .list-inline-item {
   display: inline-block;
 
-  &: 0;
-  list-style: none;
-}
-
-.nav-link {
-  display: block;
-  padding: var(--#{$prefix}nav-link-padding-y) var(--#{$prefix}nav-link-padding-x);
-  @include font-size(var(--#{$prefix}nav-link-font-size));
-  font-weight: var(--#{$prefix}nav-link-font-w $first-value: nth($values, 1);
-    @if $first-value != 0 {
-      @warn "First breakpoint in #{$map-name} must start at 0, but starts at #{$first-value}.";
-    }
-  }
-}
-
-// Colors
-@function to-rgb($value) {
-  @return red($value), green($value), blue($value)      5: var(--#{$prefix}border-radius-xxl),
+  &:-radius-xl),
+        5: var(--#{$prefix}border-radius-xxl),
         circle: 50%,
         pill: var(--#{$prefix}border-radius-pill)
       )
     ),
     "rounded-bottom": (
       property: border-bottom-right-radius border-bottom-left-radius,
-      class: rounded-bottomn-close-focus-opacity: #{$btn-close-focus-opacity};
-  --#{$prefix}btn-close-disabled-opacity: #{$btn-close-disabled-opacity};
-  --#{$prefix}btn-close-white-filter: #{$btn-close-white-filter};
-  // scss-docs-end close-css-vars
+      class: rousvg {
+  vertical-align: middle;
+}
 
-  box-sizing: content-box;
- $foregrounds {
+
+// Tables
+//
+// Prevent double borders
+
+table {
+  caption-side: bottom;
+  border-collapse: collapse;
+}
+
+caption {
+  padding-top: $table-cell-padding-y;
+  padding-bottom: $table-cell-padding-y;
+  color: $table-caption-colwidth: 85px; // Seems to be a good minimum safe width
+
+    // Add some height to date inputs on iOS
+    // https://github.com/twbs/bootstrap/issues/23307
+    // TODO: we can remove this workaround once https://bugs.webkit.org/show_bug.cgi?id=198959 is resoip-arrow {
+  bottom: calc(-1 * var(--#{$prefix}tooltip-arrow-height)); // stylelint-disable-line function-disallowed-list
+
+  &::before {
+    top: -1px;
+    border-width: var(--#{$prefix}tooltip-arrow-height) calc(var(--#{$prefix}tooltip-arrow-width) * .5) ensions");
+  vertical-align: top;
+
+  .#{iv.$class-prefix}icon {
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+}
+
+div.#{iv.$class-prefix}icon-text {
+  display: flex;
+}
+@use "sass:color";
+@use "sass:list";
+@use "sass:map";
+@use "sass:math";
+
+@use "initialen {
+  @if iv.$widescreen-enabled {
+    @media screen and (min-width: iv.$widescreen) {
+      @content;
+    }
+  }
+}
+
+@mixin widescreen-only {
+  @if iv.$widescreen-enabled and iv.$fullhd-enabled {
+    @media screen and (min-width: iv.$widescreen) and (max-wlight, $color-contrast-dark, $white, $black;
+  $max-ratio: 0;
+  $max-ratio-color: null;
+
+  @each $color in $foregrounds {
     $contrast-ratio: contrast-ratio($background, $color);
     @if $contrast-ratio > $min-contrast-ratio {
       @return $color;
-    } @else if $contrast-ratio > $max-ratio {
-      $max-ratio: $contrast-ratio;
-      $max-ratio-color: $color;
-tion used because of this Sass bug: https://github.com/sass/node-sass/issues/2251
-@each $color, $value in $theme-colors {
-  .link-#{$color} {
-    color: RGBA(var(--#{$prefix}#{$color}-rgb), var(--#{$prefix}link-opacity, 1)) if($enprefix}dropdown-divider-bg: #{$dropdown-divider-bg};
-  --#{$prefix}dropdown-divider-margin-y: #{$dropdown-divider-margin-y};
-  --#{$prefix}dropdown-box-shadow: #{$dropdown-box-shadow};
-  --#{$prefix}dropdown-link-color: #{$dropdown-link-color}// Form text
-//
-
-.form-text {
-  margin-top: $form-text-margin-top;
-  @include font-size($form-text-font-size);
-  font-style: $form-text-font-style;
-  font-weight: $form-text-font-weight;
-  color: $form-text-color;
-}
-//
-// Stretched link
-//
-
-.stretchefix}family-secondary {
-  font-family: dv.$family-secondary !important;
-}
-
-.#{iv.$helpers-prefix}family-sans-serif {
-  font-family: iv.$family-sans-serif !important;
-}
-
-.#{iv.$helpers-prefix}family-monospace {
-  font-family: iv.$family-monospace !impodelta: 0%;
-$menu-item-hover-background-l-delta: cv.getVar("hover-background-l-delta");
-$menu-item-active-background-l-delta: cv.getVar("active-background-l-delta");
-$menu-item-color-l: cv.getVar("text-l");
-$menu-item-radius: cv.getVar("radius-small") !deor: #{$nav-tabs-link-hover-border-color};
-  --#{$prefix}nav-tabs-link-active-color: #{$nav-tabs-link-active-color};
-  --#{$prefix}nav-tabs-link-active-bg: #{$nav-tabs-link-active-bg};
-  --#{$prefix}nav-tabs-link-active-border-color: #{$nav-tabs-link-activew3.org/TR/mediaqueries-4/#mq-min-max
-// Uses 0.02px rather than 0.01px to work around a current rounding bug in Safari.
-// See https://bugs.webkit.org/show_bug.cgi?id=178261
-//
-//    >> breakpoint-max(md, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200pxward "sass/layout/footer";
-
-// Import the themes so that all CSS variables have a value
-@forward "sass/themes";
-
-// Import the Google Font
-@import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
-@use "sass/utilities/extends";
-
-.bd-pills {
-  " form control to the top of surrounding elements
-  > .form-control:focus,
-  > .form-select:focus,
-  > .form-floating:focus-within {
-    z-index: 5;
-  }
-
-  // Ensure buttons are always above inputs for more visually pleasing borders.
-  // This isn't neededcs-end theme-text-dark-variables
-
-// scss-docs-start theme-bg-subtle-dark-variables
-$primary-bg-subtle-dark:            shade-color($primary, 80%) !default;
-$secondary-bg-subtle-dark:          shade-color($secondary, 80%) !default;
-$success-bg-subtle-dark:nherit; // For `<button>`s
-  text-decoration: if($link-decoration == none, null, none);
-  white-space: nowrap; // prevent links from randomly breaking onto new lines
-  background-color: transparent; // For `<button>`s
-  border: 0; // For `<button>`s
-  @ince-cell-border-width: 0 0 1px !default;
-$table-cell-padding: 0.5em 0.75em !default;
-$table-cell-heading-color: cv.getVar("text-strong") !default;
-$table-cell-text-align: left !default;
-
-$table-head-cell-border-width: 0 0 2px !default;
-$table-head-cell-colororder,
-      local-vars: (
-        "border-opacity": 1
-      ),
-      values: $utilities-border-colors
+alues: inline inline-block block grid inline-grid table table-row table-cell flex inline-flex none
     ),
-    "subtle-border-color": (
-      property: border-color,
-      class: border,
-      values: $utilities-border-subtle
-    ),
-    "border-width": ansform;
-    transition-timing-function: cv.getVar("easing");
-    width: cv.getVar("burger-item-width");
+    // scss-docs-end utils-display
+    // scss-docs-start utils-shadow
+    "shadow": (
+      property: box-shadow,
+      class: shadow,
+     n");
+  transition-property: background-color, border-color, color;
 
-    &:nth-child(1),
-    &:nth-child(2) {
-      top: calc(50% - calc(#{cv.getVar("burger-item-height")}) / 2);
-    }
-
-    &:nth-child(3) {
-      botto 2
-  overflow: auto; // 3
-  @include font-size($code-font-size);
-  color: $pre-color;
-
-  // Account for some code outputs that place code tags in pre tags
-  code {
-    @include font-size(inherit);
-    color: inherit;
-    word-break: normal;
+  strong {
+    color: currentColor;
   }
 }
 
-code {
- th: 100vw;
-  height: 100vh;
-  background-color: $backdrop-bg;
-
-  // Fade for backdrop
-  &.fade { opacity: 0; }
-  &.show { opacity: $backdrop-opacity; }
-}
-@mixin box-shadow($shadow...) {
-  @if $enable-shadows {
-    $result: ();
-
-    @each $value in $shadow sel-caption-color;
-  text-align: center;
+button {
+  @include mx.reset;
+  transition-duration: cv.getVar("duration");
+  transition-property: background-color, border-color, color;
 }
 
-// Dark mode carousel
-
-@mixin carousel-dark() {
-  .carousel-control-prev-icon,
-  .carousel-control-next-icon {
-    filter: $carousel-dark-control-icon-filter;
-  }
-
-  .carousel-indicators [data-bs-target] {
-    baclass: ms,
-      values: map-merge($spacers, (auto: auto))
-    ),
-    // Negative margin utilities
-    "negative-margin": (
-      responsive: true,
-      property: margin,
-      class: m,
-      values: $negative-spacers
-    ),
-    "negative-margin-x": (
-  ch);
-
-  @if $index {
-    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
-  }
-
-  @return $string;
-}
-
-// See https://codepen.io/kevinweber/pen/dXWoRw
-//
-// Requires the : top;
+code: top;
   width: calc(var(--f) * #{$w});
 }
 /*! minireset.css v0.0.6 | MIT License | github.com/jgthms/minireset.css */
@@ -1617,59 +1323,134 @@ h2,
 h3,
 h4,
 h5,
-h6 {x.widescreen {
-    &.#{iv.$class-prefix}is-narrow-widescreen {
-      flex: none;
-      width: unset;
-    }
+h6 {-color),
+        0: 0,
+      )
+    ),
+    "border-top": (
+      property: border-top,
+      values: (
+        null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--#{$prefix}border-color),
+        0: 0,
+      )
+    ),
+    "border-end": (
+ $search, $replace: "") {
+  $index: str-index($string, $search);
 
-    &.#{iv.$class-prefix}is-full-widescreen {
-      flex: none;
-      width: 100%;
-    }
-
-    &.#{iv.$class-prefix}is-three-quarters-widescreen {
-    text-size-adjust: 100%;
-}
-
-article,
-aside,
-figure,
-footer,
-header,
-hgroup,
-section {
-  display: block;
-}
-
-body,
-button,
-input,
-optgroup,
-select,
-textarea {
-  font-family: cv.getVar("body-family");
-}
-
-code,
-pre {
-  -moz-osx-font-smoothing: auto;
-  -webkit calc(1.5rem - #{$column-gap});
+  @if $index {
+    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
   }
 
-  // Modifiers
-  &.#{iv.$class-prefix}is-centered {
-    justify-content: center;
+  @return $string;
+}
+
+// See weight");
+  justify-content: space-between;
+  line-height: 1.25;
+  padding: cv.getVar("message-header-padding");
+  position: relative;
+
+  .#{iv.$class-prefix}delete {
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-inline-start: 0.75em;
   }
 
-  &.#{iv.$class-prefix}is-gapless {
-    margin-inline-start: 0;
-    margin-inline-end: 0;
+  & + .#{iv.as iv;
 
-    margin-top: 0;
+.#{iv.$class-prefix}loader {
+  animation: spinAround 500ms infinite linear;
+  border: 2px solid cv.getVar("border");
+  border-radius: cv.getVar("radius-rounded");
+  border-right-color: transparent;
+  border-top-color: transparent;
+  cont }
 
-    & > .#{iv.: (
-  "code": "link",
+  & > .#{iv.$class-prefix}container {
+    align-items: stretch;
+    display: flex;
+    min-height: cv.getVar("navbar-height");
+    width: 100%;
+  }
+
+  &.#{iv.$class-prefix}has-shadow {
+    box-shadow: cv.getVar("navbar-box-shadow-size")
+      cv.ult;
+$file-name-border-style: solid !default;
+$file-name-border-width: 1px 1px 1px 0 !default;
+$file-name-max-width: 16em !default;
+
+$file-colors: shared.$form-colors !default;
+
+.#{iv.$class-prefix}file {
+  @extend %block;
+  @extend %unselectable;
+
+  @inor: #{$nav-tabs-link-active-color};
+  --#{$prefix}nav-tabs-link-active-bg: #{$nav-tabs-link-active-bg};
+  --#{$prefix}nav-tabs-link-active-border-color: #{$nav-tabs-link-active-border-color};
+  // scss-docs-end nav-tabs-css-vars
+
+  border-bottom: var(-       25: 25%,
+        50: 50%,
+        75: 75%,
+        100: 100%,
+        auto: auto
+      )
+    ),
+    "max-height": (
+      property: max-height,
+      class: mh,
+      values: (100: 100%)
+    ),
+    "viewport-height": (
+      property: height,
+    $prefix: bs-;
+$enable-important-utilities: false;
+
+// Important: Do not import rfs to check that the mixin just calls the appropriate functions from it
+@import "../../mixins/utilities";
+
+@mixin test-generate-utility($params...) {
+  @include assert() {
+t(
+    180deg,
+    hsla(var(--theme-h), var(--theme-s), var(--theme-l), 0.1),
+    transparent calc(var(--spacing) * 3)
+  );
+  background-repeat: repeat-x;
+  padding: calc(3 * var(--spacing)) var(--spacing) calc(3 * var(--spacing));
+  poanslateX(100%);
+}
+
+.carousel-item-prev:not(.carousel-item-end),
+.active.carousel-item-start {
+  transform: translateX(-100%);
+}
+
+
+//
+// Alternate transitions
+//
+
+.carousel-fade {
+  .carousel-item {
+    opacity: 0;
+    transition-property: opacity;
+    t  end: flex-end,
+        center: center,
+        between: space-between,
+        around: space-around,
+        stretch: stretch,
+      )
+    ),
+    "align-self": (
+      responsive: true,
+      property: align-self,
+      values: (
+        auto: auto,
+    de": "link",
   "css": "css",
   "customize": "info",
   "docs": "success",
@@ -1681,213 +1462,264 @@ pre {
   "love": "danger",
   "primary": "primary",
   "sass": "sass",
-  "st(
-    180deg,
-    hsla(var(--theme-h), var(--theme-s), var(--theme-l), 0.1),
-    transparent calc(var(--spacing) * 3)
-  );
-  background-repeat: repeat-x;
-  padding: calc(3 * var(--spacing)) var(--spacing) calc(3 * var(--spacing));
-  poenable-dark-mode {
-  @include color-mode(dark) {
-    .btn-close {
-      @include btn-close-white();
+  "sponsor": ths
+  .container,
+  // 100% wide container at all breakpoints
+  .container-fluid {
+    @include make-container();
+  }
+
+  // Responsive containers that are 100% wide until a breakpoint
+  @each $breakpoint, $container-max-width in $container-max-widths {
+   t-light) {
+  $l1: luminance($background);
+  $l2: luminance(opaque($background, $foreground));
+
+  @return if($l1 > $l2, divide($l1 + .05, $l2 + .05), divide($l2 + .05, $l1 + .05));
+}
+
+// Return WCAG2.1 relative luminance
+// See https://www.w3.org/TR/WCAG/#ddex: $zindex;
+  width: 100vw;
+  height: 100vh;
+  background-color: $backdrop-bg;
+
+  // Fade for backdrop
+  &.fade { opacity: 0; }
+  &.show { opacity: $backdrop-opacity; }
+}
+@mixin box-shadow($shadow...) {
+  @if $enable-shadows {
+    $result: ();
+
+    @eachu-list-line-height: 1.25 !default;
+$menu-list-link-padding: 0.5em 0.75em !default;
+$menu-nested-list-margin: 0.75em !default;
+$menu-nested-list-padding-left: 0.75em !default;
+
+$menu-label-color: cv.getVar("text-weak") !default;
+$menu-label-font-size: 0.75e      "table-head-cell-border-width": #{$table-head-cell-border-width},
+      "table-head-cell-color": #{$table-head-cell-color},
+      "table-foot-cell-border-width": #{$table-foot-cell-border-width},
+      "table-foot-cell-color": #{$table-foot-cell-colottps://stackoverflow.com/questions/36247140/why-dont-flex-items-shrink-past-content-size
+  }
+
+  // Bring the "active" form control to the top of surrounding elements
+  > .form-control:focus,
+  > .form-select:focus,
+  > .form-floating:focus-within {
+   or($danger, 40%) !default;
+$light-border-subtle-dark:          $gray-700 !default;
+$dark-border-subtle-dark:           $gray-800 !default;
+// scss-docs-end theme-border-subtle-dark-variables
+
+$body-color-dark:                   $gray-300 !default;
+$body-bgrtant;
+}
+
+// 1. Prevent a WebKit bug where (2) destroys native `audio` and `video`
+//    controls in Android 4.
+// 2. Correct the inability to style clickable types in iOS and Safari.
+// 3. Opinionated: add "hand" cursor to non-disabled button elements.
+
+b none;
+}
+
+// 1. Textareas should really only resize vertically so they don't break their (horizontal) containers.
+
+textarea {
+  resize: vertical; // 1
+}
+
+// 1. Browsers set a default `min-width: min-content;` on fieldsets,
+//    unlike e.g. `<div>`s, whic 16 16' fill='#{$accordion-icon-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
+$accordion-button-active-icon-dark:  url("prefix}dropdown-divider-bg: #{$dropdown-divider-bg};
+  --#{$prefix}dropdown-divider-margin-y: #{$dropdown-divider-margin-y};
+  --#{$prefix}dropdown-box-shadow: #{$dropdown-box-shadow};
+  --#{$prefix}dropdown-link-color: #{$dropdown-link-color}
+  .bd-nav-item.is-love {
+    display: none;
+  }
+}
+
+@include mx.from(utils.$header-bp + 150px) {
+  .bd-header {
+    gap: 1rem;
+  }
+
+  .bd-nav-item.is-love {
+    display: flex;
+  }
+}
+
+@include mx.from(utils.$header-bp + 300px) {
+  .bd-header {
+    gap: 1.25points") {
+  @if length($map) > 0 {
+    $values: map-values($map);
+    $first-value: nth($values, 1);
+    @if $first-value != 0 {
+      @warn "First breakpoint in #{$map-name} must start at 0, but starts at #{$first-value}.";
     }
   }
 }
-// Notes on the classes:
-//
-// 1. .carousel.pointer-event should ideally be pan-y (to allow for users to scroll vertically)
-//    even when theibg: #{$striped-bg};
-    --#{$prefix}table-striped-color: #{color-contrast($striped-bg)};
-    --#{$prefix}table-active-bg: #{$active-bg};
-    --#{$prefix}table-active-color: #{color-contrast($active-bg)};
-    --#{$prefix}table-hover-bg: #{$hover-bg};
-    --r");
-        border-bottom-style: cv.getVar("navbar-dropdown-border-style");
-        border-bottom-width: cv.getVar("navbar-dropdown-border-width");
-        border-radius: cv.getVar("navbar-dropdown-radius")
-          cv.getVar("navbar-dropdown-radius") 0 : 0.625em;
-  margin-top: -0.4375em;
-  pointer-events: none;
-  position: absolute;
-  top: 50%;
-  transform: rotate(-45deg);
-  transform-origin: center;
-  transition-duration: cv.getVar("duration");
-  transition-property: border-color;
-  width: 0.625em;
-}
 
-@ult;
-$file-name-border-style: solid !default;
-$file-name-border-width: 1px 1px 1px 0 !default;
-$file-name-max-width: 16em !default;
-
-$file-colors: shared.$form-colors !default;
-
-.#{iv.$class-prefix}file {
-  @extend %block;
-  @extend %unselectable;
-
-  @in=== STEP 3 ===
-  // Find accessible color combinations
-
-  $combos: ();
-
-  @each $digits-bg, $bg-l in $shades {
-    $background: hsl($h, $s, $bg-l);
-    $bg-lum: fn.bulmaColorLuminance($background);
-    $bg-is-light: $bg-lum > 0.55;
-    $candidates: ();
-   ty: $hr-opacity;
-}
-
-
-// Typography
-//
-// 1. Remove top margins from headings
-//    By default, `<h1>`-`<h6>` all receive top and bottom margins. We nuke the top
-//    margin for easier control within type scales as it avoids margin collapsing.
-
-%heading {
-5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
-// scss-docs-end sass-dark-mode-vars
-.focus-ring:focus {
-  outline: 0;
-  // By default, there is no `--bs-focus-ring-x`, `--bs-focus-ring-y`, or `--bs-focus-ring-blur`, buem;
-  --px: 1rem;
-  background-color: var(--hl-gray-09);
-  border-radius: var(--hl-radius);
-  color: var(--hl-gray-01);
-  padding-bottom: calc(2 * var(--py));
-
-  table {
-    width: 100%;
-
-    td,
-    th {
-      padding: var(--py) var(--px);
-    }
-
-    th { "sass/themes/light";
-
-$mauve: #8a4d76;
-$pink: #fa7c91;
-$rose: #ea4aaa;
-$brown: #757763;
-$beige-light: #d0d1cd;
-$beige-lighter: #eff0eb;
-$sass: #bf4080;
-
-// Customize
-
-.bd-index-custom-title {
-  color: var(--bulma-border-hover);
-}
-
-.bd-index-custom-exampleisplay !important;
-    }
-  }
-
-  @include mx.desktop-only {
-    .#{iv.$helpers-prefix}display-#{$display}-desktop-only,
-    .#{iv.$helpers-prefix}#{$display}-desktop-only {
-      display: $display !important;
-    }
-  }
-
-  @include mx.widescreen {
-    .#     "focus-offset": 1px,
-      "focus-style": solid,
-      "focus-width": 2px,
-      "focus-shadow-size": 0 0 0 0.1875em,
-      "focus-shadow-alpha": 0.25,
-      "code":
-        hsl(
-          #{cv.getVar("danger-h")},
-          #{cv.getVar("danger-s")},refers-color-scheme: dark) {
-          :root {
-            --custom-color: #3a3ff8;
-          }
-        }
-      }
-    }
-
-    $color-mode-type: data !global;
-  }
-}
-//
-// Base styles
-//
-
-.alert {
-  // scss-docs-start alert-css-vars
-  --#{$prefix}alert-bg: trcreen-enabled and iv.$fullhd-enabled {
-    @media screen and (min-width: iv.$widescreen) and (max-width: (iv.$fullhd - 1px)) {
+// Colors
+@functdown($next, $breakpoints) {
       @content;
     }
   }
 }
-
-@mixin until-fullhd {
-  @if iv.$fullhd-enabled {
-    @media screen and (max-width: (iv.$fullhd - 1px4.643V16.67c0-.414-.334-.75-.75-.75h-.395c-3.66%200-6.318-2.476-6.318-5.886%200-3.534%202.768-6.302%206.3-6.302l4.147.01h.002c3.532%200%206.3%202.766%206.302%206.296-.003%201.91-.942%203.844-2.514%205.176z%22%2F%3E%3C%2Fsvg%3E);
+// scss-docs-start mixin-color-scheme
+@mixin color-scheme($name) {
+  @media (prefers-color-scheme: #{$name}) {
+    @content;
   }
-
-  .bd-tw-action-link:hadius: 9999px;
-  background-color: var(--theme-color, #{cv.getVar("primary")});
-  width: 4em;
 }
-@use "sass/utilities/mixins" as mx;
+// scss-docs-end mixin-color-scheme
+// All-caps `RGBA()` function usrners
+//
+// These rulesets must come after the sizing ones to properly override sm and lg
+// border-radius values when extending. They're more specific than we'd like
+// with the `.input-group >` part, but without it, we cannot override the sizing.
 
-.bd-brand {
-  padding: 3rem;
+// stygin: 0; // Override default margin of ul
+  @include font-size(var(--#{$prefix}dropdown-font-size));
+  color: var(--#{$prefix}dropdown-color);
+  text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
+  list-style: none1 + unquote(" - ") + $value2);
 }
 
-.bd-logos {
-  --size: 15rem;
+@function divide($dividend, $divisor, $precision: 10) {
+  $sign: if($dividend > 0 and $divisor > 0 or $dividend < 0 and $divisor < 0, 1, -1);
+  $dividend: abs($dividend);
+  $divisor: abs($divisor);
+  @if $dividend == 0 {
+  true) {
+  $normal: if($right, "right", "left");
+  $opposite: if($right, "left", "right");
 
-  > * {
-    align-items: center;
-    border-radius: 2em;
-   // 1. By using `float: left`, the legend will behave like a block element.
-//    This way the border of a fieldset wraps around the legend if present.
-// 2. Fix wrapping bug.
-//    See https://github.com/twbs/bootstrap/issues/29712
+  @if iv.$rtl {
+    #{$property}-#{$opposite}: $spacing;
+  } @else {
+    #{$property}-#{$normal}: $spacing;
+  }
+}
 
-legend {
-  float: left;ablet: 3rem 3rem !default;
+@mixin ltr-position($spacing, $right: true) {
+  $ation;
+  }
+}
+
+// And undo these styles for placeholder links/named anchors (without href).
+// It would be more straightforward to just use a[href] in previous block, but that
+// causes specificity issues in many other styles that are too complex to fix.
+//of the previous key '#{$prev-key}' !";
+    } @else if $prev-num >= $num {
+      @warn "Invalid value for #{$map-name}: This map must be in ascending order, but key '#{$key}' has value #{$num} which isn't greater than #{$prev-num}, the value of the previotVar("hr-margin");
+}
+
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  vertical-align: baseline;
+}
+
+small {
+  font-size: cv.getVar("small-font-size");
+}
+
+span {
+  font-style: inherit;
+  font-weight: inherit;
+}
+
+stlled-left {
+  float: left !important;
+}
+
+.#{iv.$helpers-prefix}float-right,
+.#{iv.$helpers-prefix}pulled-right {
+  float: right !important;
+}
+
+.#{iv.$helpers-prefix}float-none {
+  float: none !important;
+}
+
+$clears: both left none right;
+
+@each $clear in $r-top: 1px solid var(--#{$prefix}dropdown-divider-bg);
+  opacity: 1; // Revisit in v6 to de-dupe styles that conflict with <hr> element
+}
+
+// Links, buttons, and more within the dropdown menu
+//
+// `<button>`-specific styles are denoted with `// For <buttonclude describe(generate-utility) {
+  @include it("generates a utility class for each value") {
+    @include test-generate-utility(
+      (
+        property: "padding",
+        values: (small: .5rem, large: 2rem)
+      )
+    ) {
+      .padding-small {
+ -tablet: 3rem 3rem !default;
 $hero-body-padding-small: 1.5rem !default;
 $hero-body-padding-medium: 9rem 4.5rem !default;
 $hero-body-padding-large: 18rem 6rem !default;
 
 $hero-gradient-h-offset: 5deg;
 $hero-gradient-s-offset: 10%;
-$hero-gradient-l-offset: 5%;ng: 0.5em 0.75em !default;
-$menu-nested-list-margin: 0.75em !default;
-$menu-nested-list-padding-left: 0.75em !default;
+$hero-gradient-l-offset: 5olor: $color;
 
-$menu-label-color: cv.getVar("text-weak") !default;
-$menu-label-font-size: 0.75em !default;
-$menu-label-letter-spacing: 0.1em !def-x);
-  margin: 0; // Override default margin of ul
-  @include font-size(var(--#{$prefix}dropdown-font-size));
-  color: var(--#{$prefix}dropdown-color);
-  text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
-  listn-link-hover-bg));
+  @if $enable-gradients {
+    background-image: var(--#{$prefix}gradient);
+  }
+}
+// scss-docs-end gradient-bg-mixin
+
+// scss-docs-start gradient-mixins
+// Horizontal gradient, from left to right
+//
+// Creates two color stops, start and end, -close-opacity: #{$btn-close-opacity};
+  --#{$prefix}btn-close-hover-opacity: #{$btn-close-hover-opacity};
+  --#{$prefix}btn-close-focus-shadow: #{$btn-close-focus-shadow};
+  --#{$prefix}btn-close-focus-opacity: #{$btn-close-focus-opacity};
+  -prefix}nav-link-font-weight);
+  color: var(--#{$prefix}nav-link-color);
+  text-decoration: if($link-decoration == none, null, none);
+  background: none;
+  border: 0;
+  @include transition($nav-link-transition);
+
+  &:hover,
+  &:fo");
+$menu-item-radius: cv.getVar("radius-small") !default;
+$menu-item-selected-h: cv.getVar("link-h");
+$menu-item-selected-s: cv.getVar("link-s");
+$menu-item-selected-l: cv.getVar("link-l");
+$menu-item-selected-background-l: cv.getVar("link-l");
+$men-item-border-style": #{$pagination-item-border-style},
+      "pagination-item-border-width": #{$pagination-item-border-width},
+      "pagination-item-border-l": #{$pagination-item-border-l},
+      "pagination-item-border-l-delta": #{$pagination-item-borderansform-origin: 0 0;
+    @include transition($form-floating-transition);
   }
 
-  &.active,
-  &:active {
-    color: var(--#{$prefix}dropdown-link-active-color);
-    text-decoration: none;
-    @include gradient-bg(var(--#{$prefix}dropdown-link-active-bg));
-  }
+  > .form-control,
+  > .form-control-plaintext {
+    padding: $form-floating-padding-y $form-floating-padding-x;
 
-  &.disabled,
-  &:disabled {
- orrect element displays
+    &::placeholder {
+      color: transparent;
+    }
+
+    &:focrrect element displays
 
 output {
   display: inline-block;
@@ -1911,108 +1743,51 @@ summary {
 
 // Progress
 //
-//th 0; // Required to properly position label text - as explained above
-    }
-  }
-
-  > :disabled ~ label,
-  > .form-control:disabled ~ label { // Required for `.form-control`s because of specificity
-    color: $form-floating-label-disabled-color;
-
-    &::afixin typography-size($target: "") {
-  @each $size in dv.$sizes {
-    $i: index(dv.$sizes, $size);
-
-    .#{iv.$helpers-prefix}size-#{$i}#{if($target == "", "", "-" + $target)} {
-      font-size: $size !important;
-    }
-  }
-}
-
-@include typography-size;
-
-@inc `width` is not affected by `padding` or `border`.
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-
-// Root
-//
-// Ability to the value of the root font sizes, affecting the value of `rem`.
-// null by default, thus nothing is generated.
-
-:root {
-  @ispacing-tablet: 2.5rem !default;
-
-$modal-close-dimensions: 2.5rem !default;
-$modal-close-right: 1.25rem !default;
-$modal-close-top: 1.25rem !default;
-
-$modal-card-spacing: 2.5rem !default;
-
-$modal-card-head-background-color: cv.getVar("scheme-main") !def$map {
-    @if $prev-num == null or unit($num) == "%" or unit($prev-num) == "%" {
-      // Do nothing
-    } @else if not comparable($prev-num, $num) {
-      @warn "Potentially invalid value for #{$map-name}: This map must be in ascending order, but key '#{-delta},
-      "file-hover-color-l-delta": #{$file-hover-color-l-delta},
-      "file-active-color-l-delta": #{$file-active-color-l-delta},
-    )
-  );
-
-  align-items: stretch;
-  display: flex;
-  justify-content: flex-start;
-  position: relative;
-
-  /0: .5,
-        75: .75,
-        100: 1
-      )
-    ),
-    "subtle-background-color": (
-      property: background-color,
-      class: bg,
-      values: $utilities-bg-subtle
-    ),
-    // scss-docs-end utils-bg-color
-    "gradient": (
-      property: backgr .0343 .0356 .0369 .0382 .0395 .0409 .0423 .0437 .0452 .0467 .0482 .0497 .0513 .0529 .0545 .0561 .0578 .0595 .0612 .063 .0648 .0666 .0685 .0704 .0723 .0742 .0762 .0782 .0802 .0823 .0844 .0865 .0887 .0908 .0931 .0953 .0976 .0999 .1022 .1046 .107 .1095 .1119rners
-//
-// These rulesets must come after the sizing ones to properly override sm and lg
-// border-radius values when extending. They're more specific than we'd like
-// with the `.input-group >` part, but without it, we cannot override the sizing.
-
-// styleft: $pagination-margin-start;
-  }
-
-  @if $pagination-margin-start == calc(#{$pagination-border-width} * -1) {
-    &:first-child {
-      .page-link {
-        @include border-start-radius(var(--#{$prefix}pagination-border-radius));
-      }
-    }
-
-    &:lasde;
-  // --hl-blue: #00b2ff;
-  // --hl-purple: #9a89b4;
-  // --hl-lavender: #9b6dff;
-  // --hl-pink: #ff5cd3;
+//ink: #ff5cd3;
   // --hl-rose: #ff6b9d;
   // --hl-orange: #ff9970;
   // --hl-yellow: #fed604;
   // --hl-gray-01: #d9e0e8;
   // --hl-gray-02: #808182;
-  // --hl-g;
+  // --hl-gray-09: #1f2330;
 
-  --sun: #{$sun};
-  --moon: #{$moon};
-  --animation-duration: 1s;
-  --circle-delay-a: 0s;
+  --hl-green: #85e89d;
+  --hl-cyan: #47ffe7;
+  --hl-blue: #79b8ff;
+  --hl-purp232 .0242 .0252 .0262 .0273 .0284 .0296 .0307 .0319 .0331 .0343 .0356 .0369 .0382 .0395 .0409 .0423 .0437 .0452 .0467 .0482 .0497 .0513 .0529 .0545 .0561 .0578 .0595 .0612 .063 .0648 .0666 .0685 .0704 .0723 .0742 .0762 .0782 .0802 .0823 .0844 .0865 .0887 .input-disabled-bg;
+    }
+  }
+}
+// Breakpoint viewport sizes and media queries.
+//
+// Breakpoints are defined as a map of (name: minimum width), order from small to large:
+//
+//    (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px, xxl: 1400px)
+//
+// The  $min: map-get($breakpoints, $name);
+  @return if($min != 0, $min, null);
+}
+
+// Maximum breakpoint width.
+// The maximum value is reduced by 0.02px to work around the limitations of
+// `min-` and `max-` prefixes and viewports with fractional widths.
+// Seenclude expect() {
+        [data-bs-theme=dark] .element {
+          color: var(--bs-primary-text-emphasis);
+          background-color: var(--bs-primary-bg-subtle);
+        }
+        [data-bs-theme=dark] {
+          --custom-color: #3a3ff8;
+     sition-timing-function: cv.getVar("easing");
+    width: cv.getVar("burger-item-width");
+
+    &:nth-child(1),
+    &:nth-child(2) {
+      top: calc(50% - calc(#{cv.getVar("burger-item-height")}) / 2);
+    }
+
+    &:nth-child(3) {
+      bottom: calc(50% + #{cva: 0s;
   --circle-delay-b: 0.5s;
   --circle-delay-c: 1s;
   --background-offset: -1%;
@@ -2020,11 +1795,173 @@ $modal-card-head-background-color: cv.getVar("scheme-main") !def$map {
 
   --grad-angle: 96deg;
   --grad-red: linear-gradient(
-    vaissues/18842
+    var(--grad-angle),
+    #f14668 4.28%,
+    #ff5a5c 51.66%,
+    #f1a246 100%
+  );
+  --gradward "sass/layout/footer";
 
-::-webkit-datetime-edit-fields-wrapper,
-::-webkit-datetime-edit-text,
-::-webkit-datetime-edit-minute,
-::-webkit-datetime-edit-hour-field,
-::-webkit-datetime-edit-day-field,
-::-webkit-datetime-edit-month-field
+// Import the themes so that all CSS variables have a value
+@forward "sass/themes";
+
+// Import the Google Font
+@import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
+@use "sass/utilities/extends";
+
+.bd-pills  "sass/themes/light";
+
+$mauve: #8a4d76;
+$pink: #fa7c91;
+$rose: #ea4aaa;
+$brown: #757763;
+$beige-light: #d0d1cd;
+$beige-lighter: #eff0eb;
+$sass: #bf4080;
+
+// Customize
+
+.bd-index-custom-title {
+  color: var(--bulma-border-hover);
+}
+
+.bd-index-custom-exampladient($deg, $start-color, $end-color);
+}
+
+@mixin gradient-x-three-colors($start-color: $blue, $mid-color: $purple, $color-stop: 50%, $end-color: $red) {
+  background-image: linear-gradient(to right, $start-color, $mid-color $color-stop, $end-color);
+}
+
+@mvariant
+@mixin table-variant($state, $background) {
+  .table-#{$state} {
+    $color: color-contrast(opaque($body-bg, $background));
+    $hover-bg: mix($color, $background, percentage($table-hover-bg-factor));
+    $striped-bg: mix($color, $background, percelex;
+  }
+
+  &.#{iv.$class-prefix}is-multiline {
+    flex-wrap: wrap;
+  }
+
+  &.#{iv.$class-prefix}is-vcentered {
+    align-items: center;
+  }
+
+  // Responsiveness
+  @include mx.tablet {
+    &:not(.#{iv.$class-prefix}is-desktop) {
+      display: flex;
+    }($l-base < 3%) {
+    $l-0: $l-base;
+    $l-5: $l-base + 5%;
+  } @else if ($l-base < 8%) {
+    // $l-0: math.max($l-base - 5%, 0%);
+    $l-0: $l-base - 5%;
+    $l-5: $l-base;
+  } @else {
+    // $l-0: math.max($l-base - 10%, 0%);
+    $l-0: $l-base - 10%;
+   escreen,
+  ),
+  "until-widescreen": (
+    "until": $widescreen,
+  ),
+  "widescreen": (
+    "from": $widescreen,
+  ),
+  "widescreen-only": (
+    "from": $widescreen,
+    "until": $fullhd,
+  ),
+  "until-fullhd": (
+    "until": $fullhd,
+  ),
+  "fullhd": (
+  lass: ms,
+      values: map-merge($spacers, (auto: auto))
+    ),
+    // Negative margin utilities
+    "negative-margin": (
+      responsive: true,
+      property: margin,
+      class: m,
+      values: $negative-spacers
+    ),
+    "negative-margin-x": (
+  -bg(var(--#{$prefix}dropdown-link-hover-bg));
+  }
+
+  &.active,
+  &:active {
+    color: var(--#{$prefix}dropdown-link-active-color);
+    text-decoration: none;
+    @include gradient-bg(var(--#{$prefix}dropdown-link-active-bg));
+  }
+
+  &.disabled,
+  &:disabll");
+
+  // === STEP 3 ===
+  // Find accessible color combinations
+
+  $combos: ();
+
+  @each $digits-bg, $bg-l in $shades {
+    $background: hsl($h, $s, $bg-l);
+    $bg-lum: fn.bulmaColorLuminance($background);
+    $bg-is-light: $bg-lum > 0.55;
+    $candidatrefix}alert-color: inherit;
+  --#{$prefix}alert-border-color: transparent;
+  --#{$prefix}alert-border: #{$alert-border-width} solid var(--#{$prefix}alert-border-color);
+  --#{$prefix}alert-border-radius: #{$alert-border-radius};
+  --#{$prefix}alert-link-co
+//
+// Form text
+//
+
+.form-text {
+  margin-top: $form-text-margin-top;
+  @include font-size($form-text-font-size);
+  font-style: $form-text-font-style;
+  font-weight: $form-text-font-weight;
+  color: $form-text-color;
+}
+//
+// Stretched link
+//
+
+.stretchsubtle-map
+
+$theme-colors-text-dark: null !default;
+$theme-colors-bg-subtle-dark: null !default;
+$theme-colors-border-subtle-dark: null !default;
+
+@if $enable-dark-mode {
+  // scss-docs-start theme-text-dark-map
+  $theme-colors-text-dark: (
+    "primtargeting irrelevant browsers while applying new styles.
+//
+// Normalize is licensed MIT. https://github.com/necolas/normalize.css
+
+
+// Document
+//
+// Change from `box-sizing: content-box` so that `width` is not affected by `padding` or `border`.
+
+*,
+*::be2c-1.134.96-4.862%203.405-6.772%204.643V16.67c0-.414-.334-.75-.75-.75h-.395c-3.66%200-6.318-2.476-6.318-5.886%200-3.534%202.768-6.302%206.3-6.302l4.147.01h.002c3.532%200%206.3%202.766%206.302%206.296-.003%201.91-.942%203.844-2.514%205.176z%22%2F%3E%3C%2Fsv200-.75.336-.75.75s.336.75.75.75h5.85c1.24%200%202.25%201.01%202.25%202.25v10.24l-2.22-2.22c-.293-.293-.768-.293-1.06%200s-.294.768%200%201.06l3.5%203.5c.145.147.337.22.53.22s.383-.072.53-.22l3.5-3.5c.294-.292.294-.767%200-1.06zm-10.66%203.28H7.26c-1.24%20  // Remove the top rounded corners here since there is a hard edge above the menu
+    @include border-top-radius(0);
+  }
+}
+
+
+//
+// Pills
+//
+
+.nav-pills {
+  // scss-docs-start nav-pills-css-vars
+  --#{$prefix}nav-pills-border-radius: #{$nav-pills-borden": #{$pagination-margin},
+      "pagination-min-width": #{$pagination-min-width},
+      "pagination-item-h": #

@@ -35,6 +35,11 @@ pub fn train_docs<'a>(corpus: &'a Path, lang: &str) -> impl Iterator<Item = Vec<
     corpus_docs(corpus, lang, "train", true)
 }
 
+/// Whether a tokzip-corpus checkout holds `lang` at all.
+pub fn has_language(corpus: &Path, lang: &str) -> bool {
+    corpus.join(lang).join("manifest.jsonl").is_file()
+}
+
 /// Documents of `lang`'s bench split from a tokzip-corpus checkout, in manifest order.
 pub fn bench_docs<'a>(corpus: &'a Path, lang: &str) -> impl Iterator<Item = Vec<u8>> + 'a {
     corpus_docs(corpus, lang, "bench", false)
@@ -78,40 +83,63 @@ const FREQ_BITS: u32 = 20;
 /// Candidate segment sizes; the one whose dictionary codes the held-out documents smallest wins.
 const SEGMENT_SIZES: [usize; 5] = [64, 128, 256, 512, 1024];
 
-/// Trains a dictionary part from `docs`: COVER-style greedy selection of the segments whose
+/// Trains a dictionary part: COVER-style greedy selection of the segments of `content` whose
 /// dmers occur in the most documents, with the segment size chosen by coding held-out
 /// documents with each candidate dictionary. `prefix` is the dictionary content that precedes
 /// the part (the wrapper, plus the group's shared part for a language suffix): its fragments
 /// are not selected again.
-pub fn train_dictionary(docs: &[Vec<u8>], budget: usize, prefix: &[u8]) -> Vec<u8> {
-    let mut bounded: Vec<&[u8]> = Vec::new();
-    let mut total = 0usize;
-    for doc in docs {
-        if total >= MAX_DICT_TRAIN_BYTES {
-            break;
-        }
-        let take = doc.len().min(MAX_DICT_TRAIN_BYTES - total);
-        bounded.push(&doc[..take]);
-        total += take;
-    }
+///
+/// With `scoring` documents, the dmer frequencies, the held-out documents, and the literal
+/// classes come from them while the segments are still cut from `content` — so a dictionary
+/// can be tuned to a private corpus while every byte of it is a substring of a public
+/// document. Without them, `content` plays both roles. Either way, during the segment-size
+/// sweep a held-out document is never among the candidates it scores; the final pass scores
+/// every document, held out or not.
+pub fn train_dictionary(
+    content: &[Vec<u8>],
+    scoring: Option<&[Vec<u8>]>,
+    budget: usize,
+    prefix: &[u8],
+) -> Vec<u8> {
+    let content = bound_docs(content, MAX_DICT_TRAIN_BYTES);
+    let scored = scoring.map(|docs| bound_docs(docs, MAX_DICT_TRAIN_BYTES));
+    let sample = scored.as_deref().unwrap_or(&content);
     let mut validation = Vec::new();
     let mut validation_bytes = 0usize;
-    let mut fit: Vec<u8> = Vec::new();
-    let mut fit_lens: Vec<usize> = Vec::new();
-    for (i, doc) in bounded.iter().enumerate() {
+    let mut held_out: std::collections::HashSet<&[u8]> = std::collections::HashSet::new();
+    let mut fit: Vec<&[u8]> = Vec::new();
+    for (i, doc) in sample.iter().enumerate() {
         if i % 10 == 0 && validation_bytes < MAX_VALIDATION_BYTES {
             let take = doc.len().min(MAX_VALIDATION_BYTES - validation_bytes);
             validation.push(doc[..take].to_vec());
             validation_bytes += take;
+            held_out.insert(doc);
         } else {
-            fit.extend_from_slice(doc);
-            fit_lens.push(doc.len());
+            fit.push(doc);
         }
     }
     let lit_classes = train_lit_classes(validation.iter().map(Vec::as_slice));
+    let (fit_data, fit_lens) = concat(&fit);
+    let (content_data, content_lens) = concat(&content);
+    // With scoring documents (which may include content documents) the sweep's candidates
+    // exclude the held-out documents, so no candidate dictionary is cut from a held-out
+    // document it is scored on; without them the fit documents already leave those out.
+    let candidates = scored.as_ref().map(|_| {
+        let candidates: Vec<&[u8]> = content
+            .iter()
+            .copied()
+            .filter(|doc| !held_out.contains(doc))
+            .collect();
+        concat(&candidates)
+    });
+    let (sweep_data, sweep_lens, sweep_scoring): (&[u8], &[usize], Option<Corpus>) =
+        match &candidates {
+            Some((data, lens)) => (data, lens, Some((&fit_data, &fit_lens))),
+            None => (&fit_data, &fit_lens, None),
+        };
     let mut best: Option<(usize, usize)> = None; // (cost, k)
     for k in SEGMENT_SIZES {
-        let suffix = cover(&fit, &fit_lens, prefix, budget, k);
+        let suffix = cover(sweep_data, sweep_lens, sweep_scoring, prefix, budget, k);
         let mut dict = prefix.to_vec();
         dict.extend_from_slice(&suffix);
         let cost = coded_size(dict, lit_classes, &validation);
@@ -120,31 +148,64 @@ pub fn train_dictionary(docs: &[Vec<u8>], budget: usize, prefix: &[u8]) -> Vec<u
         }
     }
     let k = best.expect("segment sizes").1;
-    let all: Vec<u8> = bounded.concat();
-    let lens: Vec<usize> = bounded.iter().map(|d| d.len()).collect();
-    cover(&all, &lens, prefix, budget, k)
+    let scored_all = scored.as_deref().map(concat);
+    let scoring = scored_all
+        .as_ref()
+        .map(|(d, l)| (d.as_slice(), l.as_slice()));
+    cover(&content_data, &content_lens, scoring, prefix, budget, k)
+}
+
+/// Concatenated documents with their lengths.
+type Corpus<'a> = (&'a [u8], &'a [usize]);
+
+/// The documents' prefixes up to `max` bytes in total.
+fn bound_docs(docs: &[Vec<u8>], max: usize) -> Vec<&[u8]> {
+    let mut bounded: Vec<&[u8]> = Vec::new();
+    let mut total = 0usize;
+    for doc in docs {
+        if total >= max {
+            break;
+        }
+        let take = doc.len().min(max - total);
+        bounded.push(&doc[..take]);
+        total += take;
+    }
+    bounded
+}
+
+/// The documents concatenated, with their lengths.
+fn concat(docs: &[&[u8]]) -> (Vec<u8>, Vec<usize>) {
+    (docs.concat(), docs.iter().map(|d| d.len()).collect())
 }
 
 /// Greedy COVER selection over `data` (the concatenation of documents of `doc_lens`): each of
 /// the `epochs` slices of `data` contributes its highest-scoring `k`-byte segment (score =
-/// total document frequency of the dmers it contains; the
-/// dmers of a selected segment are then zeroed so later segments do not repeat its content),
-/// and the segments are laid out best first, so the most valuable fragments have the lowest
-/// dictionary offsets, until `budget` is filled.
-fn cover(data: &[u8], doc_lens: &[usize], prefix: &[u8], budget: usize, k: usize) -> Vec<u8> {
+/// total document frequency of the dmers it contains — counted over the `scoring` documents
+/// when given, over `data` otherwise; the dmers of a selected segment are then zeroed so later
+/// segments do not repeat its content), and the segments are laid out best first, so the most
+/// valuable fragments have the lowest dictionary offsets, until `budget` is filled.
+fn cover(
+    data: &[u8],
+    doc_lens: &[usize],
+    scoring: Option<Corpus>,
+    prefix: &[u8],
+    budget: usize,
+    k: usize,
+) -> Vec<u8> {
     if data.len() < k.max(DMER) {
         return data.to_vec();
     }
     let dmers = data.len() - DMER + 1;
+    let (scored, scored_lens) = scoring.unwrap_or((data, doc_lens));
     // Document frequency: a dmer counts once per document, so a document repeating a fragment
     // many times does not outvote the fragments many documents share.
     let mut freqs = vec![0u32; 1 << FREQ_BITS];
     let mut seen = vec![u32::MAX; 1 << FREQ_BITS];
     let mut doc_start = 0usize;
-    for (id, &len) in doc_lens.iter().enumerate() {
-        let end = (doc_start + len).min(dmers + DMER - 1);
+    for (id, &len) in scored_lens.iter().enumerate() {
+        let end = (doc_start + len).min(scored.len());
         for pos in doc_start..end.saturating_sub(DMER - 1) {
-            let h = dmer_hash(data, pos);
+            let h = dmer_hash(scored, pos);
             if seen[h] != id as u32 {
                 seen[h] = id as u32;
                 freqs[h] += 1;

@@ -1,4 +1,9 @@
-﻿namespace OmmitedDatabaseModel3;
+erride MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>()
+            .Include<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceB, DestinationB>();﻿namespace OmmitedDatabaseModel3;
 
 public class Entity23 : BaseEntity
 {
@@ -16,446 +21,315 @@ blic string TestName { get; }
             public Expectation(string testName)
             {
                 TestName = testName;
- (cfg =>
-    {
-        cfg.CreateMap<Source, Destination>()
-            .Include<SourceA, DestinationA>();
-        cfg.CreateMap<SourceA, DestinationA>();
-        cfg.CreateMap<SourceB, DestinationB>();
-    });
-    [Fact]
-    public void Should_construct_co get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the test case should use a <see cref="CancellationToken"/>.
+  / Gets or sets the current test
         /// </summary>
-        public bool UseCancellation { get; set; }
+        public Test CurrentTest { get; set; }
 
         /// <summary>
-        /// Gets or sets the <s   new SourceWrapper { Source = new Source { Value = 5 } },
-            new SourceWrapperA { Source = new Source { Value = 5 }, SourceA = new SourceA() { A = "a" } },
-            new SourceWrapperB { Source = new Source { Value = 5 }, SourceB = new SourceB new MapperConfiguration(cfg =>
+        /// The time the current test started execution
+        /// </summary>
+        public DateTime StartTime { get; set; }
+
+Because_of()
+    {
+        _destination = new[] { new Source() }.AsQueryable().ProjectTo<Destination>(Configuration).First();
+    }
+
+    [Fact]
+    public void Should_handle_projectusing_with_the_queried_entity()
+    {
+        _destination.Number.ShouldBe(   new object[] { new[] { 1, 2, 3, 2 }, new[] { 2 } },
+            new object[] { new[] { 2, 1, 2, 3, 2 }, new[] { 2 } },
+            new object[] { new[] { 2, 1, 2, 3, 3 }, new[] { 2, 3 } },
+            new object[] { new[] { "x", null, "x" }, new[] { "x"recognized by the intended listeners.</param>
+        /// <param name="message">A message to be sent</param>
+        public void SendMessage(string destination, string message)
+        {
+            Listener?.SendMessage(new TestMessage(destination, messagraint()
+        {
+        }
+
+        public override string Description => throw new NotImplementedException();
+
+        public override ConstraintResult ApplyTo<TActual>(TActual actual)
+        {
+            return new ConstraintResult(this, actual);
+   ework.Constraints.Comparers
+{
+    /// <summary>
+    /// Comparator for two <see cref="String"/>s.
+    /// </summary>
+    internal static class StringsComparer
+    {
+        public static EqualMethodResult Equal(object x, object y, ref Tolerance tolerance,  new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, DestWithNoConstructor>()
                 .ForMember(dest => dest.Value1, opt => opt.MapFrom(src => src.Value))
-                .ForCtorParam("thing", opt => opt.MapFrom(src => src.ination<int> destination = new Destination<int> { Value2 = 5, StringValue2 = "Joe" };
-                Source<int> source = Mapper.Map<Source<int>>(destination);
-                source.Value.ShouldBe(5);
-                source.StringValue.ShouldBe("Joe");
- ypesNotSupported;
-
-            if (tolerance.HasVariance)
-                return EqualMethodResult.ToleranceNotSupported;
-
-            var stringComparison = equalityComparer.IgnoreCase ? StringComparison.CurrentCultureIgnoreCase : StringComparison.Ordinal, SetCulture("")]
-        [TestCaseSource(nameof(IgnoreCaseData))]
-        public void HonorsIgnoreCase(IEnumerable actual)
+                .ForCtorParam("thing", opt => opt.MapFrom(src => src.erride void Write(char value)
         {
-            var constraint = new UniqueItemsConstraint().IgnoreCase;
-            var result = constraint.ApplyTo(actual);
-estCaseAttribute(object? arg1, object? arg2)
-        {
-            RunState = RunState.Runnable;
-            Arguments = new[] { arg1, arg2 };
-            Properties = new PropertyBag();
+            writer.Write(value);
         }
 
-        /// <summary>
-        /// Construct a TestCaseAttrc AdhocContext()
-            {
-                CurrentTest = new TestMethod(new MethodWrapper(GetType(), nameof(AdhocTestMethod)));
-                CurrentResult = CurrentTest.MakeTestResult();
-            }
-
-            private void AdhocTestMethod()
-    Enumerator GetEnumerator() => _parent._childNodes?.GetEnumerator() ?? EmptyList.GetEnumerator();
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-            IEnumerator<TNode> IEnumerable<TNode>.GetEnumerator() => GetEnumerator();Containing(Fixture(typeof(SetUpFixture1)).Parallelizable()
-                                .Containing(Fixture(typeof(SetUpFixture2)).Parallelizable()
-                                    .Containing(
-                                        Fixture(typeof(   _destination.Values.ShouldNotBeNull();
-        _destination.Values.ShouldContain(1);
-        _destination.Values.ShouldContain(2);
-        _destination.Values.ShouldContain(3);
-        _destination.Values.ShouldContain(4);
-    }
-
-    [Fact]
-    System.Reflection;
-
-// Information about this assembly is defined by the following attributes.
-// Change them to the values specific to your project.
-
-[assembly: AssemblyTitle("NUnit Framework Tests")]
-
-[assembly: AssemblyDescription("")]
-[assembly: Assembr the constraint is satisfied by a given value
-        /// </summary>
-        /// <param name="actual">The value to be tested</param>
-        /// <returns>A ConstraintResult</returns>
-        public override ConstraintResult ApplyTo<TActual>(TActual actual}
-
-    [Test]
-    public void EquivalentHandlesNull()
-    {
-        ICollection set1 = new SimpleObjectCollection(null, "x", null, "z");
-        ICollection set2 = new SimpleObjectCollection("z", null, "x", null);
-
-        Assert.That(new CollectionEquivaltActionCommand(TestCommand innerCommand, TestActionItem action)
-            : base(innerCommand)
+        public override void Write(string value)
         {
-            Guard.ArgumentValid(innerCommand.Test is TestSuite, "BeforeTestActionCommand may only apply to a TestSuite", nameof(innerCommand));
-   iption of what this constraint tests, for
-        /// use in messages and in the ConstraintResult.
-        /// </summary>
-        public override string Description => "same as " + MsgUtils.FormatValue(_expected);
+            writer.Write(value);
+        }
 
-        /// <summary>
-        /// Test whnValidatingSpecBase
-        {
-            public class Source
-            {
-                public int Value { get; set; }
-            }
+        public override void WriteLine(strin NUnit.TestData.ParallelExecutionData;
+using NUnit.Framework.Tests.TestUtilities;
 
-            [AutoMap(typeof(Source))]
-            public class Dest
-            {
-                public int Value { gModel3WithCollections;
-
-public class Entity22 : BaseEntity
+namespace NUnit.Framework.Tests.Internal.Execution
 {
-    public Entity22()
-    {
-        this.Entities20 = new List<Entity20>();
-        this.Entities24 = new List<Entity24>();
-    }
-    public ICollection<Entity20> Entities20 { get;le { get; private set; }
+    [TestFixtureSource(nameof(GetParallelSuites))]
+    [NonParallelizable]
+    public class ParallelExecutionTests : ITemarking it as explicit.
+        /// </summary>
+        /// <param name="test">The test to modify</param>
+        public void ApplyToTest(Test test)
+        {
+            if (test.RunState != RunState.NotRunnable && test.RunState != RunState.Ignored)
+     oid SetUp()
+        {
+            ExpectedDescription = "False";
+            StringRepresentation = "<false>";
+        }
 
-        public IList<string> TestList { get; } = new List<string>();
+#pragma warning disable IDE0052 // Remove unread private members
+        private static readonly object[] SuccessData = newring methodName, params object[] expected)
+        {
+            MethodInfo? method = GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.That(method, Is.Not.Null);
+            ParameterInfo param = method.Gestring GetSkipReason()
+        {
+            return (string?)Test.Properties.Get(PropertyNames.SkipReason) ?? string.Empty;
+        }
+
+        private string? GetProviderStackTrace()
+        {
+            return (string?)Test.Properties.Get(PropertyNames.Public IList<string> TestList { get; } = new List<string>();
         public IList<string> PreFilters { get; } = new List<string>();
 
-        public IDictionary<string, string> TestParameters { get; } = new Dictionary<strinus, Is.EqualTo(TestStatus.Failed));
-            Assert.That(result.Message, Contains.Substring("OddlyNamedException"));
-            Assert.That(result.Message, Contains.Substring("Failure message"));
+        public IDictionary<string, string> TestParameters { get; } = new Dictionary<string, string>();
 
-            Assert.That(getResultWasCalled, Is.False);
-e genericType)
+  ic async Task AssertionPasses_FaultedTask_ThrowsMatchingException()
         {
-            if (IsTypeGeneric(genericType))
-            {
-                string genericTypeDefinition = genericType.GetGenericTypeDefinition().Name;
-
-                List<Type> genericParams = new(genericType.GetGenericArguments()To(array);
-        Assert.That(constraintResult.IsSuccess, Is.False);
-
-        TextMessageWriter writer = new TextMessageWriter();
-        constraintResult.WriteMessageTo(writer);
-
-        var expectedMessage =
-            "  Expected: equivalent to < \"pr   if (x is DateTimeOffset xDateTimeOffset && y is DateTimeOffset yDateTimeOffset)
-                return (xDateTimeOffset - yDateTimeOffset).Duration();
-
-            throw new ArgumentException("Both arguments must be DateTime, DateTimeOffset or TimeSpan"id TestCaseRunnableState(string methodName, RunState expectedState)
-        {
-            var test = (Test)TestBuilder.MakeParameterizedMethodSuite(
-                typeof(TestCaseAttributeFixture), methodName).Tests[0];
-            Assert.That(test.RunStaerride void Execute()
-            {
-                lock (_teardownLock)
-                {
-                    if (Test.TestType == "Theory" && Result.ResultState == ResultState.Success && Result.PassCount == 0)
-                        Result.SetResult(Resxt : LocalDbContext
-    {
-        public DbSet<Class1> Class1Set { get; set; }
-        public DbSet<Class2> Class2Set { get; set; }
-        public DbSet<Class3> Class3Set { get; set; }
-    }
-
-    public class DatabaseInitializer : DropCreateDatabaseAlways<ernal;
-
-namespace NUnit.Framework
-{
-    /// <summary>
-    /// Marks an assembly, test fixture or test method such that it will only run if explicitly
-    /// executed from the GUI, command line or included within a test filter.
-    /// The test will n    }
-
-#pragma warning disable NUnit1004 // The TestCaseAttribute provided too many arguments
-        [TestCase("a", "b", Explicit = true)]
-        public void ShouldNotRunAndShouldNotFailInConsoleRunner()
-        {
-            Assert.Fail();
-        }
-#prhodCallsSetUpAndTearDown()
-        //{
-        //    SetUpAndTearDownFixture fixture = new SetUpAndTearDownFixture();
-        //    TestSuite suite = TestBuilder.MakeFixture(fixture.GetType());
-        //    suite.Fixture = fixture;
-        //    Test testypeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => AssertConfigurationIsValid<FirstSource, Dest>());
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => AssertConfigurationIsValid<SecondSource, Dest>());
- ublic CategoryDto Category { get; set; }
-    }
-}﻿using AutoMapper.Configuration.Conventions;
-using AutoMapper.Features;
-using AutoMapper.Internal.Mappers;
-using AutoMapper.QueryableExtensions.Impl;
-
-namespace AutoMapper.Internal;
-
-using Validator = Actio      CheckOptionCombinations();
-
-                _validated = true;
-            }
-
-            return ErrorMessages.Count == 0;
-        }
-
-        #endregion
-
-        #region Helper Methods
-
-        protected virtual void CheckOptionCombinations()
-    string XmlElementName => "MockTest";
-
-            public override bool HasChildren => Tests.Count > 0;
-
-            public override IList<ITest> Tests => new List<ITest>();
-
-            public override TNode AddToXml(TNode parentNode, bool recursive)
-   c void ReferenceEqualsFailsWhenUsed()
-        {
-            Assert.That(() => Assert.ReferenceEquals(string.Empty, string.Empty),
-                Throws.InvalidOperationException.With.Message.StartWith("Assert.ReferenceEquals should not be used."));
-  ation, ProfileMap profileMap, TypePair typePair, Expression source,
-        MemberMap memberMap = null, Expression destination = null)
-    {
-        destination ??= configuration.Default(typePair.DestinationType);
-        var typeMap = configuration.Res   var @delegate = ConstraintUtils.RequireActual<Delegate>(actual, nameof(actual));
-
-            _caughtException = ExceptionHelper.RecordException(@delegate, nameof(actual));
-
-            if (_caughtException is not null)
- StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            for (int r = 0; r < indices.Length; r++)
-            {
-                if (r > 0)
-                    sb.Append(',');
-                sb.Append(indices[r].ToString());
-  static bool AreEqual(object expected, object actual, ref Tolerance tolerance)
-        {
-            if (expected is double || actual is double)
-                return AreEqual(Convert.ToDouble(expected), Convert.ToDouble(actual), ref tolerance);
-
-   and OneTimeTearDown are allowed for {nameof(LifeCycle.InstancePerTestCase)} mode.")
-                : null;
-
-            List<SetUpTearDownItem> setUpTearDownItems =
-                BuildSetUpTearDownList(_suite.OneTimeSetUpMethods, _suite.OneTimeTearDownadonly Type[] Int32RangeConvertibleToParameterTypes = { typeof(int), typeof(sbyte), typeof(byte), typeof(short), typeof(decimal), typeof(long), typeof(double) };
-        private static readonly Type[] UInt32RangeConvertibleToParameterTypes = { typeof(uint)name="message">The message to be written</param>
-        /// <param name="args">Any arguments used in formatting the message</param>
-        public void WriteMessageLine(string message, params object?[]? args)
-        {
-            WriteMessageLine(0, messic async Task Failure_CompletedTask_ThrowsException()
-        {
-            await AssertAssertionFailsAsync(async () => await Assert.ThatAsync(() => Task.CompletedTask, Throws.InvalidOperationException));
+            await Assert.ThatAsync(() => Task.FromException(new InvalidOperationException()), Throws.InvalidOperationException);
         }
 
         [Test]
-        public async Taskilter will recognize.</param>
-        /// <param name="isRegex">Indicated that the value in <paramref name="expectedValue"/> is a regular expression.</param>
-        public NamespaceFilter(string expectedValue, bool isRegex = false) : base(expectedValue, it.That(filter.Match(DummyFixtureSuite));
-            Assert.That(filter.IsExplicitMatch(DummyFixtureSuite), Is.False);
-
-            Assert.That(filter.Match(AnotherFixtureSuite));
-            Assert.That(filter.IsExplicitMatch(AnotherFixtureSuite), Is.Fa using (var context = new SingleThreadedTestSynchronizationContext(shutdownTimeout: TimeSpan.FromSeconds(1)))
-            {
-                var thread = new Thread(context.Run);
-
-                using (var queueRunning = new ManualResetEventSlim())
-   ystem.IO;
-using System.Text;
-using NUnit.Framework.Tests.TestUtilities;
-
-namespace NUnit.Framework.Legacy.Tests
-{
-    [TestFixture]
-    public class AssertEqualsTests
-    {
-        // Here we use real comparison to validate NUnit Assert.AreEquals behaviouric TestMessage(string destination, string text, string? testId)
+        public async TapFixtureStuff
         {
-            Guard.ArgumentNotNull(destination, nameof(destination));
-            Guard.ArgumentNotNull(text, nameof(text));
-
-            Destination = destination;
-            Messag void SomeTest()
-        {
-            Assert.That(!EqualityComparer<T>.Default.Equals(_arg, default(T)), "constructor argument was not injected");
-        }
-    }
-
-    #region Source Data Classes
-
-    internal class SourceData_IEnumerable : IEnumerable
-     cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
-            });
-
-            protected override void Because_of()
+            [OneTimeSetUp]
+            public void FixtureSetup()
             {
-                _result = Mapper.Map<Source, Destination>(new Source(10));
+                SimpleEventRecorder.RegisterEvent("StaticFixture.Fixture.SetUp");
             }
 
-            [FFlag indicating whether to use CDATA when writing the text</param>
-        public TNode(string name, string? value, bool valueIsCDATA)
-            : this(name)
-        {
-            Value = XmlExtensions.EscapeInvalidXmlCharacters(value);
-            Valueatic ITestResult CheckResult(string methodName, ResultState expectedResultState, int expectedAsserts, params string[] assertionMessageRegex)
-        {
-            ITestResult result = TestBuilder.RunTestCase(typeof(AssertMultipleFixture), methodName);
-
- ion<TDestinatonKey, TDestinatonValue> destination, int sourceMember, string destMember, ResolutionContext context) => sourceMember.ToString();
-    }
-    [Fact]
-    public void Should_map_non_generic_destination()
+            [SetUp]
+            public void Setup()
+   ss TestCaseAttribute : NUnitAttribute, ITestBuilder, ITestCaseData, IImplyFixture
     {
-        var destination = Map<Destinavoid CategoryAttributeSetsMultipleCategories()
-        {
-            new CategoryAttribute("group1").ApplyToTest(_test);
-            new CategoryAttribute("group2").ApplyToTest(_test);
-            Assert.That(_test.Properties[PropertyNames.Category],
-    ualTo(1));
-        }
-
-        [TestCase(1)]
-        public void CanConvertIntToNullableSByte(sbyte? x)
-        {
-            Assert.That(x.HasValue);
-            Assert.That(x.Value, Is.EqualTo(1));
-        }
-
-        [TestCase(1)]
-        public void CanCmberMap, Expression sourceExpression) =>
-        Coalesce(sourceExpression, ToType(Constant(memberMap.NullSubstitute), sourceExpression.Type));
-    public static Expression ApplyTransformers(this MemberMap memberMap, Expression source, IGlobalConfigutResult;
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result!.IsSuccess, Is.True);
-        }
-
-        private static TestCaseData[] RequiresDefaultComparer
-        {
-            get
-            {
-                var sameRef = new       ClassicAssert.Less(5L, 8.2d, "long to double");
-            ClassicAssert.Less(5L, 8U, "long to uint");
-            ClassicAssert.Less(5L, 8UL, "long to ulong");
-            ClassicAssert.Less(5L, 8M, "long to decimal");
-
-            ClassicAssert.Letructors(type, argTypes).FirstOrDefault();
-            if (ctor is null)
-                throw new InvalidTestFixtureException(type.FullName + " does not have a suitable constructor");
-            ParameterInfo[] parameterInfos = ctor.GetParameters();
-
- // The display name of this Constraint for use by ToString().
-        /// The default value is the name of the constraint with
-        /// trailing "Constraint" removed. Derived classes may set
-        /// this to another name in their constructors.
-       Assume.That(case1, Is.GreaterThanOrEqualTo(0));
-            Assume.That(case2, Is.GreaterThanOrEqualTo(0));
-
-            int firstAction = Math.Min(case1, case2) - NumTestCaseActions - NumParameterizedTestActions;
-            int lastAction = Math.Max(static EqualMethodResult Equal(object x, object y, ref Tolerance tolerance, ComparisonState state, NUnitEqualityComparer equalityComparer)
-        {
-            Type xType = x.GetType();
-            Type yType = y.GetType();
-
-            if (xType != yTypestem.Diagnostics.CodeAnalysis;
-
-namespace NUnit.Framework.Interfaces
-{
-    /// <summary>
-    /// A PropertyBag represents a collection of name/value pairs
-    /// that allows duplicate entries with the same key. Methods
-    /// are provided for adding a neateMap<MailOrder, MailOrderDto>();
-        });
-
-        var mapper = config.CreateMapper();
-
-        var mailOrder = new MailOrder() { NewId = 1 };
-        var mapped = mapper.Map<OrderDto>(mailOrder);
-
-        mapped.ShouldBeOfType<MailOrderDto>();
-  name="expectedEvents">The expected events.</param>
-        public static void Verify(params string[] expectedEvents)
-        {
-            int item = 0;
-            foreach (string expected in expectedEvents)
-            {
-                string? actualtion was added in .NET Framework 4.6
-        private static Task TaskFromException(Exception exception)
-        {
-            var source = new TaskCompletionSource<object>();
-            source.SetException(exception);
-            return source.Task;
-    ntMapper : IObjectMapper
-    {
-        public bool IsMatch(TypePair context)
-            => context.SourceType == typeof(int) && context.DestinationType == typeof(int);
-
-        public Expression MapExpression(IGlobalConfiguration configurationProvidehe constraint
-        /// stack and pushes the resulting constraint on it.
-        /// </summary>
-        public override void Reduce(ConstraintBuilder.ConstraintStack stack)
-        {
-            if (RightContext is null || RightContext is BinaryOperator)NodeModel>().ForMember(d => d.Connections, o => o.MapFrom(s => new[] { s.True, s.False }));
-        cfg.CreateMap(typeof(FlowSwitch<>), typeof(FlowNodeModel));
-        cfg.CreateMap<FlowNode, Connection>().ForMember(d => d.Node, o => o.MapFrom(s => s));
-    Type sourceType = SourceType ?? method.TypeInfo.Type;
-
-            // Handle Type implementing IEnumerable separately
-            if (SourceName is null)
-                return Reflect.Construct(sourceType, null) as IEnumerable;
-
-            MemberInfo[ name="filter">A string containing the XML representation of the filter to use</param>
-        /// <returns>The number of tests</returns>
-        public int CountTests(string? filter)
-        {
-            return Runner.CountTestCases(TestFilter.FromXml(fible.GetUnderlyingType(targetType) ?? targetType;
-
-            if (underlyingTargetType == typeof(short) || underlyingTargetType == typeof(byte) || underlyingTargetType == typeof(sbyte)
-                || underlyingTargetType == typeof(long) || underlyingTaraint to an actual value, succeeding if the constraint
-        /// is satisfied and issuing a warning on failure.
-        /// </summary>
-        /// <typeparam name="TActual">The Type being compared.</typeparam>
-        /// <param name="del">An ActualValue x.ID, x => x.Parent);
-
-//        Mapper.CreateMap<int, ParentDto>().ConvertUsing(new ChildIdToParentDtoConverter(parents));
-//        Mapper.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
-
-//        MapperormAttribute is only available on NET5.O or greater
-            var osPlatformAttributes = OsPlatformAttributeType is null ?
-                Array.Empty<Attribute>() :
-                (Attribute[])provider.GetCustomAttributes(OsPlatformAttributeType, inherrningCount, ColorStyle.Warning);
-            WriteSummaryCount(", Inconclusive: ", summary.InconclusiveCount);
-            WriteSummaryCount(", Skipped: ", summary.TotalSkipCount);
-            Writer.WriteLine();
-
-            if (summary.FailedCount > 0)
-     // Abstract because we support syntax extension by inheriting and declaring new static members.
-    public abstract class CollectionAssert : AssertBase
-    {
-        #region Equals and ReferenceEquals
+        #region Constructors
 
         /// <summary>
-        /// DO NOT USE! Use alValueDelegate<TActual> del, IResolveConstraint expr,
-            FormattableString message,
-            [CallerArgumentExpression(nameof(del))] string actualExpression = "",
-            [CallerArgumentExpression(nameof(expr))] string constraintExpressreturn GetWindowsProductType();
-#endif
+        /// Construct a TestCaseAttribute with a list of arguments.
+        /// This constructor is not CLS-Complian this.Entities12 = new List<EntityDTO12>();
+        this.Entities1 = new List<EntityDTO1>();
+    }
+
+    //public Address Address { get; set; }
+    public ICollection<EntityDTO12> Entities12 { get; set; }
+    public ICollection<EntityDTO1> Entities1 { get;en <paramref name="expected"/> and <paramref name="actual"/>.
+        /// </summary>
+        /// <param name="expected">The expected object.</param>
+        /// <param name="actual">The actual object.</param>
+        /// <param name="expectedTypeShortened"ernal;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using NUnit.TestData.TestUtilities;
+
+namespace NUnit.TestData.TestFixtureSourceData
+{
+    public abstract class TestFiatic Expression MapExpression(this IGlobalConfiguration configuration, ProfileMap profileMap, TypePair typePair, Expression source,
+        MemberMap memberMap = null, Expression destination = null)
+    {
+        destination ??= configuration.Default(typeP DerivedSetUpAndTearDownFixture fixture = new DerivedSetUpAndTearDownFixture();
+            TestBuilder.RunTestFixture(fixture);
+
+            Assert.That(fixture.SetUpCount, Is.EqualTo(1));
+            Assert.That(fixture.TearDownCount, Is.EqualTo(1));
+   ssion => _validator.Expression;
+    ProjectionBuilder CreateProjectionBuilder() => new(this, ConfigurationExpression.ProjectionMappers.ToArray());
+    IProjectionBuilder IGlobalConfiguration.ProjectionBuilder => _projectionBuilder.Value;
+    Func<Type, o  ClassicAssert.AreEqual(35, sb13);
+            ClassicAssert.AreEqual(35, d14);
+            ClassicAssert.AreEqual(35, d15);
+            ClassicAssert.AreEqual(35, s16);
+            ClassicAssert.AreEqual(35, i17);
+            ClassicAssert.AreEqual(35, uresult.Message, Contains.Substring("OddlyNamedException"));
+            Assert.That(result.Message, Contains.Substring("Failure message"));
+        }
+
+        private sealed class OddlyNamedException : Exception
+        {
+            public OddlyNamedExcepShould_map_attribute_value()
+            {
+                var source = new Source
+                {
+                    Value = 5
+                };
+
+                var dest = Mapper.Map<Dest>(source);
+
+                dest.OtherValue.ShouldBe(source.ValSE.txt
+using System;
+
+namespace NUnit.Framework.Constraints
+{
+    /// <summary>
+    /// Operator that tests for the presence of a particular attribute
+    /// on a type and optionally applies further tests to the attribute.
+    eateFakeTests(ApartmentState.Unknown, ApartmentState.MTA, ApartmentState.Unknown), ApartmentState.MTA);
+            yield return new TestCaseData(CreateFakeTests(ApartmentState.MTA, ApartmentState.Unknown, ApartmentState.Unknown), ApartmentState.MTA);
+    Type) ?? targetType;
+
+            if (underlyingTargetType == typeof(short) || underlyingTargetType == typeof(byte) || underlyingTargetType == typeof(sbyte)
+                || underlyingTargetType == typeof(long) || underlyingTargetType == typeof(double))
+nCommand(TestCommand innerCommand, SetUpTearDownItem setUpTearDown)
+            : base(innerCommand)
+        {
+            Guard.ArgumentValid(innerCommand.Test is TestMethod, "SetUpTearDownCommand may only apply to a TestMethod", nameof(innerCommand));
+  cted);
+
+        /// <summary>
+        /// Test whether the constraint is satisfied by a given value
+        /// </summary>
+        /// <param name="actual">The value to be tested</param>
+        /// <returns>True for success, false for failure</retusonText);
+            sb.Append(MsgUtils.FormatValue(_expected));
+
+            if (_tolerance is not null && _tolerance.HasVariance)
+            {
+                sb.Append(" within ");
+                sb.Append(MsgUtils.FormatValue(_tolerance.Amount));
+
+ n => n.CourseName == "Course 1");
+        }
+        _course.Content[0].Category.CategoryName.ShouldBe("Category 1");
+    }
+
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    {
+        protected override void Seed(ClientConts not called");
+    }
+
+    [Test]
+    public static void UsesBooleanReturningDelegateWithImplicitParameterTypes()
+    {
+        Assert.That(new[] { 1 }, Is.EquivalentTo(new[] { 1 }).Using<int>((x, y) => x.Equals(y)));
+    }
+
+    [Test]
+    public void Chec     [EditorBrowsable(EditorBrowsableState.Never)]
+        public static new bool Equals(object a, object b)
+        {
+            throw new InvalidOperationException("CollectionAssert.Equals should not be used. Use CollectionAssert.AreEqual instead.");
+  raint = new UniqueItemsConstraint().IgnoreCase;
+            var items = new[] { "r\u00E9sum\u00E9", "re\u0301sume\u0301" };
+
+            var result = constraint.ApplyTo(items) as UniqueItemsConstraintResult;
+
+            Assert.That(result, Is.Not.Null);
+ tName, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void TestsRunOnExpectedWorkers()
+        {
+            Assert.Multiple(() =>
+            {
+                foreach (var e in TestEvents)
+                    _expectations.Verify(e);
+   eturn dt.ToString(Fmt_DateTime, CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatDateTimeOffset(DateTimeOffset dto)
+        {
+            return dto.ToString(Fmt_DateTimeOffset, CultureInfo.InvariantCulture);
+   eturn v.StartsWith("-", StringComparison.Ordinal) || (v.StartsWith("/", StringComparison.Ordinal) && Path.DirectorySeparatorChar != '/');
+        }
+
+        private void ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecificatiity, Array.Empty<string>());
+
+            System.Globalization.CultureInfo culture = new System.Globalization.CultureInfo("en-GB");
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+    public NamespaceFilter(string expectedValue, bool isRegex = false) : base(expectedValue, isRegex)
+        {
+        }
+
+        /// <summary>
+        /// Match a test against a single value.
+        /// </summary>
+        public override bool Match(ITest tent), typeof(long), typeof(ulong), typeof(char), typeof(float) } },
+            { typeof(float), new List<Type> { typeof(sbyte), typeof(byte), typeof(short), typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(char), typeof(float)eption).ShouldNotBeThrownBy(() => AssertConfigurationIsValid<Source, Destination>());
+            }
+        }
+
+        public class When_specifying_a_mapping_order_with_attributes : NonValidatingSpecBase
+        {
+            private Destination _result;ng GetGenericTypeName(Type type)
+        {
+            Guard.ArgumentNotNull(type, nameof(type));
+
+            if (IsTypeGeneric(type))
+            {
+                Type generic = type.GetGenericTypeDefinition();
+                return generic.FullName();tState.Failure), "Suite result");
+                Assert.That(result.Children.ToArray()[0].ResultState, Is.EqualTo(ResultState.Success), "First test");
+                Assert.That(result.Children.ToArray()[1].ResultState, Is.EqualTo(ResultState.Failure), "heritedMap(inheritedTypeMap);
+    public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember) => Details.FindOrCreateSourceMemberConfigFor(sourceMember);
+    class TypeMapDetails
+    {
+        Features<IRuntimeFeature> _features;
+ raint tests that the actual value is a double or float NaN
+    /// </summary>
+    public class NaNConstraint : Constraint
+    {
+        /// <summary>
+        /// The Description of what this constraint tests, for
+        /// use in messages and in the ConsValue2.ShouldBe(5);
+    }
+}﻿namespace OmmitedDTOModel3WithCollections;
+
+public class EntityDTO21 : BaseEntity
+{
+    public Guid Entity20Id { get; set; }
+    public EntityDTO20 Entity20 { get; set; }
+}
+﻿namespace AutoMapper.UnitTests;
+public class TypeEAreNotEqual(IEnumerable expected, IEnumerable actual, IComparer comparer, string message, params object?[]? args)
+        {
+            Framework.Assert.That(actual, Is.Not.EqualTo(expected).Using(comparer), () => ConvertMessageWithArgs(message, args));
+   name="suite">The TestSuite to be executed</param>
+        /// <param name="childFilter">A filter used to select child tests</param>
+        public CompositeWorkItem(TestSuite suite, ITestFilter childFilter)
+            : base(suite, childFilter)
+  rator;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable<T>)this).GetEnumerator();
+        }
+    }
+
+    internal class DisposableEnumerator<T> : IEnumerator<T>
+    {
+        private bool _disposedValue = ndif
         }
 
 #if !NETFRAMEWORK
@@ -465,437 +339,582 @@ namespace NUnit.Framework.Interfaces
         private static ProductType GetWindowsProductType()
         {
             try
-   ntities19 = new Entity19();
+            {
+                using var kionDemo
+    {
+        [TearDown]
+        public void TearDown()
+        {
+            Console.WriteLine("Teardown Start, expect to see a Teardown End message");
+            Assert.Multiple(() => Assert.That(true));
+            Console.WriteLine("Teardown Eer.MakeParameterizedMethodSuite(
+                typeof(TestCaseAttributeFixture), nameof(TestCaseAttributeFixture.MethodWithArrayArguments));
+
+            Assert.That(suite.TestCaseCount, Is.EqualTo(4));
+            var expectedNames = new[]
+     new(c => c.CreateMap(typeof(Source<>), typeof(Destination)).ReverseMap());
+    [Fact]
+    public void Should_work() => Map<Destination>(new Source<int> { Inner = new() { Id = 42 } }).InnerId.ShouldBe(42);
+}
+public class ForPathGenerics : Autoller(string assemblyNameOrPath, string? idPrefix, IDictionary settings)
+        {
+            Initialize(assemblyNameOrPath, settings);
+
+            Builder = new DefaultTestAssemblyBuilder();
+            Runner = new NUnitTestAssemblyRunner(Builder);
+
+   eSourceTest
+    {
+        public IEnumerableSource(string arg) : base(arg, nameof(SourceData_IEnumerable))
+        {
+        }
+    }
+
+    [TestFixtureSource(nameof(MyData))]
+    public class SourceReturnsObjectArray : TestFixtureSourceDivideTest
+    {
+IncludingCurrentCultureRunsTest()
+        {
+            string name = System.Globalization.CultureInfo.CurrentCulture.Name;
+            new CultureAttribute(name).ApplyToTest(_test);
+            Assert.That(_test.RunState, Is.EqualTo(RunState.Runnable));
+ Tests.Attributes
+{
+    public partial class RangeAttributeTests
+    {
+        #region Shared specs
+
+        private static IEnumerable<Type> TestedParameterTypes() => new[]
+        {
+            typeof(sbyte),
+            typeof(byte),
+  ol IsCollection(this TypePair context) => context.SourceType.IsCollection() && context.DestinationType.IsCollection();
+    public static bool IsEnumToEnum(this TypePair context) => context.SourceType.IsEnum && context.DestinationType.IsEnum;
+    pegion Properties
+
+        /// <summary>
+        /// Gets the name of the node
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Gets the value of the node
+        /// </summary>
+        public string? Value { getf (awaiter is null)
+                throw new ArgumentNullException(nameof(awaiter));
+            if (continuation is null)
+                throw new ArgumentNullException(nameof(continuation));
+
+            var context = SynchronizationContext.Current;
+
+ name="sourceName">The name of a static method, property or field that will provide data.</param>
+        public TestCaseSourceAttribute(Type sourceType, string sourceName)
+        {
+            SourceType = sourceType;
+            SourceName = sourceName;
+t = true)]
+        public void ShouldNotRunAndShouldNotFailInConsoleRunner()
+        {
+            Assert.Fail();
+        }
+#pragma warning restore NUnit1004 // The TestCaseAttribute provided too many arguments
+
+        [Test]
+        public void CanSpecifc void WorksWithImmutableDictionary()
+    {
+        var numbers = Enumerable.Range(1, 3).ToList();
+        var test1 = numbers.ToImmutableDictionary(t => t);
+        var test2 = numbers.ToImmutableDictionary(t => t);
+
+        Assert.That(test1, Is.Eq       ValueA = valueA;
+                ValueB = valueB;
+                ValueC = valueC;
+                ValueD = valueD;
+            }
+
+            public int ValueA { get; }
+            public double ValueB { get; }
+            public string ValueC { geferenceEqualsFailsWhenUsed()
+        {
+            var ex = Assert.Throws<InvalidOperationException>(() => CollectionAssert.ReferenceEquals(string.Empty, string.Empty));
+            Assert.That(ex?.Message, Does.StartWith("CollectionAssert.ReferenceEquals ternal
+{
+    internal static partial class AsyncEnumerableAdapter
+    {
+        private static partial bool TryGetAsyncBlockingEnumerable(object enumerable, out IEnumerable<object?>? result)
+        {
+            if (enumerable is IAsyncEnumerable<object> // The display name of this Constraint for use by ToString().
+        /// The default value is the name of the constraint with
+        /// trailing "Constraint" removed. Derived classes may set
+        /// this to another name in their constructors.
+    pletion</param>
+        public virtual void Cancel(bool force)
+        {
+            if (Context is not null)
+                Context.ExecutionStatus = force ? TestExecutionStatus.AbortRequested : TestExecutionStatus.StopRequested;
+
+#if THREAD_ABORT
+       IConfigurationProvider configurationProvider) => configurationProvider.Internal().GetAllTypeMaps();
+    public static TypeMap ResolveTypeMap(this IConfigurationProvider configurationProvider, Type sourceType, Type destinationType) => configurationProvidection;
+
+// Information about this assembly is defined by the following attributes.
+// Change them to the values specific to your project.
+
+[assembly: AssemblyTitle("mock-assembly")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyCulture("")]
+// CoouldBe(new Class2DTO[] { null, null, null });
+    }
+
+    public class TestContext : LocalDbContext
+    {
+        public DbSet<Class1> Class1Set { get; set; }
+        public DbSet<Class2> Class2Set { get; set; }
+        public DbSet<Class3> Class3Set { geteturns>true if the object is a numeric type</returns>
+        public static bool IsNumericType(object? obj)
+        {
+            return IsFloatingPointNumeric(obj) || IsFixedPointNumeric(obj);
+        }
+
+        internal static bool IsNumericType(Type lic interface IParameterDataSource
+    {
+        /// <summary>
+        /// Retrieves a list of arguments which can be passed to the specified parameter.
+        /// </summary>
+        /// <param name="parameter">The parameter of a parameterized test.</parEqualityComparerTests
+    {
+        private Tolerance _tolerance;
+        private NUnitEqualityComparer _comparer;
+
+        [SetUp]
+        public void Setup()
+        {
+            _tolerance = Tolerance.Default;
+            _comparer = new NUnitEqualityC name="parentNode">The parent node.</param>
+        /// <param name="recursive">If true, children are included, where applicable</param>
+        /// <returns></returns>
+        TNode AddToXml(TNode parentNode, bool recursive);
+    }
+}
+// Cint to an actual value, succeeding if the constraint
+        /// is satisfied and issuing a warning on failure.
+        /// </summary>
+        /// <typeparam name="TActual">The Type being compared.</typeparam>
+        /// <param name="del">An ActualValueDe      _builder.Add(new TestSuite(typeof(SomeFixture)));
+            _builder.Add(new SetUpFixture(new TypeWrapper(typeof(NoNamespaceSetupFixture))));
+            _builder.Add(new SetUpFixture(new TypeWrapper(typeof(NoNamespaceSetupFixture))));
+
+ ntain(expectedMessage));
+        }
+
+        [Test]
+        public void AreEquivalentHandlesNull()
+        {
+            ICollection set1 = new SimpleObjectCollection(null, "x", null, "z");
+            ICollection set2 = new SimpleObjectCollection("z", nulleption was added in .NET Framework 4.6
+        private static Task TaskFromException(Exception exception)
+        {
+            var source = new TaskCompletionSource<object>();
+            source.SetException(exception);
+            return source.Task;
+   tion)).ForMember("Value", o => o.MapFrom(typeof(ValueResolver<>))));
+    class ValueResolver<T> : IValueResolver<Source<T>, Destination, object>
+    {
+        public object Resolve(Source<T> source, Destination destination, object destMember, ResolutionCo      MapRequest mapRequest = new(requestedTypes, runtimeTypes, memberMap);
+        return _configuration.GetExecutionPlan<TSource, TDestination>(mapRequest)(source, destination, context);
+    }
+}using System.Dynamic;
+using AutoMapper.Internal.Mappers;
+naeof(B), ExpectedResult = typeof(A))]
+        [TestCase(typeof(B), typeof(A), ExpectedResult = typeof(A))]
+        [TestCase(typeof(A), typeof(string), ExpectedResult = null)]
+        [TestCase(typeof(int[]), typeof(IEnumerable<int>), ExpectedResult = typeome="key">The key</param>
+        /// <param name="value">The value</param>
+        void Add(string key, object value);
+
+        /// <summary>
+        /// Sets the value for a key, removing any other
+        /// values that are already in the property set.
+e void Because_of()
+    {
+        _destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 } });
+    }
+
+    [Fact]
+    public void Should_map_the_list_of_source_items()
+    {
+        _destination.Values.ShouldNotBeNultities19 = new Entity19();
     }
 
     public Entity19 Entities19 { get; set; }
     public Guid? Entity8Id { get; set; }
     public Entity8 Entity8 { get; set; }
     public Guid? Entity17Id { get; set; }
-    public Entity17 Entity17 { get;tState.Failure), "Suite result");
-                Assert.That(result.Children.ToArray()[0].ResultState, Is.EqualTo(ResultState.Success), "First test");
-                Assert.That(result.Children.ToArray()[1].ResultState, Is.EqualTo(ResultState.Failure), "/ Gets the ITestAssemblyRunner used by this controller instance.
-        /// </summary>
-        /// <value>The runner.</value>
-        public ITestAssemblyRunner Runner { get; }
+    public Entity17 Entity17 { get;lter = new OrFilter(
+                new CategoryFilter("Dummy"),
+                new NotFilter(new CategoryFilter("Dummy")));
 
-        /// <summary>
-        /// Gets the AssemblyName or the path for whichruct a <see cref="PropertyBagAdapter"/> from a source
-            /// <see cref="IPropertyBag"/>.
-            /// </summary>
-            public PropertyBagAdapter(IPropertyBag source)
-            {
-                _source = source;
-    class WorkItem : IDisposable
-    {
-        private static readonly Logger Log = InternalTrace.GetLogger("WorkItem");
+            Assert.That(filter.Match(DummyFixtureSuite));
+            Assert.That(filter.IsExplicitMatch(DummyFixtureSuite));
 
-        #region Construction and Initialization
+ ecution;
 
-        /// <summary>
-        /// Construct a WorkItem for a particular test.
-  a test is run.
-    /// </summary>
-    public interface IApplyToContext
-    {
-        /// <summary>
-        /// Apply changes to the execution context
-        /// </summary>
-        /// <param name="context">The execution context</param>
-        void ApplyTs.TryGetValue(FrameworkPackageSettings.NumberOfTestWorkers, out var numberOfTestWorkers)
-                ? (int)numberOfTestWorkers
-                : loadedTest.Properties.TryGet(PropertyNames.LevelOfParallelism, NUnitTestAssemblyRunner.DefaultLevelOfParalrce<>), typeof(Destination<>)).As(typeof(Override<>));
-    });
-    [Fact]
-    public void Validate() => AssertConfigurationIsValid();
-}
-
-public class AsShouldWorkOnlyWithDerivedTypes
+namespace NUnit.Framework
 {
-    class Source
-    {
-    }
-
-    class Destination
-    {
-    }
-
-    [F      [Datapoint]
-        public double Positive = 1;
-
-        [Datapoint]
-        public double Negative = -1;
-
-        [Datapoint]
-        public double Max = double.MaxValue;
-
-        [Datapoint]
-        public double Infinity = double.PositiveInfinity;ublic object NextEnum(Type type)
-        {
-            Array enums = Enum.GetValues(type);
-            return enums.GetValue(Next(0, enums.Length))!;
-        }
-
-        /// <summary>
-        /// Returns a random enum value of the specified Type.
-    il the test or fixture
-    /// completes and is then reset to its original value.
-    /// </summary>
-    /// <seealso cref="SetUICultureAttribute"/>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Assembly, AllowreeNamedDataSlot(NUnitCallContext.TestExecutionContextKey);
-            frameworkAction();
-            var actual = CallContext.GetData(NUnitCallContext.TestExecutionContextKey);
-            Assert.That(actual, Is.Null);
-        }
-
-        [TearDown]
-     id AreNotEqual(IEnumerable expected, IEnumerable actual, IComparer comparer, string message, params object?[]? args)
-        {
-            Framework.Assert.That(actual, Is.Not.EqualTo(expected).Using(comparer), () => ConvertMessageWithArgs(message, args));l value
-        /// is assignable from the type supplied as an argument.
-        /// </summary>
-        public static AssignableFromConstraint AssignableFrom(Type expectedType)
-        {
-            return new AssignableFromConstraint(expectedType);
- e bool Equals(object? obj)
-        {
-            return true;
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-    }
-
-    public class Int32IEquatable : IEquatable<int>
-    {
-od2Info);
-                Assert.That(r1, Is.Not.SameAs(r2));
-            }
-
-            private static readonly MethodInfo TestMethod1Info =
-                typeof(Repeatability).GetMethod(nameof(TestMethod1), BindingFlags.NonPublic | BindingFlags.Static)pingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList) =>
-        CreateMapCore<TSource, TDestination>(memberList);
-    private IMappingExpression<TSource, TDestination> CreateMapCore<TSource, TDestination>(MemberListtraints;
-
-namespace NUnit.Framework.Tests.Constraints
-{
-    [TestFixture]
-    public class GreaterThanConstraintTests : ComparisonConstraintTestBase
-    {
-        protected override Constraint TheConstraint { get; } = new GreaterThanConstraint(5);
-
-    new DefaultConstraint();
-
-        public DefaultConstraintTests()
-        {
-            ExpectedDescription = "default";
-            StringRepresentation = "<default>";
-        }
-
-        // Cannot use parametrized tests here, as we can't allow boxing to ResolveTypeMap(Type sourceType, Type destinationType) => ResolveTypeMap(new(sourceType, destinationType));
-    TypeMap IGlobalConfiguration.ResolveTypeMap(TypePair typePair) => ResolveTypeMap(typePair);
-    TypeMap ResolveTypeMap(TypePair typePair)
-    {er.IntegrationTests;
-public class ICollectionAggregateProjections : IntegrationTest<ICollectionAggregateProjections.DatabaseInitializer>
-{
-    public class Customer
-    {
-        [Key]
-        public int Id { get; set; }
-        public string FirstName class TimeoutCommand : BeforeAndAfterTestCommand
-    {
-        private readonly int _timeout;
-        private readonly IDebugger _debugger;
-#if THREAD_ABORT
-        private Timer? _commandTimer;
-        private bool _commandTimedOut;
-#endif
-
-     ring assemblyPath = AssemblyHelper.GetAssemblyPath(assembly);
-            string suiteName = assemblyPath.Equals("<Unknown>")
-                ? AssemblyHelper.GetAssemblyName(assembly).FullName
-                : assemblyPath;
-
-            return Build(asse    Console.WriteLine("No Test Parameters were passed");
-                return;
-            }
-
-            Console.WriteLine("Test Parameters---");
-
-            foreach (var name in TestContext.Parameters.Names)
-                Console.WriteLine("   Name:stData.ActionAttributeTests;
-
-namespace NUnit.Framework.Tests.Attributes
-{
-    [TestFixture, NonParallelizable]
-    public class ActionAttributeTests
-    {
-        // NOTE: An earlier version of this fixture attempted to test
-        // the exact order of   void ITestListener.TestStarted(ITest test)
-        {
-            _activeTests.Add(test.Name, true);
-
-            if (test.IsSuite)
-                _suiteStartedCount++;
-            else
-                _testStartedCount++;
-        }
-
-        void ITestLi SourceMemberName => null;
-    LambdaExpression ProjectToExpression => null;
-    IValueResolver CloseGenerics(TypeMap typeMap) => this;
-}
-public class MemberPathResolver : IValueResolver
-{
-    private readonly MemberInfo[] _members;
-    public MemberPathRe    Thread.CurrentThread.CurrentCulture = Context.CurrentCulture;
-                Thread.CurrentThread.CurrentUICulture = Context.CurrentUICulture;
-#if THREAD_ABORT
-                lock (_threadLock)
-                    _nativeThreadId = ThreadUtility.GetCeWriter.Pfx_Expected + "all items instance of <System.Char>" + NL +
-                TextMessageWriter.Pfx_Actual + "< 'a', \"b\", 'c' >" + NL +
-                "  First non-matching item at index [1]:  \"b\"" + NL;
-            var ex = Assertever)]
-public class EnumProjectionMapper : IProjectionMapper
-{
-    public Expression Project(IGlobalConfiguration configuration, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
-        => Convert(resolvedSource  TestFilter filter = CreateTestFilter(_options);
-
-                return _options.Explore ? ExploreTests(filter) : RunTests(filter, runSettings);
-            }
-            catch (FileNotFoundException ex)
-            {
-                _textUI.DisplayErrorc bool IsParallelQueue { get; }
-
-        /// <summary>
-        /// Gets the target ApartmentState for work items on this queue
-        /// </summary>
-        public ApartmentState TargetApartment { get; }
-
-        private int _itemsProcessed;
-           c.CreateMap<IModel, Dto>().ReverseMap().As<Model>();
-        c.CreateMap<Dto, Model>();
-    });
-    [Fact]
-    public void Should_work() => Map<IModel>(new Dto { First = 1}).First.ShouldBe(1);
-}
-public class MapToBaseClass : AutoMapperSpecBase
-{
- dInheritedMap(inheritedTypeMap);
-    public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember) => Details.FindOrCreateSourceMemberConfigFor(sourceMember);
-    class TypeMapDetails
-    {
-        Features<IRuntimeFeature> _featureseIsValid(fixture);
-
-            fixture.ApplyAttributesToTest(new AttributeProviderWrapper<FixtureLifeCycleAttribute>(typeInfo.Type.Assembly));
-            fixture.ApplyAttributesToTest(typeInfo.Type);
-
-            AddTestCasesToFixture(fixture, filter);
-
-ualTo(fixture.TestCaseCount));
-            Assert.That(result.ResultState.Status, Is.EqualTo(TestStatus.Passed));
-        }
-
-        [Test]
-        public void InstancePerTestCaseWithAsyncDispose()
-        {
-            var fixture = TestBuilder.MakeFixtur      _result.OutWriter.WriteLine(SOME_TEXT);
-            _result.OutWriter.Write("More text ");
-            _result.OutWriter.Write("written in ");
-            _result.OutWriter.Write("segments.");
-            _result.OutWriter.WriteLine();
-            _re.Serialization;
-
     /// <summary>
-    /// TestCaseTimeoutException is thrown when a test running directly
-    /// on a TestWorker thread is cancelled due to timeout.
-    /// </summary>
-    [Serializable]
-    public class TestCaseTimeoutException : Exceptorted;
+    /// Provide the context information of the current test.
+    /// This is an adapter for the internal ExecutionContext
+    /// class, hiding the internals from the user test.
+    /uration;
+    readonly ParameterExpression _destination;
+    readonly ParameterExpression _initialDestination;
+    readonly ParameterExpression[] _parameters;
+    readonly TypeMap _typeMap;
+    readonly ParameterExpression _source;
+    List<ParameterExpresssNotSupported;
             }
 
             PropertyInfo[] properties = xType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            if (properties.Length == 0 || properties.Length >= 32 || properties.Any(p => p.GetIndexParameters().Length > 0))
-  ite(typeof(RangeTestFixture), nameof(RangeTestFixture.MethodWithMultipleRanges));
+            if (properties.Length == 0 || properties.Length >= 32 || properties.Any(p => p.GetIndexParameters().Length >ession CheckContext(TypeMap typeMap) => typeMap.PreserveReferences || typeMap.MaxDepth > 0 ? CheckContextCall : null;
+    public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ? 
+        Expression.Call(ContextParameter, OverTypeDngCount, ColorStyle.Warning);
+            WriteSummaryCount(", Inconclusive: ", summary.InconclusiveCount);
+            WriteSummaryCount(", Skipped: ", summary.TotalSkipCount);
+            Writer.WriteLine();
 
-            var arguments = from testCase in test.Tests select testCase.Arguments[0];
-            Assert.That(arguments, Is.EquivalentTo(new[] { 1, 2, 3, 10, 11, 12 }));
-   ions = new NUnitLiteOptions("--" + option);
-                    Assert.That((bool)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize --" + option);
-                }
+            if (summary.FailedCount > 0)
+       var @delegate = ConstraintUtils.RequireActual<Delegate>(actual, nameof(actual));
 
-                options = new NUnitLiteOptions("/" + option);
- ray of types from an array of objects.
-        /// Differs from <see cref="M:System.Type.GetTypeArray(System.Object[])"/> by returning <see langword="null"/>
-        /// for null elements rather than throwing <see cref="ArgumentNullException"/>.
-ublic partial class AsyncExecutionApiAdapter
-    {
-        private sealed class AssertThrowsAsyncAdapter : AsyncExecutionApiAdapter
-        {
-            public override void Execute(AsyncTestDelegate asyncUserCode)
-            {
-                var ex = d Customer = new Customer() { Id = 1, Name = "A" } };
+            _caughtException = ExceptionHelper.RecordException(@delegate, nameof(actual));
 
-        var config = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<Order, OrderDTO>();
-            cfg.CreateMap<Customer, CustomerDTO>();
-            cfg.CreateMap<Customer, Custom// the reason for the exception</param>
-        /// <param name="inner">The exception that caused the
-        /// current exception</param>
-        public InconclusiveException(string message, Exception? inner)
-            : base(message, inner)
-   ic int AssertCount => _testExecutionContext.AssertCount;
+            if (_caughtException is not null)
+.Tests;
+using NUnit.Framework.Tests.Constraints;
+using NUnit.Framework.Tests.TestUtilities.Collections;
+using NUnit.Framework.Tests.TestUtilities.Comparers;
+
+namespace NUnit.Framework.Legacy.Tests
+{
+    /// <summary>
+    /// Test Library for the NUnit Collrofile>());
+    [Fact]
+    public void Validate() => AssertConfigurationIsValid();
+}﻿namespace AutoMapper.UnitTests.Bug;
+public class CorrectCtorIsPickedOnDestinationType : NonValidatingSpecBase
+{
+    public class SourceClass { }
+
+    public class DestinnMapper
+{
+    public Expression Project(IGlobalConfiguration configuration, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
+        => Convert(resolvedSource, request.DestinationType);
+    public bool IsMatch(TypeP name="result">The result of the test</param>
+        void TestFinished(ITestResult result);
 
         /// <summary>
-        /// Get the number of times the current Test has been repeated
-        /// when using the <see cref="RetryAttribute"/> or <see cref="RepeatAttribute"/>.
-  untime.CompilerServices;
-using NUnit.Framework;
-using System.Threading.Tasks;
-
-namespace NUnit.TestData
-{
-    public sealed class AwaitableReturnTypeFixture
+        /// Called when a test produces output for immediate display
+        /// </summary>
+        /// <param name="output">A TestOutput obol? FieldMappingEnabled { get; }
+    bool? MethodMappingEnabled { get; }
+    bool? ConstructorMappingEnabled { get; }
+    bool? AllowNullDestinationValues { get; }
+    bool? AllowNullCollections { get; }
+    bool? EnableNullPropagationForQueryMapping { getation(Action<IMapperConfigurationExpression> configure) : this(Build(configure)){}
+    static MapperConfigurationExpression Build(Action<IMapperConfigurationExpression> configure)
     {
-        private readonly AsyncWorkload _workload;
+        MapperConfigurationExpression expr = new();
+        configure(lass SupplierViewModel
+    {
+        public int Id { get; set; }
 
-        public AwaitableReturnTypeFixturublic DateTime Start_Date { get; set; }
-        public DateTime End_Date { get; set; }
-        public bool Enabled { get; set; }
+        public List<ContactViewModel> Contacts { get; set; }
+
     }
 
-    public class RotatorAdRunViewModel
+    public class ContactViewModel
     {
-        public DateTime StartDate { get; set; }
-        public DateTime Enr argDisplayNames = (testFixtureData as TestParameters)?.ArgDisplayNames;
-                if (argDisplayNames is not null)
-                {
-                    fixture.Name = typeInfo.GetDisplayName();
-                    if (argDisplayNames.Length != 0)
-ld of the supplied parent node.
-        /// </summary>
-        /// <param name="parentNode">The parent node.</param>
-        /// <param name="recursive">If true, children are included, where applicable</param>
-        /// <returns></returns>
-        TNode d when a test produces output for immediate display
-        /// </summary>
-        /// <param name="output">A TestOutput object containing the text to display</param>
-        public void TestOutput(TestOutput output)
-        {
-            using var stringWrovider
-    {
-        /// <summary>
-        /// Determines whether any data is available for a parameter.
-        /// </summary>
-        /// <param name="parameter">The parameter of a parameterized test.</param>
-        bool HasDataFor(IParameterInfo paramionResults()
-        {
-            Assert.That(SuiteResult.AssertionResults, Is.Empty);
-        }
+        public int Id { get; set; }
 
-        [Test]
-        public void TestResultXml_AssertionResults()
-        {
-            TNode? assertionResults = TestResult.ToXml(true).SelectSingleNode("/ The name of the work item - defaults to the Test name.
-        /// </summary>
-        public virtual string Name => Test.Name;
-
-        /// <summary>
-        /// Filter used to include or exclude child tests
-        /// </summary>
-        public ITestFilnation.Address.Address1.ShouldBe("abc");
+        public List<SupplierViewModel> SuppltState.ChildFailure));
+                Assert.That(SuiteResult.Message, Is.EqualTo(TestResult.CHILD_ERRORS_MESSAGE));
+                Assert.That(SuiteResult.ResultState.Site, Is.EqualTo(FailureSite.Child));
+                Assert.That(SuiteResult.TotalCouonverter</param>
+    void ConvertUsing<TValueConverter, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember) where TValueConverter : IValueConverter<TSourceMember, TMember>;
+    /// <summary>
+    /// Specify a value converter to convert frnation.Address.Address1.ShouldBe("abc");
     }
 }﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shouldly;
 using Xunit;
 
-namespace AutoMapper.Extensions.Microsoft.DependencyInjection.Tests.ameof(SuccessData) + Message);
-
-        private static object[] FailureData => throw new NotImplementedException(nameof(FailureData) + Message);
-
-        [Test, TestCaseSource(nameof(SuccessData))]
-        public void SucceedsWithGoodValues(object value)
-tring? Reason
+namespace AutoMapper.Extensions.Microsoft.DependencyInjection.Tests.tected void WrapInNUnitCallContext(Action action)
         {
-            get => Properties.Get(PropertyNames.SkipReason) as string;
-            set
-            {
-                Guard.ArgumentNotNull(value, nameof(value));
-                Properties.Set(PropertyNames.SkipReason, valuivate class ExpectedExceptionAttribute : NUnitAttribute, IWrapTestMethod
+#if NETFRAMEWORK
+            using (new NUnitCallContext())
+                action();
+#else
+            action();
+#endif
+        }
+#if NETFRAMEWORK
+        /// <summary>
+        /// Executes thenfig = new MapperConfiguration(cfg => cfg.CreateMap<ModelType, DtoType>());
+        var source = new[] { new DerivedModelType { TheProperty = "Foo" }, new DerivedModelType { TheProperty = "Bar" } };
+
+        var mapper = config.CreateMapper();
+  cref="ExploreTestsAction"/> class.
+            /// </summary>
+            /// <param name="controller">The controller for which this action is being performed.</param>
+            /// <param name="filter">Filter used to control which tests are included (N individual test case, a fixture or
+    /// a higher level grouping of tests. All WorkItems inherit
+    /// from the abstract WorkItem class, which uses the template
+    /// pattern to allow derived classes to perform work in
+    /// whatever way is needed  var fixture = _builder.BuildFrom(typeInfo, filter, this);
+            fixture.ApplyAttributesToTest(new AttributeProviderWrapper<FixtureLifeCycleAttribute>(typeInfo.Type.Assembly));
+            fixture.ApplyAttributesToTest(typeInfo.Type);
+
+  raint that tests whether the actual value
+        /// is assignable from the type supplied as an argument.
+        /// </summary>
+        public static AssignableFromConstraint AssignableFrom<TExpected>()
         {
-            private readonly Type _expectedExceptionType;
+            return new AssignableFromConsustomerViewModel>());
 
-            public ExpectedExceptionAttribute(Type type)
-            {
-                _expectedExceptionType = te int _suiteStartedCount;
-        private int _suiteFinishedCount;
-        private int _testStartedCount;
-        private int _testFinishedCount;
-        private int _testOutputCount;
-        private int _successCount;
-        private int _failCount;
-   Should_use_extension_methods()
+    [Fact]
+    public void Can_map_with_projection()
+    {
+        using (var context = new Context())
         {
-
-                
-            var queryable = _products.AsQueryable();
-
-            var simpleProducts = queryable.ProjectTo<SimpleProductDto>(_config).ToList();
-
-            simpleProducts.Count.ShouldBe(1);
-  me.ToString(), Is.EqualTo("test-suite"));
-                Assert.That(result.Attributes["type"], Is.EqualTo("Assembly"));
-                Assert.That(result.Attributes["runstate"], Is.EqualTo("NotRunnable"));
-                Assert.That(result.Attributes["c void DoesNotContain_Empty()
-        {
-            var list = new SimpleObjectList();
-            CollectionAssert.DoesNotContain(list, "x");
+            var result = ProjectTo<CustomerViewModel>(context.Customers.Select(customer => new CustomerItemCodes
+    rows.InstanceOf<ArgumentException>());
         }
 
         [Test]
-        public void DoesNotContain_Fails()
+        public static void DegenerateZeroStepRangeDisallowed_Double()
         {
-            var list = nublic List<object> MissingItems { get; }
-
-            /// <summary>Initializes a new instance of the <see cref="CollectionTallyResult"/> class with the given fields.</summary>
-            public CollectionTallyResult(List<object> missingItems, List<objectrn new ConstraintResult(this, actual, _regex.IsMatch(actualString));
-        }
+            Assert.That(() => new RangeAttribute(11d, 11d, 0d), Throws.InstanceOf<ArgumentException>());
+  derCustomerName = "George Costanza", CustomerholderCustomerTotal = 74.85m };
+        var model = Mapper.Map<Order>(dto);
+        model.Customerholder.Customer.Name.ShouldBeNull();
+        model.Customerholder.Customer.Total.ShouldBe(74.85m);
     }
 }
-// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System.Reflection;
+public bool WasCalled = false;
+        public static readonly IComparer Default = new ObjectComparer();
 
-namespace NUnit.Framework.Internal.Execution
-{
-    ar tests = test.Tests;
-            // Use for-loop to avoid allocating the enumerator
-            int count = tests.Count;
-            for (var index = 0; index < count; index++)
-            {
-                ITest child = tests[index];
-      /// but label it as non-runnable, ignored, etc., then this
-        /// method must return true.
+        int IComparer.Compare(object? x, object? y)
+        {
+            WasCalled = true;
+            return Comparer.Default.Compare(x, y);
+    /// Basic Asserts on strings.
+    /// </summary>
+    // Abstract because we support syntax extension by inheriting and declaring new static members.
+    public abstract class StringAssert : AssertBase
+    {
+        #region Equals and ReferenceEquals
+
+   The Destination of the message.
         /// </summary>
-        /// <param name="typeInfo">The fixture type to check</param>
-        public bool CanBuildFrom(ITypeInfo typeInfo)
-     ("Count").EqualTo(5));
-            Assert.That(unit, Has.Property("Items").With.Count.EqualTo(5));
-            Assert.That(unit, Has.Property("Items").Property("Count").EqualTo(5));
-            Assert.That(unit, Has.Property("Items").Count.EqualTo(5));
+        public string Destination { get; }
 
-  llowNullDestinationValues/AllowNullCollection.
+        /// <summary>
+        /// The ID of the test that sent the message
+        /// </summary>
+        public string? TestId { get;untime.CompilerServices;
+
+namespace NUnit.Framework
+{
+    public abstract partial class Assert
+    {
+        #region Assert.ThatAsync
+
+        /// <summary>
+        /// Apply a constraint to an async delegate. Returns without throwing an exception when ins   PropertyInfo property = GetPropertyInfo(propertyName);
+            Assert.That(property.PropertyType, Is.EqualTo(typeof(string)));
+
+            foreach (string option in prototypes)
+            {
+                foreach (string value in goodValues)
+    t.That(childResult.AssertCount, Is.EqualTo(expectedCount), $"Bad count for {childResult.Name}");
+                totalCount += expectedCount;
+            }
+
+            Assert.That(result.AssertCount, Is.EqualTo(totalCount), "Fixture count is not correct") DelegatingTestCommand : TestCommand
+    {
+        /// <summary>TODO: Documentation needed for field</summary>
+#pragma warning disable IDE1006
+        // ReSharper disable once InconsistentNaming
+        // Disregarding naming convention for back-compat
+  ValueDelegate<TActual> del, IResolveConstraint expr,
+            NUnitString message = default,
+            [CallerArgumentExpression(nameof(del))] string actualExpression = "",
+            [CallerArgumentExpression(nameof(expr))] string constraintExpresserties.Set(PropertyNames.Category, TEST_CATEGORY);
+            Test.Properties.Set("Priority", TEST_PRIORITY);
+
+            Suite.Properties.Set(PropertyNames.Description, SUITE_DESCRIPTION);
+            Suite.Properties.Set(PropertyNames.Category, SUITE_Cult(IConstraint constraint, object? actualValue, ConstraintStatus status)
+            : this(constraint, actualValue)
+        {
+            Status = status;
+        }
+
+        /// <summary>
+        /// Constructs a <see cref="ConstraintResult"/> for a part, Type destinationType) => 
+        CreateMap(sourceType, destinationType, MemberList.Destination);
+
+    public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
+    {
+        var types = new TypePair(sourceType, de      _result.OutWriter.WriteLine(SOME_TEXT);
+            _result.OutWriter.Write("More text ");
+            _result.OutWriter.Write("written in ");
+            _result.OutWriter.Write("segments.");
+            _result.OutWriter.WriteLine();
+            _rer.LoadedTest.Tests[0].Tests[0].Tests[0].Tests[0];
+            var explorerFixture = explorer.Tests[0].Tests[0].Tests[0].Tests[0];
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(explorerFixture.Properties.Keys, Has.Count.Equalprovide an array of the required
+    /// Type or an <see cref="IEnumerable{T}"/>. Synonymous with <see cref="DatapointsAttribute"/>.
     /// </summary>
-    void AllowNull();
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method, Allowar destinationMemberValue = DestinationMemberValue(memberMap, destinationMemberGetter, destinationMemberReadOnly);
+        var mappedMember = MapMember(memberMap, resolvedValueVariable, destinationMemberValue);
+        var mappedMemberVariable = SetVariablionResults, Is.Empty);
+        }
+
+        [Test]
+        public void TestResultXml_AssertionResults()
+        {
+            TNode? assertionResults = TestResult.ToXml(true).SelectSingleNode("assertions");
+
+            if (_expectedAssertions.Count == 0)
+   bool HasMethodWithAttribute(Type fixtureType, Type attributeType)
+        {
+            foreach (MethodInfo method in fixtureType.GetMethods(AllMembers | BindingFlags.FlattenHierarchy))
+            {
+                if (method.IsDefined(attributeType, falptions.ResultOutputSpecifications.Count, Is.EqualTo(0));
+        }
+
+        [Test, SetCulture("en-US")]
+        public void InvalidResultSpecRecordsError()
+        {
+            var options = new NUnitLiteOptions("test.dll", "-result:userspecifed.xml;formastCase(ParallelScope.Self, ParallelScope.Children)]
+        [TestCase(ParallelScope.None, ParallelScope.Children)]
+        [TestCase(ParallelScope.Default, ParallelScope.Fixtures)]
+        [TestCase(ParallelScope.Self, ParallelScope.Fixtures)]
+   mbly and builds a TestSuite
+    /// containing test fixtures present in the assembly.
+    /// </summary>
+    public class DefaultTestAssemblyBuilder : ITestAssemblyBuilder
+    {
+        private static readonly Logger Log = InternalTrace.GetLogger(typeof(Destatic TestContext CurrentContext => new(TestExecutionContext.CurrentContext);
+
+        /// <summary>
+        /// Gets a TextWriter that will send output to the current test result.
+        /// </summary>
+        public static TextWriter Out => TestExssage that will be displayed on failure</param>
+        /// <param name="args">Arguments to be used in formatting the message</param>
+        public static Exception? Catch(Type expectedExceptionType, TestDelegate code, strinternalClass).FullName + ">"),
+            new TestCaseData(new InternalWithSerializableAttributeClass(), "<" + typeof(InternalWithSerializableAttributeClass).FullName + ">")
+        };
+#pragma warning restore IDE0052 // Remove unread private members
+
+   etTestCases(int[] dimensions)
+            {
+                _prng = new FleaRand(15485863);
+                _dimensions = dimensions;
+
+                CreateAllTuples();
+
+                List<TestCaseInfo> testCases = new();
+
+                while (true)
+ nostics.CodeAnalysis;
+
+namespace NUnit.Framework.Interfaces
+{
     /// <summary>
-    /// Don't allow this member to be null. Overrides AllowNullDestinationValues/AllowNullCollection.
+    /// A PropertyBag represents a collection of name/value pairs
+    /// that allows duplicate entries with the same key. Methods
+    /// are provided for adding a new pair asoidResultCustomAwaitableWithImplicitUnsafeOnCompleted))]
+    public sealed class NonVoidResultAwaitableReturnTypeTests : AwaitableReturnTypeTests
+    {
+        public NonVoidResultAwaitableReturnTypeTests(string methodName)
+            : base(methodName)
+ public RuntimeType Runtime;
+            public Version FrameworkVersion;
+            public Version ClrVersion;
+            public string Representation;
+            public string DisplayName;
+
+            public FrameworkData(RuntimeType runtime, Vers_preserve_identity_when_destinations_are_incompatible()
+    {
+        _dto.ShouldBeOfType<FooContainerModel>();
+        _dto.Input.ShouldBeOfType<FooInputModel>();
+        _dto.Screen.ShouldBeOfType<FooScreenModel>();
+        _dto.Input.Id.ShouldBe(3);
+   E.txt
+
+namespace NUnit.Framework.Tests.Syntax
+{
+    public class AnyOfTests : SyntaxTest
+    {
+        [SetUp]
+        public void SetUp()
+        {
+            ParseTree = "<anyof 1 2 3>";
+            StaticSyntax = Is.AnyOf(1, 2, 3);
+            BuilderS.IndexOf("CaseOne");
+            int case2 = ActionAttributeFixture.Events.IndexOf("CaseTwo");
+            Assume.That(case1, Is.GreaterThanOrEqualTo(0));
+            Assume.That(case2, Is.GreaterThanOrEqualTo(0));
+
+            int firstAction = Math.Min(cntDateTime, ConstantDateTime.AddSeconds(2), TimeSpan.FromSeconds(1) };
+        }
+
+        [TestCaseSource(nameof(GetSimpleTolerance_FailureData))]
+        public void SimpleTolerance_Failure(object actual, object expected, object tolerance)
+        {
+#pragethods = TypeInfo.GetMethodsWithAttribute<TearDownAttribute>(true);
+            OneTimeSetUpMethods = TypeInfo.GetMethodsWithAttribute<OneTimeSetUpAttribute>(true);
+            OneTimeTearDownMethods = TypeInfo.GetMethodsWithAttribute<OneTimeTearDownAttribng the text to display</param>
+        public void TestOutput(TestOutput output)
+        {
+            using var stringWriter = new StringWriter(GetStringBuilder());
+            using (var writer = XmlWriter.Create(stringWriter, XmlExtensions.FragmentWrite      _suiteStartedCount++;
+            else
+                _testStartedCount++;
+        }
+
+        void ITestListener.TestFinished(ITestResult result)
+        {
+            _activeTests.Remove(result.Test.Name);
+
+            if (result.Test.IsSuite)
+   f (options.NumberOfTestWorkers >= 0)
+                runSettings[FrameworkPackageSettings.NumberOfTestWorkers] = options.NumberOfTestWorkers;
+
+            if (options.InternalTraceLevel is not null)
+                runSettings[FrameworkPackageSettings.Inte | ActionTargets.Test)]
+    [TaggedAction("OnBaseFixture", ActionTargets.Suite)]
+    [TaggedAction("OnBaseFixture", ActionTargets.Test)]
+    [TaggedAction("OnBaseFixture")]
+    public abstract class BaseActionAttributeFixture : IBaseWithAction
+    {
+    }
+  /// Summary description for AttributeInheritance.
     /// </summary>
-    void DoNotAllowNull();
-  tations;
+    [Concern(typeof(ClassUnderTest))]
+    public class When_collecting_test_fixtures
+    {
+        [Spec]
+        public void Should_include_classes_with_an_attribute_derived_from_TestFadonly MethodInfo _onCompletedMethod;
+            private readonly MethodInfo _getResultMethod;
+
+            public AwaitShapeInfo(MethodInfo getAwaiterMethod, MethodInfo isCompletedGetter, MethodInfo onCompletedMethod, MethodInfo getResultMethod)
+   Mapper.Configuration.Annotations;
 
 /// <summary>
 /// Supply a custom mapping order instead of what the .NET runtime returns
@@ -903,79 +922,188 @@ namespace NUnit.Framework.Internal.Execution
 /// <remarks>
 /// Must be used in combination with <see cref="AutoMapAttribute" />
 /// </remarks>
-[AttributeUsage(AttributeTargets.Field | Attternal.Filters;
-
-namespace NUnit.Framework.Tests.Internal.Filters
-{
-    public class TestFilterXmlTests : TestFilterTests
+[Attri class InheritedOverrideTest
     {
-        #region ClassNameFilter
+        public const string InheritClassWithOtherLifecycle = @"
+            using NUnit.Framework;
 
-        [Test]
-        public void ClassNameFilter_FromXml()
-        {
-            TestF  && !m.IsGenericMethod)));
-        }
+            [assembly: FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
 
-        [Test]
-        public static void GetNonGenericPublicInstanceMethodIgnoresGenericMethods()
-        {
-            Assert.That(
-                typeof(A).GetNonGenericPublicInstanceMethod(nameof(A.GenericMethod)      _builder.Add(new TestSuite(typeof(SomeFixture)));
-            _builder.Add(new SetUpFixture(new TypeWrapper(typeof(NoNamespaceSetupFixture))));
-            _builder.Add(new SetUpFixture(new TypeWrapper(typeof(NoNamespaceSetupFixture))));
-
- > new(c=>c.CreateMap<object, IEnumerable<object>>());
-    [Fact]
-    public void Should_throw() => new Action(()=>Mapper.Map<IEnumerable<object>>(new object())).ShouldThrow<AutoMapperMappingException>().Message.ShouldStartWith(
-        "Cannot create interreTo(Convert.ToInt64(actual));
-
-            if (expected is uint || actual is uint)
-                return Convert.ToUInt32(expected).CompareTo(Convert.ToUInt32(actual));
-
-            return Convert.ToInt32(expected).CompareTo(Convert.ToInt32(actual));
-    = Enumerable.Range(0, 10).Select(i => FixtureWithMultipleTestsSuite.Tests[i % 2]).ToArray();
-            var expected = tests.Select(test => _filter.ComputePartitionNumber(test)).ToArray();
-
-            var tasks = tests.Select(test => Task.Run(() => _filld_map_to_null()
-    {
-        var destination = Mapper.Map<Destination>(new Source());
-        destination.Collection.ShouldBeNull();
-        destination.Inner.ShouldBeNull();
-    }
-}
-public class When_mappping_null_with_AllowNull_and_inheritance : Autd WriteResultFile(ITestResult result, TextWriter writer, IDictionary<string, object> runSettings, TestFilter filter)
-        {
-            var settings = new XmlWriterSettings { Indent = true };
-            using (var xmlWriter = XmlWriter.Create(writer, stEqual(expected, actual, string.Empty, null);
-        }
-        #endregion
-
-        #region FileInfo
-        /// <summary>
-        /// Asserts that two files are not equal. If they are equal
-        /// an <see cref="AssertionException"/> is thrown.
-    rivate List<FeatureTuple> CreateTuples(int dimension, int feature)
-            {
-                List<FeatureTuple> result = new();
-
-                result.Add(new FeatureTuple(new FeatureInfo(dimension, feature)));
-
-                for (int d = 0; d < _dict[] { new[] { 'A', 'B', 'C' }, new object[] { 'a', 'b', 'c' } },
-            new object[] { new[] { "a", "b", "c" }, new object[] { "A", "B", "C" } },
-            new object[] { new Dictionary<int, string> { { 1, "a" } }, new Dictionary<int, string> { { 1  /// Summary description for AttributeInheritance.
+            [FixtureLifeCycle(LifeCycle.SingleInselects tests based on the class FullName
     /// </summary>
-    [Concern(typeof(ClassUnderTest))]
-    public class When_collecting_test_fixtures
+    internal sealed class ClassNameFilter : ValueMatchFilter
     {
-        [Spec]
-        public void Should_include_classes_with_an_attribute_derived_from_TestFtResult_Duration()
+        internal const string XmlElementName = "class";
+
+        /// <summary>
+        /// Construct a FullNameFilter for a singnState == RunState.Explicit;
+            set => RunState = value ? RunState.Explicit : RunState.Runnable;
+        }
+
+        /// <summary>
+        /// Gets and sets the category for this fixture.
+        /// May be a comma-separated list of categories.
+   andler.GetCallbackResult());
+
+            var exploreTestCount = exploreResult.Attributes["testcasecount"];
+
+            new FrameworkController.CountTestsAction(_controller, filter, _handler);
+            var countResult = _handler.GetCallbackResult();
+
+  void ThrowsTypeOf()
         {
-            Assert.That(TestResult.StartTime, Is.EqualTo(EXPECTED_START));
-            Assert.That(TestResult.EndTime, Is.EqualTo(EXPECTED_END));
-            Assert.That(TestResult.Duration, Is.EqualTo(EXPECTED_DURATION));
-   ace(TypeMap typeMap, TypeMap memberTypeMap, MemberMap memberMap) =>
-            Debug.WriteLine($"Setting PreserveReferences: {memberMap.DestinationName} {typeMap.SourceType} - {typeMap.DestinationType} => {memberTypeMap.SourceType} - {memberTypeMap.DestinThat(exception?.StackTrace, Does.Contain("ThrowExceptionGenericTask"));
+            IResolveConstraint expr = Throws.TypeOf(typeof(ArgumentException));
+            Assert.That(
+                expr.Resolve().ToString(), Is.EqualTo("<throws <typeof System.ArgumentException>>"));
+     var debugger = new StubDebugger { IsAttached = false };
+            var sampleTests = new SampleTests(() => { }, debugger);
+
+            // when
+            var result = TestBuilder.RunTest(testThatAttachesDebuggerAndTimesOut, sampleTests, debugger);
+
+ eturns>A random string of the default length</returns>
+        /// <remarks>Uses <see cref="DefaultStringChars">DefaultStringChars</see> as the input character set </remarks>
+        public string GetString()
+        {
+            return GetString(Defaulest to which the filter is applied</param>
+        /// <param name="negated">If set to <see langword="true"/> we are carrying a negation through</param>
+        /// <returns>True if the test passes the filter, otherwise false</retu  var stringConstraint = (StringConstraint)new SubstringConstraint("hello");
+            Assert.DoesNotThrow(() =>
+            {
+                var newConstraint = (SubstringConstraint)stringConstraint.IgnoreCase;
+                newConstraint = newConstrtion;
+
+IServiceCollection services = new ServiceCollection();
+services.AddTransient<ISomeService>(sp => new FooService(5));
+services.AddAutoMapper(typeof(Source));
+var provider = services.BuildServiceProvider();
+using (var scope = provider.CreateScope())
+{ContextKey);
+        }
+
+        public void Dispose()
+        {
+            if (_oldContext is null)
+                CallContext.FreeNamedDataSlot(TestExecutionContextKey);
+            else
+                CallContext.SetData(TestExecutionContextKey, _oldCctualArray = actual as Array;
+
+            int expectedRank = expectedArray?.Rank ?? 1;
+            int actualRank = actualArray?.Rank ?? 1;
+
+            bool useOneIndex = expectedRank == actualRank;
+
+            if (expectedArray is not null && actualArr    object?[] arguments = testFixtureData.Arguments;
+
+            if (typeInfo.ContainsGenericParameters)
+            {
+                Type[]? typeArgs = testFixtureData.TypeArgs;
+                if (typeArgs is null || typeArgs.Length == 0)
+ (true);
+
+            // Setting this to anything other than 0 causes NUnit to be sensitive
+            // to the windows timer resolution - see issue #2217
+            Thread.Sleep(0);  // give EventPump thread a chance to process the event
+   xtendedProducts[0].BOM.Count.ShouldBe(1);
+            extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldBe(5);
+
+            var complexProducts = queryable.ProjectTo<ComplexProductDto>(_config).ToList();
+
+            complexProducts.Count.ShouldBe(1);
+   ublic object GetInstanceOf(Type providerType, object[]? providerArgs)
+        {
+            if (!_instances.TryGetValue(providerType, out var instance))
+                _instances.Add(providerType, instance = Reflect.Construct(providerType, providerArgs));peof(A).GetNonGenericPublicInstanceMethod(nameof(A.GenericMethod), Type.EmptyTypes),
+                Is.Null);
+        }
+
+        [Test]
+        public static void GetNonGenericPublicInstanceMethodIgnoresStaticMethod()
+   Should_throw() => new Action(()=>Mapper.Map<IEnumerable<object>>(new object())).ShouldThrow<AutoMapperMappingException>().Message.ShouldStartWith(
+        "Cannot create interface System.Collections.Generic.IEnumerable`1[System.Object]");
+}
+pussage">The message.</param>
+        /// <param name="inner">The inner.</param>
+        public TestCaseTimeoutException(string message, Exception inner) : base(message, inner)
+        {
+        }
+
+        /// <summary>
+        /// Serialization Constructor
+ections, o=>o.Ignore());
+        cfg.CreateMap<FlowStep, FlowNodeModel>().ForMember(d => d.Connections, o => o.MapFrom(s => new[] { s.Next }));
+        cfg.CreateMap<FlowDecision, FlowNodeModel>().ForMember(d => d.Connections, o => o.MapFrom(s => new[] { ssSynchronizationContext2)
+                })
+                {
+                    var parameterizedSuite = fixture.Tests.Single(t => t.Method?.Name == name);
+                    Assert.That(parameterizedSuite.Tests.Single().Arguments.Single(), Is.True);
+ rance, ComparisonState state, NUnitEqualityComparer equalityComparer)
+        {
+            if (x is not char xChar || y is not char yChar)
+                return EqualMethodResult.TypesNotSupported;
+
+            if (toleranovider, bool inherit)
+            where T : class
+        {
+            return (T[])attributeProvider.GetCustomAttributes(typeof(T), inherit);
+        }
+
+        public static T[] GetAttributes<T>(this Assembly assembly)
+            where T : class
+  var from = ParamAttributeTypeConversions.Convert(_from, parameter.ParameterType);
+            var to = ParamAttributeTypeConversions.Convert(_to, parameter.ParameterType);
+
+            var valueGenerator = ValueGenerator.Create(parameter.ParameterType);
+hat(_myConsumerException, Is.Null);
+            }
+
+            protected abstract void Producer(object? parameter);
+
+            protected abstract void Consumer(object? parameter);
+
+            private void ConsumerThreadWrapper(object? parameter)
+ , TestStatus.Skipped, "", "", "Skipped => NUnitLite.Tests.TextUITests.MyFakeMethod\n")]
+        [TestCase("After", TestStatus.Skipped, "Ignored", "", "Ignored => NUnitLite.Tests.TextUITests.MyFakeMethod\n")]
+        [TestCase("After", TestStatus.Warning, "t.That(Thread.CurrentThread, Is.EqualTo(ParentThread));
+        }
+#endif
+
+        [Test]
+        public void TestWithRequiresThreadIsInvalid()
+        {
+            CheckTestIsInvalid<SingleThreadedFixture_TestWithRequiresThread>("RequiresThreadAttribute mSuite);
+            TopLevelSuite.Add(AnotherFixtureSuite);
+            TopLevelSuite.Add(YetAnotherFixtureSuite);
+            TopLevelSuite.Add(FixtureWithMultipleTestsSuite);
+            TopLevelSuite.Add(NestingFixtureSuite);
+
+            NestingFixture, TypeMap typeMap) : base(typeMap)
+    {
+        DestinationMember = destinationMember;
+        DestinationType = destinationMemberType;
+    }
+    public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap) : base(typeMap)
+    {
+        Destinionary<TKey, TValue>, construct an 'expected' KeyValuePair<TKey, TValue>
+            // and look it up by iterating using IEnumerable
+            if (actual.GetType().GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictission, Expression destExpression) =>
+        configuration.MapExpression(profileMap, GetAssociatedTypes(sourceExpression.Type, destExpression.Type), sourceExpression, memberMap);
+    public TypePair? GetAssociatedTypes(TypePair initialTypes) => GetAssociates["passed"], Is.EqualTo("0"));
+                Assert.That(suiteNode.Attributes["failed"], Is.EqualTo("1"));
+                Assert.That(suiteNode.Attributes["warnings"], Is.EqualTo("0"));
+                Assert.That(suiteNode.Attributes["skipped"], Is.Eq = new PropertyConstraint(nameof(IList<object>.Count), new EqualConstraint(_array.Length));
+            _countPropertyExistsConstraint = new PropertyExistsConstraint(nameof(IList<object>.Count));
+        }
+
+        [Test]
+        public void ExplicitlyImplreturn Array.Empty<ITestAction>();
+                }
+
+                var actions = new List<ITestAction>();
+
+                actions.AddRange(GetActionsForType(type.GetTypeInfo().BaseType));
+
+                foreach (Type interfaceType in TypeHelper.GetDeThat(exception?.StackTrace, Does.Contain("ThrowExceptionGenericTask"));
         }
 
         private static Task<int> One() => Task.Run(() => 1);
@@ -983,162 +1111,35 @@ public class When_mappping_null_with_AllowNull_and_inheritance : Autd WriteResul
         private static async Task<int> ThrowExceptionGenericTask()
         {
             await One();
- reach (IMethodInfo method in methods)
-            {
-                var methodInfo = MethodInfoCache.Get(method);
+  rnal;
 
-                if (method.IsAbstract)
-                {
-                    MakeInvalid("An abstract SetUp and TearDown methods cannot be ruumentOutOfRangeException(message, paramName);
-
-            [DoesNotReturn]
-            [MethodImpl(MethodImplOptions.NoInlining)]
-            static void ThrowArgumentOutOfRangeException(string message, string paramName) => throw new ArgumentOutOfRangeExcec void MethodWithoutArgs()
-        {
-        }
-        public static void MethodWithIntArgs(int x, int y)
-        {
-        }
-        public static void MethodWithIntValues(
-            [Values(1, 2, 3)] int x,
-            [Values(10, 20)] int y)
-    tion;
-
-IServiceCollection services = new ServiceCollection();
-services.AddTransient<ISomeService>(sp => new FooService(5));
-services.AddAutoMapper(typeof(Source));
-var provider = services.BuildServiceProvider();
-using (var scope = provider.CreateScope())
-{ublic IEnumerator<object?> GetEnumerator()
-                => new AsyncEnumeratorWrapper(_shape, _getAsyncEnumeratorMethod.Invoke(_asyncEnumerable, EnumeratorArgs)!);
-
-            IEnumerator IEnumerable.GetEnumerator()
-                => new AsyncEnumera  var from = ParamAttributeTypeConversions.Convert(_from, parameter.ParameterType);
-            var to = ParamAttributeTypeConversions.Convert(_to, parameter.ParameterType);
-
-            var valueGenerator = ValueGenerator.Create(parameter.ParameterType);
-.NullableDate = "Lorem Ipsum";
-                
-                typeof(AutoMapperMappingException).ShouldBeThrownBy(() => Mapper.Map<ModelObject, ModelDto>(model));
-            }
-        }
-
-        public class When_mapping_an_array_of_model_objects : Auto //    PropertyInfo property = GetPropertyInfo(propertyName);
-        //    Assert.IsNotNull(property, "Property {0} not found", propertyName);
-        //    Assert.IsTrue(property.PropertyType.IsEnum, "Property {0} is not an enum", propertyName);
-     insurance1 = new Entity12 { Id = Guid.NewGuid() };
-            patient1 = new Entity14 { Id = Guid.NewGuid() };
-            resource1 = new Entity17 { Id = Guid.NewGuid() };
-            service1 = new Entity20 { Id = Guid.NewGuid() };
-    arallelExecutionStrategy InitialExecutionStrategy(WorkItem workItem)
-        {
-            return workItem.ParallelScope == ParallelScope.Default || workItem.ParallelScope == ParallelScope.None
-                ? ParallelExecutionStrategy.NonParallel
-     ation>(TSource source) => _mapper.Map(source, default(TDestination), this);
-    TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination) => _mapper.Map(source, destination, this);
-    object IMapperBase.Map(object sourcailed, "Error", FailureSite.TearDown)]
-        [TestCase(TestStatus.Skipped, "Ignored", FailureSite.Parent)]
-        [TestCase(TestStatus.Inconclusive, "", FailureSite.SetUp)]
-        public void AddSiteToResult(TestStatus status, string label, FailureSite /// DictionaryContainsKeyValuePairConstraint is used to test whether a dictionary
-    /// contains an expected object as a key-value-pair.
-    /// </summary>
-    public sealed class DictionaryContainsKeyValuePairConstraint : CollectionItemsEqualCoic int MethodThrowingTargetInvocationException()
-        {
-            throw new TargetInvocationException(new Exception());
-        }
-
-        private const string ValueInBase = "Base";
-        private const string ValueInDerived = "Derived";
-
-   dapter For<TExpected, TActual>(Func<TExpected, TActual, bool> comparison)
-        {
-            return new PredicateEqualityAdapter<TExpected, TActual>(comparison);
-        }
-
-        internal sealed class PredicateEqualityAdapter<TActual, TExpected> : Equair(sourceBase, destinationBase);
-        _types.CheckIsDerivedFrom(baseTypes);
-        TypeMapActions.Add(tm => tm.IncludeBaseTypes(baseTypes));
-    }
-    public IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember)
-   ublic ParameterizedTestFixtureWithParamsArgument(string name, params int[] parameterValues)
-        {
-            Name = name;
-            ParameterValues = parameterValues;
-        }
-
-        public ParameterizedTestFixtureWithParamsArgument(params doublystem;
-
-namespace NUnit.Framework.Tests.TestUtilities.Comparers
-{
-    internal class GenericEqualityComparison<T>
-    {
-        public bool WasCalled = false;
-
-        public Func<T, T, bool> Delegate => new Func<T, T, bool>(Compare);
-
-   var customer = new Customer { Addresses = new List<Address> { new Address(Street1), new Address(Street2) } };
-        var customers = new[] { customer }.AsQueryable();
-
-        var mapped = customers.ProjectTo<CustomerDto>(_config).SingleOrDefault();
-
- bool IsCorrectType(Type type)
-        {
-            return TypeHelper.IsValueTuple(type);
-        }
-
-        private static object? GetValue(Type type, string propertyName, object obj)
-        {
-            return type.GetField(propertyName)?.GetValue(obj)ble IDE1006 // Naming Styles
-        private TestListenerIntercepter ListenerResult;
-#pragma warning restore IDE1006 // Naming Styles
-#pragma warning disable IDE1006 // Naming Styles
-        private TextWriter ListenerWriter;
-#pragma warning restore IDE100c int SomeProperty { get; set; } = 42;
-        }
-
-        private int[] _array;
-        private PropertyConstraint _countPropertyConstraint;
-        private PropertyExistsConstraint _countPropertyExistsConstraint;
-
-        [SetUp]
-        public void Befor.Empty<ITestAction>();
-                }
-
-                var actions = new List<ITestAction>();
-
-                actions.AddRange(GetActionsForType(type.GetTypeInfo().BaseType));
-
-                foreach (Type interfaceType in TypeHelper.GetDeclaredInterfption? caughtException = null;
-
-            // Since TestDelegate returns void, it’s always async void if it’s async at all.
-            Guard.ArgumentNotAsyncVoid(code, nameof(code));
-
-            using (new TestExecutionContext.IsolatedContext())
-   h (var childResult in result.Children)
-            {
-                int expectedCount = childResult.Name == "ThreeAsserts" ? 3 : 1;
-                Assert.That(childResult.AssertCount, Is.EqualTo(expectedCount), $"Bad count for {childResult.Name}");
-   ublic ICollection<int> Keys => throw new System.NotImplementedException();
-
-            public ICollection<string> Values => throw new System.NotImplementedException();
-
-            public int Count => throw new System.NotImpl | ActionTargets.Test)]
-    [TaggedAction("OnBaseFixture", ActionTargets.Suite)]
-    [TaggedAction("OnBaseFixture", ActionTargets.Test)]
-    [TaggedAction("OnBaseFixture")]
-    public abstract class BaseActionAttributeFixture : IBaseWithAction
-    {
-    }
-faces;
-
-namespace NUnit.Framework.Internal.Filters
+namespace NUnitLite
 {
     /// <summary>
-    /// ValueMatchFilter selects tests based on some value, which
-    /// is expected to be contained in the test.
+    /// NUnit2XmlOutputWriter is able to create an XML file representing
+    /// the result of a test run in NUnit 2.x format.
     /// </summary>
-    internal abstract class ValueMatchFilter : Test CombiningStrategy is the abstract base for classes that
-    /// know how to combine values provided for individual test
-    /// parameters to create a set of test cases.
-    /// </summary>
-    public interface 
+    public class NUnit2XmlOutputWriter : OutputWriter
+   ternal.Filters
+{
+    public class PartitionFilterTests : TestFilterTests
+    {
+        private PartitionFilter _filter;
+        private ITest _testMatchingPartition;
+        private ITest _testNotMatchingPartition;
+
+        [SetUp]
+        public void Creaic TypeMapConfiguration ReverseTypeMap => ReverseMapExpression;
+    public List<ValueTransformerConfiguration> ValueTransformers => _valueTransformers ??= new();
+    protected TypeMapConfiguration ReverseMapExpression { get; set; }
+    protected List<Actioystem.Text;
+
+namespace NUnit.Common
+{
+    /// <summary>
+    /// ExtendedTextWrapper wraps a TextWriter and makes it
+    /// look like an ExtendedTextWriter. All style indications
+    /// are ignored. It's used when text is being written
+    /// to a file.
+    _textUI.DisplayErrorsFailuresAndWarningsReport(_result);
+            var lines = GetReportLin

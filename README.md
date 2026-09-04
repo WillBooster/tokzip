@@ -6,7 +6,7 @@
 
 Lossless compressor for **prompts, LLM outputs, and source code** stored at rest — one
 function in, one function out, no compression options (only an optional decode length limit).
-The codec is Rust compiled to a single **wasm module (~1.2 MB, all 21 dictionaries and models
+The codec is Rust compiled to a single **wasm module (~1.25 MB, all 21 dictionaries and models
 included)** with a thin TypeScript wrapper; it runs on Node, Bun, and Cloudflare Workers.
 
 ```ts
@@ -38,15 +38,19 @@ the closest one.
 
 - **Codec**: LZ77 over the document plus the segment's dictionary (128 KB for prose
   languages; for code, a 64 KB part shared by every programming language plus 48 KB per
-  language; COVER-trained: the fragments whose 8-byte grams occur in the most documents of
-  the corpus, segment size picked by coding held-out documents), price-based parse (a bounded
+  language; COVER-trained: the fragments of the public corpus whose 8-byte grams occur in the
+  most documents — counted over the public corpus and, for the languages it holds at least
+  1 MiB of, the private production corpus, so every dictionary byte is a substring of a public document
+  while the selection follows production usage; segment size picked by coding held-out
+  documents), price-based parse (a bounded
   shortest-path over 4 KB chunks, not a global optimum), adaptive binary range coder
   (LZMA-style symbol layout, terminated on the shortest representation of its final interval)
   whose literals are modeled by an order-2 context (128 trained classes of the previous byte
   × 32 of the one before) and whose models start from trained priors — short documents get
   the benefit of the statistics immediately, long documents adapt to themselves. The literal
   priors are shared by the languages of a group (Latin prose, Japanese, Chinese, code) and
-  trained on the group's pooled statistics; the rest is per language. Matches into the
+  trained on the group's pooled statistics — public and private documents alike, since priors
+  are statistics, not content; the rest is per language. Matches into the
   dictionary are coded as absolute dictionary offsets, so the same fragment costs the same
   wherever it is referenced.
 - **Detection without a parser**: one table maps every 4-gram hash to the languages whose
@@ -84,16 +88,16 @@ compressed size as a percentage of the input:
 
 | documents  | tokzip    | brotli -11 | zstd -19 | gzip -9 |
 | ---------- | --------- | ---------- | -------- | ------- |
-| all        | **21.0%** | 26.3%      | 31.1%    | 31.9%   |
-| ≤ 1 KB     | **28.6%** | 47.6%      | 60.2%    | 61.1%   |
+| all        | **20.9%** | 26.3%      | 31.1%    | 31.9%   |
+| ≤ 1 KB     | **28.7%** | 47.6%      | 60.2%    | 61.1%   |
 | 1–4 KB     | **23.1%** | 33.9%      | 42.1%    | 42.2%   |
-| 4–16 KB    | **21.0%** | 25.8%      | 30.4%    | 31.2%   |
-| > 16 KB    | **19.4%** | 21.6%      | 24.5%    | 25.6%   |
-| ja-JP      | **25.0%** | 35.6%      | 42.8%    | 43.3%   |
+| 4–16 KB    | **20.8%** | 25.8%      | 30.4%    | 31.2%   |
+| > 16 KB    | **19.2%** | 21.6%      | 24.5%    | 25.6%   |
+| ja-JP      | **24.9%** | 35.6%      | 42.8%    | 43.3%   |
 | zh-CN      | **26.6%** | 36.8%      | 45.3%    | 46.1%   |
 | typescript | **15.0%** | 17.7%      | 19.8%    | 20.6%   |
-| java       | **14.0%** | 23.3%      | 28.2%    | 28.6%   |
-| html       | **19.3%** | 21.3%      | 25.4%    | 26.1%   |
+| java       | **13.8%** | 23.3%      | 28.2%    | 28.6%   |
+| html       | **17.9%** | 21.3%      | 25.4%    | 26.1%   |
 
 Throughput through the wasm build in Bun on an Apple M-series laptop: compression ~2.8 MB/s
 (the price-based parse is the cost; a 4 KB document takes ~1.3 ms), decompression ~90 MB/s.
@@ -111,7 +115,8 @@ bun install
 bun run build         # rust → wasm/tokzip.wasm (committed; rebuild after codec changes), then builds dist/
 bun test              # round-trip and resilience tests through the wasm build
 cargo test --release --manifest-path rust/Cargo.toml
-bun run train         # retrain dict/*.bin and priors/*.bin from ../tokzip-corpus (then build)
+bun run train         # retrain dict/*.bin and priors/*.bin from ../tokzip-corpus (then build);
+                      # a sibling ../tokzip-corpus-private checkout scores the training
 ```
 
 Layout: `rust/crates/tokzip` (codec: `lz.rs` parse + coder, `lang.rs` dictionaries +
