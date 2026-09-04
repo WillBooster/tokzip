@@ -92,8 +92,9 @@ const SEGMENT_SIZES: [usize; 5] = [64, 128, 256, 512, 1024];
 /// With `scoring` documents, the dmer frequencies, the held-out documents, and the literal
 /// classes come from them while the segments are still cut from `content` — so a dictionary
 /// can be tuned to a private corpus while every byte of it is a substring of a public
-/// document. Without them, `content` plays both roles. Either way a held-out document is
-/// never among the candidates it scores.
+/// document. Without them, `content` plays both roles. Either way, during the segment-size
+/// sweep a held-out document is never among the candidates it scores; the final pass scores
+/// every document, held out or not.
 pub fn train_dictionary(
     content: &[Vec<u8>],
     scoring: Option<&[Vec<u8>]>,
@@ -121,8 +122,8 @@ pub fn train_dictionary(
     let (fit_data, fit_lens) = concat(&fit);
     let (content_data, content_lens) = concat(&content);
     // With scoring documents (which may include content documents) the sweep's candidates
-    // exclude the held-out documents, so no candidate dictionary is cut from a document it
-    // is scored on; without them the fit documents already leave the held-out ones out.
+    // exclude the held-out documents, so no candidate dictionary is cut from a held-out
+    // document it is scored on; without them the fit documents already leave those out.
     let candidates = scored.as_ref().map(|_| {
         let candidates: Vec<&[u8]> = content
             .iter()
