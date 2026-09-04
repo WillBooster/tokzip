@@ -1,23 +1,8 @@
-on);
-    });
-});
-import * as ts from "../../_namespaces/ts.js";
-import * as Utils from "../../_namespaces/Utils.js";
-import
-/// <reference path="fourslash.ts" />
-
-// @Filename: /a.ts
-////export function a() {}
-
-// @Filename: /b.ts
-////function *f() {
-mport {
-    createServerHost,
-    File,
-    libFile,
-} from "../helpers/virtualFileSystemWithWatch.js";
-
-describe("unittes }
+.ts" />
+////interface T {
+////     aaa?: string;
+////     foo(): void;
+//// }
 //// const obj: T = {
 ////     foo() {
 //        
@@ -26,123 +11,94 @@ describe("unittes }
 //// }
 
 verify.completions({
-    marker: st/project2/tsconfig.json": jsonToReadableText({
-                compilerOptions: {
-                    composite: true,
-    string;
-    typings?: string;
-}
+    marker: "",
+    includes: [{
+      name: "aaa",
+   / />
+////}
+////function fn9() {
+////    return <Foo cla/*9*/ something />
+////}
+////function fn10() {
+////    return <Foo something /*10*/ />
+////}
+////function fn11() {
+////    return <Foo something cla/*11*/ />
+////}
+////function fn12() {
+///pers.js";
+import { libContent } from "../helpers/contents.js";
+import {
+    baselineTsserverLogs,
+    openFilesForSession,
+    protocolFileLocationFromSubstring,
+    TestSession,
+} from "../helpers/tsserver.js";
+import {
+    createServerHost,
+   0
 
-/** @internal */
-export interface CachedTyping {
-    typingLocation: string;
-    version,
-    clear,
-    EntityNameOrEntityNameExpression,
-    forEach,
-    getOwnValues,
-    getSymbolId,
-    Identifier,
-    InueuedTimeoutCallbacks(),
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+MERCHANTABLITY OR NON-INFRIify.codeFix({
+    description: [ts.Diagnostics.Delete_unused_param_tag_0.message, "b"],
+    index: 0,
+    newFileContent:
+`/**
+ * @param {number} a
+ */
+function foo(a: number) {
+    a;
+}`
+});
+// @module: amd
+// @Filename: foo_0.ts
+export class=>
+    ModifiedAnimal.parse({
+      species: "asdf",
+      population: 1324,
+    } as any);
+  expect(bad).toThrow();
+});
+// @ts-ignore TS6133
+import { expect } from "https://deno.land/x/expect@v0.2.6/mod.ts";
+const test = Deno.test;
+
+import { util } fromrom "./_namespaces/ts.server.js";
+
+export interface TypingResolutionHost {
+    directoryExists(path: string): boolean;
+    fileExists(fileName: string): boolean;
+    readFile(path: string, encoding?: string): string | undefined;
+    readDirectory(root, context.program.getTypeChecker(), context.preferences, context.program.getCompilerOptions())),
+});
+
+function doChange(changes: textChanges.ChangeTracker, sourceFile: SourceFile, position: number, checker: TypeChecker, preferences: UserPreferences, coojects/myproject/node_modules2`, `/user/username/projects/myproject/node_modules`),
+                timeouts: sys => sys.runQueuedTimeoutCallbacks(),
             },
         ],
     });
 
-    verifyTscWatch({
-        scenario,
-        subScenario: "** @type {Foo} */
-export default "";
+    describe("ignores files/folder changes in node_modules thatst Outer: z.ZodType<Outer> = z.object({
+    data: z.union([
+      z.object({ name: z.string(), a: z.number() }),
+      z.object({ name: z.string(), b: z.number() }),
+    ]),
+  });
+});
+// @ts-ignore TS6133
+import { expect, test } from "@jest/globals";
 
-// @strict: true
-// @noEmit: true
-
-function f1(obj: Record<string, unknown>, key: strin2?: string | undefined;
-    f3: string | null;
-    f4: { t: string | boolean }[];
-  };
-
-  util.assertEqual<z.TypeOf<typeof Test>a"])).toThrow();
-  expect(() => intNum.parse([])).toThrow();
-  expect(() => nonEmptyMax.parse([])).toThrow();
-  expect(() => noncommand: ts.server.protocol.CommandTypes.GetSupportedCodeFixes,
-        });
-        session.executeCommandSeq<ts.server.protoc*************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserv`declare var process: NodeJS.Process;
-declare namespace NodeJS {
-    interface Process {
-        on(msg: string): void;
-    S OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
-
-See the Apache Version 2.0 License for speciash.ts' />
-
-// @filename: a.ts
-/////**
-//// * @param {number} a
-//// * @param {string} b
-//// */
-////function foo(a: numbport { util } from "../helpers/util.ts";
-import * as z from "../index.ts";
-import { ZodIssueCode } from "../index.ts";
-
-cons"
-  >(true);
-  util.assertEqual<
-    PersonWithNickname,
-    { firstName: string; lastName: string; nickName: string }
-  >(true)ED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANanges: textChanges.ChangeTracker, sourceFile: SourceFile, position: number, checker: TypeChecker, preferences: UserPreferences, const module: File = {
-                path: `/user/username/projects/myproject/node_modules2/@types/qqq/index.d.ts`,
-    e path='fourslash.ts'/>
-
-// @strictNullChecks: true
-// @exactOptionalPropertyTypes: true
-//// interface IC {
-////     a?: numbqual(2);
-//   }
-// });
-export namespace errorUtil {
-  export type ErrMessage = string | { message?: string };
-  export const err2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at htult = schema.safeParse("asdfsdf");
-  expect(result.success).toEqual(false);
-  if (!result.success) {
-    expect(result.error.for.");
-            }
-
-            return originalFileExists.call(host, fileName);
-        };
-
-        const watch = ts.creatreturn Debug.fail(); // Shouldn't have called this.
-        default:
-            Debug.assertNever(result);
-    }
-}
-class Drom "./_namespaces/ts.js";
-
-export interface TypeWriterTypeResult {
-    line: number;
-    syntaxKind: number;
-    sourceTemNode,
-    Diagnostic,
-    Diagnostics,
-    factory,
-    FileTextChanges,
-    find,
-    findAncestor,
-    FunctionDeclaraenFilesForSession([aTs], session);
-        baselineTsserverLogs("plugins", "With local plugins", session);
-    });
-
-    it(",
-    Block,
-    canHaveModifiers,
-    ClassDeclaration,
-    ClassElement,
-    CodeFixContext,
-    CompilerOptions,
-  guageVariant,
+impoScanner,
+    Debug,
+    isJsxAttribute,
+    isJsxElement,
+    isJsxText,
+    isKeyword,
+    isToken,
+    isTrivia,
+    LanguageVariant,
     last,
     Node,
     NodeArray,
@@ -150,46 +106,181 @@ export interface TypeWriterTypeResult {
     SyntaxKind,
 } from "../_namespaces/ts.js";
 
-constpath]: libFile.content,
-            }, { currentDirectory: "/users/username/projects/project" }),
-        commandLineArgs: ["-ing, onClick?: () => void}): any;
-////}
-////
-////declare const Foo: NestedInterface;
-////
-////function fn1() {
-////    rete(node.parent) && node.parent.name === node) return true;
-        if (ts.isImportEqualsDeclaration(node.parent) && node.parent..ts' />
+conexport {};
+declare class B { static w(): number; }
+interface Reflect {}; // no collision
+class C extends B {
+    static _ = super.w();
+}
 
-// @allowSyntheticDefaultImports: true
-// @moduleResolution: node
-// @noUnusedLocals: true
-// @target: es2018
-// @jsx: de,
+// @filename: interfaceInContainingScopeStaticBlock.ts
+export {};
+declare class B { static w(): number; }
+ine path='fourslash.ts'/>
+
+// @strictNullChecks: true
+// @exactOptionalPropertyTypes: true
+//// interface IC {
+////     a?: number
+//// }
+//// interface J {
+////     a?: number | undefined
+//// }
+//// declare var j: J
+//// class C {
+////     ic: IC
+//// Ts: File = { path: "/a.ts", content: "export const a = 1;" };
+        const bTs: File = { path: "/b.ts", content: `import * as foo from './a.js';` };
+
+        const host = createServerHost([aTs, bTs]);
+        const session = new TestSession(host);
+  json": jsonToReadableText({
+                    compilerOptions: {
+                        composite: true,
+                        traceResolution: true,
+                        outDir: "outDir",
+                    },
+                }),
+   Modifiers,
+    ClassDeclaration,
+    ClassElement,
+    CodeFixContext,
+    CompilerOptions,
+    concatenate,
+    copyLeadingComments,
+    Diagnostics,
+    every,
+    Expression,
+    factory,
+    filter,
+    forEach,
+    FunctionDeclaration,
+ e_1.code,
 ];
+
 registerCodeFix({
-    errorCodes,
     fixIds: [fixId],
-    getCodeActions(context) {
-        const changes = textChocation);
-        }
-    });
+    errorCodes,
+    getCodeActions: function getCodeActionsToAddMissingAsync(context) {
+        const { sourceFile, errorCode, cancellationToken, program, span } = context;
+        const diagnost
+// @allowJs: true
+// @checkJs: true
+// @outDir: ./out
+// @filename: checkJsdocTypeTagOnExportAssignment4.js
+
+// @Filename: a.js
+/**
+ * @typedef {number} Foo
+ */
+
+/** @type {Foo} */
+export default "";
+
+// @strict: true
+// @noEmit: true
+
+function f1(obj var x: any;
+declare function isFunction(x): x is Function;
+declare function isObject(x): x is Object;
+declare function isAnything(x): x is {};
+declare function isError(x): x is Error;
+declare function isDate(x): x is Date;
+
+
+if (isFunction(x)) { /efined {
+    if (isPropertyAccessExpression(node)) {
+        return node.name;
+    }
+
+    const propName = node.argumentExpression;
+    if (isNumericLiteral(propName)) {
+        return propName;
+    }
+
+    if (isStringLiteralLike(propName)) {
+  
+}
+
+/** @internal */
+export const enum NameValidationResult {
+    Ok,
+    EmptyName,
+    NameTooLong,
+    NameStartsWithDot,
+    NameStartsWithUnderscore,
+    NameContainsNonURISafeCharacters,
+}
+
+const maxPackageNameLength = 214;
+
+/** @inte
 
     const newTypingNames: string[] = [];
     const cachedTypingPaths: string[] = [];
-    infe
-test("passthrough index signature", () => {
-  const a = z.object({ a: z.string() });
-  type a = z.infer<typeof a>;
-  utiunittests:: tsbuild:: moduleSpecifiers:: synthesized module specifiers across referenced projects resolve correctly", () ={
-  // export type DeepPartial<T extends AnyZodObject> = T extends AnyZodObject
-  //   ? ZodObject<
-  //       { [k in keyof T["ind(
-//   //     SyntaxKind.VariableDeclaration
-//   //   );
+    inferredTypings.forEach((inferred, typing) => {
+        if (inferred) {
+            cachedTypingPaths.push(inferred);
+        }
+        else {
+   ash.ts' />
 
-//   //   // Assert that find definition returned the Zod definiti    useCaseSensitiveFileNames: project.useCaseSensitiveFileNames(),
-                fileExists: project.fileExists.bind(project
+////function /*a*/foo/*b*/(// comment
+////    // a comment
+////    a: number,
+////    // b comment
+////    b: number
+////) {
+////    return a + b;
+////}
+
+goTo.select("a", "b");
+edit.applyRefactor({
+    refactorName: "Convert parame,
+    Identifier,
+    IndexedAccessType,
+    IndexType,
+    InterfaceType,
+    MappedType,
+    ObjectFlags,
+    ObjectType,
+    ResolvedType,
+    Signature,
+    Symbol,
+    SymbolWalker,
+    SyntaxKind,
+    Type,
+    TypeFlags,
+    TypeParam/    "types": "index.d.ts",
+////}
+
+// @filename: node_modules/react/index.d.ts
+////export = React;
+////declare namespace JSX {
+////    interface IntrinsicElements { [x: string]: any; }
+////}
+////declare namespace React {}
+
+// @filename: node_modules/react/ash.ts"/>
+
+/////**/
+
+goTo.marker();
+edit.insertLine("module A");
+edit.insert("export class ");
+
+verify.navigationTree({
+    "text": "\"navigationBarItemsItems2\"",
+    "kind": "module",
+    "childItems": [
+        {
+            "text": "<class     ];
+        const aTs: File = { path: "/a.ts", content: `class c { prop = "hello"; foo() { return this.prop; } }` };
+        const tsconfig: File = {
+            path: "/tsconfig.json",
+            content: "{}",
+        };
+        const { sessioructor(a) { }
 }
 
 class Derived extends Base {
@@ -198,913 +289,607 @@ class Derived extends Base {
     }
 }
 
-class Derived2 extends Base {ntent: `import {y} from "./file1Consumer1";`,
-        }],
-        changes: [
-            {
-                caption: "change ion getFiles(fileContent1: string, fileContent2 = fileContent1, fileContent3 = fileContent1, fileContent4 = fileContent1) {
-  on([
-//       z.number(),
-//       z.string().transform(z.number(), (val) => {
-//         return parseFloat(val);
-//       }),
-/ds", () => {
-  const nameSchema = z.string().refine((val) => val.length > 5);
-  const schema = z.object({
-    nullableObject: z. = new TestSession(host);
-        openFilesForSession([appSrcIndexTs], session);
-        const project = session.getProjectSerrence: QuotePreference): PropertyName | undefined {
-    if (isPropertyAccessExpression(node)) {
-        return node.name;
-   (() => schema.parse(null)).toThrow();
-  expect(() => schema.parse(undefined)).toThrow();
-  expect(() => schema.parse({})).toTh(factory.createPropertyDeclaration(modifiers, symbol.name, /*questionOrExclamationToken*/ undefined, /*type*/ undefined, /*initi    moduleResolution: "nodenext",
-                            outDir: "./dist",
-                            declaration: true,s
-//// var x = "hello world"; /*2*/
-
-goTo.marker("1");
-verify.numberOfErrorsInCurrentFile(1);
-
-goTo.marker("2");
-verify.n   );
-    changeTracker.replaceNode(
-        sourceFile,
-        insertionSite,
-        cloneWithModifier,
-    );
+class Derived2 extends Base {
+    constructor(public a: string) {
+        super(this); // error
+    }
 }
 
-fun // eslint-disable-line ban/ban
-      ? (obj: any) => Object.keys(obj) // eslint-disable-line ban/ban
-      : (object: any) => {
-goTo.select("a", "b");
-edit.applyRefactor({
-    refactorName: "Convert parameters to destructured object",
-    actionName: "mber): number;
-////    foo4(b: string): number;
-////    /** new 1*/
-////    new (a: string);
-////    new (b: number);
-////gs,
-    createSessionWithCustomEventHandler,
-    openFilesForSession,
-    TestSession,
-} from "../../helpers/tsserver.js";
-     readonly a: {
-//           readonly [x: string]: readonly any[];
-//         };
-//         readonly b: {
-//           readon);
-}
+class Derived3 extends Base {
+ se);
+  if (!result.success) {
+    expect(result.error.issues.length).toEqual(3);
+  }
+});
 
-// @filename: constEnumInContainingScopeStaticBlock.ts
-export {};
-declare class B { static w(): number; }
-const enum });
+const schema = z.object({
+  inner: z.object({
+    name: z
+      .string()
+      .refine((val) => val.length > 5)
+      .array()
+      .refine((val) => val.length <= 1oEqual(2);
+//   }
+// });
+export namespace errorUtil {
+  export type ErrMessage = string | { message?: string };
+  export const errToObj = (message?: ErrMessage) =>
+    typeof message === "string" ? { message } : message || {};
+  export const toString = (metrue;
+////    }
+////
+////    var unusued = [1, 2, 3, 4].map(x => { return 4 })
+////
+////    return;
+////    return true;
+////}
+////
+////class A {
+////    ret/*3*/urn;
+////    r/*4*/eturn 8675309;
+////}
+
+// Note: For this test, these 'return's !isParenthesizedTypeNode(typeArgument) &&
+            isParenthesizedTypeNode(factory.createUnionTypeNode([typeArgument, factory.createKeywordTypeNode(SyntaxKind.VoidKeyword)]).types[0]);
+        if (needsParens) {
+            changes.insertText(sourcetifier(node: Node): boolean {
+        if (node.parent) {
+            switch (node.parent.kind) {
+                case SyntaxKind.JsxAttribute:
+                case SyntaxKind.JsxOpeningElement:
+                case SyntaxKind.JsxClosingElement:
+     1.parse(null)).toThrow();
+});
+import Benchmark from "benchmark";
+
+import { z } from "../index";
+
+const emptySuite = new Benchmark.Suite("z.object: empty");
+const shortSuite = new Benchmark.Suite("z.object: short");
+const longSuite = new Benchmark.Suite("z.st,
+
+  // ];
+});
+
+test("get literal value", () => {
+  expect(literalStringSchema.value).toEqual("asdf");
+});
+
+test("optional convenience method", () => {
+  z.ostring().parse(undefined);
+  z.onumber().parse(undefined);
+  z.oboolean().parse(undefined);
+});
+return (isArrowFunction(node) || isMethodDeclaration(node) || isFunctionExpression(node) || isFunctionDeclaration(node)) && textSpansEqual(span, createTextSpanFromNode(node, sourceFile));
+    }) as FixableDeclaration | undefined;
+
+    return decl;
+}
+export interface ParseContext {
+  readonly common: {
+    readonly issues: ZodIssue[];
+    readonly contextualErrorMap?: ZodErrorMap;
+    readonly async: boolean;
+  };
+  readonly path: ParsePath;
+  readonly schemaErrorMap?: ZodErrorMap;
+  readonly parent: PntersectionFn<T> = (
+    T extends unknown ? (k: () => T) => void : never
+  ) extends (k: infer Intersection) => void
+    ? Intersection
+    : never;
+
+  type GetUnionLast<T> = UnionToIntersectionFn<T> extends () => infer Last
+    ? Last
+    : never;
+
+  typine no-restricted-syntax
+                );
+            });
+        }
+    });
 }
 export declare var m1_a1: number;
 export declare class m1_c1 {
     m1_c1_p1: number;
 }
-export declare var m1_instan   },
-////    },
-////}
-
-verify.navigationTree({
-    "text": "<global>",
-    "kind": "script",
-    "childItems": [
-  arent) : undefined;
-            if (!type || type.flags & ts.TypeFlags.Any) type = this.checker.getTypeAtLocation(node);
-  xtends unknown ? (k: () => T) => void : never
-  ) extends (k: infer Intersection) => void
-    ? Intersection
-    : never;
-
-  typ
-  path: (string | number)[];
-  errorMap: ZodErrorMap;
-  async: boolean;
-};
-
-export type ParsePathComponent = string | number;
-e@jest/globals";
-
-import * as z from "../index";
-
-const RealSet = Set;
-const RealMap = Map;
-const RealDate = Date;
-
-test("doesnâ€******* */
-
-
-/// <reference no-default-lib="true"/>
-
-interface WeakKeyTypes {
-    symbol: symbol;
-}
-// @lib: es5
-class Foo {
-   xport class ZodError<T = any> extends Error {
-  issues: ZodIssue[] = [];
-
-  get errors() {
-    return this.issues;
-  }
-
-  constreturn Promise.resolve("asdf" as any);
-  });
-  await expect(validatedFunction()).rejects.toBeInstanceOf(z.ZodError);
-});
-ription: [ts.Diagnostics.Rename_param_tag_name_0_to_1.message, "d", "c"],
-    index: 1,
-    newFileContent:
-`/**
- * @parconst currentDirectory = program.getCurrentDirectory();
-            const getCanonicalFileName = ts.createGetCanonicalFileName(({
-    properties: z.object({
-      is_animal: z.boolean(),
-    }),
-  });
-  const Cat = z
-    .object({
-      properties: z.obj;
-
-// @noImplicitReferences: true
-// @module: node16,nodenext
-// @declaration: true
-// @outDir: out
-// @filename: /node_mre the names for source files in the project
-     */
-    function getTypingNamesFromSourceFileNames(fileNames: string[]) {
-  r) {}
-  })
-  .on("cycle", (e: Benchmark.Event) => {
-    console.log(`${(manySuite as any).name}: ${e.target}`);
-  });
-
-export denction visitSymbol(symbol: Symbol | undefined): boolean {
-            if (!symbol) {
-                return false;
-   port { jsonToReadableText } from "../helpers.js";
-import {
-    getFsConentsForAlternateResultAtTypesPackageJson,
-    getFsConple declaration files in the program", /*useOutFile*/ false);
+export declare var m1_instance1: m1_c1;
+export declare function m1_f1(): m1_c1parse(
+    Promise.resolve({ name: "Bobby", age: "10" })
+  );
+  await expect(failPromise).rejects.toBeInstanceOf(z.ZodError);
+  // done();/z
 });
 
-describe("unittests:: tsc-watch:: emit for configured projtifier(node.parent.parent.parent.parent.parent.name)) {
-            return node.parent.parent.parent.parent.parent.name.getTexteserved. Licensed under the Apache License, Version 2.0. 
-// See LICENSE.txt in the project root for complete license informaverify.baselineDocumentHighlights();
-verify.baselineDocumentHighlights(test.markers());
-//@filename: file.tsx
-//@jsx: react) => { return 1 };
+test("promise parsing fail", () => {
+  const bad = () => promSchema.parse({ then: () => {}, catch: {} });
+  exration(/*modifiers*/ undefined, "Foo", /*typeParameters*/ undefined, /*heritageClauses*/ undefined, /*members*/ undefined!), // TODO: GH#18217
+                        ts.factory.createModuleDeclaration(/*modifiers*/ undefined, ts.factory.createIdentifier(tEqual<t1, (...args_1: unknown[]) => unknown>(true);
 
-verify.quickInfoAt("", "(parameter) x: any");
+  const t2 = t1.args(z.string());
+  type t2 = z.infer<typeof t2>;
+  util.assertEqual<t2, (arg: string, ...args_1: unknown[]) => unknown>(true);
 
-/// <reference path='fourslash.ts'/>
+  const t3 = t2.returns(z.boolean());
+  type t3 = z.indes: [
+        { name: "c", text: "class c" },
+        { name: "c1", text: "class c1" },
+        { name: "c2", text: "class c2" },
+        { name: "c3", text: "class c3" },
+        { name: "c4", text: "class c4" },
+        { name: "c5", text: "class const minTwo = z.set(z.string()).min(2);
+const maxTwo = z.set(z.string()).max(2);
+const justTwo = z.set(z.string()).size(2);
+const nonEmpty = z.set(z.string()).nonempty();
+const nonEmptyMax = z.set(z.string()).nonempty().max(2);
 
-////interface I {ullable(),
-    optionalObject: z.object({ name: nameSchema }).optional(),
-    optionalArray: z.array(nameSchema).optional(),
-     NodeFlags,
-    nodeIsMissing,
-    ObjectLiteralExpression,
+test("type inference", ()  ObjectLiteralExpression,
     ParameterDeclaration,
     ParenthesizedExpression,
-    Pare at http://www.apache.org/licenses/LICENSE-2.0
+    ParenthesizedTypeNode,
+    PrefixUnaryExpression,
+    PropertyAccessExpression,
+    PropertyAssignment,
+    PropertyDeclaration,
+    PropertyName,
+    PropertySignumber>;
 
-THIS CODE IS PROVIDED ON A.issues[1].path).toEqual([1]);
-  }
-});
-import defaultErrorMap from "./locales/en";
-import type { ZodErrorMap } from "./ZodError"nt;
-// });
+async function f0() { }
+async function f1(): Promise<void> { }
+async function f3(): MyPromise<void> { }
 
-// test('invalid check', () => {
-//   expect(() => A.parse({} as any)).toThrow();
-// });
+let f4 = async function() { }
+let f5 = async function(): Promise<void> { }
+let f6 = async function(): MyPromise<void> { }
 
-// test('schema getter', (
-    /**
-     * Adds inferred typings from manifest/module pairs (think package.json + node_modules)
-     *
-     * @param prues[0].code).toEqual(
-      z.ZodIssueCode.invalid_date
-    );
-  }
-});
-// ==============
-
-test("parse symbolSchema string", () =const firstVarName = (file.statements[0] as ts.VariableStatement)
-                        .declarationList.declarations[0].nametent: "export = pad;declare function pad(length: number, text: string, char ?: string): string;",
-        };
-        host.esistent changes
-    set(index: number, value: T): List<T>;
-    delete(index: number): List<T>;
-    remove(index: number): List<Tves);
-    }
-
-    toString() {
-        return formatDisjunction(this._alternatives);
-    }
-}
-
-interface Comparator {
-   , // TODO: GH#18217
-                        ts.factory.createModuleDeclaration(/*modifiers*/ undefined, ts.factory.createIdentirio}`,
-            commandLineArgs: ["--w", "/a/app.ts"],
-            sys: () =>
-                createWatchedSystem(
-     }),
-]);
-const returns2 = z.union([z.string(), z.number()]);
-
-const func2 = z.function(args2, returns2);
-
-test("function inferencer): boolean;
-}
-import * as fakes from "../../_namespaces/fakes.js";
-import * as Harness from "../../_namespaces/Harness.js";ubstitutionTemplateLiteral("foo", "foo"),
-                    ),
-                ),
-            ]);
-    }
-
-    function trash.ts"/>
-
-//// import { a1, a2 } from "a";
-//// ;
-//// import {
-//// } from "a";
-//// ;
-//// import [|{
-////   b1,
-///alse },
-    { marker: ["3"], exact: [{ name: "type", sortText: completion.SortText.GlobalsOrKeywords }], isNewIdentifierLocatio
-const negative = z.number().negative();
-const nonpositive = z.number().nonpositive();
-const nonnegative = z.number().nonnegativBuilderContext) {
-        if (node.kind === SyntaxKind.GetAccessor) {
-            return createReturnFromSignature(node, contecanAction) {
-            // readTokenInfo was called before with the same expected scan action.
-            // No need to re-sIndexed<T>;
-    export module Keyed {}
-    export function Keyed<K, V>(collection: Iterable<[K, V]>): Seq.Keyed<K, V>;
-    exporad)",
-});
-
-verify.signatureHelp(
-    { marker: "8", overloadsCount: 2, docComment: "this is signature 2" },
-    { marker: "export * from "./errors.ts";
-export * from "./helpers/parseUtil.ts";
-export * from "./helpers/typeAliases.ts";
-export * from "assert.isUndefined(session.getProjectService().configuredProjects.get(tsconfig.path)!.getLanguageService().getAutoImportProvider.nullable();
-const booleanSchemaOptional = z.boolean().optional();
-const booleanSchemaNullable = z.boolean().nullable();
-const dndShape<A extends object, B extends object> = {
-    [K in keyof A as K extends keyof B ? never : K]: A[K];
-  } & {
-    [K in key       : undefined
-//   );
-
-//   if (propertyAssignment == null)
-//     fail(`Could not find property assignment with name ${namt({
-  type: z.literal("c"),
-});
-const objC = {
-  type: "c",
-};
-
-const dSchema = z.object({
-  type: z.literal("d"),
-});
-
-const do
-    },
-    [Symbol.toStringTag]: {
-        configurable: true,
-        enumerable: false,
-        writable: false,
-     case SyntaxKind.ArrowFunction:
-            case SyntaxKind.FunctionExpression:
-                return typeFromFunctionLikeExtent: `export function foo(): string;`,
-    };
-
-    function verifyFileUpdates(host: TestServerHost, session: TestSession) {
-    CancellationToken,
-    CompilerOptions,
-    consumesNodeCoreModules,
-    createMultiMap,
-    Debug,
-    emptyArray,Iterators
-    keys(): IterableIterator<K>;
-    values(): IterableIterator<V>;
-    entries(): IterableIterator<[K, V]>;
-    // Co  reportsUnnecessary: undefined,
-                    reportsDeprecated: undefined,
-                    source: undefined,
-   nst program = ts.createProgram(["/.src/index.ts"], opts.compilerOptions!, host);
-        program.emit(program.getSourceFile("/.    // original comment 1.
-    static staticProp: number = 1;
-    // original comment 2.
-    instanceProp: number = 2;
-    /ineSourceMap?: boolean;
-    baselineReadFileCalls?: boolean;
-    baselinePrograms?: boolean;
-    baselineDependencies?: boole     * Creates a new index in store with the given name, keyPath and options and returns a new IDBIndex. If the keyPath and optiace I { } // error
-    export interface E { }
-    interface E { } // error
-}
-
-// Should report error only once for instant    projectFileName,
-        }, session);
-
-        // should have one external project since config file is missing
-
-    setCompilerOptionsForInferredProjectsRequestForSession,
-    TestSession,
-    toExternalFiles,
-    verifyGetErrRequest,
-} frorEachChild,
-    getEffectiveConstraintOfTypeParameter,
-    getLineAndCharacterOfPosition,
-    getLocaleSpecificMessage,
-     toLocaleString(locales: string | string[], options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions): string;
-}
-
-interType,
-    Identifier,
-    IntersectionTypeNode,
-    isBlock,
-    isConstTypeReference,
-    isDeclarationReadonly,
-    isGexpect(schema.parse("false")).toEqual(true);
-  expect(schema.parse("0")).toEqual(true);
-  expect(schema.parse("1")).toEqual(true)      "/project/b.ts": "export const b = 10;",
-                "/project/tsconfig.json": "{}",
-                [libFile.path]:racker.with(context, t => doChange(t, program, info));
-        return [createCodeFixAction(fixId, changes, [Diagnostics.Export_lassLikeDeclaration | MethodDeclaration, container: ClassLikeDeclaration): SerializedTypeNode {
-        switch (node.kind) {
- oken = getTokenAtPosition(sourceFile, pos);
-    if (token.parent && isJSDocParameterTag(token.parent) && isIdentifier(token.parest extends Test {}
-  abstract class AbstractBar {
-    constructor(public val: string) {}
-  }
-  class Bar extends AbstractBar {}ry.parse({ posts });
-  expect(cat.posts).toEqual(posts);
-  const asyncCat = await Registry.parseAsync({ posts });
-  expect(async true });
-  // @ts-expect-error
-  schema.omit({ $unknown: true });
-  // @ts-expect-error
-  schema.required({ $unknown: true });
-ult = compareStringsCaseSensitive(leftIdentifier, rightIdentifier);
-            if (result) return result;
-    s/tsc.js";
-import { verifyTscWatch } from "../helpers/tscWatch.js";
-import { loadProjectFromFiles } from "../helpers/vfs.js";expect(f).toThrow();
-});
-
-test("parse stringSchema undefined", () => {
-  const f = () => stringSchema.parse(val.undefined);
-  ex | "duration"
-  | "ip"
-  | "base64"
-  | { includes: string; position?: number }
-  | { startsWith: string }
-  | { endsWith: strinEqual({ inner: "asdf" });
-  expect(outer.parse({})).toEqual({ inner: "asdf" });
-  expect(outer.parse({ inner: undefined })).toEq{
-    name: z.string(),
-  });
-
-  const syncResult = strictObj.safeParse({ name: "asdf", unexpected: 13 });
-  expect(syncResult.sps://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/invalidateFramebuffer) */
-    invalidateFramebuffer(target: GLenu*/
-    isInteger(number: unknown): boolean;
-
-    /**
-     * Returns a Boolean value that indicates whether a value is the reserveInsensitiveBasePath = "c:/dev/";
-const caseInsensitiveHost = new fakes.ParseConfigHost(createFileSystem(/*ignoreCase*/ true, cer; }
-interface Reflect {}; // no collision
-class C extends B {
-    static { super.w(); }
-}
-
-// @filename: uninstantiatedb: es5
-// @sourcemap: true
-declare var console: {
-    log(msg: any): void;
-}
-type Robot = [number, string, string];
-type Mntent);
-            host.runQueuedTimeoutCallbacks();
-
-            host.writeFile(commonFile3.path, commonFile3.content);
-  g: T) => any
-  ): T | undefined => {
-    for (const item of arr) {
-      if (checker(item)) return item;
-    }
-    return undefitring[];
-
-declare function f2(arg: unknown): unknown;
-
-declare function f3(): string;
-
-type AllParams<T> =
-    T exteumberSchemaOptional>, number | undefined>(
-    true
-  );
-  util.assertEqual<z.TypeOf<typeof numberSchemaNullable>, number | nullocol.ConfigureRequest>({
-        command: ts.server.protocol.CommandTypes.Configure,
-        arguments: {
-            preferort { z } from "..";
-
-interface Category {
-  name: string;
-  subcategories: Category[];
-}
-
-const testCategory: Category = {
-  na,
-    setParent,
-    setTextRange,
-    SignatureDeclaration,
-    skipTypeParentheses,
-    SourceFile,
-    SyntaxKind,
- t("passing validations", () => {
-  z.bigint().parse(BigInt(1));
-  z.bigint().parse(BigInt(0));
-  z.bigint().parse(BigInt(-1));
- }
-////var i/*64*/1 = new c/*65q*/1();
-////var i1/*66*/_p = i1.p1;
-////var i1/*68*/_f = i1.p/*69*/2;
-////var i1/*70*/_r = i1.   // Since this is first event, it will have all the files
-                filesToReload.forEach(f => host.ensureFileOrFolder(tExecutingFilePath()} ${argsToPass.join(" ")}`);
-        let oldPrograms: readonly CommandLineProgram[] = ts.emptyArray;
-    : SyncParseReturnType = { status: "dirty", value: "whatever" };
-  const valid: SyncParseReturnType = { status: "valid", value: "modules/@types/bar/index.d.ts"),
-                timeouts: sys => {
-                    sys.runQueuedTimeoutCallbacks();
-    createTextSpanFromBounds,
-    createTextSpanFromNode,
-    createTextSpanFromRange,
-    Debug,
-    DefaultClause,
-    findCcorrect parsing", () => {
-  Test.parse({
-    f1: 12,
-    f2: "string",
-    f3: "string",
-    f4: [
-      {
-        t: "string",
-ar n: number;
-}
-
-function fn() {
-    var s: boolean;
-    var n = s;
+let f7 = s;
     var n: boolean;
 }
 
 class C {
     s: Date;
-   
-    super();
+    n = this.s;
+    x() {
+        var p = this.n;
+        var p: Date;
+    }
+}
 
-    const actualProto = new.target.prototype;
-    if (Object.setPrototypeOf) {
-      // eslint-disable-next-line st file = ts.createSourceFile("a.ts", t.source, ts.ScriptTarget.Latest, /*setParentNodes*/ true);
-        const selectionRange const expression = prop.name.expression;
-                if (!isPrimitiveLiteralValue(expression, /*includeBigInt*/ false) && !ts:: tsserver:: resolutionCache:: tsserverProjectSystem with project references", () => {
-    it("sharing across references", (ction verifyWithMaxCacheLimit(subScenario: string, useSlashRootAsSomeNotRootFolderInUserDirectory: boolean) {
- erface Segment {
-    // Information about the entire piece of text between the dots.  For example, if the
-    // text between odules/module2/index.ts`);
-            const files = [module1, module2, file1, file2, file3, file4, configFile, libFile];
-   program: Program,
-    host: LanguageServiceHost,
-    preferences: UserPreferences,
-    useAutoImportProvider: boolean,
-   
-const minTwo = z.string().array().min(2);
-const maxTwo = z.string().array().max(2);
-const justTwo = z.string().array().length(2app",
-                    version: "1.0.0",
-                    type: "module",
-                })),
-            edits: [
- ile: () => noopFileWatcher,
-    watchDirectory: () => noopFileWatcher,
-};
+module M3 {
+    var s: any;
+    module M4 {
+        var n = s;
+        var n: any;
+    }
+}
+// @target: ES5 // eslint-disable-line ban/ban
+      ? (obj: any) => Object.keys(obj) // eslint-disable-line ban/ban
+      : (object: any) => {
+          const keys = [];
+          for (const key in object) {
+            if (Object.prototype.hasOwnProperty.call(object, k = z.boolean().optional();
+const booleanSchemaNullable = z.boolean().nullable();
+const dateSchemaOptional = z.date().optional();
+const dateSchemaNullable = z.date().nullable();
+const symbolSchemaOptional = z.symbol().optional();
+const symbolSchemaNullable     projectFileName,
+        }, session);
 
-class TestSession extends ts.server.Session {
-   1;
+        // should have one external project since config file is missing
+
+        host.writeFile(config.path, config.content);
+        openExternalProjectForSession({
+            rootFiles: toExternalFiles(a8,
+//// }|] from "a";|]
+//// export { a1, a2 };
+//// ;
+//// export { a3, a4 } from "a";
+//// ;
+//// export {
+//// };
+//// ;
+//// export [|{
+////   b1,
+////   b2,
+//// }|];
+//// ;
+//// export {
+//// } from "b";
+//// ;
+//// export [|{
+////      {
+                    caption: "Modify package json file to add type module",
+                    edit: sys =>
+                        sys.writeFile(
+                            `/user/username/projects/myproject/package.json`,
+     .add("invalid: wrong shape", () => {
+    try {
+      many.parse({ type: "unknown" });
+    } catch (err) {}
+  })
+  .on("cycle", (e: Benchmark.Event) => {
+    console.log(`${(manySuite as any).name}: ${e.target}`);
+  });
+
+export default {
+  suites: [doubleS   getDirectories: () => [],
+    createDirectory: ts.noop,
+    getExecutingFilePath(): string {
+        return "";
+    },
+    getCurrentDirectory(): string {
+        return "";
+    },
+    getEnvironmentVariable(): string {
+        return "";
+    "project root is used with case-sensitive system", /*useCaseSensitiveFileNames*/ true);
+    verifyOpenFileWorks("project root is used with case-insensitive system", /*useCaseSensitiveFileNames*/ false);
+
+    it("uses existing project even if project refs" />
+
+////var a = { f: /**/a
+
+verify.quickInfoAt("", "var a: any");
+
+// @noImplicitReferences: true
+// @module: node16,nodenext
+// @declaration: true
+// @outDir: out
+// @filename: /node_modules/pkg/package.json
+{
+    "name": "pkg",
+    "versiiple declaration files in the program", /*useOutFile*/ true);
+    verifyFilesEmittedOnce("without --outFile and multiple declaration files in the program", /*useOutFile*/ false);
+});
+
+describe("unittests:: tsc-watch:: emit for configured projects", () itEachChild(node, rootTransform, context);
+            }
+        }
+    });
+
+    // https://github.com/Microsoft/TypeScript/issues/24709
+    testBaseline("issue24709", () => {
+        const fs = vfs.createFromFileSystem(Harness.IO, /*ignoreCase*/ tru"true")).toEqual(true);
+  expect(schema.parse("false")).toEqual(true);
+  expect(schema.parse("0")).toEqual(true);
+  expect(schema.parse("1")).toEqual(true);
+  expect(schema.parse("")).toEqual(false);
+  expect(schema.parse(1)).toEqual(true);
+  expect(schemaconst project = new Project({
+//     tsConfigFilePath: path.join(__dirname, "..", "..", "tsconfig.json"),
+//     skipAddingFilesFromTsConfig: true,
+//   });
+//   const sourceFile = project.addSourceFileAtPath(filePath);
+
+//   test("works for object proper
+
+    export var tokenTable = new TokenInfo[];
+    export var nodeTypeTable = new string[];
+    export var nodeTypeToTokTable = new number[];
+    export var noRegexTable = new boolean[];
+
+    noRegexTable[TokenID.Identifier] = true;
+    noRegexTabler(),
+  });
+
+  // @ts-expect-error
+  schema.pick({ $unknown: true });
+  // @ts-expect-error
+  schema.omit({ $unknown: true });
+  // @ts-expect-error
+  schema.required({ $unknown: true });
+  // @ts-expect-error
+  schema.partial({ $unknown: true });
+})> expect(err.issues[0].code).toEqual(ZodIssueCode.invalid_union));
+//   if (p2.success === true) throw new Error();
+//   expect(p2.success).toBe(false);
+//   expect(p2.error.issues[0].code).toEqual(ZodIssueCode.invalid_union);
+// });
+
+test("custom path in [k in K]: VS });
+//     return { [key]: valueSchema };
+//     const parsed = schema.parse(data);
+//     return parsed;
+//     // const inferred: z.infer<z.ZodObject<{ [k in K]: VS }>> = parsed;
+//     // return inferred;
+//   };
+//   const parsed = createSreturn {
+      ...first,
+      ...second, // second overwrites first
+    };
+  };
+
+  export type extendShape<A extends object, B extends object> = {
+    [K in keyof A as K extends keyof B ? never : K]: A[K];
+  } & {
+    [K in keyof B]: B[K];
+  };
+}
+
+exporN-INFRINGEMENT.
+
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
+***************************************************************************** */
+
+
+/// <reference no-default-lib="true"/>
+
+inariableStatement = isVariableDeclaration(declaration) ? tryCast(declaration.parent.parent, isVariableStatement) : undefined;
+    return variableStatement && length(variableStatement.declarationList.declarations) === 1 ? variableStatement : declaration;
+}anguageService().getAutoImportProvider();
+        session.host.baselineHost("After getAutoImportProvider");
+        const completionsAfter = project.getLanguageService().getCompletionsAtPosition(indexTs.path, 0, { includeCompletionsForModuleExports: tru  var x = 10;
+////    x = x + 1;
 ////};
 ////f();
 
 
 verify.baselineCurrentFileBreakpointLocations();import {
     createCodeFixAction,
-    createCombine sources: { file: string; text: string; }[], customTransformers: ts.CustomTransformers, options: ts.CompilerOptions = {}) {
-  After = project.getLanguageService().getCompletionsAtPosition(indexTs.path, 0, { includeCompletionsForModuleExports: true });
- ({
-    Tuna: "asdf",
-    Salmon: "asdf",
-  });
+    createCombinedCodeActions,
+    eachDiagnostic,
+    registerCodeFix,
+} from "../_namespaces/ts.codefix.js";
+ts:: tsserver:: events:: ProjectsUpdatedInBackground", () => {
+    function verifyProjectsUpdatedInBackgroundEvent(scenario: string, createSession: (host: TestServerHost) => TestSession) {
+        it("when adding new file", () => {
+            const comFactory<ts.SourceFile>[]) {
+        const transformed = ts.transform(ts.createSourceFile("source.ts", sourceText, ts.ScriptTarget.ES2015), transformers);
+        const printer = ts.createPrinter({ newLine: ts.NewLineKind.CarriageReturnLineFeed }, {
+   aration): ArrayLiteralExpression {
+        const valueDeclaration = isClassLike(node)
+            ? getFirstConstructorWithBody(node)
+            : isFunctionLike(node) && nodeIsPresent((node as FunctionLikeDeclaration).body)
+            ? node
+     b: string): number;
+////    foo3(a: number): number;
+////    foo3(b: string): number;
+////    /** foo4 1*/
+////    foo4(a: number): number;
+////    foo4(b: string): number;
+////    /** new 1*/
+////    new (a: string);
+////    new (b: number);
+////s signature 4 - with number parameter"]
+});
 
-  // shouldn't require us to specify all props in record
-  const result3 = recorring.
-     * If there is no element at that position, the result is undefined.
-     * If a valid UTF-16 surrogate pair does not nst config: File = {
-            path: configFile.path,
-            content: jsonToReadableText({ compilerOptions: { incrementturn codeFixAll(context, errorCodes, (changes, diag) => makeChange(changes, diag.file, diag));
+verify.signatureHelp(
+    { marker: "16", overloadsCount: 2, docComment: "this is signature 4 - with string parameter" },
+    { marker: "o16", overloadsCount: 2, docComment: "this is signature 4 - with numb.protocol.ChangeRequest>({
+                        command: ts.server.protocol.CommandTypes.Change,
+                        arguments: {
+                            file: file.path,
+                            insertString: newContent,
+ ve.parse(BigInt(-2))).toThrow();
+  expect(() => negative.parse(BigInt(0))).toThrow();
+  expect(() => negative.parse(BigInt(3))).toThrow();
+  expect(() => nonnegative.parse(BigInt(-1))).toThrow();
+  expect(() => nonpositive.parse(BigInt(1))).toThrow();
+  ex }
+
+declare const ok5: Overloads<(x: unknown) => boolean>;  // {rule: 2, variants: [[unknown], boolean] }
+
+declare const ok6: Overloads<(x: any) => boolean>;  // {rule: 2, variants: [[any], boolean] }
+interface Array<T> {
+    /**
+     * Determines w>, context?: any): List<M>;
+    filter<F extends T>(predicate: (value: T, index: number, iter: this) => value is F, context?: any): List<F>;
+    filter(predicate: (value: T, index: number, iter: this) => any, context?: any): this;
+  }
+  export module Map {(indentation === undefined || i < indentation); i++) {
+            if (!ts.isWhiteSpaceLike(line.charCodeAt(i))) {
+                if (indentation === undefined || i < indentation) {
+                    indentation = i;
+                    break;
+    <T>(
+        incremental: ts.MapLike<T> | undefined,
+        clean: ts.MapLike<T> | undefined,
+        verifyValue: (key: string, incrementalValue: T | undefined, cleanValue: T | undefined) => string[] | undefined,
+        message: string,
+    ) {
+  ptions[1].parse(1234);
+  await union.options[0].parseAsync("asdf");
+  await union.options[1].parseAsync(1234);
+});
+
+test("readonly union", async () => {
+  const options = [z.string(), z.number()] as const;
+  const union = z.union(options);
+  union.parse("adex";
+
+test("object augmentation", () => {
+  const Animal = z
+    .object({
+      species: z.string(),
+    })
+    .augment({
+      population: z.number(),
+    });
+  // overwrites `species`
+  const ModifiedAnimal = Animal.augment({
+    species: z.array(z.steepEqual(state.semanticDiagnosticsPerFile!.get(libFile.path as ts.Path), ts.emptyArray);
+                assert.deepEqual(state.semanticDiagnosticsPerFile!.get(file1.path as ts.Path), ts.emptyArray);
+                assert.deepEqual(state.semanticDiagnos/src/index.ts
+////const x = Re/**/
+
+verify.completions({
+  marker: test.marker(""),
+  isNewIdentifierLocation: true,
+  includes: {
+    name: "React",
+    hasAction: true,
+    source: "/node_modules/@types/react/index",
+    sortText: completion.SortText.Autconst getCanonicalFileName = ts.createGetCanonicalFileName(program.useCaseSensitiveFileNames());
+            const buildInfoDirectory = ts.getDirectoryPath(ts.getNormalizedAbsolutePath(buildInfoPath!, currentDirectory));
+            return ts.ensurePathIual<z.TypeOf<typeof numberSchemaOptional>, number | undefined>(
+    true
+  );
+  util.assertEqual<z.TypeOf<typeof numberSchemaNullable>, number | null>(true);
+  util.assertEqual<z.TypeOf<typeof bigintSchemaOptional>, bigint | undefined>(
+    true
+  );
+  utict({
+  type: z.literal("a"),
+});
+const objA = {
+  type: "a",
+};
+
+const bSchema = z.object({
+  type: z.literal("b"),
+});
+const objB = {
+  type: "b",
+};
+
+const cSchema = z.object({
+  type: z.literal("c"),
+});
+const objC = {
+  type: "c",
+};
+
+const dSchema uivalent to Bar
+//// }
+////
+//// function whatever(x: Bar) {
+////     x.he/*function_call*/llo()
+//// }
+
+verify.baselineGoToImplementation("function_call");/// <reference path="fourslash.ts" />
+
+// @strict: true
+// @target: esnext
+// @lib: esnext
+
+//"entries",
+        )!.value,
+    },
+    [Symbol.toStringTag]: {
+        configurable: true,
+        enumerable: false,
+        writable: false,
+        value: "IterableWeakMap",
     },
 });
-
-function makeChanisitor, context);
-            };
-            return (node: ts.SourceFile) => ts.visitNode(node, visitor, ts.isSourceFile);
-  /** Prop5 implementaion*/
-////    public /*107*/prop5(aorb: any) {
-////        return 10;
-////    }
-////}
-////class c1 {
-/Generate 'get' and 'set' accessors",
-    actionDescription: "Generate 'get' and 'set' accessors",
-    newContent: `class A {
-   s";
-
-/**
- * Gets a string literal to use as the assigned name of an anonymous class or function declaration.
- * @internal
- t: esnext
-
-// @Filename: /exports1.ts
-//// export const a = 0;
-//// export const A = 1;
-//// export const b = 2;
-//// expopublic set p2(value: number) {
-////        this.val = value;
-////    }
-////    public set nc_p2(value: number) {
-//    // Disable sourcemap support for the duration of the test, as sourcemapping the errors generated during this test is slow anerface Deferred<T> {
-    resolve: (value: T | PromiseLike<T>) => void;
-    reject: (reason: unknown) => void;
-    promise: Pr-b", "/src/projects/a", "/src/projects/b", "--verbose", "--traceResolution", "--explainFiles"],
-        edits: noChangeOnlyRunsPatternMatchKind, isCaseSensitive: boolean): PatternMatch {
-    return {
-        kind,
-        isCaseSensitive,
-    };
-}
-s z.ZodError).formErrors).toEqual(expected);
-  }
-}
-
-test("Should have error messages appropriate for the underlying type", () valid: a", () => {
-    many.parse(objA);
-  })
-  .add("valid: c", () => {
-    many.parse(objC);
-  })
-  .add("invalid: null", () =n this.sys.readFile(path);
-    }
-
-    public readDirectory(path: string, extensions: string[], excludes: string[], includ(fn: (i: number) => T): (n: number) => T[];
-const a2 = times(identity)(5); // => [0, 1, 2, 3, 4]
-import {
-    arrayFrom,
-   lean, keyUsages: ReadonlyArray<KeyUsage>): Promise<CryptoKey>;
-    importKey(format: Exclude<KeyFormat, "jwk">, keyData: BufferSreturn { arg: val, arg2: false };
-  });
-
-  util.assertEqual<
-    typeof myFunc,
-    (arg: string, ...args_1: unknown[]) => nuExports = new Map<__String, true>();
-            const checker = program.getTypeChecker();
-            const defaultInfo = get !== "string") {
-    throw new Error("Not a string");
-  }
-
-  return str;
+import * as Harness from "../../_namespaces/Harness.js";roject/a.ts", session);
+            session.getProjectService().configuredProjects.get("/project/tsconfig.json")!.updateGraph();
+            closeFilesForSession(["/project/b.ts"], session);
+            session.getProjectService().configuredProjects.getithm: RsaHashedKeyGenParams | EcKeyGenParams, extractable: boolean, keyUsages: ReadonlyArray<KeyUsage>): Promise<CryptoKeyPair>;
+    generateKey(algorithm: AesKeyGenParams | HmacKeyGenParams | Pbkdf2Params, extractable: boolean, keyUsages: ReadonlyArray<Keadonly [string, number]
+//   >(true);
+//   util.assertEqual<
+//     z.infer<(typeof deepReadonlySchemas_0)[14]>,
+//     ReadonlyMap<string, Date>
+//   >(true);
+//   util.assertEqual<
+//     z.infer<(typeof deepReadonlySchemas_0)[15]>,
+//     ReadonlySet<Prnt: `{ "compilerOptions": { "module": "commonjs" } }`,
 };
-const stringSchema = z.string();
-const optionalStrinonst typingsCacheLocation = host.getGlobalTypingsCacheLocation();
-        if (typingsCacheLocation && startsWith(info.moduleFilerence 1", () => {
-  type func1 = z.TypeOf<typeof func1>;
-  util.assertEqual<func1, (k: string) => number>(true);
+const packageJson: File = {
+    path: "/package.json",
+    content: `{ "dependencies": { "@angular/forms": "*", "@angular/core": "*" } }`,
+};
+const indexTs: File = {
+    path: "/index.ts",
+ = 0;
+    let currentChunkSpan = 0;
+    let firstMatch: number | undefined;
+    let contiguous: boolean | undefined;
+
+    while (true) {
+        // Let's consider our termination cases
+        if (currentChunkSpan === chunkCharacterSpans.length) {
+  number, ...boolean[]]>(true);
 });
 
-test("metvoid;
-////};
+test("parse should fail given sparse array as tuple", () => {
+  expect(() => testTuple.parse(new Array(3))).toThrow();
+});
+
+// test('tuple with optional elements', () => {
+//   const result = z
+//     .tuple([z.stri;
 
 format.document();
 
 goTo.marker("callAutoformat");
 verify.currentLineContentIs("        call: any");
-goTo.peof import("readline");
-    const os = require("os") as typeof import("os");
-    const tty = require("tty") as typeof import(rify.codeFixAvailable([
-    { description: ts.Diagnostics.Add_undefined_to_optional_property_type.message }
-]);
+goTo.marker("callIndent");
+verify.indentationIs(8);
+goTo.marker("constrAutoformat");
+verify.currentLineContentIs("        constr: any");
+goTo. = <T>(value: T): OK<T> => ({ status: "valid", value });
 
-verify.codeFix( in tuple", () => {
-  expect(() => z.tuple([]).parse(["asdf"] as any)).toThrow();
+export type SyncParseReturnType<T = any> = OK<T> | DIRTY<T> | INVALID;
+export type AsyncParseReturnType<T> = Promise<SyncParseReturnType<T>>;
+export type ParseReturnType<T> =
+  | SyncParseReturnTypes";
+export * from "./unittests/evaluation/forAwaitOf.js";
+export * from "./unittests/evaluation/forOf.js";
+export * from "./unittests/evaluation/generator.js";
+export * from "./unittests/evaluation/objectRest.js";
+export * from "./unittests/evaluationch.
+    characterSpans: TextSpan[];
+}
+
+function createPatternMatch(kind: PatternMatchKind, isCaseSensitive: boolean): PatternMatch {
+    return {
+        kind,
+        isCaseSensitive,
+    };
+}
+
+/** @internal */
+export function createPatternMatfunc1, (k: string) => number>(true);
 });
 
-test("invalid enum value", () => {
-  expe-curly-in-string
-                    files: ["${configDir}/main.ts"], // eslint-disable-line no-template-curly-in-string,
-       isIdentifier,
-    isPrivateIdentifier,
-    isPropertyNameLiteral,
-    isStringLiteral,
-    ModifierFlags,
-    NamedEvaluurnType<T> =>
-  typeof Promise !== "undefined" && x instanceof Promise;
-import Benchmark from "benchmark";
-
-const suite = <(typeof schemas)[12]>, readonly string[]>(true);
-
-  util.assertEqual<z.infer<(typeof schemas)[13]>, readonly [string, number]>(let lastSingleLineCommentEnd = -1;
-    let singleLineCommentCount = 0;
-    const sourceText = sourceFile.getFullText();
-    f { newLine: ts.NewLineKind.CarriageReturnLineFeed });
-        verifyNewLines(content, { newLine: ts.NewLineKind.LineFeed });
- / new logger()
-
-goTo.file('second.ts')
-verify.noErrors()
-verify.getSuggestionDiagnostics([]);
-// @allowJs: true
-// @checkJs: tr
-////}
-////
-////class C2 implements Number{
-////}
-////
-////class C3 extends Array<string>{
-////}
-////
-////class C4 extends NumberAction: function getRefactorEditsToExtractType(context, actionName): RefactorEditInfo {
-        const { file } = context;
-    path="/.lib/react16.d.ts" />
-
-import React from 'react';
-
-interface BaseProps {
-  when?: ((value: string) => boolean) | "a  }, z.string()).parse(1234);
-  } catch (err) {
-    z.ZodError.assert(err);
-    expect(err.issues.length).toEqual(1);
-  }
-});
-
-t   allowJs: true,
-            outDir: "./lib",
-            esModuleInterop: true,
-            module: "commonjs",
-  nst newLineCharacter = getNewLineOrDefaultFromHost(context.host, context.formatContext?.options);
-        changes.insertNodeAt(include: null, // eslint-disable-line no-restricted-syntax
-                    files: ["../main.ts"],
-                }),
- ol.flags & SymbolFlags.Transient ? undefined : symbol;
-            const storedModuleSymbol = moduleSymbol.flags & SymbolFlags. CharacterCodes.doubleQuote:
-        case CharacterCodes.hash:
-        case CharacterCodes.percent:
-        case CharacterCodthoutFixAll,
-    registerCodeFix,
-} from "../_namespaces/ts.codefix.js";
-import {
-    __String,
-    arrayFrom,
-    ArrowFu const goodData = new Date();
-  const badData = new Date().toISOString();
-
-  const goodResult = await dateSchema.safeParseAsst b: RequiresLeadingSlash = "no slash";
-
-type Protocol<T extends string, U extends string> = `${T}://${U}`;
-function downloa;
-
-// interface A {
-//   val: number;
-//   b: B;
-// }
-
-// interface B {
-//   val: number;
-//   a: A;
-// }
-
-// const A: z.ZodTypetion in this array at which to begin searching for searchElement.
-     */
-    includes(searchElement: number, fromIndex?: numb    // If there exists union that is not `void 0` expression, check if the the common type is identifier.
-            // anythi      "kindModifiers": "export"
-        }
-    ]
-});
-
-verify.navigationBar([
-    {
-        "text": "\"navigationBarJsDocCo const jsdoc = tag.parent;
-    const fn = jsdoc.parent;
-    if (!isFunctionLike(fn)) return [];
-
-    return mapDefined(fn.paMultiSkilledRobot = ["mower", ["mowing", ""]];
-////let multiRobotB: MultiSkilledRobot = ["trimmer", ["trimming", "edging"]];
-/      after(() => {
-            baseFs = undefined!;
-            sys = undefined!;
-            editsSys = undefined!;
-    denext
-// @verbatimModuleSyntax: true
-// @allowJs: true
-
-// @Filename: /node_modules/@types/node/path.d.ts
-//// declare module 'n = 0;
-    let firstMatch: number | undefined;
-    let contiguous: boolean | undefined;
-
-    while (true) {
-        // Let'mangleScopedPackageName,
-    mapDefined,
-    MapLike,
-    ModuleResolutionKind,
-    noop,
-    Path,
-    resolveModuleName,s from the keys of `moduleSymbol.exports`.)
-            // 3. Otherwise, we have a default/namespace import that can be importesion: () => "1",
-            getScriptSnapshot: name => snapFor(name),
-            getDefaultLibFileName: () => "lib.d.ts",
- um nativeEnumTest {
-  asdf = "qwer",
-}
-// @ts-ignore
-const nativeEnumSchema = z.nativeEnum(nativeEnumTest);
-test("nativeEnum asy   it("should always return the file itself if '--isolatedModules' is specified", () => {
-                const { host, moduleF
-    uniform3fv(location: WebGLUniformLocation | null, data: Iterable<GLfloat>, srcOffset?: number, srcLength?: GLuint): void;
- marks from "./datetime";
-import discriminatedUnionBenchmarks from "./discriminatedUnion";
-import ipv4Benchmarks from "./ipv4";
-i@param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
-     ypeof x === "string");  // Error
-    const t2: Test = new Test();
-    t2.assert(typeof x === "string");
-}
-
-// Repro from #3ario: "moduleResolution",
-        subScenario: "module resolutions from files with partially used import attributes",
-        ];
-
-        const { session, findAllReferences } = setup(files);
-
-        openFilesForSession([files.find(f => f.path =reateSetup(files: readonly File[], openFiles: readonly File[], completionRequestLocation: protocol.FileLocationRequestArgs) {
-() => null;
-
-// @Filename: /project/index.js
-////BrowserRouter/**/
-
-goTo.file("/project/index.js");
-verify.importFixAtPosition([
-    path: "/b.ts",
-    content: "foo",
-};
-const tsconfig: File = {
-    path: "/tsconfig.json",
-    content: "{}",
-};
-cocrementalMap = new Map(Object.entries(incremental));
-        const cleanMap = new Map(Object.entries(clean));
-        cleanMaperface FontFaceSet extends Set<FontFace> {
-}
-
-interface FormData {
-    [Symbol.iterator](): IterableIterator<[string, FormDataEnecker, importName: StringLiteralLike): Path[] | undefined {
-        const symbol = checker.getSymbolAtLocation(importName);context?: any): Map<any, any>;
-    filter<F extends V>(predicate: (value: V, key: K, iter: this) => value is F, context?: any):      isBinaryExpression(left) ? isBinaryExpression(right)
-                    && left.operatorToken.kind === right.operatorToke(max));
-}
-
-const testSymbol = Symbol("test");
-
-export class Mocker {
-  pick = (...args: any[]) => {
-    return args[getRandomInt ? true : false;  // false
-type Test2 = C extends D ? true : false;  // false
-type Test3 = D extends C ? true : false;  // faltring>;
-    /** Returns an iterator allowing to go through all values of the key/value pairs contained in this object. */
-    vaptions: Primitive[];
-}
-
-export interface ZodInvalidEnumValueIssue extends ZodIssueBase {
-  received: string | number;
-  code: tysync (): Promise<number> => mp;
-let f13 = async (): MyPromise<number> => p;
-
-let o = {
-	async m1() { },
-	async m2(): Promiommon.contextualErrorMap, // contextual error map is first priority
-      ctx.schemaErrorMap, // then schema-bound map if availarify.organizeImports(
-`import {
-    type Type1,
-    type Type2,
-    type Type3,
-    type Type4,
-    type Type5,
-    type //    private privateMethod() { }
-////    protected protectedMethod() { }
-////    static staticMethod() { }
-////    getValue(ringToNumber]);
-
-  type t1 = z.input<typeof val>;
-  util.assertEqual<t1, [string]>(true);
-  type t2 = z.output<typeof val>;
-  ut value;
-        const buildInfo = ts.getBuildInfo(path, value);
-        if (!buildInfo) return value;
-        ts.Debug.a      `,
-        );
-        testExtractRange(
-            "extractRange18",
-            `
-                function f() {
- Tag,
-    JSDocTag,
-    JSDocTagInfo,
-    JSDocTemplateTag,
-    JSDocThrowsTag,
-    JSDocTypedefTag,
-    JSDocTypeTag,
-   nst checker = () => {
-    testTuple.parse([123, { name: "Rudy2" }, ["blue", "red"]] as any);
-  };
-  try {
-    checker();
-  } Key, derivedKeyType: AlgorithmIdentifier | AesDerivedKeyParams | HmacImportParams | HkdfParams | Pbkdf2Params, extractable: boolring());
-  const res = schema.safeParse(null);
-  expect(res.success).toBe(false);
-});
-// @ts-ignore TS6133
-import { expect } froAn object with properties reflecting the locale
-     * and formatting options computed during initialization
-     * of the `Intlrn x > 0 ? x : y;
-////         }
-////     }
-//// }|]
-
-verify.rangeAfterCodeFix(`
-class A {
-    y: number;
-    x: (x: number, y?:() === file) {
-                        // skip extraction if the type node is in the range of the type parameter declaration.
-de(node: Node): SerializedTypeNode {
-        if (isFunctionLike(node) && node.type) {
-            return serializeTypeNode(noons?: AstWalkOptions, state?: any): IAstWalker {
-            if (!options) {
-                options = new AstWalkOptions();
-   file: "index.ts",
-            text: "import { A } from './a.js';\nexport { A } from './a.js';",
-        },
-    ], {
-        Literal,
+test("method parsing", () => {
+  const methodObject = z.object({
+    property: z.number(),
+    method: z.function().args(z.string()).returns(z.number()),
+  });
+  const methodInstance = {
+    property: 3,
+    method(node);
+        return false;
     }
 
-    export class SavedToken {
-        constructor (public tok: Token, public minChar: number, public li", replacementSpan: test.ranges()[0] }
-    ],
-    preferences: { includeInsertTextCompletions: true },
-});
-interface I1 {
-	rmatPartTypesRegistry {
-        day: any;
-        dayPeriod: any;
-        era: any;
-        hour: any;
-        literal: any;
-   ;
+    function inferAccessorType(node: GetAccessorDeclaration | SetAccessorDeclaration, allAccessors: AllAccessorDeclarations, context: SyntacticTypeNodeBuilderContext) {
+        if (node.kind === SyntaxKind.GetAcces from "foo2";');
+verify.organizeImports(
+`import { type a, A, b } from "foo2";
+interface Use extends A {}
+console.log(a, b);`,
+    /*mode*/ undefined,
+    { organizeImportsIgnoreCase: true, organizeImportsTypeOrder: "inline" });
 
-var a: {
-    <T extends Date>(): T;
+edit.replaceLine(0getRobots() {
+    return robots;
 }
-var r3 = a<Date>().getDate();
-var r3b = a()['getDate']();
 
-var b = {
-    foo: () => booleanRecord.parse("asdf")).toThrow();
-});
+let multiRobotA: MultiSkilledRobot = ["mower", ["mowing", ""]];
+let multiRobotB: MultiSkilledRobot = ["trimmer", ["trimming", "edging"]];
+let multiRobots = [multiRobotA, multiRobotB];
+function getMultiRobots() {
+RangeToExtract(context);
+        Debug.assert(info && !isRefactorErrorInfo(info), "Expected to find a range to extract");
 
-test("string record parse - fail", () => {
-  const badCheck = () =>
-    boo{
+        const name = getUniqueName("NewType", file);
+        const edits = textChanges.ChangeTracker.with(context, changes => {
+oduleResolution",
+            subScenario: "package json file is edited when package json with type module exists",
+            commandLineArgs: ["--w", "--p", "src", "--extendedDiagnostics", "-traceResolution", "--explainFiles"],
+            sys: () =>mbol, checker);
+            const storedSymbol = symbol.flags & SymbolFlags.Transient ? undefined : symbol;
+            const storedModuleSymbol = moduleSymbol.flags & SymbolFlags.Transient ? undefined : moduleSymbol;
+            if (!storedSymbol || !se CanvasPath {
+    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/roundRect) */
+    roundRect(x: number, y: number, w: number, h: number, radii?: number | DOMPointInit | Iterable<number | DOMPointInit>): void;
+}
+
+inction f() {
     [#|
     try {
         f2()
@@ -1117,314 +902,634 @@ test("string record parse - fail", () => {
 function f2() {
 }
 }
-    fy.getSemanticDiagnostics([]);
-goTo.marker("2");
-verify.getSemanticDiagnostics([{
-    message: "Duplicate function implem*  that are supported in date and time formatting
-         *  without having to fall back to the runtime's default locale.
-     mber, type: GLenum, offsetsList: Int32Array | Iterable<GLsizei>, offsetsOffset: number, instanceCountsList: Int32Array | Iterab  host.deleteFile(`${project}/node_modules/react/jsx-runtime/index.d.ts`);
-                host.deleteFile(`${project}/node_mction spanForCallExpression(node: CallExpression): OutliningSpan | undefined {
-        if (!node.arguments.length) {
-  .punctuation("("),
-    c.parameterName("p1"),
-    c.punctuation(")"),
-    c.punctuation("{"),
-    c.punctuation("}"));
-
-coactorActionsToConvertOverloadsToOneSignature(context: RefactorContext): readonly ApplicableRefactorInfo[] {
-    const { file, sts", { removeComments: true }, printer => printer.printFile(sourceFile));
-        });
-
-        // https://github.com/microsofion &&
-            isJSDocTypeLiteral(node.typeExpression.type) ? node.typeExpression.type.jsDocPropertyTags : undefined;
+            `,
+        [ts.refactor.extractSymbol.Messages.cannotExtractRangeContainingConditionalReturnStatement.message],nativeEnumTest {
+  asdf = "qwer",
 }
-
-    TaggedTemplateExpression,
-    TextRange,
-    TextSpan,
-    TypeAssertion,
+// @ts-ignore
+const nativeEnumSchema = z.nativeEnum(nativeEnumTest);
+test("nativeEnum async parse", async () => {
+  const goodData = nativeEnumTest.asdf;
+  const badData = "asdf";
+
+  const goodResult = await nativeEnumScodeModulesPathPart,
+    PackageJsonImportFilter,
+    Path,
+    pathContainsNodeModules,
+    Program,
+    skipAlias,
+    SourceFile,
+    startsWith,
+    Statement,
+    stripQuotes,
+    Symbol,
+    SymbolFlags,
+    timestamp,
     TypeChecker,
-    usingSingleLineStringW2 {
-        a: <T>() => T;
-        a2: <T>(x?: T) => T;
-        a3: <T>(x: T) => T;
-        a4: <T>(x: T, y?: T) => T;
-    createLoggerWithInMemoryLogs,
-    HarnessLSCouldNotResolveModule,
-    LoggerWithInMemoryLogs,
-} from "./tsserverLogger.js";odule: ts.ModuleKind.System,
-                    target: ts.ScriptTarget.ES5,
-                    jsx: ts.JsxEmit.React,
-  3.3) with a property named N of a type that is assignable to the target given in E,
-//        where N is the numeric index of Ela.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/Locale#Parameters) with some or all of options of the loasdf")).resolves.toEqual("asdf");
-  return await expect(schema3.parseAsync("qwer")).resolves.toEqual("qwer");
-});
+ on fs() {
+        return loadProjectFromFiles({
+            "/src/projects/project/packages/a/index.js": `export const a = 'a';`,
+            "/src/projects/project/packages/a/test/index.js": `import 'a';`,
+            "/src/projects/project/packages/a******
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http:/o serialize.
+     */
+    function serializeTypeNode(node: TypeNode | undefined): SerializedTypeNode {
+        if (node === undefined) {
+            return factory.createIdentifier("Object");
+        }
 
-test("parseAs a new transaction with the given mode ("readonly" or "readwrite") and scope which can be a single object store name or aortedLocalesOf(locales?: LocalesArgument, options?: { localeMatcher?: RelativeTimeFormatLocaleMatcher; }): UnicodeBCP47LocaleIdehods of an object.
-     * @param o Object that contains the properties and methods. This can be an object that you created or a", "handles moving statement to an existing file", session);
-    });
+        node = skipTypeParentheses(node);
 
-    it("handles moving statements to a non-TS file", ()nction open(): void {
-            openExternalProjectForSession({
-                rootFiles: toExternalFiles([file1.path]),
- ///   title: string;
-////   messages: {
-////     messageText: string;
-////     messageHtml: string;
-////   }[];
-//// }|]
-Node: Node) {
-    // intended to capture the entire type in cases where the user selection is not exactly the entire type
-    tion changeCaseFile(file: FileOrFolderOrSymLink, testPath: (path: string) => boolean, replacePath: (path: string) => string): Fi   node = isClassDeclaration(node) ?
-        factory.updateClassDeclaration(
-            node,
-            node.modifies({
-  marker: "",
-  includes: [{
-    name: "secondary",
-    sortText: completion.SortText.OptionalMember,
-    hasAction: tonst inner = z.string().default("asdf");
-  const outer = z.object({ inner }).default({
-    inner: undefined,
-  });
-  type input
-    readonly size: number | undefined;
-    // Force evaluation
-    cacheResult(): this;
-    // Sequence algorithms
-    map<M>(osition
-        || lastJsDoc
-            && existingDocComment
-            && lastJsDoc !== existingDocComment
-    ) {
-  dStatement(node: Node): node is ValidStatement {
-    return isExpressionStatement(node) || isReturnStatement(node) || isVariabl
-    
-    use(v);
+ ueBase {
+  code: typeof ZodIssueCode.custom;
+  params?: { [k: string]: any };
 }
 
+export type DenormalizedError = { [k: string]: DenormalizedError | string[] };
 
-function foo8_c(x) {
-    for (const y = 0; y < 1;) {
-        const x = 1;
-        var v = x;
-    ef.js
+export type ZodIssueOptionalMessage =
+  | ZodInvalidTypeIssue
+  | ZodInvalidLiteralIssue
+  | Zot(x),
+);
 
-//// class Foo {
-////     constructor(value: number) { this.property1 = "hello"; }
-////     static method1() {}
-////(getDirectoryPath(fileName), directory => {
-            if (this.installTypingHost.fileExists(combinePaths(directory, "packages.System {
-    public readonly vfs: vfs.FileSystem;
-    public readonly args: string[] = [];
-    public readonly output: stri part is prefix match of
-    //          some word part. That way we don't match something like 'Class' when the user
-    //  ccess) expect(badResult.error).toBeInstanceOf(z.ZodError);
-});
+// Repro from #30297
 
-/// array
-const arraySchema = z.array(z.string());
-test("array ars/util";
-import * as z from "../index";
+declare function foo2<T, U = T>(fn: T, a?: U, b?: U): [T, U];
 
-test("first party switch", () => {
-  const myType = z.string() as z.ZodFirstPartySchemll be used as the this value for each invocation of
-     * predicate. If it is not provided, undefined is used instead.
-    t * as vfs from "./_namespaces/vfs.js";
-import * as vpath from "./_namespaces/vpath.js";
-import { incrementalVerifier } from     { target, experimentalDecorators: true },
-                );
+foo2(() => {});
+foo2(identity);
+foo2(identity, 1);
 
-                assert.deepEqual(actions, [
-   e.json
-{
-    "name": "package",
-    "private": true,
-    "type": "module"
-}
-// @filename: subfolder/package.json
-{
-    xpect(arg.error.issues[0].message).toEqual("bad");
+// Repro from #30324
+
+declare function times<T>(fn: (i: number) => T): (n: number) => T[];
+consructor(public val: string) {}
   }
-});
-test("preprocess as the second property of object", () ntains anything that augments to global scope we need to build them as if
-     * they are global files as well as module
-    : "pkg",
-    "version": "0.0.1",
-    "exports": {
-        "import": "./import.js",
-        "require": "./require.js"
-    }   var len = preAst.members.length;
-            if (walker.options.reverseSiblings) {
-                for (var i = len - 1; i />
+  class Bar extends AbstractBar {}
 
-////let x = { a: 1, b: 2 };
+  const TestSchema = z.instanceof(Test);
+  const SubtestSchema = z.instanceof(Subtest);
+  const AbstractSchema = z.instanceof(AbstractBar);
+  const BarSchema = z.instanceof(Bar);
+
+  Test> :
+    T;
+
+type MyPromise<T> = {
+    then<U>(f: ((value: T) => U | PromiseLike<U>) | null | undefined): MyPromise<U>;
+}
+
+type InfinitePromise<T> = Promise<InfinitePromise<T>>;
+
+type P0 = __Awaited<Promise<string | Promise<MyPromise<number> | null const lineStarts = sourceFile.getLineStarts();
+    for (const currentLineStart of lineStarts) {
+        const lineEnd = sourceFile.getLineEndOfPosition(currentLineStart);
+        const lineText = sourceFile.text.substring(currentLineStart, lineEnd);
+ 
+    JSDocSatisfiesTag,
+    JSDocSeeTag,
+    JSDocTag,
+    JSDocTagInfo,
+    JSDocTemplateTag,
+    JSDocThrowsTag,
+    JSDocTypedefTag,
+    JSDocTypeTag,
+    lastOrUndefined,
+    length,
+    lineBreakPart,
+    map,
+    mapDefined,
+    MethodDsserverProjectSystem module resolution caching", () => {
+    const configFile: File = {
+        path: `/user/username/projects/myproject/tsconfig.json`,
+        content: jsonToReadableText({ compilerOptions: { traceResolution: true } }),
+    };
+
+   isBlock,
+    isCallExpression,
+    isCallOrNewExpression,
+    isClassLike,
+    isDeclaration,
+    isFunctionLike,
+    isIfStatement,
+    isInComment,
+    isInterfaceDeclaration,
+    isJsxText,
+    isModuleBlock,
+    isNodeArrayMultiLine,
+   
+    isExpression,
+    isExternalModule,
+    isNoSubstitutionTemplateLiteral,
+    NodeFactory,
+    NoSubstitutionTemplateLiteral,
+    setTextRange,
+    SourceFile,
+    SyntaxKind,
+    TaggedTemplateExpression,
+    TemplateHead,
+    TemplateLiter    [Symbol.iterator](): IterableIterator<[K, V]>;
+    }
+    export module Indexed {}
+    export function Indexed<T>(collection: Iterable<T>): Collection.Indexed<T>;
+    export interface Indexed<T> extends Collection<number, T> {
+      toJS(): Array<any>;
+om(
+    program: Program,
+    host: LanguageServiceHost,
+    preferences: UserPreferences,
+    useAutoImportProvider: boolean,
+    cb: (module: Symbol, moduleFile: SourceFile | undefined, program: Program, isFromPackageJson: boolean) => void,
+) {
+  const ms = require("ms") as typeof import("ms");
+    const readline = require("readline") as typeof import("readline");
+    const os = require("os") as typeof import("os");
+    const tty = require("tty") as typeof import("tty");
+    const isatty = tty.
+
+// @esModuleInterop: true
+
+// @Filename: /abc.d.ts
+////declare module "a" {
+////    /*1*/export const /*2*/x: number;
+////}
+
+// @Filename: /b.ts
+////import a from "a";
+////a./*3*/x;
+
+verify.baselineFindAllReferences('1', '2', '3');
+/// <re(null);
+  checkErrors(z.null(), {});
+  z.null().nullable().parse(null);
+  checkErrors(z.object({}), 1);
+  z.object({}).nullable().parse(null);
+  checkErrors(z.tuple([]), 1);
+  z.tuple([]).nullable().parse(null);
+  checkErrors(z.unknown(), 1);
+  z.unknown(lementsInstancedWEBGL) */
+    multiDrawElementsInstancedWEBGL(mode: GLenum, countsList: Int32Array | Iterable<GLsizei>, countsOffset: number, type: GLenum, offsetsList: Int32Array | Iterable<GLsizei>, offsetsOffset: number, instanceCountsList: Int32Array |     declarationDir: "${configDir}/decls", // eslint-disable-line no-template-curly-in-string
+                        rootDirs: ["root1", "${configDir}/root2", "root3"], // eslint-disable-line no-template-curly-in-string
+                        paths: {ZodTypeAny, bad: any) {
+  let expected;
+  try {
+    a.parse(bad);
+  } catch (error) {
+    expected = (error as z.ZodError).formErrors;
+  }
+  try {
+    a.optional().parse(bad);
+  } catch (error) {
+    expect((error as z.ZodError).formErrors).toEqual(expectg]>;
+    /** Returns an iterator allowing to go through all keys of the key/value pairs contained in this object. */
+    keys(): IterableIterator<string>;
+    /** Returns an iterator allowing to go through all values of the key/value pairs contained in thinction, fixedDeclarations?: Set<number>) {
+    const changes = trackChanges(t => makeChange(t, errorCode, context.sourceFile, checker, expression, fixedDeclarations));
+    return createCodeFixAction(fixId, changes, Diagnostics.Add_await, fixId, DiagnoFiles: ["/.src/main.ts"],
+            main: "/.src/main.ts",
+        }, { module: ts.ModuleKind.System });
+        assert.equal(result.a, 2);
+        assert.equal(result.b, 2);
+    });
+    itIfBigInt("pre-increment in commonjs using BigInt", () =ots, file => file.fileName);
+            const outputs = new Map<string, string>();
+            const host: ts.CompilerHost = {
+                getSourceFile: fileName => fileMap.get(fileName),
+                getDefaultLibFileName: () => "lib.d.ts",
+@param target The target object to copy to.
+     * @param sources One or more source objects from which to copy properties
+     */
+    assign(target: object, ...sources: any[]): any;
+
+    /**
+     * Returns an array of all symbol properties found direct ExportDeclaration {
+    return makeExportDeclaration(/*exportSpecifiers*/ undefined, moduleSpecifier);
+}
+function reExportDefault(moduleSpecifier: string): ExportDeclaration {
+    return makeExportDeclaration([factory.createExportSpecifier(/*isTypeOnl-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/RelativeTimeFormat#Parameters).
+     */
+    interface RelativeTimeFormatOptions {
+        /** The locale matching algorithm to use. For information about this option, see [Intl page](   let a = 1;
+    [#|const x: number = 1;
+    a++;|]
+    a; x;
+}`,
+    );
+
+    testExtractFunction(
+        "extractFunction_VariableDeclaration_Writes_Mixed1",
+        `
+function f() {
+    let a = 1;
+    [#|const x = 1;
+    let y = 2;
+    a+/let x = { a: 1, b: 2 };
 ////let y = ({ a, /**/ } = x, 1);
 
 verify.completions({ marker: "", exact: ["b"] });
 //===let
-me !== node;
-        case SyntaxKind.BindingElement:
-            return (parent as BindingElement).propertyName !== node;
-   h TV and TRV.
-    text = text.replace(/\r\n?/g, "\n");
-    return setTextRange(factory.createStringLiteral(text), node);
-}
-ion f1(): c1;
-// @allowUnreachableCode: false
-// @preserveConstEnums: true
-
-while (true);
-var x = 1;
-
-module A {
-    wh(bTs.path as ts.Path, /*preferCapitalized*/ false, ts.returnTrue, (info, symbolName) => {
-            if (symbolName === "SIGInature?.has(sourceFile.resolvedPath)) return false;
-
-        const info = state.fileInfos.get(sourceFile.resolvedPath)!;
-    = new SymbolTableScope(members, ambientMembers, typeMembers, ambientTypeMembers, type.symbol);
-                var agg = new Stput.text, /*retainTrailingDirectorySeparator*/ true);
-                    Harness.Baseline.runBaseline(this.getBaselineFolder(lean, cancelable?: boolean, data?: any, origin?: string, lastEventId?: string, source?: MessageEventSource | null, ports?: Itera`module.exports =` was changed to `export default` */
-type ModuleExportsChanged = boolean;
-
-function convertStatement(
-    sos", "Burgers", "Salad"] as const;
-  const FoodEnum = z.enum(foods, {
-    errorMap: () => ({ message: "This is not food!" }),
-  ; i < workerCount; i++) {
-            // TODO: Just send the config over the IPC channel or in the command line arguments
-    arationFileMaps", "getEditsForFileRename", session);
-    });
-
-    it("getEditsForFileRename when referencing project doesnt ints: number) { // no error
-    var arguments = 10; // no error
-}
-
-declare function f2(i: number, ...arguments); // no error  arrow function, etc.), then
-    // its containing `CallHierarchyItem` is a containing function or SourceFile that matches the      { path: "/node_modules/@angular/core/package.json", content: `{ "typings": "./core.d.ts" }` },
-            { path: "/node_eckErrors(z.unknown(), 1);
-  z.unknown().nullable().parse(null);
+l0:
+for (let x of []) {
+    (function() { return x});
+    (() => x);
+    if (x == 1) {
+        break;
+    }
+    if (x == 1) {
+        ]
+        }
+    ]
 });
 
-test("unwrap", () => {
-  const unwrapped = z.string().nullaseline
-            if (!sys.fileExists(`${outputFile}.readable.baseline.txt`)) addBaseline(`Readable baseline not present in che context.
- * SourceFile objects account for most of the memory usage by the language service. Sharing
- * the same DocumentReptions {
-        /** The locale matching algorithm to use. For information about this option, see [Intl page](httpgnosticMessageChain {
-    location?: ExpectedDiagnosticLocation;
-}
+verify.navigationBar([
+    {
+        text: "<global>",
+        kind: "script",
+        childItems: [
+            {
+                text: "A",
+                kind: "class"
+            }
+        ]
+    },
+    {
+///    private privateMethod() { }
+////    protected protectedMethod() { }
+////    static staticMethod() { }
+////    getValue(): string | boolean { return "hello"; }
+////    private privateMethod1() { }
+////    protected protectedMethod1() { }
+///n this.sys.realpath(path);
+    }
 
-export enum DiagnosticKind {
-    Error = "Error",
-     dateStyle?: "full" | "long" | "medium" | "short" | undefined;
-        timeStyle?: "full" | "long" | "medium" | "short" | unde...
-    //
-    // 14.3.2.1 RS: Evaluation
-    //   VariableDeclaration : BindingIdentifier Initializer
-    //     ...
-    /alue: unknown): asserts value is string[];
-declare function assertDefined<T>(value: T): asserts value is NonNullable<T>;
+    public getDefaultLibLocation(): string {
+        return vpath.resolve(this.getCurrentDirectory(), this.defaultLibLocation);
+    }
 
-funImports, fixIdInfer],
-    getAllCodeActions: context => {
-        const { sourceFile, program, cancellationToken } = corceFiles()) {
-            const version = Debug.checkDefined(sourceFile.version, "Program intended to be used with Builder shou A fake `ts.CompilerHost` that leverages a virtual file system.
- */
-export class CompilerHost implements ts.CompilerHost {
-  odule: commonjs
+    public getDefaultLibFileName(options: ts.CompilerOptions): striturn;
+        }
+        // Close all the watchers
+        this.projectWatchers.delete(projectName);
+        this.sendResponse({ kind: ActionWatchTypingLocations, projectName, files: [] });
 
-interface I {
-    a: number;
-}
+        if (this.log.isEnabled()) {
+            this.log.wrthout having to fall back to the runtime's default locale.
+         *
+         * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
+         *  For the general form and interpretation Name)) continue;
+                const symbol = checker.getSymbolAtLocation(moduleName);
+                if (!symbol) continue;
 
-export function f(x: any): x is I {
-    return typeof x.a === "number";ponents,
-    getTextOfIdentifierOrLiteral,
-    getTextOfNode,
-    getTouchingPropertyName,
-    ImportSpecifier,
-    isExteig.json`,
-                    // Use outFile because otherwise the real and linked files will have the same output path
-      makeExportDeclaration([factory.createExportSpecifier(/*isTypeOnly*/ false, rename, text)]),
-        ];
-        changes.replac use type inference, rather than passing explicit type arguments.
-    // Note the inclusion of arrow functions to ensure that sntext/getActiveUniforms) */
-    getActiveUniforms(program: WebGLProgram, uniformIndices: Iterable<GLuint>, pname: GLenum): any;
-  let sourceFilePath = ts.getNormalizedAbsolutePath(sourceFile.fileName, compilerResult.program!.getCurrentDirectory());
- ort { a } from "${windowsStyleRoot.toLocaleUpperCase()}/${projectRootRelative}/a"
-import { b } from "${windowsStyleRoot.toLocal   * same as the corresponding elements of this object (converted to a String) starting at
-     * endPosition â€“ length(this).ontext/vertexAttribI) */
-    vertexAttribI4iv(index: GLuint, values: Iterable<GLint>): void;
-    /** [MDN Reference](httpstry.range)));
+                // Add any file other than our own as reference
+                addReferenceFromAmbientModule(symbol);
+  eb/API/SubtleCrypto/unwrapKey) */
+    unwrapKey(format: KeyFormat, wrappedKey: BufferSource, unwrappingKey: CryptoKey, unwrapAlgorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams, unwrappedKeyAlgorithm: AlgorithmIdenti;  // string | undefined
+        assertDefined(x);
+        x;  // string
+    }
+    if (!!true) {
+        assert(false);
+        x;  // Unreachable
+    }
+    if (!!true) {
+        assert(false && x === undefined);
+        x;  // Unreachable
+    }path: `${windowsStyleRoot}/${projectRootRelative}/b.ts`,
+                    content: `
+import { a } from "${windowsStyleRoot.toLocaleUpperCase()}/${projectRootRelative}/a"
+import { b } from "${windowsStyleRoot.toLocaleLowerCase()}/${projectRootRelativetement.expression, "___setFunctionName" as __String) &&
+        (statement.expression as CallExpression).arguments.length >= 2 &&
+        (statement.expression as CallExpression).arguments[1] === node.emitNode?.assignedName;
 }
 
 /**
- * Gets the call sites that call into the provided call hierarchy declaration.
- *
- * @internal
- */
+ * Gets whether a  { [x: number]: number, [x: string]: any; }
+//
+// should always be required.
 
-    FsContents,
-    getProjectConfigWithNodeNext,
-    libContent,
-} from "./contents.js";
-import { libFile } from "./virtua(symbol.valueDeclaration && isExternalModuleAugmentation(symbol.valueDeclaration)) {
-        return checker.getMergedSymbol(tion transformNamedEvaluationOfExportAssignment(context: TransformationContext, node: NamedEvaluation & ExportAssignment, ignoreuch, the first argument will be a well formed template call site object and the rest
-     * parameter will contain the substituixIdDeleteImports = "unusedIdentifier_deleteImports";
-const fixIdInfer = "unusedIdentifier_infer";
-const errorCodes = [
-    D  // Return array of values that needs emit
-        return arrayFrom(mapDefinedIterator(seenFileNamesMap.values(), value => valfile, span.start);
-    const endToken = findTokenOnLeftOfPosition(file, span.start + span.length);
-    const adjustedSpan =Node | undefined) => void) {
-    if (!hasSyntacticModifier(node, ModifierFlags.Ambient) && node.body && isModuleBlock(node.bodyt type NumberOf<N extends any> = N extends number ? _NumberOf<N> : N;
+interface StringTo<T> {
+    [x: string]: T;
 }
-declare module "Any/Implements" {
-    import { Extend
-    { organizeImportsIgnoreCase: "auto", organizeImportsTypeOrder: "inline" }
-);
 
-edit.replaceLine(0, 'import { type A, typeeclare let s0: string;
-declare let s1: TaggedString1;
-declare let s2: TaggedString2;
-declare let s3: TaggedString1 | TaggedSContext2D/roundRect) */
-    roundRect(x: number, y: number, w: number, h: number, radii?: number | DOMPointInit | Iterable<numbe // If we're an accessibility modifier, we're in an instance member and should search
-                // the constructor's para_export_to_default_export),
-    kind: "refactor.rewrite.export.default",
+interface NumberTo<T> {
+    [x: number]: T;
+}
+
+interface StringAndNumberTo<T> extends StringTo<T>, NumberTo<T> {
+}
+
+interface Obj {(const moduleSpecifier of importingFile.imports) {
+        const imported = program.getResolvedModuleFromModuleSpecifier(moduleSpecifier, importingFile)?.resolvedModule;
+        if (!imported || imported.resolvedFileName !== exportingFile.fileName) {
+    setImmediate: () => 0,
+    clearImmediate: ts.noop,
+    createHash: Harness.mockHash,
+    watchFile: () => noopFileWatcher,
+    watchDirectory: () => noopFileWatcher,
 };
 
-registerRefactor(refactorName, {
-    kinds: [ObjectOrArrayLiteral(node: Node, open: SyntaxKind.OpenBraceToken | SyntaxKind.OpenBracketToken = SyntaxKind.OpenBraceToken): Out > 2 && s.charCodeAt(0) === CharacterCodes.slash && s.charCodeAt(1) === CharacterCodes.slash;
+class TestSession extends ts.server.Session {
+    getProjectService() {
+ ): CompletionEntry[] {
+    if (!isIdentifier(tag.name)) {
+        return emptyArray;
     }
+    const nameThusFar = tag.name.text;
+    const jsdoc = tag.parent;
+    const fn = jsdoc.parent;
+    if (!isFunctionLike(fn)) return [];
 
-    // This is the functtypingsInstaller = disableAutomaticTypingAcquisition
-                ? undefined
-                : new NodeTypingsInstallerAdaostics.Type_0_is_not_assignable_to_type_1.code,
-    Diagnostics.Argument_of_type_0_is_not_assignable_to_parameter_of_type_1_wi///var robotA: Robot = { name: "mower", skills: { primary: "mowing", secondary: "none" } };
-////var robotB: Robot = { name: "trdJS, OperatorPrecedence.None, NodeType.None, OperatorPrecedence.None, NodeType.None, "default", ErrorRecoverySet.SCase);
-    see-line @typescript-eslint/unified-signatures
-    /**
-     * @deprecated pass scriptKind for and impliedNodeFormat correctness #35070
+    return mapDeferface Element {}
+    interface IntrinsicElements {
+        div: {
+            propA?: boolean;
+        };
+    }
+}
+export function jsx(...args: any[]): void;
+export function jsxs(...args: any[]): void;
+export const Fragment: unique symbol;
+`,
+ reateProgram: ts.CreateProgram<ts.BuilderProgram>;
 
-type O = {
-    a: number,
-    b: number
+    private constructor(sys: System | vfs.FileSystem, options?: ts.CompilerOptions, setParentNodes?: boolean, createProgram?: ts.CreateProgram<ts.BuilderProgram>, jsDocParsingMode?: ts.JSDocParsingMode)ngle signature";
+const refactorDescription = getLocaleSpecificMessage(Diagnostics.Convert_overload_list_to_single_signature);
+
+const functionOverloadAction = {
+    name: refactorName,
+    description: refactorDescription,
+    kind: "refactor.rewrite.    // Disable sourcemap support for the duration of the test, as sourcemapping the errors generated during this test is slow and not something we care to test
+    let oldPrepare: ts.AnyFunction;
+    let oldStackTraceLimit: number;
+    before(() => expect(obj4.success).toBe(true);
+  if (obj4.success) {
+    expect(obj4.data.a).toBeUndefined();
+  }
+});
+
+test("dont parse undefined values", () => {
+  const result1 = z.record(z.any()).parse({ foo: undefined });
+
+  expect(result1).toEqual({
+    foo: undefr],
+    getAllCodeActions: context => {
+        const { sourceFile, program, cancellationToken } = context;
+        const checker = program.getTypeChecker();
+        const sourceFiles = program.getSourceFiles();
+        return codeFixAll(context, erro<T extends object> = T extends any
+  ? util.OmitKeys<T, "path">
+  : never;
+
+export type IssueData = stripPath<ZodIssueOptionalMessage> & {
+  path?: (string | number)[];
+  fatal?: boolean;
 };
-type K = keyof O | 'c';
-function ff(o: O, k: K) {
-    switch(k) {
-  Program) {
-    const node = getTokenAtPosition(file, startPosition);
-    const containingDecl = findAncestor(node, isConvertasticWithLocation,
-    disposeEmitNodes,
-    EmitFlags,
-    EmitHelper,
-    EmitHint,
-    EmitHost,
-    EmitOnly,
-    Emitaration
+
+export type ErrorMapCtx = {
+  defaultError: string;
+  data: any;xt } from "../helpers.js";
+import { forEachDeclarationEmitWithErrorsScenario } from "../helpers/declarationEmit.js";
+import {
+    noChangeRun,
+    verifyTsc,
+} from "../helpers/tsc.js";
+import { verifyTscWatch } from "../helpers/tscWatch.j   FileTextChanges,
+    find,
+    FindAllReferences,
+    findAncestor,
+    findPrecedingToken,
+    forEach,
+    getAncestor,
+    getFixableErrorSpanExpression,
+    getSymbolId,
+    hasSyntacticModifier,
+    Identifier,
+    isArrowFunction,result;
+    }
+    if (isIntersectionTypeNode(selection)) {
+        const result: TypeElement[] = [];
+        const seen = new Map<string, true>();
+        for (const type of selection.types) {
+            const flattenedTypeMembers = flattenTypeLiterkeyPath and options define constraints that cannot be satisfied with the data already in store the upgrade transaction will abort with a "ConstraintError" DOMException.
+     *
+     * Throws an "InvalidStateError" DOMException if not called within an upgradeBCP47LocaleIdentifier | Locale | readonly (UnicodeBCP47LocaleIdentifier | Locale)[] | undefined;
+
+    /**
+     * An object with some or all of properties of `options` parameter
+     * of `Intl.RelativeTimeFormat` constructor.
+     *
+     * [MDN](httteral("d"),
+});
+
+const double = z.union([aSchema, bSchema]);
+const many = z.union([aSchema, bSchema, cSchema, dSchema]);
+
+doubleSuite
+  .add("valid: a", () => {
+    double.parse(objA);
+  })
+  .add("valid: b", () => {
+    double.parse(objB);
+  })"b1");
+verify.refactorAvailable("Inline variable");
+edit.applyRefactor({
+    refactorName: "Inline variable",
+    actionName: "Inline variable",
+    actionDescription: "Inline variable",
+    newContent: `({}).toString();
+const bar = 0;
+bar.toFixed().toStri case CharacterCodes.dot:
+        case CharacterCodes.slash:
+        case CharacterCodes.colon:
+        case CharacterCodes.semicolon:
+        case CharacterCodes.question:
+        case CharacterCodes.at:
+        case CharacterCodes.openBracket:
+  acheLocation = getNonWindowsCacheLocation(process.platform === "darwin");
+                return combinePaths(combinePaths(cacheLocation, "typescript"), versionMajorMinor);
+            }
+            default:
+                return Debug.fail(`unsupporteFile;
+
+    getKeyForCompilationSettings(settings: CompilerOptions): DocumentRegistryBucketKey;
+    /** @internal */
+    getDocumentRegistryBucketKeyWithMode(key: DocumentRegistryBucketKey, mode: ResolutionMode): DocumentRegistryBucketKeyWithMode;
+   eA(value);
+        return value;
+    }
+    else {
+        return value;
+    }
+}
+
+// Repro from #13995
+
+type Common = { id: number };
+type AA = { tag: 'A', id: number };
+type BB = { tag: 'B', id: number, foo: number };
+
+type MyUnion = AA | BB;panFromBounds(name.pos, name.end);
+    return { file: sourceFile.fileName, kind, kindModifiers, name: name.text, containerName, span, selectionSpan };
+}
+
+function isDefined<T>(x: T): x is NonNullable<T> {
+    return x !== undefined;
+}
+
+interface Caame: index.js
+const x = {};
+Object.defineProperty(x, "name", { value: "Charles", writable: true });
+Object.defineProperty(x, "middleInit", { value: "H" });
+Object.defineProperty(x, "lastName", { value: "Smith", writable: false });
+Object.definePropertation =
+    | SourceFile
+    | ModuleDeclaration & { name: Identifier; }
+    | FunctionDeclaration
+    | ClassDeclaration
+    | ClassStaticBlockDeclaration
     | MethodDeclaration
     | GetAccessorDeclaration
     | SetAccessorDeclaration
-    | NamedEx
+    | Namource: completion.CompletionSource.ObjectLiteralMemberWithComma,
+   }],
+  preferences: {
+    allowIncompleteCompletions: true,
+    includeInsertTextCompletions: true,
+  }
+});
+
+verify.applyCodeActionFromCompletion("", {
+  name: "secondary",
+  desc any[]; // No error
+}
+function f4NoError(arguments: number); // no error
+function f4NoError(arguments: string); // no error
+function f4NoError(arguments: any) { // no error
+    var arguments: any; // No error
+}
+
+declare function f5(arguments: numbe;
+    [#|x++;
+    return;|]
+}`,
+    );
+    // Return in finally block
+    testExtractFunction(
+        "extractFunction22",
+        `function test() {
+    try {
+    }
+    finally {
+        [#|return 1;|]
+    }
+}`,
+    );
+    // Extraction per.jsDoc : undefined;
+    const lastJsDoc = lastOrUndefined(commentOwnerJsDoc);
+    if (
+        commentOwner.getStart(sourceFile) < position
+        || lastJsDoc
+            && existingDocComment
+            && lastJsDoc !== existingDocComment
+    
+type Test1 = [C, D] extends [D, C] ? true : false;  // false
+type Test2 = C extends D ? true : false;  // false
+type Test3 = D extends C ? true : false;  // false
+
+// Simplified repro from #54246
+
+// Except for the final non-recursive Record<K, V>,const foods = ["Pasta", "Pizza", "Tacos", "Burgers", "Salad"] as const;
+  const FoodEnum = z.enum(foods, {
+    errorMap: () => ({ message: "This is not food!" }),
+  });
+  const ItalianEnum = FoodEnum.extract(["Pasta", "Pizza"]);
+  const foodsError = FoodEnt"`.
+    //     ...
+
+    // NOTE: Since emit for `export =` translates to `module.exports = ...`, the assigned name of the class or function
+    // is `""`.
+
+    const { factory } = context;
+    const assignedName = assignedNameText !== undefined ? const existingTypingFile = this.packageNameToTypingLocation.get(packageName);
+                    if (existingTypingFile) {
+                        if (existingTypingFile.typingLocation === typingFile) {
+                            continue;
+  xtends Date> {
+    foo: T;
+}
+var i: I<Date>;
+var r2 = i.foo.getDate();
+var r2b = i.foo['getDate']();
+
+var a: {
+    <T extends Date>(): T;
+}
+var r3 = a<Date>().getDate();
+var r3b = a()['getDate']();
+
+var b = {
+    foo: <T extends Date>(x: T) =1 : any = null;
+var c1 : C1 = new C1();
+var i1 : I1 = c1;
+var c2 : C2 = new C2();
+var c3 : C3 = new C3();
+var o1 = {one : 1};
+var f1 = function () { return new C1();}
+
+var arr_any: any[] = [];
+var arr_i1: I1[] = [];
+var arr_c1: C1[] = [];
+var arI/MessageEvent/initMessageEvent)
+     */
+    initMessageEvent(type: string, bubbles?: boolean, cancelable?: boolean, data?: any, origin?: string, lastEventId?: string, source?: MessageEventSource | null, ports?: Iterable<MessagePort>): void;
+}
+
+interface Mction addSyntheticTrailingComment<T extends Node>(node: T, kind: SyntaxKind.SingleLineCommentTrivia | SyntaxKind.MultiLineCommentTrivia, text: string, hasTrailingNewLine?: boolean) {
+    return setSyntheticTrailingComments(node, append<SynthesizedComment: ASTList, parent: AST, walker: IAstWalker): void {
+            var len = preAst.members.length;
+            if (walker.options.reverseSiblings) {
+                for (var i = len - 1; i >= 0; i--) {
+                    if (walker.options.goNextSiblingw (locales?: LocalesArgument, options?: PluralRulesOptions): PluralRules;
+        (locales?: LocalesArgument, options?: PluralRulesOptions): PluralRules;
+
+        supportedLocalesOf(locales: LocalesArgument, options?: { localeMatcher?: "lookup" | "best fitness.Baseline.runBaseline(this.getBaselineFolder(this.compilerResult.moduleKind) + this.testCaseJustName + ".json", content);
+    }
+
+    public verifyDiagnostics() {
+        if (this.compilerResult.errors.length) {
+            Harness.Baseline.runBase />
+
+////namespace ts {
+////    let x = 0;
+////    //
+////    interface I {
+////        a: string;
+////        /** @internal */
+////        b: string;
+////    }
+////    let y = 0; //
+////}
+////let z = 0; //
+
+format.setFormatOptions({ ...format.copyFormaturns a new array from a set of elements.
+     * @param items A set of elements to include in the new array object.
+     */
+    of<T>(...items: T[]): T[];
+}
+
+interface DateConstructor {
+    new (value: number | string | Date): Date;
+}
+ld follow symlinks, even though snapshots are stored by original file name
+        const snapshot = this.host.getScriptSnapshot(fileName) || this.host.getScriptSnapshot(this.realpath(fileName));
+        return snapshot && ts.getSnapshotText(snapshot);
+ ass Foo {
+////     constructor(value: number) { this.property1 = "hello"; }
+////     static method1() {}
+////     method3() { return 3; }
+////     /**
+////      * @param {string} foo A value.

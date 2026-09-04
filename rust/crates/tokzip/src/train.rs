@@ -92,7 +92,8 @@ const SEGMENT_SIZES: [usize; 5] = [64, 128, 256, 512, 1024];
 /// With `scoring` documents, the dmer frequencies, the held-out documents, and the literal
 /// classes come from them while the segments are still cut from `content` — so a dictionary
 /// can be tuned to a private corpus while every byte of it is a substring of a public
-/// document. Without them, `content` plays both roles.
+/// document. Without them, `content` plays both roles. Either way a held-out document is
+/// never among the candidates it scores.
 pub fn train_dictionary(
     content: &[Vec<u8>],
     scoring: Option<&[Vec<u8>]>,
@@ -117,11 +118,22 @@ pub fn train_dictionary(
     let lit_classes = train_lit_classes(validation.iter().map(Vec::as_slice));
     let (fit_data, fit_lens) = concat(&fit);
     let (content_data, content_lens) = concat(&content);
-    // Without scoring documents the held-out ones are cut from the candidates too, exactly
-    // as they are scored: the segments then come from the fit documents.
+    // The sweep's candidates exclude the held-out documents (scoring documents may include
+    // content documents), so no candidate dictionary is cut from a document it is scored on.
+    let held_out: std::collections::HashSet<&[u8]> = validation.iter().map(Vec::as_slice).collect();
+    let candidates: Vec<&[u8]> = content
+        .iter()
+        .copied()
+        .filter(|doc| !held_out.contains(doc))
+        .collect();
+    let (candidate_data, candidate_lens) = concat(&candidates);
     let (sweep_data, sweep_lens, sweep_scoring): (&[u8], &[usize], Option<Corpus>) =
         if scored.is_some() {
-            (&content_data, &content_lens, Some((&fit_data, &fit_lens)))
+            (
+                &candidate_data,
+                &candidate_lens,
+                Some((&fit_data, &fit_lens)),
+            )
         } else {
             (&fit_data, &fit_lens, None)
         };
@@ -136,10 +148,10 @@ pub fn train_dictionary(
         }
     }
     let k = best.expect("segment sizes").1;
-    let (all_data, all_lens) = concat(sample);
-    let scoring = scored
+    let scored_all = scored.as_deref().map(concat);
+    let scoring = scored_all
         .as_ref()
-        .map(|_| (all_data.as_slice(), all_lens.as_slice()));
+        .map(|(d, l)| (d.as_slice(), l.as_slice()));
     cover(&content_data, &content_lens, scoring, prefix, budget, k)
 }
 

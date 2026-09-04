@@ -23,16 +23,24 @@ const MIN_SCORING_BYTES: usize = 1024 * 1024;
 
 fn main() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
-    let args: Vec<String> = std::env::args().skip(1).collect();
-    let scoring_corpus = args
-        .iter()
-        .position(|a| a == "--scoring")
-        .map(|i| PathBuf::from(args.get(i + 1).expect("--scoring <corpus dir>")));
-    let corpus = args
-        .first()
-        .filter(|a| *a != "--scoring")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| root.join("../tokzip-corpus/corpus"));
+    let mut args = std::env::args().skip(1);
+    let mut corpus: Option<PathBuf> = None;
+    let mut scoring_corpus: Option<PathBuf> = None;
+    while let Some(arg) = args.next() {
+        if arg == "--scoring" {
+            let dir = PathBuf::from(args.next().expect("--scoring <corpus dir>"));
+            assert!(
+                dir.is_dir(),
+                "scoring corpus {} is not a directory",
+                dir.display()
+            );
+            scoring_corpus = Some(dir);
+        } else {
+            assert!(corpus.is_none(), "unexpected argument {arg}");
+            corpus = Some(PathBuf::from(arg));
+        }
+    }
+    let corpus = corpus.unwrap_or_else(|| root.join("../tokzip-corpus/corpus"));
     let wrapper = std::fs::read(root.join("dict/wrapper.bin")).expect("dict/wrapper.bin");
     let languages = tokzip::train::languages();
     let docs_by_language: Vec<Vec<Vec<u8>>> = languages
@@ -48,9 +56,10 @@ fn main() {
         })
         .collect();
     // Per language, the scoring documents: the scoring corpus's interleaved with the first
-    // corpus's (`None` where the scoring corpus holds too little of the language). Scoring
-    // by the scoring corpus alone codes it 0.2 pp smaller but the first corpus 0.2 pp larger
-    // than the interleaving does.
+    // corpus's, up to the trainer's input bound (`None` where the scoring corpus holds too
+    // little of the language). Scoring by the scoring corpus alone codes it 0.2 pp smaller but
+    // the first corpus 0.2 pp larger than the interleaving does. The pair order alternates so
+    // that the trainer's fixed-stride held-out selection draws from both corpora.
     let scoring_by_language: Vec<Option<Vec<Vec<u8>>>> = languages
         .iter()
         .enumerate()
@@ -63,14 +72,29 @@ fn main() {
             if docs.iter().map(Vec::len).sum::<usize>() < MIN_SCORING_BYTES {
                 return None;
             }
-            let mut blended = Vec::new();
-            for j in 0..docs.len().max(docs_by_language[i].len()) {
-                blended.extend(docs.get(j).cloned());
-                blended.extend(docs_by_language[i].get(j).cloned());
+            let public = &docs_by_language[i];
+            let mut blended: Vec<Vec<u8>> = Vec::new();
+            let mut bytes = 0usize;
+            for j in 0..docs.len().max(public.len()) {
+                let pair = [docs.get(j), public.get(j)];
+                let order = if j % 2 == 0 { [0, 1] } else { [1, 0] };
+                for doc in order.into_iter().filter_map(|o| pair[o]) {
+                    if bytes >= tokzip::train::MAX_DICT_TRAIN_BYTES {
+                        return Some(blended);
+                    }
+                    bytes += doc.len();
+                    blended.push(doc.clone());
+                }
             }
             Some(blended)
         })
         .collect();
+    if scoring_corpus.is_some() {
+        assert!(
+            scoring_by_language.iter().any(Option::is_some),
+            "the scoring corpus holds no language with at least {MIN_SCORING_BYTES} bytes"
+        );
+    }
     // A group's shared part is trained on its languages' documents interleaved, so every
     // language weighs in before the trainer's input bound cuts the pool.
     let mut shared: Vec<Vec<u8>> = Vec::new();
@@ -81,16 +105,31 @@ fn main() {
         let mut part = Vec::new();
         if group.shared_budget() > 0 && !members.is_empty() {
             let pooled = pool(&members, |i| Some(&docs_by_language[i]));
-            let scoring_pool = pool(&members, |i| scoring_by_language[i].as_ref());
-            let scoring = (!scoring_pool.is_empty()).then_some(scoring_pool.as_slice());
-            part =
-                tokzip::train::train_dictionary(&pooled, scoring, group.shared_budget(), &wrapper);
+            // Every member weighs in on the shared part's statistics: its scoring blend when
+            // it has one, its own documents otherwise.
+            let scoring_pool = scoring_corpus.as_ref().map(|_| {
+                pool(&members, |i| {
+                    Some(
+                        scoring_by_language[i]
+                            .as_ref()
+                            .unwrap_or(&docs_by_language[i]),
+                    )
+                })
+            });
+            part = tokzip::train::train_dictionary(
+                &pooled,
+                scoring_pool.as_deref(),
+                group.shared_budget(),
+                &wrapper,
+            );
             println!(
-                "{}: shared dictionary part {} B from {} docs, scored by {} docs",
+                "{}: shared dictionary part {} B from {} docs{}",
                 group.name(),
                 part.len(),
                 pooled.len(),
-                scoring_pool.len()
+                scoring_pool
+                    .as_ref()
+                    .map_or(String::new(), |s| format!(", scored by {} docs", s.len()))
             );
         }
         let path = root.join("dict").join(format!("{}.bin", group.name()));

@@ -1,1305 +1,1425 @@
-nd
-    end
-  end
-end
-# frozen_string_literal: true
+::Base.lease_connection
+      connection.clear_cache!
 
-require 'sinRoutesTest < ActiveSupport::TestCase
-  setup :build_app
-  teardoators # :nodoc:
-    class MailerGenerator < Base # :nodoc:
-     able
-      attr_reader :options
+      connection.create_table("samples", force: true) do |t|
+        t.in}
 
-      def initialize(app)
-     quire "abstract_unit"
-require "action_view/dependency_tracker"
+    sub = Class.new(@base)
+    assert sub.respond_to?(:foo)
+    assert_equal 'bar', sub.foo
+    assert sub.respond_to?(:biz)
+r(__method__) unless block_given?
 
-tection'
+        to_hash.each_value(&block)
+      end
 
-module Rack
-  module Protection
-    ##
-    # Preventedrequire_relative 'test_helper'
-
-class SettingsTest < Minitest::T merge(other, &block)
-        to_hash.merge(other, &block)
-     active_support/core_ext/array/extract_options'
-require 'active_squire "cases/helper"
-require "support/connection_helper"
-
-moodule ActiveJob
-  def self.deprecator # :nodoc:
-    @deprecator true
-
-module DummyApp
-  def self.call(env)
-    Thread.current[:lr_handler' do
-      ran = false
-      mock_app do
-        set :s Rack::Test::Methods
-    extend Forwardable
-    attr_accessor :squire "test_helper"
-require "database/setup"
-
-class ActiveStorag      app = Sinatra.new do
-        private
-        def priv; en true
-
-# :markup: markdown
-
-require "active_support/inflector/meran).to be true
-    end
-
-    it 'returns the block result' do
-  _equal 2, hash[?b]
-  end
-
-  def test_default_block
-    hash = Sication
+      def empty?
+        to_hash.empty?
+         require "sinatra/base"
+  #     require "sinatra/cookies"
   #
-  #     require "sinatra"
-  #     require "sinatra/co  #
-  # This is possible with the +provides+ condition:
-  #
-  #     keys = []
-      foo  = nil
-      bar  = nil
+  #     class MyApp < Sinatra::Base
+  #       helpers Sinatra::Ckdown
 
-      cookie_roeRecord
-  module ConnectionAdapters
-    module PostgreSQL
-         def self.track
-        Rack.send :remove_const, :Builder
-    rent_transaction = Sample.lease_connection.current_transaction
- equal File.expand_path($0), File.expand_path(@application.send(:nd
+require "active_support/inflector/methods"
+require "active_support/dependencies"
+
+module ActionDispatch
+  # # Action DispeRecord
+  class PostgresqlTransactionNestedTest < ActiveRecord::PostgreSQLTestCase
+    self.use_transactional_tests = fal.capitalize do
+      before :all do
+        begin
+          require inner
+        rescue LoadError => e
+          skip "Skippingction.current_transaction
+        unless current_transaction.is_a?(ActiveRecord::ConnectionAdapters::SavepointTransaction), hash)
+  end
 end
 
 class TestIndifferentHash < Minitest::Test
   def setup
-rrors' do
-      klass = Sinatra.new(Sinatra::Application)
-
-     s ArgumentError do
-      @base.set(:fiz, @base) { 'baz' }
-    enequest.
-    #
-    # This middleware is not used when using the R   def compile!(verb, path, block, **options)
-      options[:promodule Sinatra
-  # A poor man's ActiveSupport::HashWithIndiffeess block_given?
-
-        super
-      end
-
-      def map(&block) < ActionView::TestCase
-  def tracker
-    ActionView::Dependenroller < ActionController::Base
-      include ActionController::on
-    @connection.clear_cache!
-    @connection.create_table("mystache_club).send(:private_method)
-    assert_nothing_raised do
-g
-    # Supported browsers:: all
-    # More infos::         httpord::PostgreSQLTestCase
-    self.use_transactional_tests = falsc:
-    extend ActiveSupport::Concern
-
-    module ClassMethods # ss TestApp < Sinatra::Base
-      get('/') { 'Hello World' }
-   ult value
-  #
-  module ConfigFile
-    # When the extension is re  case value
-      when Hash
-        value.is_a?(self.class) ? v  super(*args)
-    end
-
-    def default=(value)
-      super(conv }
-    yield
-  ensure
-    File.unlink(layout) rescue nil
-  endd
-
-    module Helpers
+    @hash = Sinatra::IndifferentHash[:a=>:a, ?b=>:b, 3module Helpers
       include Sinatra::JSON
 
-      def resre 'sinatra/base'
+      def respond_with(template, object = nil, &block)
+        unless Symbol === temamework agnostic.
+  module TestHelpers
+    include Rack::Test::Methods
+    extend Forwardable
+    attr_accessor :settings
 
-  class Application < Base
-    # we assume thle "config/routes.rb", <<-RUBY
-      Rails.application.routes.dr      ActiveSupport::CodeGenerator.batch(self, __FILE__, __LINE_quire "isolation/abstract_unit"
-
-module ApplicationTests
-  modun
-    include ActiveModel::AttributeMethods
-
-    included do
-   not_includes @organization.members, @member
-    assert_includes     end).to eq('bar')
-    end
+    #king, ActiveStorage.track_variants = ActiveStorage.track_variants, true
   end
-
-  describe :assoc do
-    itOneThroughAssociationsTest < ActiveRecord::TestCase
-  fixtures :assert_predicate connection, :active?
-    end
-
-    test "rollbacoo'] = 'bar'
-        cookies.clear
-        cookies.empty?
-      on you need to require the helpers, and then tell
-  # the applicfalse)
-    end
-
-    it 'does not loop through deleted cookies' dDelegator.target
-  end
-
-  def teardown
-    Sinatra::Delegator.ta    rescue LoadError => e
-          skip "Skipping: " << e.messa}
-  #       [status, headers, body]
-  #     end
-  #   end
-  #
-        error = if defined? JRUBY_VERSION
-        IndexError
-    assert_match(/#{path}:#{line}/, e.backtrace.first)
-    eect
-    assert_instance_of Enumerator, enum
-  end
-
-  def test_reort/configuration_file"
-require "rails/engine"
-require "rails/a true
-
-RSpec.describe Rack::Protection do
-  it_behaves_like 'any recommended.
-    mocks.verify_partial_doubles = true
-  end
-
-  c     extend Rack::Utils
-
-      class << self
-        alias escapts = {})
-    #
-    # Return the Rack environment used for a requ.new([], 200, { 'Content-Type' => 'text/html' }) }
-
-  def assert     # The rest of your modular application code goes here...
-  _reading(*)
-        raise IOError, 'not opened for reading'
-        # method.
-      def inline_templates=(file = nil)
-     __dir__)
-    end
-
-    def environment
-      "development"
-    enethod to define namespaces in your application.
-  #
-  # You can onments
-  #
-  # By default, the reloader is only enabled for theTest
-  setup do
-    @app = mock_app(Sinatra::Application) do
-  ]
-    assert_nil @hash[:d]
-  end
-
-  def test_key
-    assert_nil kill(pid)
-    end
-  end
-
-  private
-    def plugin_path
-      "#{dy= yield
-    def link_headers
-      yield if block_given?
-     
-      Rack::Lint.new @app
-    end
-
-    unless method_defined  def method_missing(method, *args, &block)
-        return supertabase_key
-          error = assert_raises(ArgumentError) do
-  IntegrationTest < Minitest::Test
-  extend IntegrationHelper
-  aapp = nil, &block)
-      instrumenting = ActiveSupport::Notifica.new(app)
-    request = Rack::MockRequest.new(middleware)
-
-    i   def warn(env, message)
-        return unless options[:loggingbing a method that does not exist on
-    # a real object. This i   remove_from_config("config.active_record.timestamped_migratioer"
-
-module ActionView
-  module Helpers # :nodoc:
-    # = Actionen access
-    # token matches the token included in the session.tch it with its
-      # Sinatra's internal representation.
-        size = s1.bytesize
-        i = 0
-        while i < size
-          # Indicates with a +glob+ which files should not be reloa    it "passes the subclass to configure blocks" do
-      ref = r_type)
-    assert_not_predicate member_detail_with_one_associatn(reaction)
-        alias_method(:default_reaction, reaction)
-  _with_primary_key_option
-    assert_equal categories(:general), 
-  def with_headers(headers)
-    proc { [200, { 'content-type' =only: true)
-        response['Set-Cookie'].lines.detect { |l| l.ist for the current application to watch it
-      # in the file d
 
   teardown do
-    @connection.drop_table :default_strings
-  e'renders inline markdown strings' do
-    markdown_app { markdown   if supports_datetime_with_precision?
-      test "schema dumpings
-        @namespace
-      end
+    ActiveStorage.track_variants =  true
 
-      def template_cache
-    d
+module DummyApp
+  def self.call(env)
+    Thread.current[:last_env] = env
+    body = (env['REQUEST_METHOD'] == 'HEAD' ? ''equal File.expand_path(__dir__), @base.root
+
+      @application.app_file = __FILE__
+      assert_equal File.expand_path(__dir__)     set :show_exceptions, :after_handler
+        error(RuntimeError) { ran = true }
+        get('/') { raise ArgumentError }
+  if current_adapter?(:PostgreSQLAdapter) || current_adapter?(:SQLite3Adapter)
+    def test_multiline_default_text
+      record = true
+
+RSpec.describe Rack::Protection::SessionHijacking do
+  it_behaves_like 'any rack application'
+
+  it 'accepts a session wified' do
+      io = StringIO.new
+      Rack::Protection::Base.send(:define_method, :special) { |*args| io << args.inspect }
+    assert_predicate response, :committed?,     "response should be committed"
+      assert_predicate response, :sent?,          "re>= Gem::Version.new("3.0")
 
     private
 
-    def content_blocks
-      @content_blocks ||== self)
-        raise ArgumentError, "may not set #{key}" unless   #   person = Person.new
-    #   person.attribute_names
-    #   it 'works with middleware' do
-      middleware = Class.new dok)
+    def convert_key(key)
+      key.is_a?(Symbol) ? key.to_s : key
     end
 
-    # Check if a block of content with the given key StringIO.new
-      Rack::Protection::Base.send(:define_method,
+    def conv
 
-  it "raises error if template not found" do
-    mock_app { ges LiveStreamRouterTest < ActionDispatch::IntegrationTest
-  class not match default or permitted URIs.
+  class AsciidoctorTest < Minitest::Test
+    def asciidoc_app(&block)
+      mock_app do
+        set :views, __dir__ + '/views' setup :build_app
+  teardown :teardown_app
+
+  test "no results" do
+    app_file "config/routes.rb", <<-RUBY
+      Rails.applica      @transformer = block
+        self
+      end
+
+      def write(data)
+        self << data
+        data.to_s.bytesize
+     gs
+    end
+end
+# frozen_string_literal: true
+
+class Liquid < ActiveRecord::Base
+  self.table_name = :liquid
+  has_many :moleculeers:: all
+    # More infos::         http://en.wikipedia.org/wiki/Cross-site_request_forgery
     #
-    # If you want tf test_has_one_through_with_conditions_eager_loading
-    # condirrent_adapter?(:SQLite3Adapter)
-    def test_multiline_default_t    primary_abstract_class
+    # Does not accept unsafe  end
+  #
+  #       # The rest of your modular application code goes here...
+  #     end
+  #
+  # === Config File Format
+  #
+  # I_pattern = nil)
+        if pattern.respond_to? :to_hash
+          conditions = conditions.merge pattern.to_hash
+          patterra/base'
 
-              establish_connection :no block matches the key and a default block is specified' do
-  rivate
+module Sinatra
+  # = Sinatra::MultiRoute
+  #
+  # Create multiple routes with one statement.
+  #
+  # == Usage
+  #
+  # U_with_primary_key_option
+    assert_equal categories(:general), authors(:david).essay_category
 
-      def set_token(session)
-        session[options[:kegger
-    def logger
-      if settings.respond_to?(:logger)
-     _file_blob(filename: "racecar.jpg")
-    assert_difference -> { At,
-    # unless a formatter has already been configured
-    # (e[0]
+    authors = Author.joins(:essaquire "isolation/abstract_unit"
+require "rails/command"
+require "io/console/size"
+
+class Rails::Command::RoutesTest <f test_delete
+    @hash.delete(:a)
+    @hash.delete(?b)
+    assert_nil @hash[:a]
+    assert_nil @hash[?b]
   end
 
-  test 'inline_templates ignores IO errors' do
-    mo  #   class Person < ActiveRecord::Base
-    #     belongs_to :orreate!(name: "Justin")
+  def test_dig
+ work with method_missing proxies for options" do
+    mixin = Module.new do
+      def respond_to?(method, *)
+        method.to_sribute_names
+      #   # => ["id", "created_at", "updated_at", "name", "age"]
+      def attribute_names
+        @attribute_namesde content_type' do
+    render_app :str => { :content_type => :txt } do
+      content_type :html
+      render :str, 'foo'
+    enassert_match(/#{path}:#{line}/, e.backtrace.first)
+    end
+  end
 
-    10.times do
-      blob = directly_upaction_dispatch/http/headers"
-require "action_dispatch/testing/ttures :posts, :authors, :author_addresses, :categories, :categorr_name.to_s
-        attr_name = attribute_aliases[attr_name] || f test_polymorphic_has_many_create_model_with_inheritance_and_cuilderTest < Minitest::Test
-  def builder_app(options = {}, &bloc(object)
-      recorded_methods.each { |m, a, b| object.send(m, t('/').first
+  it 'renders Proc templates using the call result' do
+    ren
+  it "raises error if template not found" do
+    mock_app do
+      get('/') { builder :no_such_template }
+    end
+    ast/hash/indifferent_access"
+require "action_dispatch"
+require "action_dispatch/http/headers"
+require "action_dispatch/testing/tes   user = User.create!(name: "Josh")
+
+    blob1 = directly_upload_file_blob(filename: "racecar.jpg")
+    assert_difference -> { f test_has_one_through_nonpreload_eager_loading_through_polymorphic
+    members = assert_queries_count(1) do
+      Member.all.m false unless supports_savepoints?
+
+  fixtures :posts, :authors, :author_addresses, :categories, :categorizations, :comments, :tpter?(:Mysql2Adapter, :TrilogyAdapter)
+    include SchemaDumpingHelper
+
+    if supports_default_expression?
+      test "schema d_to(*args)
+        return @conditions[:provides] || base.respond_to if args.empty?
+
+        @conditions[:provides] = args
+     c:
+        if klass.method_defined?(name) || klass.private_method_defined?(name)
+          if superklass.method_defined?(name) |models/person"
+
+module ActiveRecord
+  module ConnectionAdapters
+    class ConnectionHandlersShardingDbTest < t::Testing::ConstantLookup
+        include Assertions
+
+        included do
+          class_attribute :_connection_class
+ of th Link header(s) and generates HTML tags
+    # from it.
+    #
+    # Example:
+    #
+    #   get '/' do
+    #     # You can o_equal 1, count
+        count = 2
+      end
+    end
+
+    get '/'
+    assert ok?
+    assert_equal 2, count
+    assert_equal 'Hell_equal 200, @response.status
+    assert_equal 'text/html', @response['Content-Type']
+    assert_equal [], @response.body
+   } }
+    assert_raises(Errno::ENOENT) { get('/') }
+  end
+
+  it "renders with inline layouts" do
+    mock_app do
+      layout { 'th(*args, &block) } }
+  end
+
+  def req(*types)
+    path = types.shift if types.first.is_a?(String) && types.first.start_with?('/(key)
+      super(convert_key(key))
+    end
+
+    alias has_key? key?
+    alias include? key?
+    alias member? key?
+
+    def valhm, :if_not_exists) # :nodoc:
+
+    PrimaryKeyDefinition = Struct.new(:name) # :nodoc:
+
+    ForeignKeyDefinition = Struct.new(:fr   @app = Rack::Lint.new Rack::Builder.new(&block).to_app
+    end
+  end
+
+  def with_headers(headers)
+    proc { [200, { 'conten      frame_options = options[:frame_options]
+          frame_options = options[:frame_options].to_s.upcase unless frame_option_helper"
+require "action_view/helpers/output_safety_helper"
+
+module ActionView
+  module Helpers # :nodoc:
+    # = Action View Tauest.preferred_type.split('/').first
 
     String.instance_methods.each do |method|
-     class ThreeMigration < ActiveRecord::Migration::Current
-   mes.each do |new_name|
-              generate_alias_attribute_meach_pair do |key, value|
-            type = TAG_TYPES[key]
-       previous_env, ENV["RAILS_ENV"] = ENV["RAILS_ENV"], "default_enide content_type' do
-    render_app :str => { :content_type => :of the modified files.
-    def self.registered(klass)
-      @rel    # ## Connection is automatically inferred
+      next unless "".respond_to? method
+     odels/cpk"
+
+class HasOneThroughAssociationsTest < ActiveRecord::TestCase
+  fixtures :member_types, :members, :clubs, :membersoved?
+        !File.exist?(path)
+      end
+    end
+
+    MUTEX_FOR_PERFORM = Mutex.new
+
+    # Allow a block to be executed after ages' do
+    env = Rack::MockRequest.env_for("/dummy").tap { |env| env["PATH_INFO"] = "/<script>" }
+    _, _, body = @app.call(erchived"
+      t.string "published", limit: 1
+    end
+    BooleanType.reset_column_information
+
+    @emulate_booleans = @connectrt_no_match(/create_table\(:users\)/, output)
+        assert_no_match(/CreateUsers/, output)
+        assert_no_match(/add_column under ActiveModel::Type.)
     #
-    # Actionk)
-    original_mtime = File.exist?(path) ? File.mtime(path) : T
-    # Notice this method takes into consideration the default rse
-  if current_adapter?(:Mysql2Adapter, :TrilogyAdapter)
-    #  all the attribute related methods for columns in the database
- , include_subdomains: false, preload: false
-
-      def strict_trase.configurations.configs_for(env_name: "arunit", name: "primarcaller_locations.first
-        filename = first_location.path
-  nts.</p>\n"
-  end
-end
-
-rescue LoadError
-  warn "#{$!}: skipping :type, original_type
-    Company.reset_column_information
-  end
-patch::Routing::RouteSet.new
-  end
-
-  routes.draw do
-    get "/tcation.config.database %>
-            adapter: sqlite3
-        Y   def fizz!(name); end
-  end
-
-  it 'will add the methods to the     register Sinatra::Reloader
-      enable :reloader
-    enef string_column
-    BooleanType.columns.find { |c| c.name == "phe end of the file.
-    length = File.read(__FILE__).length
-    
-
-ActiveSupport.run_load_hooks :action_text_record, ActionText::rrently loaded version of Active Job as a +Gem::Version+.
-  des_many_with_pluralize_table_names_false
-    aircraft = Aircraft.oaders
-
-    delegate :default_url_options, :default_url_options=     logger = ActionController::Base.logger || Logger.new($stdouionController"])
-    assert_equal expected_perm_output, output
- h do |name, type, options|
-          connection.add_column(tableclass ContentSecurityPolicy < Base
-      default_options defaud the record from :one but can read the record
-        # from :d:
+    #   class Person < ActiveRecord::Base
+    #     belongs_to :organization
+    #   end
     #
-    #   require 'rack/protection'
-    #   require 'rack/    @current_engine = engine.to_sym
-      yield
-    ensure
+ave_a_counter_cache
+    assert_raise(ArgumentError) do
+      Class.new(ActiveRecord::Base) do
+        has_one :thing, through: :ert_not_predicate boy_klass.new(name: "Alex"), :valid?
+  end
+
+  def test_has_one_marked_for_destruction
+    boy_klass = Clas, Request.new(env).params[options[:authenticity_param]]) ||
+          options[:allow_if]&.call(env)
+      rescue StandardError
+ class ApplicationRecord < ActiveRecord::Base
+              primary_abstract_class
+
+              establish_connection :primary
+    # See {connection.column_exists?}[rdoc-ref:SchemaStatements#column_exists?]
+      def column_exists?(column_name, type = nilcation.config.database %>
+            database: <%= Rails.application.config.database %>
+          <% else %>
+            databa  def add_to(table)
+        columns.each do |name, type, options|
+          table.column(name, type, **options.first
+  end
+
+  def test_polymorphic_has_many_create_model_with_inheritance
+    post = posts(:thinking)
+    assert_instance_of Sd
+
+    # @return [Boolean]
+    def last_request?
+      last_request
+      true
+    rescue Rack::Test::Error
+      false
+    enanType.columns.find { |c| c.name == "archived" }
+  end
+
+  def string_column
+    BooleanType.columns.find { |c| c.name == "publily. You can also use +after_reload+ to execute a
+  # block after any file being reloaded.
+  #
+  # === Classic Application
+  #
+        DEFAULT_OPTIONS
+      end
+
+      def initialize(app, options = {})
+        @app = app
+        @options = default_options.mection.execute('SELECT 1 + "foo"')
+
+      warning_event, * = subscriber.events.first
+
+      assert_kind_of ActiveRecord::SQLWarn and <tt>2</tt> to all the blocks registered
+    # for <tt>:head</tt>.
+    def yield_content(key, *args, &block)
+      if block_duction do
+  #         logger = Logger.new(File.open("#{root}/log/#{environment}.log", 'a'))
+  #         logger.level = Logger::rails/generators/test_unit"
+
+module TestUnit # :nodoc:
+  module Generators # :nodoc:
+    class ControllerGenerator < Base # :nod     previous_env, ENV["RAILS_ENV"] = ENV["RAILS_ENV"], "default_env"
+
+          config = {
+            "default_env" => {
+ end
+
+  # Returns the path of the Sinatra application file created by
+  # +setup_example_app+.
+  def app_file_path
+    File.join(ing on the setting of
+  # on the setting of +ActiveSupport.to_time_preserves_timezone+.
+  def to_time
+    preserve_timezone ? ge
+  # Setting this allows you to use `--seed` to deterministically reproduce
+  # test failures related to randomization by passinexpect(last_response).to be_ok
+  end
+
+  it 'denies post requests with a remote referrer' do
+    post('/', {}, 'HTTP_REFERER' => on::ContentSecurityPolicy, block_all_mixed_content: true, disown_opener: true, upgrade_insecure_requests: true
+
+      run DummyA   #   person = Person.create(name: 'Bob')
+      #   person.name     # => "Bob"
+      #   person.nickname # => "Bob"
+         if type == :data && value.is_a?(Hash)
+              value.each_pair do |k, v|
+                next if v.nil?
      
-    # Other extensions you don't want to be loaded unless needection_pool = config.connection_pool
-        fixture_files_to_re true
+    # any of its nested autosave associations are likewise changed)
+    def changed_for_autosave?
+      new_record? || has_chan, reject_if: proc(&:empty?)
+  accepts_nested_attributes_for :update_only_ship, update_only: true
+  accepts_nested_attributes_forall.merge!(order: "posts.id").to_a
+    posts_with_taggings = Post.all.merge!(includes: :taggings, order: "posts.id").to_a
+    as     t.column :creator_id,  :integer
+      #     t.column :item_number, :string
+      #     t.column :name,        :string, defa = nil
 
-class Hash
-  # Replaces the hash with only the given keyslain_text
-      assert_raises(ActionView::MissingTemplate) do
-  veModel
-  module Type
-    class IntegerTest < ActiveModel::TestCing in this module allows you to define the events in the object affect the routes defined in
-  # it.  For instance, lets defineBase
-  #     has_one :author, autosave: true
-  #   end
-  #
-  # SleConnectionError.new(name) if connection.nil?
-            conne     # the callbacks to get defined multiple times, there are gu:no_such_template } }
-    assert_raises(Errno::ENOENT) { get('/ all of the fields on the model).
-    #
-    # For example:
-    #t_not_empty records
-      assert_not_empty @post.comments
-    ou can also use nested blocks.
-  #
-  # Example
-  #
-  #     #    def generators(&blk)
-      self.class.generators(&blk)
-    text_class.create(name: "Dune")
-    end
-  end
-
-  class Encrypted '/'
-  end
-
-  it 'uses the correct engine' do
-    assert_equal e    # Raises if the wrong reflection name is used to set the Edg
-  it 'is possible to access url params from the route param' doe.message
-            end
-          end
-
-          before do
-   xt
-    end
-    assert_equal "text/html;charset=utf-8", headers['     # Content can also be captured with a block, which is usefu, __dir__ + '/data'
-      disable :protection
-    end
-    get "/e = Array options[:use]
-
-      if options.fetch(:without_sessiontaggings.count
-    posts(:welcome).taggings.first.update_columnsator: code_generator
-
-          define_element :a, code_generatod_with :foo, object
-        expect(req(:pdf)).to be_ok
-     e attribute value
-      # escaping.
-      #
-      # ==== Optionser_create save_method
-            after_update save_method
-       # If the record is new or it has changed, returns true.
-     "can be used in a nested fashion for partials and whatnot" do
-  ration is true schema_dump is false" do
-        add_to_config subscriber.events.first
-
-      assert_kind_of ActiveRecord::SQL  self.table_name = "companies"
-    attribute :type, :string, dentation for more info.
-    #
-    # The `:allow_if` option can be rescue
-    out.close
-  end
-end
-
-post '/' do
-  connections.each icationCable::ConnectionTest < ActionCable::Connection::TestC'writes the first character of a string' do
-      stream { |out|ributes are escaped by default. This can be disabled using
-   sed, for example, to include information that
-    # references tor
-    # instance.
-    def key_generator(secret_key_base = sel get('/foo') do
-        assert_equal [], response.body
-            = Post.all.merge!(order: "posts.id").to_a
-    posts_with"rails/generators"
-
-module Rails
-  module Command
-    class Desten the key is missing" do
-    FileUtils.rm_rf @key_path
-
-    a-Type']
-  end
-
-  it 'renders .sass files in views path' do
-    sst, :persisted?
-    assert_predicate saved_tag, :persisted?
-      def call(env)
-        status, headers, body = @app.call(e explicitly require it in any files.
-#
-# Given that it is alwayspendencies
-  end
-
-  def test_finds_dependencies_on_method_chainsng the order they're loaded
-    # and the order specified by thenection
-            Sample.transaction(requires_new: false) do
- equal "primary", default_writing_pool.db_config.name
-
-    .table_name do |t|
-        t.integer :non_null_integer, null: fa  def params_valid?
-      @request.parameters
-    rescue Actio{ |out| out.public_send(method) }}.
-          to raise_error(IOEmissing_translation = ActionView::Base.debug_missing_translationer method, pass
-  # <tt>instance_writer: false</tt> or <tt>insta     # * <tt>:if</tt> - A symbol or an array of symbols, each nagth|
-      Topic.clear_validators!
-      Topic.validates_length_re_ext/hash/indifferent_access"
-  #
-  # which will, in turn, req, :identifier
-
-      def to_str
-        ERB::Util.h(@string)
-   Request
-      def self.included(base)
-        base.class_eval dofor_html
-    old_exception_handler = I18n.exception_handler
-          after do
-        assert_equal 1, count
-        count = 2
- ke 'any rack application'
-
-  it 'accepts requests without X-Forwons_with_block if content_or_options_with_block.is_a?(Hash)
-    port::Autoload
-
-    eager_autoload do
-      autoload :Fragments
-     # will also create an index, similar to calling {add_index}odule Arel # :nodoc: all
-  module Nodes
-    class InsertStateme       FileUtils.rm_rf("#{app_path}/config/environments")
-    reload
-      expect(app_const.middleware).not_to be_empty
-    endomain=example.org; path=/; expires=Thu, 01 Jan 1970 00:00:00 GM.primary_key
-  end
-
-  def test_inheritance_without_mapping
-    ar has been modified" do
-      update_app_file(
-        :routes =pport::Deprecation::Deprecators.new.tap do |deprecators|
-     s_singleton_classes
-    klass = Parent.new.singleton_class
-    autorials/security/content-security-policy/
-    #
-    # Sets the  test_does_not_exclude_records_when_no_arguments
-    assert_no_e test_named_routes_with_nil_keys
-        with_routing do |set|
- st_has_many_going_through_join_model_with_custom_foreign_key
-  T' => 'Test'})
-    assert request.respond_to?(:user_agent)
-    aionTestModel.lease_connection
-
-        thread = Thread.new do @base.change_column_null(name, column_name, null, default)
-    models/subscription"
-require "models/subscriber"
-
-class Readonl you can use the helpers in your views
-  #     get '/' do
-  #   _opener: true, upgrade_insecure_requests: true
-
-      run DummyAc:
-  end
-
-  # = Active Record \Fixtures
-  #
-  # \Fixtures are a       nil
-    end
-
-    action "Action 2" do
-      nil
-    en MyMiddleware
-    assert_equal(MyMiddleware.initialized, false)
-   def before_setup
+      cookie_route('foo=bar', 'bar=baz') do
+        cookies.each do |key, value|
+          foo = value if key == 'foo'
+  base.class_eval do
+        @load_hooks = Hash.new { |h, k| h[k] = [] }
+        @loaded     = Hash.new { |h, k| h[k] = [] }
+    ET</tt>,
+    # <tt>HEAD</tt>, <tt>OPTIONS</tt>, <tt>TRACE</tt> if their given access
+    # token matches the token included in t "sqlite3", "database" => "test/db/primary.sqlite3" },
+              "primary_replica" => { "adapter" => "sqlite3", "database" =ion_session" do
+    runner = Class.new do
+      def before_setup
       end
     end.new
 
-    runner.extend(Actts_variables_before_initialization_callbacks
-    vegetable = Vegt_type: "text/plain", identify: true, service_name: nil, record:ets for
-    # production as part of a build step that otherwise deredOptions.new.update(config)
-        end
-
-        config
-       it 'has a not_found method for backwards compatibility' do
- .logger, ActiveSupport::Logger.new(output)
-
-      beginewise changed)
-    def changed_for_autosave?
-      new_record? |    association_id = record._read_attribute(primary_key)
-    ) }
-    it { expect(cookies('foo=bar').length).to eq(1) }
-  end
-Case
-  include SharedTrackerTests
-
-  def make_tracker(name, templength_of_nasty_params
-    assert_raise(ArgumentError) { Topic.    if app.config.active_record.query_log_tags.present?
-     
-  def delete
-    service.delete(key)
-    service.delete_prefixe_helpers"
-require "net/http"
-
-class Rails::Engine::CommandsTest emplate, @view_paths = name, template, view_paths
-        @parsen_params = params.clone
-      clean_params.delete("action")
-      set :views, __dir__ + '/views'
-      get('/', &bloconging_to_invalid_parent_with_touch_should_not_raise_exception
- clude RenderERBUtils
-
-  tests ActionView::Helpers::TagHelper
-
-  able
-
-    class_methods do
-      def handle_exception(exception)ction.column_exists?}[rdoc-ref:SchemaStatements#column_exists?]
-   it "allows to specify glob to reaload matching files" do
-  records.each do |record|
-              next if record.destroyed     # Appends a primary key definition to the table definition.clear_active_connections!(:all)
-        ActiveRecord::Base.lease#{record.class.name.downcase}_#{record.id || '<new>'}"
-    end
-ebs</tt>
-    # must be called around or after the job call.
-    # # ignored in this case.
-    # However, it is not allowed to uses and reloading routes
-  # whenever the files change in developtitle]
-
-    t.title = ""
-    assert_predicate t, :invalid?
-    aute_type_nonexistent_constant
-    e = assert_raises NameError d  when Array
-        object.map! { |e| _deep_transform_values_in"application/json")
-  end
-
-  it "allows overriding content type nition object, in order to be used
-    # for generating a number  def create_fixtures(fixtures_directories, fixture_set_names, ce }
-    end
-
-    it "doesn't duplicate before filters with everye something .." }
-
-        unlink('/') { ".. separate something      relation.includes(:record)
-        else
-          relation
-ime = Time.utc(2008, 7, 8, 12, 18, 38)
-    assert_called_with(I1taggables
-    end
-
-    assert_raise ActiveRecord::HasManyThroughy1 = klass.find(1)
-    old_pet = toy1.pet
-
-    toy2 = klass.find "renders correctly" do
-      mock_app do
-        helpers Sinatrting string for database" do
-        type = Type::Integer.new
-  king.reload.tags.reload.size)
-    assert_not_equal(tags_before, l
-
-    STRING = [MAJOR, MINOR, TINY, PRE].compact.join(".")
-  en    @path_helpers.map(&:to_s) + @url_helpers.map(&:to_s)
-    t option' do
-    sass_app { sass :hello, :layout => :layout2 }
- 
-      AbstractCompany.new
-    end
-    assert_equal("AbstractCom # Destroying one of the associated models as part of the parentinverse_of) if reflection.instance_variable_defined?(:@inverse_oallows an exception handler to handle the exception" do
- valid?
-
-    t.author_name = "A very long author name that shouldf with_database_existing
-        Dir.chdir(app_path) do
-  lters in a sequence instead of
-      # chaining them with nestedady defined column 'testing_column' on 'testings'.", error.messat_type_data
-    assert_raise(ActiveRecord::RecordNotFound) { Fir    # => NoMethodError
+    runner.extend(ActionDispatch::Integr
+  it "can be used in a nested fashion for partials and whatnot" do
+    mock_app do
+      template(:inner) { "hi" }
+      templamestamps
+    # * change_column_default (must supply a +:from+ and +:to+ option)
+    # * change_column_null
+    # * change_columnuction? # => true
+  #   post.comments.length # => 2
   #
-  # A default value may be specifler.
-    # Optionally raises an exception if the layout could nolls to_EXT if available" do
-        respond_with Struct.new(:to_get('/', :p1 => 1)
-        expect(last_response.status).to eq(40ica" => { "adapter" => "sqlite3", "database" => "test/db/primaryquire "env_helpers"
-
-module Rails
-  module Generators
-    cl class BookOrder < ApplicationRecord
-  #     self.primary_key = #
-  # Alternatively, you may enable auto-instantiation of thesv", payload[:type]
-    end
-
-    def test_send_stream_with_optio     # We need to create a new class in order to install the new
-    # Declares a block that will be executed when a \Rails comp variant = blob.variant(resize_to_limit: [100, 100]).processed
-
-@new_record_before_save = previously_new_record_before_save
-    ptions is not supported. Pass a symbol for an instance method,
- oodle += ' and after'
-        raise StandardError, "after"
-     _with_multiple_line_message
-
-      wait_for_response_stream_closon
-    Gem::Version.new VERSION::STRING
+  # Note that the model is _not_ yet removed from the database:
+  #
+ f test_inherits_custom_primary_key
+    assert_equal Subscriber.primary_key, SpecialSubscriber.primary_key
   end
 
-  module VERSIOrt_not_nil Company.find(item.id)
-      assert_not_nil Namespacedopen_redirects(service)
-      old_raise_on_open_redirects = Acticlude Enumerable
+  def test_inhee.to_sym
+      yield
+    ensure
+      @current_engine = engine_was
+    end
 
-      DEFAULT_STATEMENT_LIMIT = 1000
+    private
 
-     ined in superclasses" do
-    base = Class.new(Sinatra::Base)
-       rails "db:migrate"
+    def render(engine, *)
+      with_ene_ext/object/json"
+require "active_support/core_ext/module/delegation"
 
-        output = rails("db:migrate:statu #     define_callbacks :save, scope: [:kind, :name]
-     erts that the block will cause the specified number of
-    # jobp_symbolize_keys!
-    def symbolize_keys; to_hash.symbolize_keys the columns of the table.
-      def columns; @columns_hash.value an optional require.
-require "action_controller/railtie"
+module ActiveSupport
+  class << self
+    delegate :use_sf_excluded_records
+    comment_greetings, comment_more_greetings = comments(:greetings, :more_greetings)
 
-modu2).sort_by(&:id), authors(:david).taggings_2.sort_by(&:id)
-  ende enqueued by passing +:only+ option.
-    #
-    #   def test_no_empty?
+    relation = @post.cnView::TestCase
+  def tracker
+    ActionView::DependencyTracker
+  end
 
-          # Remove trailing "/*"
-          prefixes = wiche versioning:
-https://guides.rubyonrails.org/caching_with_railrays
-    skip unless supports_insert_on_duplicate_update?
+  def setup
+    ActionView::Template.register_template_hou can
+    # override these options with a combination of
+    # ActiveSupport::MessageVerifiers#clear_rotations and
+    # Activeion to attachment" do
+    url = rails_storage_proxy_url(create_blob(content_type: "image/jpeg"), disposition: :attachment)
+    g      warn "skip falcon server"
+      servers.delete('falcon')
+    end
 
-    af test_tag_options_with_array_of_random_objects
-    klass = Clas be created after Qux is included in Object or bug won't
-    # b, the entire file is read into memory and returned.
-  # That'll t::Testing::Isolation
+    servers.each_with_index do |server, index|
+      Serection.remove_foreign_key}[rdoc-ref:SchemaStatements#remove_foreign_key]
+      def remove_foreign_key(*args, **optstModel.lease_connection.select_value("SELECT shard_key from shard_connection_test_models")
+          shard_one_latch.wait
+     pport::EncryptedConfiguration instance for an encrypted
+    # file. By default, the encryption key is taken from either
+    # ialize(app) @app = app end
+        def call(env)
+          status, headers, body = @app.call(env)
+          [status, headers, bof test_exception_handling_plain_text
+      assert_raises(ActionView::MissingTemplate) do
+        get :exception_in_view, format:lation_with_default_scoped_by_partial_yield_block
+    expected = "translations.templates.missing_with_default_yield_block.missin#
+  # This is useful when you just want to pass a block to
+  # <tt>Sinatra::Base.register</tt>.
+  module Extension
+    declass TwoMigration < ActiveRecord::Migration::Current
+          end
+        MIGRATION
 
-    def setup
-      build_app
-     _month)
-    @previously_updated_at = @developer.updated_at
-  end  def type_for_attribute(name)
-      type_caster.type_for_attribodels/person"
-require "models/topic"
-require "models/person_withate_id
-  has_many :birds, foreign_key: :pirate_id
-  has_many :bi :boolean, default: false
-          t.column :four, :integer, deodule AbstractController
-  module Testing
-    class UrlForTest <ection.execute("CREATE TABLE `shard_connection_test_models` (shae.time_zone_aware_types = old_aware_types
-      Time.zone = old_ew.url_for(options.merge(query: "string", only_path: true))
-    or a certain attribute
-      #   hash. The hash is passed to the_postgresql_database
-      db_config = ActiveRecord::DatabaseCon #     t.remove_references
-    #     t.remove_belongs_to
-    # ut will raise an +ActiveSupport::MessageVerifier::InvalidSignatu  parent = Parent.new("foo")
-    parent.run_callbacks(:foo)
-    errors when loading YAML containing conditional statements in ERlumns ||= options.delete(:column)
+        rails "db:migrate"
 
-          unless columns
-     if_exists: true)
-        assert_not connection.table_exists?(:tn` is deprecated and will be
-          removed in Rails 8.0.
-   dd_reference
-    # * add_timestamps
-    # * change_column_defaul     mapper = Mapper.new(self)
-        if default_scope
-    ection.select_value("SELECT shard_key from shard_Case
-  test "escape_html shouldn't die when passed nil" do
-  __LINE__ + 1
-          def #{method}(*args, &block)          # d"b"
+     
+    @original_db_warnings_action = :ignore
+  end
+
+  test "db_warnings_action :raise on warning" do
+    with_db_warnings_action(ecord::RecordNotFound) { Firm.find(foo.id) }
+      assert_raise(ActiveRecord::RecordNotFound) { Firm.find_by!(id: foo.id) }
+
+      it 'returns true if there are no cookies' do
+      expect(cookies).to be_empty
+    end
+
+    it 'returns false if there are re     # Make sure we can't read the record from :one but can read the record
+        # from :default
+        assert_not ShardConnen?
+        singleton_class.define_method("#{sym}_default_value") { default }
+
+        class_eval(<<-EOS, __FILE__, __LINE__ + 1"b"
   end
 end
 
 get '/mainonly' do
   object = Object.new
   begin
-     table_rows_for_connection = Hash.new { |h, k| h[k] = [] }
-
-er.created_at_changed?, "created_at should not be changed"
-    atest_retrieves_proper_connection_with_nested_connected_to
-      from inside a :before or :after
-    # callback can be as noisy tation to see supported values.
-            MSG
-       `with_db_warnings_action`
-        # prevents the wrapping transispatch
-  class ServerTiming
-    class Subscriber # :noon_name == "index" || c.action_name == "update" }
-    set_callbax(column_name, **options)
-        indexes << [column_name, optid_default_latch = Concurrent::CountDownLatch.new
-
-        ShardC    I18n.backend = caching_backend.new
-    I18n.backend.store_tr class_option :skip_asset_pipeline, type: :boolean, aliases: "-Ad_class_names
-    [:token_list, :class_names].each do |helper_memethod_name = Renderers._render_with_renderer_method_name(name)
-me = "posts"
-      encrypts :title
+    object.send(:get, '/foo') { }
+    'false'
+  rescue NameError00, status
     end
 
-    Acy = SecureRandom.hex
-    SecureRandom.stub :hex, boundary do
-    { format: { unit: "&$", format: "%u - %n", negative_format: "(%ts"))
-
-      # Precision inherited and significant was set
-     = @old_rails_env
-        ENV["RACK_ENV"] = @old_rack_env
-      a", params: { domain: "foo", id: "1" })
-        params = extractlder_with_data_attributes
-    assert_dom_equal '<p data-number="uration.new(
-      config_path: @credentials_config_path, key_paal ["too short"], t.errors["title"]
-
-    t = Topic.new(title: "apter?
-        queue_adapter.is_a?(ActiveJob::QueueAdapters::Test     env = Rack::MockRequest.env_for(path, method: method)ically be set to <tt>Time.now</tt>.
+    it "never raises Sinatra::NotFound beyond the application" do
+      mock_app(Sinatra::Application) do
+   # === Modular Application
   #
-  # If you've set specif      yaml_files.each_with_object({}) do |file, fixtures|
-    # => "<p><a href=\"http://example.com/\">Example</a></p>"
-    #
-eturns false unless the request credentials response value match Test Case
-  #
-  # Defines some test assertions to test against _key(key), convert_value(value, conversion: :assignment))
-    etest "serialize_cast_value is equivalent to serialize after cast"the value", escape: false)
+  # To use the helpers in a modular application you need to require them, and
+  # then, tell the n.new VERSION::STRING
   end
 
-  def test_content_tag
-    aso run. Does not run if +config.eager_load+
-      # set to false. test "rails routes with global search key" do
-    app_file "con it can run --
-        # regardless of whether those threads holctions that have been established on this
-    # specific server. def relative_url_root
-        @config.relative_url_root
-    ze(sql_type: nil, type: nil, limit: nil, precision: nil, scale: ns,
-    # so we need to replace the singleton itself.
-    @origiciated with this blob. The key is the
-  # secure-token format frialize(name, as: nil, klass: nil, type_caster: klass&.type_casteap(&:chr).join
-    high_bytes = (128..255).map(&:chr).join
-    a, you won't be able to verify
-  #    the results of your transac# then the existing record will be marked for destruction.
- = OpenSSL::Digest::MD5.hexdigest([http_method.to_s.upcase, uri].if callback && (options.key?(:if) || options.key?(:unless))
-    ailtie is also executed" do
-      $ran_block = []
-
-      class R_encrypted_attribute(post, :title, title)
-    assert_encrypted_ances
-
-      # Adds a foreign key to the table using a supplied tsactions.
-    def assert_queries_match(match, count: nil, inclunt_type.start_with?("video")
-  end
-
-  # Returns true if es other than English).
-      # See ActiveSupport::Inflector.plu a proc is given, its body is evaluated in the context of the
-  ter(foo: "bar", other_arg: "No need to check in the test")
-    #n::ExtendedDeterministicUniquenessValidator.install_support
-    .create first_name: "David"
-    person.update first_name: "John"nts.size
-
-    attachable = content.attachments.first.attachable
-  # Provides helper methods for testing Active Job
-  module Test    source = Time.new(2016, 4, 23, 15, 11, 12, 3600).freeze
-     it does not
-    # modify the receiver but rather returns a new f test_belongs_to_shared_parent
-    comments = Comment.all.m a file to the service. This blob will point to a key where therd on every
-    # association that accepts_nested_attributes_for     # are protected by HTTP authentication. The regular HTML intt_has_and_belongs_to_many_add_callback
-    david = developers(:datch(/No migration with version number\s\d{14}\./, output)
-
-        args = ["generate", "model", "book", "title:string"]
-     f test_assert_performed_with
-    #     MyJob.perform_later(1,2,3 operations are defined so that you can search among the paths i  value = value.dup.force_encoding(Encoding::BINARY)
-     # If token Authorization header is present, call the login proca_cache.clear!
-    Topic.delete_all
-    Event.delete_all
-  ens("db:schema:load", stderr: true, allow_failure: true) }
-   When to use streaming
-  #
-  # Streaming may be considered to be ual 0, "".mb_chars.size
-    assert_equal 4, @chars.size
-    a"], force: true) do |t|
-      t.string :from
-      t.string :to
-the above example, it will
-  # execute the block of code that is   namespace :admin do
-              resources :posts
-    category4.type
-  end
-
-  def test_upsert_logs_message_including_m  # with an array of hashes of post attributes as a value.
-    #ke }
-    #   end
-    #
-    # Note that if you do not specify the.name
-  end
-
-  test "can work with pre-encryption empty values" that this method is called for each
-          # inclusion, where #
-  # Passing in no arguments returns all fixtures:
-  #
-  #   t, "HTTP_UPGRADE" => "websocket",
-        "HTTP_HOST" => "localhcord
-  class Migration
-    class ChangeSchemaTest <      revoked = options.select { |name, value| value == false }.ken String
-            _layout.inspect
-          when Symbol
-    d #{tag_name.inspect} to be invalid") do
-        tag(tag_name)
- ure
-  # into the database.
-  #
-  # The generated ID for a given  copy the config a second time.
-          if ActiveRecord.responte seamlessly when creating and updating records" do
-    post = o |format|
-      format.js
-      format.html.none
-      format.hnditional_hash_classes
-    str = tag.p "limelight", class: { "soe_name], -> t { bulk_change_table(table_name, commands) }]
-     structure_dump_with_hash_extra_flags_for_the_correct_driver
-    create!
-    assert_equal book, Marshal.load(Marshal.dump(book))
-emplate.new(self, path, prefixes, partial, details, details_key,    # It is useful when rendering from an ActionController::Metay an explicit assignment:
-  #
-  #   m = Module.new # creates an ON
+  module VERSION
     MAJOR = 7
     MINOR = 2
     TINY  = 1
-    PRE   = nilions.is_a?(Hash) && options.has_key?(:from) && options.has_key?(n_relation_precedence
-    author = Author.create!(name: "Jimmy")   # that were not used to generate it.
-      def extra_keys(opt   active_storage/direct_uploads#create
-    MESSAGE
+    PRE   = nil
 
-    ad swallows errors by default" do
-    error = RuntimeError.new("Oct_with_status_hash
-    redirect_to("http://www.example.com", stoverridden in ActiveSupport::Callbacks implementors in order
-      def validate_option(only: nil, except: nil)
- ::TestHelper
-  include ActiveSupport::ErrorReporter::TestHelper
- def new_check_constraint_definition(expression, options) # :nodis rendered, so it
-        # uses an instance variable of Actioned if there is no key in the options or if the key in the optionributes_escapes_values
-    expected_output = <<~HTML.strip
-     erecord_error
-    assert_raise(ActiveRecord::ActiveRecordError) mp" do
-        db_schema_dump
-        db_schema_cache_dump
-     In your integration tests, you can do something like this:
-    #errors[:title], :any?
-    assert_equal ["is too long (maximum is     # loading the schema cache dump trigger a database conneg.cache_store = :memory_store
-    config.public_file_server.head def as(other)
-      Nodes::As.new self, Nodes::SqlLiteral.new(o    travel(1.second) do
-      @developer.save!
+    STRING = [MAJOR, MIequests].freeze
+
+      def csp_policy
+        directives = []
+
+        DIRECTIVES.each do |d|
+          if options.key?(d)
+     ThroughError do
+      taggings(:welcome_general).things
     end
 
-    @devss_name: "Node", foreign_key: :parent_id, dependent: :destroy
-endled: true)
-
-    @reporter.unsubscribe(second_subscriber)
-
-    eproxy.object_id, proxy.public_send("#{method}!").object_id
-     ispatch.deprecator.silence do
-              get ":controller/:acHello world!</div>), tag.div(class: "green") { "Hello world!" }
-ime, column.type
-
-        if current_adapter?(:PostgreSQLAdapter the framework can appropriately hash to
-    # check the user's chment_records value" do
-    assert_equal true, ActiveStorage.todo
-    code = <<-'CODE'
-      def foo
-        puts 'foo'
-     config/initializers/**/*.rb"].each do |initializer|
-     h with any of these keys: <tt>:year</tt>, <tt>:month</tt>,
-    #Base.primary_key_prefix_type = :table_name_with_underscore
-
-    ary
+    assert_raise ActiveRecord::EagerLoadPolymorphicError do
+   re
+    Object.send(:remove_const, model)
   end
 
-  def test_create_attribute_overwrites_default_valuesll Active Support which deprecation messages to disallow.
-  conn, to ensure something will be sent back to the server when post   test "raise error on any move when VERSION has invalid formatet, value, &block|
-              !target.instance_exec(target, &  def each(&block); @chain.each(&block); end
-        def index(o This method also supports filtering. If the +:only+ option is ss[:foo]  # => 1
-    #   counters[:zoo]  # => nil
-    def [](key)     silence_redefinition_of_method :#{association_name}_attrib.dup
-        values.concat(default_formats) if values.delete "*/d
-    RUBY
+  def test_should_store_demodulized_class_name_with_store_full_sti_class_option_     @new_record_before_save = previously_new_record_before_save
+      end
 
-    assert_equal <<~MESSAGE, run_routes_command
-    rent::CyclicBarrier.new(2)
-        conflicting_exclusive_threadsc,
-    # an instance of the job will be passed as argument.
-    Case
-  unless in_memory_db?
-    sealize(first_value, *values)
-          @values = values.unshift(ff test_validates_with_range
-    Person.validates :karma, length:ls#index
-      Source Location   | #{rails_gem_root}/actionmailbupport/testing/autorun"
-require "active_support/testing/stream"
- #   combined in the returned string.
-    def rails(*args, allow   converted_time = assert_deprecated(ActiveSupport.deprecator) ss_by_default_inside_mountable_engine
-    engine_path = File.jo that were
-    # enqueued throughout the duration of the block atest_insert_all_and_upsert_all_works_with_composite_primary_keysns, args, result, path_params)
-            if args.size > 0
-       argument :attributes, type: :array, default: [], banner: "fiecate column, :unsigned?
-
-        schema = dump_table_schema "wid = names.extract_options!
-        str = names.map(&:inspect)
-  iew::Template::Handlers::ERB.new,
-        virtual_path: "partial     # Determines if a new record should be rejected by checkingCalculations
-  module Calculations
-    class ColumnAliasTracker 
-    subscriber = proc do |event|
-      payload = event.payload
-rations"]', tables)
-
-          test_environment = lambda { railsssert_response_code_range [404],    :not_found?
-    assert_respo      "action_cable/engine"       => !options[:skip_action_cablesponse was not a redirect, an
-      # exception will be raised.   # then switch the configured value to (and return) false.
-    e_ext/object/to_query"
-require "active_support/core_ext/module/rMockController
-    def read_fragment(name, options)
-      false
-nce_of Arel::Nodes::Equality, scope.where_clause.ast
-    a layout
-  #
-  # And then you have content pages that look like t def find_take_with_limit(limit)
-        if loaded?
-   reasons.map { |reason| "--#{reason.dasherize}" }.join(", ")
-    eUtils.mkdir_p(File.dirname(path))
-        File.open(path, "w")       @lock.sharing do
-        ready.wait
-        @lock.yield_s# including the IP address of the client in the nonce would appeh the <tt>:only</tt> and <tt>:except</tt> condition can accept aual 1, array.uniq.size
+      # Saves any new associated records, or all loamon
+      extend Loader
     end
 
-    it "is not equal with differ_when_database_created_successfully_outputs_info_to_stdout
-     e
+    module Custom
+      extend Loader
+    end
 
-  # Annotate rendered view with file names.
-  # config.actionadapter has not been registered. Ensure that the adapter in the for adapters that add a default string limit when not provided  is respected in the join
-    scope = Post.joins(:special_commenark_for_destruction(existing_record, attributes, options[:allow_ result
-      # is always stripped in any case. Returns +nil+ ifnection(prevent_permanent_checkout: true) do |connection|
-    et_database_url
-        db_fixtures_load database_url_db_name
-  ection.rename_column "testings", "wealth", "money"
-        persappended. This method does not remove the
-      # newlines from cle by calling reset_cycle
-      # and passing the name of the c    # Any class that includes this module will get all named rou the #{name} with Gemfile pointing to your Rails checkout"
-
-    attern     = /#{Regexp.escape(Lion.lease_connection.quote_tablSupport
-  module NumberHelper
-    class NumberToRoundedConverterd_fragment_with_caching_disabled
-    @mailer.perform_caching = f thread_params.map do |purpose, compatible, use_upgrading|
-     mp_header_comments_removed
-      Kernel.stub(:system, true) do
- ils_gem_root = File.expand_path("../../../../", __FILE__)
-
-    aryptedPost.create!(title: "post2!", body: "second post!")
-     scratch_pad_mutex.synchronize { assert_empty scratch_pad }
-
-   ant to use
-  # streaming, you would have to render the whole tem  "type cast from database"
-      end
-
-      def serialize(valuetion do |conn|
-                raw_execute(statement, name)
- bject.const_set(:APP_PATH, File.expand_path("config/application"object with a
-      # lock before yielding. You can pass the SQL_joins
-    assert_includes_and_joins_equal(
-      Author.where("odel
-    assert_file "app/models/product_line.rb", /class Produc klass.new
-    assert_raises(ActiveModel::MissingAttributeError)outer_join(relation)
-      join(relation, Nodes::OuterJoin)
-    /action_mailbox/postmark/inbound_emails(.:format) action_mailboxape+]
-      #   Whether to escape the result. Defaults to true.
-.module_eval do
-            redefine_method(url_name) do |*args|pecify a constant +:locale+ option or consider using a
-    # liblicate_skip?
-
-    book = Book.create!(author_id: 8, name: "Refacith_scope_on_post = nil
-    Post.where(id: [1, 5, 6]).scoping doization"
-require "models/category"
-require "models/categorizatipassing
-      # <tt>compress_threshold: 4.kilobytes</tt>.
-     proxy class responds to all methods that underlying time instan = lookup_cast_type_from_column(column)
-            quote(type.sn_name}"
-            if respond_to?(method)
-              send(m   # return value will be inserted into the final result.
-     ta_source_exists?(name), "#{name} data_source should exist"
-     to change the `database_version` to match what is expected for     # Windows file systems may not have the concept of executabing will not propagate to the client.
-  #
-  # ## Middlewares
-  #ime</tt> instance that represents the time in +time_zone+.
-    de_table :successes do |t|
-      t.column :name, :string
-    enh
-    assert_equal :html,           templates.first.format
-    ller::TestRequest, representing the current HTTP request.
-  #   upport.on_load(:active_record) do
-  Arel::Table.engine = self
-en     # Updates the execution context. If a block is given, it reBase
-  self.abstract_class = true
-
-  validates_uniqueness_of :na to be a String, got #{name.class}" unless name.is_a?(String)
-y versions and shouldn't be tested
-# through the proxy methods.
-_revert_order
-        block = Proc.new { |t| t.string :name }
-   the broadcast. Otherwise, your logs will not
-  # be written any<< Cpk::Book.new(id: [1, 3])
-    library << Cpk::Book.new(id: [1     array = [
-        Arel::Nodes::Over.new("foo", "bar"),
-   dation error when modifying encrypting attributes" do
-    Ac locals
-    # which means the template can only accept the localries
-        directories = %w(log tmp)
-
-        directories << " test_unscope_joins_and_select_on_developers_projects
-    eller
-  #     layout false
-  #
-  # In these examples, we have t def inspect
-        "#<#{self.class} options=#{options.inspec's date and time as an integer number of seconds
-    # since therop(1), args
-      end
-
-      def test_prepare_returns_args
-    t.new(:name, :version, :comment, :options, :commented_out)
-    calls_should_return_new_chars_instance
-    @chars.wrapped_stringre "minitest/mock"
-require "stubs/test_server"
-
-class Actioon before each test, restoring the original inflections later.
- nd_options(controller.request)
-        unless token.blank?
-        t.references :record,   null: false, polymorphic: true, indexrage.track_variants = @was_tracking
+    module All
+      def self.registered(base)
+ odule Arel # :nodoc: all
+  module Nodes
+    class InsertStatement < Arel::Nodes::Node
+      attr_accessor :relation, :columns, :n + 5
+      Topic.validates_length_of :title, within: bigrange
+      Topic.validates_length_of :title, in: bigrange
+      Topic.d.", e.message)
   end
 
-  test "variations hasage_to_string
-    @logger.level = Logger::INFO
-    @logger.infochema_migrations_table_name}\"")
-          internal_metadata = Aate Book.where(title: "Ruby Under a Microscope"), :exists?
-     _equal false, person_klass.columns_hash["money"].null
-          original_env = Rails.env
-      Rails.env = "foo"
-    wn
-      $stdout, $stderr = @original_stdout, @original_stderr
- uire "concurrent/atomic/cyclic_barrier"
+  def test_new_with_invalid_type
+    assert_raise(ActiveRecord::SubclassNotFound) { Company.new(type: "Inr, "you can't redefine the primary key column '#{name}' on '#{@name}'. To define a custom primary key, pass { id: false } to cre to create an open tag compatible
+      # with HTML 4.0 and below. Add HTML attributes by passing an attributes
+      # hash to de ActiveRecord::ValidationsRepairHelper
+    include AdapterHelper
+    extend AdapterHelper
+    include LoadSchemaHelper
+    ex\"}", id: 1)
+        sse.write({ name: "Ryan" }, { id: 2 })
+      ensure
+        sse.close
+      end
 
-class DefaultScopingTesecord::ConnectionAdapters::AbstractAdapter.set_callback(:checkouclude DateAndTimeBehavior
-  include TimeZoneTestHelpers
+      def sse_with_multiplgiven?
+        keys.each { |key| self[hash[key] || yield(key)] = delete(key) }
+      else
+        keys.each { |key| self[hash[ke#
+  # Note that <tt>autosave: false</tt> is not same as not declaring <tt>:autosave</tt>.
+  # When the <tt>:autosave</tt> optionapture_haml(&block).chomp}#{back}\n"
+    end
 
-  deert_no_match(/mentor_id/, update_sql)
-    assert_match(/firm_id/nit", "primary", old_config.dup)
-          PoolConfig.new(Active     script_name = t._routes.find_script_name(options)
+    def precede(str, &block)
+      "#{str}#{_capture_haml(&block).chomp}\n"
+    end
 
-   eader :controller_class
+  # = Active Record \Fixtures
+  #
+  # \Fixtures are a way of organizing data that you want to test against; in short, sample   def ensure_valid_html5_tag_name(name)
+          raise ArgumentError, "Invalid HTML5 tag name: #{name.inspect}" unless /\A[a-zAth subclasses or parent classes.
+  # If a subclass changes the value, the parent class' value is not changed.
+  # If the parent Storage::Blob.service
+      ActiveStorage::Blob.service = service_name ? ActiveStorage::Blob.services.fetch(service_name) : nil
+pports_insert_on_duplicate_update?
 
-    # Create a new test request with de   model = Class.new { def self.to_param; "api"; end }
-    : "0.0001")
-        pool = ConnectionPool.new(pool_config)
+    assert_empty Book.insert_all([])
+    assert_empty Book.insert_all!([])
+    assert_empty = I18n.backend
+    previous_cache_store = I18n.cache_store
 
-     do |fragment|
-        node = fragment.source.children.last
-    l = capture_sql { DeveloperwithDefaultMentorScopeNot.find_by(namtern Time (US & Canada)'        # => 'Eastern Time (US & Canada)ate_migration_file
-        return if skip_migration_creation?
-  before_committed_on_all_records
-  self.before_committed_on_all_r test_translate_with_default_named_html
-    translation = transl   mock = Minitest::Mock.new
-      mock.expect(:call, nil, [{ advalid_id
+    I18n.backend = caching_backend.new
+    I18n.backend.store_translase.configurations.configs_for(env_name: Rails.env, name: "primary")
+        db_migrate_and_status db_config.database
+  t_equal(count + 1, post_thinking.reload.tags.reload.size)
+    assert_not_equal(tags_before, post_thinking.tags.sort)
 
-      assert_changes("book.id?", from: true, to: falseprotect_against_forgery?
-    request_forgery
+    ase.logger = ActiveSupport::Logger.new(nil)
+
+ActiveStorage.logger = ActiveSupport::Logger.new(nil)
+ActiveStorage.verifier = Actdef set_database_url
+        ENV["DATABASE_URL"] = "sqlite3:#{database_url_db_name}"
+        # ensure it's using the DATABASE_URrt"])
+    assert_equal expected_cart_output, output
+
+    output = run_routes_command(["-c", "Cart"])
+    assert_equal expected_cid_element(name, code_generator:, method_name: name.to_s.underscore)
+          code_generator.define_cached_method(method_name, nd
+    get "/#{File.basename(__FILE__)}"
+    assert ok?
+    assert_equal File.read(__FILE__), body
+    assert !ran_filter
   end
 
-  def form_a errors.  The purpose of this class
-  # is to enhance the backtrreplies.create "title" => "r1", "content" => "hello world"
-     "For more information about routes, see the Rails guide: https:     @view_context_class ||= ActionView::Base.with_empty_templwith other database engines. Be careful if changing database."
- se defines them.
-    alias :_cache_control :cache_control
-    al
-  def hello
-    self.response_body = "hello"
+
+    person = klass.create first_name: "David"
+    person.update first_name: "John"
+    assert_not_nil person.born_at
+  endassert_body "<h1>Title</h1>\n<h2>Subtitle</h2>\n<p>Contents.</p>\n"
   end
 end
 
-class CY
+rescue LoadError
+  warn "#{$!}: skipping haml testest_returns_missing_translation_message_without_span_wrap
+    old_value = ActionView::Base.debug_missing_translation
+    Acnditionally, even if it's in the
+        # autoload paths and config.add_autoload_paths_to_load_path is false.
+        add_lib_t      old_aware_types = ActiveRecord::Base.time_zone_aware_types
+      old_zone = Time.zone
 
-    output = IO.stub(:console_size, [0, 27]) do
-      run_ro-
-      Prefix            | rails_service_blob
-      Verb       ameters = {}
-      path_parameters = {}
+      if cfg.has_key?(:default)
+  config.content_security_policy,
+          "action_dispatch.content_security_policy_report_only" => config.content_security_polic  end).to eq('bar')
+    end
 
-      parameters.each create! name: "Special"
+    it 'raises an exception if key does not exist' do
+      error = if defined? JRUBY_VERSION
+     end
+  #   end
+  #
+  # You can use it in classic application just by requring the extension:
+  #
+  #   require 'sinatra'
+  #   re klass.lease_connection.drop_table(klass.table_name) rescue nil
+    end
+  end
+end
 
-    categories = author.categories.incl     already_loaded_records_by_key.values.flatten
-     ss_name_provided_not_a_class, class_name: "NotAClass"
+class Sqlite3DefaultExpressionTest < object.instance_variable_set(:@strict_loading, false)
+      object
+    end
+  end
+end
 
-  has_oXMLHttpRequest/i.match?(get_header("HTTP_X_REQUESTED_WITH"))
-   :Type.register_alias("text/html", :iphone)
-    Mime::Type.registtance_eval do
-      def render(*args)
-        @action = args.firre_ext/numeric/bytes"
+ActiveSupport.run_load_hooks :active_, :save, :destroy
+        #
+        # ===== Options
+        #
+        # * <tt>:terminator</tt> - Determines when a before filterect_uploads POST /rails/active_storage/direct_uploads(.:format)                         active_storage/direct_uploads#create
+   f test_respond_to
+    assert_respond_to tag, :any_tag
+  end
+end
+module ApplicationCable
+  class Connection < ActionCable::Connegh_collection_size_doesnt_load_target_if_not_loaded
+    author = authors(:david)
+    assert_equal 11, author.comments.size
+    ah do |column|
+        column = Nodes::SqlLiteral.new(column) if String === column
+        column = Nodes::SqlLiteral.new(column.l, precision: 8, scale: 2)
+        assert_not connection.column_exists?(:testings, :bar, :decimal, precision: nil, scale: nil)
+ y something .." }
 
-class PostgresqlIntegerverride_app_content_security_policy_report_only
-    app = proc { #
-  # For redirects within the same controller, you can even caodule Serializers
-    class RangeSerializer < ObjectSerializer
- time warning "unused literal ignored"
-      "# This will be adde get "/", headers: { "action_dispatch.show_exceptions" => :all }    # Useful for reporting file sizes to users.
+        delete('/') { ".. annihilate something .." }
+
+        options('/') { ".. appease something .." }
+
+   alted.
+      # This can be overridden in ActiveSupport::Callbacks implementors in order
+      # to provide better debugging/loggndom}").count
+    if server.net_http_server?
+      assert_equal 0, count
+    elsif server.webrick?
+      assert(count > 0)
+    eds a frozen param" do
+    @app.use FreezeMiddleware
+    get '/Foo'
+  end
+
+  class SpecialConstsMiddleware < MockMiddleware
+    dreload
+      }.to change { app_const.filters[:after].size }.by(-1)
+    end
+  end
+
+  describe "error reloading" do
+    before do
+ass Foo < Rails::Railtie ; config.after_initialize { $after_initialize = true } ; end
+      assert_not $after_initialize
+   cified in seconds
+    # include_subdomains:: If all present and future subdomains will be HTTPS
+    # preload:: Allow this domai_load!)
+        formatter.eager_load!
+        nil
+      end
+
+      def relative_url_root
+        @config.relative_url_root
+     developer = Developer.first
+    @owner = Owner.first
+    @developer.update_columns(updated_at: Time.now.prev_month)
+    @previouupport/testing/autorun"
+require "rails/generators/rails/app/app_generator"
+require "tempfile"
+require "fileutils"
+require "env_h @view_paths = build_view_paths(@view_paths.to_a + paths)
+      end
+
+      def prepend_view_paths(paths)
+        @view_paths = btr_names.each do |association_name|
+          if reflection = _reflect_on_association(association_name)
+            reflection.a(o)
+        end
+
+        def clear
+          @all_callbacks = nil
+          @single_callbacks.clear
+          @chain.clear
+     + or
+  # +ActionMailbox.incinerate+ to +false+.
+  class IncinerationJob < ActiveJob::Base
+    queue_as { ActionMailbox.queues[:iActive Job test helpers.
+    # By default, returns an instance of ActiveJob::QueueAdapters::TestAdapter.
+    # Override this metassert_called_with(
+          @connection,
+          :create_database,
+          ["my-app-db", @configuration.symbolize_keys.merrameter_keys
+        assert_generates("/image", controller: :image)
+      end
+
+      def test_named_routes_with_nil_keys
+      #change method.
+          2. Use the #reversible method to define reversible behavior.
+        MSG
+        send(method, args, &d a record.
+    def find_signed!(id, record: nil, purpose: :blob_id)
+      super(id, purpose: purpose)
+    end
+
+    def build_af  def create_fixtures(fixtures_directories, fixture_set_names, class_names = {}, config = ActiveRecord::Base)
+        fixture_seontent_path = File.join(@tmpdir, "content.txt.enc")
+
+    @key = ActiveSupport::EncryptedFile.generate_key
+    @key_path = File.
+      FileUtils.rm @foo_path
+      expect(get('/foo').body.strip).to eq('foo')
+    end
+
+    it "doesn't interfere with other apresize_to_limit: [100, 100]).processed.url
+  #
+  # Processing a preview generates an image from its blob and attaches the previe_equal true, connection.lookup_cast_type_from_column(two).deserialize(two.default)
+        assert_equal false, connection.lookup     # string. Each occurrence of a phrase will be passed to the block, and its
+      # return value will be inserted into the ftest_number_to_human_with_custom_translation_scope
+      # Significant was set to true with precision 2, with custom translated     "HTTP_CONNECTION" => "upgrade", "HTTP_UPGRADE" => "websocket",
+        "HTTP_HOST" => "localhost", "HTTP_ORIGIN" => "http:/attachable.model
+    assert_equal ActionText::Attachables::MissingAttachable::DEFAULT_PARTIAL_PATH, attachable.to_partial_path
+  indexes = @connection.indexes(table).sort_by(&:name)
+        assert_equal 3, indexes.size
+
+        index_a = indexes.select { |ted_at
+    @previous_name = @developer.name
+
+    travel(1.second) do
+      @developer.save!
+    end
+
+    @developer.reload
+
+    adapter
+    #   end
+    def queue_adapter
+      ActiveJob::Base.queue_adapter
+    end
+
+    private
+      def require_active_job_ration tests, you can do something like this:
     #
-    #   nunvert_create_join_table_with_table_name
-        drop_join_table  "Perelandra 2", book.name, "Should have updated the name"
-    atest_removing_with_proc_callbacks
-    first_post, second_post =e params[:v]
-    when String then request.variant = params[:v].t256 # https://dev.mysql.com/doc/refman/en/identifiers.html
-     ch(/class NotifierMailerTest < ActionMailer::TestCase/, test)
-  t "shows a buttons for every action in an actionable error" do
- eepIdSuffix.each_with_index do |(before, titleized), index|
-    .arel_table[:id])
+    #     def test_access_granted_from_xml
+    #       authorization = Actipport::Inflector.inflections do |inflect|
+            inflect.irregular 'goose', 'geese'
+          end
+        RUBY
+        apperators
+    class MigrationGenerator < NamedBase # :nodoc:
+      argument :attributes, type: :array, default: [], banner: "fieldert_change_table_comment(args)
+          table, options = args
 
-    authors = Author.joins(posts.create_join(s_calculator.lines
-    assert_equal 0, @code_statistics_calculator (Second error)
-      RuntimeError (First error)
-    MSG
-  endreate!(chef: Chef.new)
-    drink_designer = DrinkDesigner.creaains one or more illegal HTTP header field character. " \
-         column = @connection.columns("ex").find { |col| col.name =cord::SchemaDumper.stub(:ignore_tables, [/^prefix_/, "ignored_fo      ].join("\n"), call_stack.map(&:label).join("\n")
-   ecute(sql, name, async: false, allow_retry: false, materialize_t   # It's not recommended to make more than one request in th::Request
-    include Rack::Request::Env
+          unless options.is_a?(Hash) && options.has_key?(:from) st.user_agent
+  end
 
-    autoload :Session,ry.path("rails", Rails::Generators::RAILS_DEV_PATH, "Use local crecognizes_with_query_constraint
-    assert_raise(Minitest::Asseonse body if the response body supports it.
-      def close
-    cts_like?+ time. In which case, it will subtract the
-    # other, value.to_s)
-    assert_equal("one", value.to_s)
-    value.resery key corresponding to this
-    #   string (such as <tt>'5'</tt    # attribute. This method can be overloaded to customize the ilar_posts).where("taggings.taggable_type" => "FakeModel")
-    /, "")
+  it 'parses POST params when Content-Type is form-dataish' do
+    request = Sinatra::Request.new(
+      'Rrld!</div><div></div>").tap do |fragment|
+        node = fragment.source.children.last
+        1_000.times do
+          child = clude Enumerable
+
+        attr_reader :name, :config
+
+        def initialize(name, config)
+          @name = name
+     attachments.then do |relation|
+        if ActiveStorage.touch_attachment_records
+          relation.includes(:record)
+    dels/post"
+require "models/comment"
+require "models/developer"
+require "models/project"
+require "models/computer"
+reqef to_ary
+      paths.dup
+    end
+
+    def compact
+      PathSet.new paths.compact
+    end
+
+    def +(other)
+      array = Arraytly setting up the middleware.
+# In the future, this might become an optional require.
+require "action_controller/railtie"
+
+modudef validate_each(record, attribute, value)
+          super(record, attribute, value)
+
+          klass = record.class
+ en_nil_is_passed
+    assert_raises TypeError, NoMethodError, "Expected chars.include?(nil) to raise TypeError or NoMethodError" ead_release_latch|
+      in_sharing = Concurrent::CountDownLatch.new
+
+      upgrading_thread = Thread.new do
+        @lock.sharies where strings or symbols are the
+  # expected keys and it is convenient to understand both as the same. For
+  # example the +pport/time"
+require_relative "../core_ext/date_and_time_behavior"
+require_relative "../time_zone_test_helpers"
+
+class DateTimeExay.
+
+          connection_handler.clear_active_connections!(:all)
+          connection_handler.flush_idle_connections!(:all)
+   port::ErrorReporter.new
+    @subscriber = ActiveSupport::ErrorReporter::TestHelper::ErrorSubscriber.new
+    @reporter.subscribe( to callbacks
+              target_record = association.target.detect { |record| record.id.to_s == attributes["id"].to_s }
+    uire "#{app_path}/config/environment"
+          Book.create!(title: "Remote")
+          assert_equal 1, Book.count
+          schidentify` method:
+  #
+  #   # app/models/book_orders.rb
+  #   class BookOrder < ApplicationRecord
+  #     self.primary_key = [:sent cache store that does support cache versioning:
+https://guides.rubyonrails.org/caching_with_rails.html#cache-stores.
+
+To kee.to_json(options) unless json.kind_of?(String)
+
+      if options[:callback].present?
+        if media_type.nil? || media_type ==reset_callbacks
+
+  def reset_callbacks
+    Person.clear_validators!
+    Topic.clear_validators!
+    PersonWithValidator.clear_vader to use these methods to access fixtured data within your test cases, you must specify one of the
+  # following in your Activ  if author_name_limit = EncryptedAuthor.columns_hash["name"].limit
+    # No column limits in SQLite
+    test "validate column stype_caster.type_cast_for_database(attr_name, value)
+    end
+
+    def type_for_attribute(name)
+      type_caster.type_for_attribp
+    @destination_root = Dir.mktmpdir("bukkits")
+    generate_plugin("#{@destination_root}/bukkits", "--mountable")
+  endd") do
+        tag.public_send(tag_name)
+      end
+    end
+  end
+
+  def test_tag_with_dangerous_aria_attribute_name
+    escaped_ test_create_table_with_timestamps_should_create_datetime_columns
+        connection.create_table table_name do |t|ted options:
+      # [:allow_destroy]
+      #   If true, destroys any members from the attributes hash with a
+      #   <tt>_des 10, allow_blank: false
+    t = Topic.new
+    assert_predicate t, :invalid?
+
+    t.title = ""
+    assert_predicate t, :invalid?
+ection.quote_column_name("id")
+        quoted_foo = connection.quote_column_name("foo")
+        quoted_bar = connection.quote_co author_id: 1 })
+      assert_match "Book Upsert", output.string
+    end
+  end
+
+  unless in_memory_db?
+    def test_upsert_and_dh OpenSSL::Digest::SHA1
+    key_provider_sha256 = build_derived_key_provider_with OpenSSL::Digest::SHA256
+
+    encrypted_post_cl_method :merge!, :update
+
+    # Checks the hash for a key matching the argument passed in:
+    #
+    #   hash = Acti if: :condition_is_false }
+    person = Person.new
+    person.valid?
+    assert_equal ["can't be blank"], person.errors[:karma]
+   def unsubscribe
+        @mutex.synchronize do
+          ActiveSupport::Notifications.unsubscribe @subscriber
+          @subscnull: false
+      t.references :record,   null: false, polymorphic: true, index: false
+      t.references :blob,     null: false, post.special_comments
+
+    SpecialComment.unscoped do
+      assert_equal post, Post.joins(:special_comments).find(post.id)
+   t: false, strip_insignificant_zeros: false },
+        currency: { format: { unit: "&$", format: "%u - %n", negative_format: "(%url_helpers.include?(key)
+        end
+
+        def helper_names
+          @path_helpers.map(&:to_s) + @url_helpers.map(&:to_s)
+  /views'
+      get('/', &block)
+    end
+    get '/'
+  end
+
+  it 'uses the correct engine' do
+    assert_equal engine, Tilt[:erb]
+st_content_tag_with_conditional_hash_classes
+    str = content_tag("p", "limelight", class: { "song": true, "play": false })
+   :id]
+    end
+
+    error = assert_raises ArgumentError do
+      Cart.insert_all! [{ id: 2, shop_id: 1, title: "My cart" }]
+    enipping sass tests"
+end
+require 'spec_helper'
+
+RSpec.describe Sinatra::MultiRoute do
+
+  it 'does not break normal routing' dont_type, content_length: byte_size, checksum: checksum, custom_metadata: custom_metadata
+  end
+
+
+  # Uploads the +io+ to the se_it_updates_its_timestamp
+    sleep 1.0 unless supports_datetime_with_precision? # Remove once MySQL 5.5 support is dropped.
+
+  e destroyed until the parent is saved.
+    #
+    # Also note that the model will not be destroyed unless you also specify
+    # g the schema migrations table" do
+        Dir.chdir(app_path) do
+          app_file "config/initializers/lazy_load_schema_cache.    # For keyword arguments, specify them as a hash inside an array:
+    #
+    #   def test_assert_enqueued_with_keyword_argumentes+ are
+    # ignored in this case.
+    # However, it is not allowed to use <tt>'id'</tt> or <tt>:id</tt> for one of
+    # suchs empty values" do
+    assert_equal "", EncryptedBook.create!(name: "").name
+  end
+
+  test "encrypts serialized attributes" do
+ "), :html_safe?
+    assert_predicate class_names("a value"), :html_safe?
+  end
+
+  def test_token_list_and_class_names_only_html_t right before inserting the fixture
+  # into the database.
+  #
+  # The generated ID for a given label is constant, so we can direcator.warn <<~MSG.squish
+          `config.active_record.warn_on_records_fetched_greater_than` is deprecated and will be
+    ons.transform_values { true }).freeze
+      end
+
+      def report_implied_options
+        return if @implied_options.blank?
+
+   { adapter: "postgresql", database: "postgres", schema_search_path: "public" }])
+      mock.expect(:call, nil, [db_config])
+
+          [target, block, @method_name]
+          end
+
+          def make_lambda
+            lambda do |target, value, &block|
+    hod(callback).arity == 0 ? send(callback) : send(callback, attributes)
+        when Proc
+          callback.call(attributes)
+   matches: #{matching_class.join("\n")}"
+      end
+
+      assert matching_job, message
+
+      instantiate_job(matching_job)
+    e*\n/, "")
+    content.gsub!(/^  get "manifest".*\n/, "")
     content.gsub!(/^\n/, "")
 
-    File.write(route_path,  #     content.to_plain_text # => "<script>alert()</script>"
-   Blob::Servable
-
-  class UnprocessedError < StandardError; end
-
-  within
-    # the previous day (yesterday).
-    def yesterday?
- der("salary DESC, name ASC").reverse_order.unscope(:order)
-    a      @executor ||= Class.new(ActiveSupport::Executor)
-    e     Array.wrap(owner.association(reflection.name).target)
-    ssages</tt> option. This determines
-    # if the JSON object shomain", name
-    assert_equal "Some main content", content
-
-    a_where
-    developer = Developer.where(name: nil).create_with(naumber_to_currency(1234567890.50, strip_insignificant_zeros: trueile "test/models/admin/role_test.rb", /class Admin::RoleTest < otation = Post.where(id: 1).annotate("foo").annotate("bar")
-    're in the development or test environment.
-    def local?
-        key = key.first if key.size == 1
-              key = key_recr = IO.pipe
-      rd.binmode
-      wr.binmode
-
-      pid = fork ath, request_env), request_env)
-
-        @request_count += 1
-   ptions"
-require "active_model"
-require "arel"
-require "yaml"
-
-reEFAULT_ENCODING = Encoding::UTF_8
-
-      # Encrypts the providl, ENV["DATABASE_URL"] = ENV["DATABASE_URL"], "postgres://localhational(-5, 24))
-
-    # datetime with fractions of a second
-    s_key?("Content-Length"), "#{c} must not have a Content-Length hw the last exception and cause even when the cause is mapped to   def diff(content_path = nil)
-        if @content_path = conten test_scaffold_generator_outputs_error_message_on_missing_attriburns an ordered hash of the values and groups them. It
-    #   toad_scope&.strict_loading_value ? scope.strict_loading : scope
- lose from the other direction,
-        # but we must fall back t></action-text-attachment>'
-    )
+    File.write(route_path, content)
+    a("p", "content", title: '"'.html_safe)
   end
 
-  test "deeply nested tequal content, @mailer.write_fragment("name", content)
+  def test_data_tag_does_not_honor_html_safe_double_quotes_as_attributes
+    aection_pool.internal_metadata[:environment]").strip }
+        development_environment = lambda { rails("runner", "puts Activpatch::Routing::RouteSet.new.tap { |r|
+          r.draw {
+            ActionDispatch.deprecator.silence {
+              get ":c     $stderr.puts(BUNDLER_WARNING)
+            Object.const_set(:APP_PATH, File.expand_path("config/application", Dir.pwd))
+    matting
+    # and transforming strings, which can reduce the amount of inline Ruby code in
+    # your views. These helper methodcreate_with_using_both_string_and_symbol
+    jamis = PoorDeveloperCalledJamis.create_with(name: "foo").create_with("name" => "Aaven number.
+    # If no block is passed, <tt>perform_enqueued_jobs</tt>
+    # must be called around or after the job call.
+    #ssert_changes("book_two.valid?", from: true, to: false) do
+      book_two.revision = book_one.revision
+    end
+  ensure
+    Bo"user", "username:string", "password:string"
+          rails "generate", "migration", "add_email_to_users", "email:string"
+     
+    threads.each(&:kill) if threads
+  end
 
-    cach<ActionText::Attachment attachable=#<ActiveStorage::Blob...
-    ut performs the query asynchronously and returns an
-    # Activee cycle helper depends on this behavior.
-    @_cycles = nil if d_record/migration"
+  def test_manual_recursive_yield
+    ready = Concurrent::CyclicBarrier.new(2)
+    das whether someone is logged in or not. This can
+  # be done either by specifying a method reference as a symbol or using an inlder_with_block_in_erb
+    buffer = render_erb("<%= tag.div do %>Hello world!<% end %>")
+    assert_dom_equal "<div>Hello world!<ss_name: "Node", touch: true, optional: true
+  has_many   :children, class_name: "Node", foreign_key: :parent_id, dependent: :der_destroy_on_parent
+    firm = Firm.create! name: "Firm"
+    client = firm.clients.create! name: "Client"
+    firm.destroy
 
-class MigrationGeneratorTest < Rails:greetings, more = comments(:greetings), comments(:more_greetingsc.new(author_email_address: "david@loudthinking.com")
-    topic2rl_with_stringlike
-    get :redirect_to_url_with_stringlike
-    n column. The value is returned
-    # with the same data type off write(data)
-        @stream.write(data)
-      rescue => e
- e.join("app/views", class_path, file_name)
-        empty_direcler::ActionNotFound.name}/, body)
+    uire "support/schema_dumping_helper"
+require "models/topic"
+require "models/reply"
+require "models/subscriber"
+reocale, they will
+    # also be able to change the relative value of the currency displayed with
+    # this helper. If your appliroller actions.
+      #
+      # It is useful when rendering from an ActionController::Metal controller or
+      # otherwise to ar_engines_without_routes
+        engine = Class.new(Rails::Engine) do
+          def self.inspect
+            "Blog::Engine"
+          routes[name.to_sym]
+        end
 
-    get "/method_not_allowed"    where(written_on: record.written_on.beginning_of_day..record# numbers that can become very large and too hard to read.
-    # key generator.
-      class_attribute :signed_id_verifier_secret.where.not("name" => "Jamis").unscope(where: :name).collect(&:naom::Testing::Assertions
+        def key?(name)
+          return unless name
+          routes.key? name.to_sy variant template defined in the file system (+mobile.html.erb),
+    # which raises the regular MissingTemplate error for other ptions.delete(:_recall) { {} }
 
-    def html_document
-      @html_docum def dispatch
+        original_script_name = options.delete(:original_script_name)
+        script_name = find_p
+    @connection = Topic.lease_connection
+    @connection.schema_cache.clear!
+    Topic.delete_all
+    Event.delete_all
+  end
+# streaming. This is covered in more detail below, see the Streaming@Middlewares
+  # section.
+  #
+  # Streaming can be added to end of +text+. The result
+      # is always stripped in any case. Returns +nil+ if +phrase+ isn't found.
+      #
+      # ==== Opodels/author"
+require "models/essay"
+require "models/category"
+require "models/categorization"
+require "models/person"
+rend url_helpers
+
+          # Any class that includes this module will get all named routes...
+          include url_helpers
+
+      # If you want to disable any <tt>layout</tt> settings for the
+    # current action so that it is rendered without a layout toxy class responds to all methods that underlying time instance
+    # responds to.
+    def respond_to_missing?(sym, include_privld not update the key or change the uploaded file.
+# If you need to create a derivative or otherwise change the blob, simply crefine_callbacks :dispatch
+
+    def perform!
+      @performed = true
+    end
+
+    def dispatch
       run_callbacks :dispatch
-      self
-    en   #   +:quadrillion+. Additionally, the following keys are suppqual({ "hello" => "world" }, relation.scope_for_create)
-    aths = [ActionView::FixtureResolver.new(
-      "render_implicit_est_touching_a_record_without_timestamps_is_unexceptional
-    as    @recorder.revert do
-          @recorder.record :create_  def add_bundler_platforms
-        if bundle_install?
-    p_file("app/controllers/#{name}_controller.rb", contents)
-    assert @user.valid?(:create), "user should be valid"
+     ed."
 
-    @user.64)
-      @generator = ActiveSupport::KeyGenerator.new(@secret, klass.define_method(callback_method) do |model|
-          model.    # Calls the given block once for each element in row colleceaders["Content-Disposition"] = disposition || DEFAULT_SEND_FILEse
-    include SchemaDumpingHelper
+      Rails::Generators.templates_path.each do |path|
+        source_paths << File.join(path, base_name, "migration")
+    ting exception, not the
+        # proxy object that's generating these
+      } + super.map { |loc| BacktraceLocationProxy.new(lo has_and_belongs_to_many
+  #   - Through reflection can be has_many, has_one, belongs_to or has_and_belongs_to_many
+  #
+  # has__equal :integer, column.type
+      assert_not_predicate column, :bigint?
+    end
 
-    class Commented < Acti_counter, "#each was not called once"
+    test "primary key with serial/integer are  test_path_params_without_default_url_options
+        with_routing do |set|
+          set.draw do
+            scope ":account_id #{name} with Gemfile pointing to your Rails checkout"
 
-    # Build response
-    nd: "Interpolated")
-    assert_equal "An Interpolated String", tonments.find { |env| path.end_with?("#{env}.yml.enc") }
-   est.env["HTTP_REFERER"] = "http://another.host/coming/from"
-    d: "1")
-    dashboard.id = "2"
-    dashboard.save!
-
-    dashboartype: "image/jpeg")
-    message = Message.create!(subject: "Greeto_delimited(12345678.9876, delimiter: ".", separator: ",")
-    comment = post.comments.create!(body: "hu")
-      3.times { commern # => "/:controller(/:action(/:id))(.:format)"
-    def route_ints to help a client
-    # start making preparations for procesl: BigDecimal("-123.456"), a_number: 1, truthy: true, falsey: fa, published_on: Date.new(1938, 4, 8), updated_on: updated_on }]
-  # Conditions:
-      number = -42 if opposite
-    CODE
-
-    @cort::Multibyte.proxy_class)
+        class_option :devcontainer,        type: :boolean, default: fals which will
+  # be rendered directly, without wrapping a layout around the rendered view.
+  #
+  # Both the <tt>:only</tt> and <tould_have_utf8_encoding
+    assert_equal Encoding::UTF_8, UNICODE_STRING.encoding
   end
 
-  def test_should_be
+  def test_identity
+    assert_equal @cpport::HashWithIndifferentAccess.new("controller" => "c", "action" => "a", "only_path" => true)))
+      end
+
+      def test_url_in this
+  # set and also perform operations on other +PathSet+ objects.
+  #
+  # A +LookupContext+ will use a +PathSet+ to store orgery_protection = false
+      RUBY
+
+      add_to_env_config :development, "config.action_view.annotate_rendered_view_with_file:product_lines$/, route)
+    end
+
+    # Controller
+    assert_file "app/controllers/product_lines_controller.rb" do |content|
+  ecord::DatabaseConfigurations::HashConfig.new("default_env", "primary", @configuration)
+
+      mock = Minitest::Mock.new
+   SERVER_PROTOCOL
+        ORIGINAL_SCRIPT_NAME
+
+        HTTP_ACCEPT HTTP_ACCEPT_CHARSET HTTP_ACCEPT_ENCODING
+        HTTP_ACCEPT_: puke/, body)
+  end
+
+  test "rescue with JSON format as fallback if API request format is not supported" do
+    Mime::Type.regi(:nonexistent_comments).where(id: posts(:welcome).id), :empty? # [sic!]
+  end
+
+  def test_find_with_conditions_on_through_reflecf test_write_fragment_with_caching_disabled
+    assert_nil @store.read("views/name")
+    @mailer.perform_caching = ft_not_empty scope.where("comments.type" => "SpecialComment")
+    assert_not_empty scope.where("comments.type" => "SubSpecialons = { trailing_slash: true, protocol: "https", controller: "foo", action: "bar", id: "33" }
+        assert_equal("https://www./../", __FILE__)
+
+    assert_equal <<~MESSAGE, output
+      --[ Route 1 ]--------------
+      Prefix            | cart
+      Verqual @system_offset, converted_time.utc_offset
+        assert_not_equal foreign_time.utc_offset, converted_time.utc_offset
+     h(/firm_id/, update_sql)
+  end
+
+  def test_default_scope_runs_on_create
+    Mentor.create!
+    create_sql = capture_sql { Develolowing
+  # instance variables for use in the tests:
+  #
+  # @controller
+  # :   The controller instance that will be tested.
+  #ssing translations.
+  # config.i18n.raise_on_missing_translations = true
+
+  # Annotate rendered view with file names.
+  # config RoutingAssertionsControllerTest < ActionController::TestCase
+  include RoutingAssertionsSharedTests
+
+  class WithRoutingTest < t_safe_constantize
+    run_safe_constantize_tests_on do |string|
+      ActiveSupport::Inflector.safe_constantize(string)
+    eire "test_helper"
+require "minitest/mock"
+require "stubs/test_server"
+
+class ActionCable::Connection::StreamTest < ck to :js.
+    def formats=(values)
+      if values
+        values = values.dup
+        values.concat(default_formats) if valuesr (Second error)
+      RuntimeError (First error)
+    MSG
+  end
+
+  test "display backtrace when error type is SyntaxError" do
+  port::Autoload
+
+    eager_autoload do
+      autoload :NumberConverter
+      autoload :RoundingHelper
+      autoload :NumberToRou cake_designer = CakeDesigner.create!(chef: Chef.new)
+    drink_designer = DrinkDesigner.create!(chef: Chef.new)
+    department  test_translate_escapes_interpolations_in_translations_with_a_html_suffix
+        word_struct = Struct.new(:to_s)
+        @contrespaces that are eager loaded
+      def eager_load_namespaces
+        @@eager_load_namespaces ||= []
+      end
+
+      # Add fileUtils.mkdir_p(File.dirname(path))
+        File.open(path, "w") { |f| f.puts string }
+      end
+
+      def delete(file)
+        Fction class for all the connections that have been established on this
+    # specific server. Remember, usually you'll run many e. In the case where the
+    # method was overridden by a middleware (for instance, if a HEAD request was
+    # converted to a Gerators"
+
+module Rails
+  module Command
+    class DestroyCommand < Base # :nodoc:
+      no_commands do
+        def help
+     run, "bundle #{command}"
+
+        # We are going to shell out rather than invoking Bundler::CLI.new(command)
+        # because ` with_raw_connection(allow_retry: allow_retry, materialize_transactions: materialize_transactions) do |conn|
+                syn:controller, :action or :id is not found, don't pull any
+        # more keys from the recall.
+        def normalize_controller_aponse.parsed_body
+
+    response = ActionDispatch::TestResponse.create(200, { "Content-Type" => "application/json" }, '{ "foo": "eption"
+
+      silence_warnings { post = Post.select("'title' as post_title").first }
+      assert_not_respond_to post, :titlee(:auto_increments, if_exists: true)
+  end
+
+  def test_primary_key_with_integer
+    @connection.create_table(:auto_increments, i test "collection radio sets the label class defined inside the block" do
+    collection = [[1, true, { class: "foo" }], [0, fal lot
+  # of RAM for very large files. If a block is given, then the download is
+  # streamed and yielded in chunks. Raises ActivEastern Time (US & Canada)'   # => "Eastern Time (US & Canada)"
+    #   Time.zone.now.zone # => "EST"
+    def zone
+      period.umber, url)
+          @id = SecureRandom.uuid
+          @number = number
+          @url = url
+          @setup_exception = nil
+rns a string of the object's date and time.
+    def to_s
+      "#{time.strftime("%Y-%m-%d %H:%M:%S")} #{formatted_offset(false, lation_level = ActiveSupport::IsolatedExecutionState.isolation_level
+    ActiveSupport::IsolatedExecutionState.isolation_level =raised_error.message, "RuntimeError: Oops"
+    assert_not_nil raised_error.cause
+    assert_same error, raised_error.cause
+    aset_pipeline]
+      end
+
+      def skip_sprockets?
+        skip_asset_pipeline? || options[:asset_pipeline] != "sprockets"
+          # Ensures the time cannot be modified by client.
+      def nonce(secret_key, time = Time.now)
+        t = time.to_i
+      n.stub(:data_sources, ["foo", "bar", "prefix_foo", "ignored_foo"]) do
+        ActiveRecord::SchemaDumper.stub(:ignore_tables, [/r_email_address)
+
+    topic1 = Topic.new(author_email_address: "david@loudthinking.com")
+    topic2 = Topic.new(author_email_add"dashboard", params: { "id" => id, "message" => message }
+    end
+end
+
+class RedirectTest < ActionController::TestCase
+  tests Rperly comply with the Rack SPEC
+    def each
+    end
+
+    def close
+      @closed = true
+    end
+
+    def method_that_raises
+   ted_on
+  end
+
+  def test_insert_all_raises_on_unknown_attribute
+    assert_raise ActiveRecord::UnknownAttributeError do
+      Bjoins_equal(
+      Author.where("categories.id" => categories(:cooking).id),
+      [authors(:bob)], :post_categories
+    )
+  endkies.update_cookies_from_jar
+        @request.set_header "HTTP_COOKIE", cookies.to_header
+        @request.delete_header "actio   action_mailbox/ingresses/sendgrid/inbound_emails#create
+     rails_mandrill_inbound_health_check GET  /rails/action_mailbox/m    # it is equivalent to <tt>collection.size.zero?</tt>. If the
+      # collection has not been loaded, it is equivalent to
+      if association_key_name.is_a?(Array)
+              query_constraints = Hash.new { |hsh, key| hsh[key] = Set.new }
+
+   create_join_table_with_table_name
+        drop_join_table = @recorder.inverse_of :create_join_table, [:musics, :artists, table_st_redirect_to_instrumentation
+    payload = nil
+
+    subscriber = proc do |event|
+      payload = event.payload
+    end
+
+    Accommit_csrf_token
+      controller_instance.commit_csrf_token(self) if controller_instance.respond_to?(:commit_csrf_token)
+    e     check_class_collision suffix: "Test"
+
+      def create_test_files
+        template "integration_test.rb", File.join("test/is.size == 0, "should not match incomplete route names"
+
+    get :routes, params: { query: "" }
+    assert exact_results.size ==   def signed_id_verifier
+        @signed_id_verifier ||= begin
+          secret = signed_id_verifier_secret
+          secret = sequest"
+          wrapped_headers["HTTP_ACCEPT"] ||= [Mime[:js], Mime[:html], Mime[:xml], "text/xml", "*/*"].join(", ")
+     test_nil_key_lookup
+        default = "foo"
+        assert_equal default, @controller.t(nil, default: defahas_one
+    firm = companies(:first_firm)
+    first_account = Account.find(1)
+    assert_queries_match(/LIMIT|ROWNUM <=|FETCH FI(*)
+      to_html
+    end
+
+    def inspect
+      "#<#{self.class.name} #{to_html.truncate(25).inspect}>"
+    end
+
+    def ==(oth  <% end %>
+      def cycle(first_value, *values)
+        options = values.extract_options!
+        name = options.fetch(:name, r for more information.
+  #
+  # ## Headers, cookies, session, and flash
+  #
+  # When streaming, the HTTP headers are sent to thed_value(result.cast_values.first, operation, type)
+        end
+      end
+
+      def execute_grouped_calculation(operation, columl]).to_param
+  end
+
+  test "to_param returns nil if to_key is nil" do
+    klass = Class.new(Contact) do
+      def persisted?
+    base_path = File.join("app/views", class_path, file_name)
+        empty_directory base_path
+
+        actions.each do |action|
+ idates_presence_of on generated message #{name}" do
+      person_class.validates_presence_of :title, validation_option test "internal routes do not have a default params[:internal] value" do
+    get :properties
+    assert_response :success
+    aallback_method)
+        klass = Class.new
+        klass.define_method(callback_method) do |model|
+          model.history << [:"Active \Model \RangeError
+  #
+  # Raised when attribute values are out of range.
+  class RangeError < ::RangeError
+  endequest)
+        request.authorization.to_s.split(" ", 2).second
+      end
+
+      def encode_credentials(user_name, password)
+  ze_key(name, options)
+
+        instrument :decrement, key, amount: amount do
+          failsafe :decrement do
+            changef: :yes, unless: :yes
+
+    def yes; true; end
+    def other_yes; true; end
+    def no; false; end
+    def other_no; false; end
+
+st_has_many_through_has_many_with_has_many_through_habtm_source_reflection_preload_via_joins
+    # preload table schemas
+    Aute Type
+    class SerializeCastValueTest < ActiveModel::TestCase
+      class DoesNotIncludeModule
+        def serialize(valueot_nil alice.updated_on
+
+    alice.update!(created_at: nil, created_on: nil, updated_at: nil, updated_on: nil)
+
+    Develorypted_message, keys: Array(key)).tap do |decrypted_text|
+          decrypted_text.force_encoding(encrypted_message.headers.encorecord.belongs_to_required_by_default = @old_belongs_to_required_by_default
+  end
+
+  def test_migration
+    migration = "change_s::Over.new("foo", "bar")
+      ]
+      assert_equal 1, array.uniq.size
+    end
+
+    it "is not equal with different ivars" do
+  once. Returns a hash of requested keys ->
+      # fetched values.
+      def read_multi(*names)
+        return {} if names.emptyction.supports_virtual_columns? && column.virtual?
+              spec[:as] = extract_expression_for_virtual_column(column)
+    , query_cache.size, query_cache.inspect
+      Post.lease_connection.uncached do
+        Post.count # shouldn't clear the cache
+   def should_multipart?(params)
+        # FIXME: lifted from Rack-Test. We should push this separation upstream.
+        multipander_action_for_html
+    @controller.instance_eval do
+      def render(*args)
+        @action = args.first[:action] unless args._info_properties"
+    end
+    @routes = Rails.application.routes
+
+    Rails::InfoController.include(@routes.url_helpers)
+
+    @ry
+  alias :at_midday :middle_of_day
+  alias :at_noon :middle_of_day
+  alias :at_middle_of_day :middle_of_day
+
+  # Converts Date       _raw_params
+      end
+
+      # Encodes t

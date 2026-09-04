@@ -1,5 +1,4 @@
- at your
-// option. This file may not be copied, modified, or distributed
+ified, or distributed
 // except according to those terms.
 
 use clap::Parser;
@@ -12,67 +11,9 @@ struct Opt {
 }
 
 fn main() {
- ight 2018 Guillaume Pinot (@TeXitoi) <texitoi@texitoi.eu>
-//
-// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
-// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
-// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at y    );
-}
-
-#[test]
-fn invalid_utf8_option_short_space() {
-    let r = Command::new("bad_utf8")
-        .arg(
-            Arg::new("arg")
-                .short('a')
-                .long("arg")
-                .action(ArgAction::Set)
-                .value_String::from("--arg"),
-            OsString::from_vec(vec![0xe9]),
-        ]);
-    assert!(r.is_ok(), "{}", r.unwrap_err());
-    let m = r.unwrap();
-    assert!(m.contains_id("arg"));
-    assert_eq!(
-        m.get_one::<OsString>("arg").unwrap(),
-        &ommand(version, about, long_about = None)]
-struct Cli {
-    /// Network port to use
-    #[arg(value_parser = clap::value_parser!(u16).range(1..))]
-    port: u16,
-}
-
-fn main() {
-    let cli = Cli::parse();
-
-    println!("PORT = {}", cli.port);
-}
-use crate::from(vec!["myprog", "test-stuff"])
-        .unwrap();
-    assert_eq!(m.subcommand_name(), Some("test"));
-}
-
-#[test]
-#[cfg(feature = "suggestions")]
-#[cfg(feature = "error-context")]
-fn subcmd_did_you_mean_output() {
-    #[cfg(feature = "suggestions")]
-    
-use serde_derive::Serialize;
-
-#[derive(Serialize)]
-#[serde(tag = "conflict")]
-enum E {
-    A {
-        #[serde(rename = "conflict")]
-        x: (),
-    },
-}
-
-fn main() {}
-#![allow(clippy::derive_partial_eq_without_eq, clippy::similar_names)]
-
-use serde::d.subcommand().unwrap();
+    let opt = Opt::parse();
+    println!("{opt:?}");
+ext, args) = m.subcommand().unwrap();
     args.get_many::<String>("").unwrap_or_default().count();
 }
 use clap::{arg, error::ErrorKind, Arg, ArgAction, Command};
@@ -83,66 +24,144 @@ use snapbox::str;
 
 #[test]
 fn subcommand() {
-    let m = Comm"]).is_err());
-    assert!(Cli::try_parse_from(["test", "--foo=v1"]).is_ok());
-    assert!(Cli::try_parse_from(["test", "--bar=v2"]).is_ok());
-    assert!(Cli::try_parse_from(["test", "--zebra=v3"]).is_err());
-    assert!(Cli::try_parse_from(["test", "--fo     .map(|s| s.to_string_lossy())
-        .collect::<Vec<_>>();
-    assert_eq!(rest, vec!["bin", "a", "1", "2", "3", "b", "c"]);
-}
-use std::io::Write;
-
-use clap::Command;
-
-fn main() -> Result<(), String> {
-    loop {
-        let line = readline()?;
-       help  Print this message or the help of the given subcommand(s)
-
-Options:
-  -h, --help     Print help
-  -V, --version  Print version
-";
-
-    let cmd = Command::new("clap-test").version("2.6").subcommand(
-        Command::new("test")
-            .about("Samples/tutorial_builder/03_05_default_values.md")]
-#![allow(unused_imports)]
-use crate::builder::*;
-
-pub use super::chapter_1 as previous;
-pub use super::chapter_3 as next;
-pub use crate::_tutorial as table_of_contents;
-/// Compute the display width of `te}
-//! # Example (Builder API)
-//!
-//! ```rust
-#![doc = include_str!("../../examples/escaped-positional.rs")]
-//! ```
-//!
-#![doc = include_str!("../../examples/escaped-positional.md")]
-#[test]
-fn insert() {
-    let mut raw = clap_lex::RawArgs::new(["bin", "d};
-use clap_complete::Generator;
-
-/// Generate Nushell complete file
-pub struct Nushell;
-
-impl Generator for Nushell {
-    fn file_name(&self, name: &str) -> String {
-        format!("{name}.nu")
+        .value_parser(value_parser!(OsString)),
+        )
+        .try_get_matches_from(vec![
+            OsString::from(""),
+            OsString::from("-a"),
+            OsString::from_vec(vec![0xe9]),
+        ]);
+    assert!(r.is_ok(), "{}", r.unwrap_erd> {
+    pub(crate) fn new(cmd: &'cmd Command) -> Self {
+        Usage {
+            cmd,
+            styles: cmd.get_styles(),
+            required: None,
+        }
     }
 
-    fn generate(&self, cmd: &Command, buf: &mut dyn terms.
+    pub(crate) fn required(mut self, required: &'cmd ChildGraph<Id>) -> Self {
+    terms.
 //
 // This work was derived from Structopt (https://github.com/TeXitoi/structopt)
 // commit#ea76fa1b1b273e65e3b0b1046643715b49bec51f which is licensed under the
 // MIT/Apache 2.0 license.
 
 use proc_macro2::{Ident, Span, TokenStream};
-use quote::{forrgo.toml");`
+use quote::{forl").expect("defaulted by clap"));
+
+    let m = cmd
+        .clone()
+        .try_get_matches_from(["opt", "--global"])
+        .unwrap();
+    assert!(m.subcommand_name().is_none());
+    assert!(*m.get_one::<bool>("global").expect("defaulted by clap"));
+
+  l_logo_url = "https://raw.githubusercontent.com/clap-rs/clap/master/assets/clap.png")]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![forbid(unsafe_code)]
+#![warn(missing_docs)]
+#![warn(clippy::print_stderr)]
+#![warn(clippy::print_stdout)]
+
+use clap::buildg").unwrap(),
+        &*OsString::from_vec(vec![0xe9])
+    );
+}
+
+#[test]
+fn refuse_invalid_utf8_subcommand_with_allow_external_subcommands() {
+    let m = Command::new("bad_utf8")
+        .allow_external_subcommands(true)
+        .external_subcommand_valueommand(Command::new("some").defer(|cmd| {
+            cmd.arg(
+                Arg::new("test")
+                    .short('t')
+                    .long("test")
+                    .action(ArgAction::Set)
+                    .help("testing testing"),
+   lp_output() {
+    static INVISIBLE_ALIAS_HELP: &str = "\
+Usage: clap-test [COMMAND]
+
+Commands:
+  test  Some help
+  help  Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
+";
+
+   e std::io::Write;
+
+use clap::Command;
+
+fn main() -> Result<(), String> {
+    loop {
+        let line = readline()?;
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+
+        match respond(line) {
+            Ok(q, "some", "some", "some", "some", "some", "some", "some", "some", "some",
+            "some", "some", "some", "some", "some", "some", "some", "some", "some", "some", "some",
+            "some", "some", "some", "some", "some", "some", "some", "some", "some"ub.com/TeXitoi/structopt/issues/{NUMBER}
+
+use crate::utils;
+
+use clap::{ArgGroup, Args, Parser, Subcommand};
+
+#[test]
+fn issue_151_groups_within_subcommands() {
+    #[derive(Args, Debug)]
+    #[command(group = ArgGroup::new("verb").required(true).multiple(p_err();
+    assert_eq!(err.kind(), ErrorKind::DisplayHelp);
+
+    let err = cmd
+        .clone()
+        .try_get_matches_from(["foo", "--version"])
+        .unwrap_err();
+    assert_eq!(err.kind(), ErrorKind::DisplayVersion);
+}
+
+#[test]
+#[should_panic = "idth
+}
+
+#[cfg(feature = "unicode")]
+fn ch_width(ch: char) -> usize {
+    unicode_width::UnicodeWidthChar::width(ch).unwrap_or(0)
+}
+
+#[cfg(not(feature = "unicode"))]
+fn ch_width(_: char) -> usize {
+    1
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[      Opt { foo: "long".into() },
+        Opt::try_parse_from(["test", "--.foo", "long"]).unwrap()
+    );
+
+    assert_eq!(
+        Opt {
+            foo: "short".into(),
+        },
+        Opt::try_parse_from(["test", "-.", "short"]).unwrap()
+    )    impl FromStr for U16ish {
+        type Err = ();
+        fn from_str(_: &str) -> Result<Self, Self::Err> {
+            unimplemented!()
+        }
+    }
+    impl<'a> FromIterator<&'a U16ish> for Vec<u16> {
+        fn from_iter<T: IntoIterator<Item = &'aCargo.toml");`
 ///
 /// # Examples
 ///
@@ -155,67 +174,104 @@ use quote::{forrgo.toml");`
 #[macro_export]
 macro_rules! command {
     () => {{
-        $crate::command!( m.unwrap().get_one::<String>("argument").map(|v| v.as_str()),
-        Some("subcommand")
+        $crate::commandtoi.eu>
+//
+// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
+// option. This file may not be copied, modifi     | clap::ValueHint::CommandString
+            | clap::ValueHint::CommandWithArguments
+            | clap::ValueHint::Username
+            | clap::ValueHint::Hostname
+            | clap::ValueHint::Url
+            | clap::ValueHint::EmailAddress => {
+       bin_name,
     );
 }
 
 #[test]
-fn subcommand_placeholder_test() {
-    let mut cmd = Command::new("myprog")
-        .subcommand(Command::new("subcommand"))
-        .subcommand_valu      .disable_help_subcommand(true)
-        .infer_subcommands(true);
-    utils::assert_output(
-        cmd,
-        "fake help",
-        "error: unrecognized subcommand 'help'
+fn value_hint() {
+    let name = "my-app";
+    let cmd = common::value_hint_command(name);
+    common::assert_matches(
+        snapbox::file!["../snapshots/value_hint.elvish"],
+        clap_complete::shells::Elvish,
+     t_eq!(matches.contains_id("mammal"), true);
+    assert_eq!(matches.index_of("mammal"), Some(1));
 
-Usage: fake [COMMAND]
-
-For more information, try '--help'.
-",
-        true,
-  let result = cmd
-        .clone()
-        .try_get_matches_from(["test", "--mammal", "dog", "--mammal", "cat"]);
-    let err = result.err().unwrap();
-    assert_eq!(err.kind(), ErrorKind::ArgumentConflict);
-
-    let matches = cmd
-        .clone()
-   ions to perform on argument values
+    let matches = cmd.clone().try_get_matches_from(["test"]).unwrap();
+    assert_eq!(matches.get_flag("mammal"), false);
+    assert_eq!(matches.contains_id("ons to perform on argument values
 ///
 /// These do not apply to [`ValueSource::DefaultValue`][crate::parser::ValueSource::DefaultValue]
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "unstable-v5", non_exhaustive)]
 pub enum ArgPredicate {
-   ")]
-#![doc(html_logo_url = "https://raw.githubusercontent.com/clap-rs/clap/master/assets/clap.png")]
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
-#![forbid(unsafe_code)]
-#![warn(missing_docs)]
-#![warn(clippy::print_stderr)]
-#![warn(clippy::print_stdout)]
+   an set
+//! [`Arg::default_value`][crate::Arg::default_value].
+//!
+//! ```rust
+#![doc = include_str!("../../examples/tutorial_builder/03_05_default_values.rs")]
+//! ```
+#![doc = include_str!("../../examples/tutorial_builder/03_05_default_values.md")]
+#![allrt!(self.cmd.find(req).is_some());
+            }
+        }
 
-#mand!() // requires `cargo` feature
-        .arg(
-            Arg::new("name")
-                .short('n')
-                .long("name")
-                .action(ArgAction::Append),
-        )
-        .get_matches();
+        let mut required_opts = FlatSet::new();
+        let mut required_positionals = Vec::new();
+        for req in unrolled_reqs.iter().chain(incls.iter()) {
+            if let Some(arg) = self_name(&self, name: &str) -> String {
+        format!("{name}.elv")
+    }
 
-    let args = matches
-        .get_ma  "test --help",
-        SUBCMD_DECL_ORDER,
-        false,
-    );
+    fn generate(&self, cmd: &Command, buf: &mut dyn Write) {
+        let bin_name = cmd
+            .get_bin_name()
+            .expect("crate::generate should have set the bin_name"apAccessDeserializer};
+use serde::de::{Deserialize, Deserializer, IntoDeserializer, MapAccess, Visitor};
+use serde_derive::Deserialize;
+use serde_test::{assert_de_tokens, Token};
+use std::fmt;
+
+#[test]
+fn test_u32_to_enum() {
+    #[derive(Deserialize, Debu  let mut cmd = Command::new("myprog")
+        .subcommand(Command::new("subcommand"))
+        .subcommand_value_name("TEST_PLACEHOLDER")
+        .subcommand_help_heading("TEST_HEADER");
+
+    assert_eq!(
+        &cmd.render_usage().to_string(),
+        "Us   None => unreachable!("No short or long options found"),
+        },
+    }
 }
-#[derive(clap::Parser)]
-struct Opt {
-    #[command(flatten)]
+
+fn generate_completion(completions: &mut String, cmd: &Command, is_subcommand: bool) {
+    let name = cmd.get_bin_name().expect("Failed to get bin name");
+
+    for arg in cmd.gg_long_space() {
+    let r = Command::new("opts")
+        .args([
+            arg!(--flag [flag] "some flag"),
+            arg!(--color [color] "some other flag"),
+        ])
+        .try_get_matches_from(vec!["", "--flag", "some", "--color", "other"]);
+  .help("first option"),
+        );
+
+    utils::assert_output(cmd, "test --help", HELP, false);
+}
+
+#[test]
+fn derive_order_no_next_order() {
+    static HELP: &str = "\
+Usage: test [OPTIONS]
+
+Options:
+      --flag_a               first flag
+      --flag_b    nd(flatten)]
     sub: SubCmd,
 }
 
@@ -226,171 +282,42 @@ fn main() {}
 use clap::{Parser, ValueEnum};
 
 #[derive(Parser)]
-#[coonst USAGE_SEP: &str = "\n       ";
+#[command(version, about, long_about = None)]
+struct Cli {
+    /// What mode to run the program in
+    #[arg(value_enum)_eq!($arg.get_value_names(), None, "Flags should precede values");
+        debug_assert!(!matches!($arg.get_action(), $crate::ArgAction::Append), "Flags should precede `...`");
 
-pub(crate) struct Usage<'cmd> {
-    cmd: &'cmd Command,
-    styles: &'cmd Styles,
-    required: Option<&'cmd ChildGraph<Id>>,
-}
+        let action = $crate::ArgAction::SetTrue;
+        let arg = $arg
+     divan::bench]
+    fn empty() -> ArgMatches {
+        build_cli().get_matches_from([""])
+    }
 
-impl<'cmd> Usage<'cmd> {
-    pub(crate) fn new(cmd: &'cmd Command) -> Self {
-        Usagerivial_casts)]
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        self.inner.source.as_ref().map(|e| e.as_ref() as _)
+    #[divan::bench]
+    fn sc() -> ArgMatches {
+        build_cli().get_matches_from(["rustup override add stable"])
     }
 }
 
-impl<F: ErrorFormatter> Display for Error<F> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-   codeWidthChar::width(ch).unwrap_or(0)
-}
-
-#[cfg(not(feature = "unicode"))]
-fn ch_width(_: char) -> usize {
-    1
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[cfg(feature = "unicode")]
-    use unicode_width::UnicodeWidthChar;
-
-    #[test]
-    fn emoj       None => unreachable!("No short or long options found"),
-        },
-    }
-}
-
-fn generate_completion(completions: &mut String, cmd: &Command, is_subcommand: bool) {
-    let name = cmd.get_bin_name().expect("Failed to get bin name");
-
-    for arg in cm clap::ValueHint::CommandName
-            | clap::ValueHint::CommandString
-            | clap::ValueHint::CommandWithArguments
-            | clap::ValueHint::Username
-            | clap::ValueHint::Hostname
-            | clap::ValueHint::Url
-          debug_assert_eq!($arg.get_long(), None, "Short flags should precede long flags");
-        debug_assert_eq!($arg.get_value_names(), None, "Flags should precede values");
-        debug_assert!(!matches!($arg.get_action(), $crate::ArgAction::Append), "Fl T>(
-    arg: &str,
-    remaining_args: &[&std::ffi::OsStr],
-    longs: I,
-    subcommands: impl IntoIterator<Item = &'a mut Command>,
-) -> Option<(String, Option<String>)>
-where
-    'help: 'a,
-    T: AsRef<str>,
-    I: IntoIterator<Item = T>,
-{
-    use cr", "-o", "some", "some", "some", "some", "some", "some", "some", "some", "some",
-            "some", "some", "some", "some", "some", "some", "some", "some", "some", "some", "some",
-            "some", "some", "some", "some", "some", "some", "some", "some",ard_to_deserialize_any;
-/// # use serde::de::{value, Deserializer, Visitor};
-/// #
-/// # struct MyDeserializer;
-/// #
-/// impl<'de> Deserializer<'de> for MyDeserializer {
-/// #   type Error = value::Error;
-/// #
-///     fn deserialize_any<V>(self, visitor:{
-    debug!("generate_inner");
-
-    let command_names = if previous_command_name.is_empty() {
-        vec![p.get_bin_name().expect(INTERNAL_ERROR_MSG).to_string()]
-    } else {
-        p.get_name_and_visible_aliases()
-            .into_iter()
-  resent, Some("true")),
-        )
-        .arg(Arg::new("dog").long("dog").action(ArgAction::SetTrue));
-
-    let matches = cmd.clone().try_get_matches_from(["test"]).unwrap();
-    assert_eq!(matches.get_flag("dog"), false);
-    assert_eq!(matches.get_flag("ct Opt(u32);
-
-fn main() {
-    let opt = Opt::parse();
-    println!("{opt:?}");
-}
-// Copyright 2018 Guillaume Pinot (@TeXitoi) <texitoi@texitoi.eu>,
-// Kevin Knapp (@kbknapp) <kbknapp@gmail.com>, and
-// Ana Hobden (@hoverbear) <operator@hoverbear.org>
-//
-//p(a.get_help().cloned())
-                        .visible(!a.is_hide_set())
-                })
-            })
-        })
-        .flatten()
-        .collect()
-}
-
-/// Get the possible values for completion
-fn possible_values(a: &clap::Arg) -> Option<Vec<claerive(Debug)]
-enum Kind {
-    A,
-    B,
-}
-
-#[derive(Parser, Debug)]
-#[command(name = "test")]
-pub struct Opt {
-    #[arg(short)]
-    number: u32,
-    #[arg(skip)]
-    k: Kind,
-}
-
-fn main() {
-    let opt = Opt::parse();
-    println!("{opt:?}");
-}
-//! ## Con clap::error::ErrorKind;
+fn build_cli() -> Command {
+    Com clap;
+    /// # use clap::error::ErrorKind;
     /// # use clap::error::ContextKind;
     /// # use clap::error::ContextValue;
     ///
     /// let cmd = clap::Command::new("prog");
     ///
     /// let mut err = clap::Error::new(ErrorKind::ValueValidation)
-    ///     .with_cmd     .help("second flag")
-            .action(ArgAction::SetTrue),
-        Arg::new("option_a")
-            .long("option_a")
-            .action(ArgAction::Set)
-            .help("second option"),
-    ]);
+ fn insert(&mut self, kind: ContextKind, value: ContextValue) -> Option<ContextValue> {
+        self.inner.context.insert(kind, value)
+    }
 
-    utils::assert_output(cmd, "test --help", UNIF m.get_many::<String>("o")
-            .unwrap()
-            .map(|v| v.as_str())
-            .collect::<Vec<_>>(),
-        ["-2"]
-    );
-    assert!(*m.get_one::<bool>("f").expect("defaulted by clap"));
-}
-
-#[test]
-fn leading_hyphen_with_only_pos_follows()me = "my-app";
-    let bin_name = "bin-name";
-    let cmd = common::basic_command(name);
-    common::assert_matches(
-        snapbox::file!["../snapshots/custom_bin_name.elvish"],
-        clap_complete::shells::Elvish,
-        cmd,
-        bin_name,
-  !(self.cmd.find(req).is_some());
-            }
-        }
-
-        let mut required_opts = FlatSet::new();
-        let mut required_positionals = Vec::new();
-        for req in unrolled_reqs.iter().chain(incls.iter()) {
-            if let Some(arg) = self.c   }
+    /// Should the message be written to `stdout` or not?
+    #[inline]
+    pub fn use_stderr(&self) -> bool {
+    }
 }
 
 #[cfg(not(feature = "debug"))]
@@ -404,52 +331,47 @@ use crate::builder::Command;
 use crate::builder::StyledStr;
 use crate::output::Usage;
 
-/// Writs: &[Id],
-        matcher: Option<&ArgMatcher>,
-        incl_last: bool,
-    ) -> Vec<StyledStr> {
-        debug!(
-            "Usage::get_required_usage_from: incls={:?}, matcher={:?}, incl_last={:?}",
-            incls,
-            matcher.is_some(),
-     match self.kind() {
-            ErrorKind::DisplayHelp | ErrorKind::DisplayVersion => Stream::Stdout,
-            _ => Stream::Stderr,
-        }
-    }
-
-    /// Returns the exit code that `.exit` will exit the process with.
-    ///
-    /// When the erroraths)] // needed for divan
-
-use clap::{Arg, ArgAction, ArgGroup, ArgMatches, Command};
-
-#[divan::bench]
-fn build() -> Command {
-    build_cli()
+/// Writesible values for completion
+fn possible_values(a: &clap::Arg) -> Option<Vec<clap::builder::PossibleValue>> {
+    if !a.get_num_args().expect("built").takes_values() {
+        None
+    } else {
+        a.get_value_parser()
+            .possible_values()
+    let actual = runtime.complete(input, &term).unwrap();
+    assert_data_eq!(actual, expected);
 }
 
-mod startup {
-    use super::{build_cli, ArgMatches};
+#[cfg(all(unix, feature = "unstable-dynamic"))]
+#[test]
+fn register_dynamic() {
+    common::register_example::<completest_pty::ElvishRuntimeBuilder>("dynamic", : Box::new(Sub::Flame {
+                arg: Box::new(Ext { arg: 42 })
+            })
+        },
+        opt
+    );
+}
+use std::path::PathBuf;
+use std::process::exit;
 
-    #[divan::bench]
-    fn empty() -> ArgMatches {
-   `: [`PossibleValue::new`][crate::builder::PossibleValue::new]
-//!   - When not present: case-converted field name is used
-//! - `help = <expr>`: [`PossibleValue::help`][crate::builder::PossibleValue::help]
-//!   - When not present: [Doc comment summary](#dite_help_usage(&self, styled: &mut StyledStr) {
-        debug!("Usage::write_help_usage");
-        use std::fmt::Write;
+use clap::{value_parser, Arg, ArgAction, Command};
 
-        if self.cmd.has_visible_subcommands() && self.cmd.is_flatten_help_set() {
-            if !self.cmd.is_subcommand_required_set()r occurrence).
-///
-/// See [`ArgAction::Count`][crate::ArgAction::Count] and [`ArgAction::Append`][crate::ArgAction::Append].
-///
-/// ### Help String
-///
-/// The help string is denoted between a pair of double quotes `""` and may contain any
-/// charactersne => return Ok(()),
+fn applet_commands() -> [Command; 2] clap::{builder::PossibleValue, Arg, ArgAction, Command, ValueHint};
+use clap_complete::generate;
+use clap_complete_nushell::Nushell;
+use std::io;
+
+fn main() {
+    let mut cmd = Command::new("myapp")
+        .version("3.0")
+        .propagate_version(true)
+! [`Command`][crate::Command], [`Arg`][crate::Arg], or [`PossibleValue`][crate::builder::PossibleValue] method can be used as an attribute.
+//!
+//! Raw attributes come in two different syntaxes:
+//! ```rust,ignore
+//! #[arg(
+//!     global = true, // name ne => return Ok(()),
 ///         Some(outdir) => outdir,
 ///     };
 ///
@@ -460,89 +382,103 @@ mod startup {
 ///
 ///     Ok(())
 /// }
-/// ``rate::_derive::_tutorial] and [cookbook][crate::_cookbook]*
-//!
-//! ## Attributes
-//!
-//! ### Terminology
-//!
-//! **Raw attributes** are forwarded directly to the underlying [`clap` builder][crate::builder].  Any
-//! [`Command`][crate::Command], [`Arg`][cr`: [`Arg::default_value`][crate::Arg::default_value] and [`Arg::required(false)`][crate::Arg::required]
-//!   - Requires `std::fmt::Display` that roundtrips correctly with the
-//!     [`Arg::value_parser`][crate::Arg::value_parser] or `#[arg(value_enum)]`
-anic!("Mismatch between definition and access of `{id}`. {err}",)
+/// ``      Self::from_arg_matches_mut(&mut __clap_arg_matches.clone())
+            }
+
+            #from_arg_matches
+
+            fn update_from_arg_matches(&mut self, __clap_arg_matches: &clap::ArgMatches) -> ::std::result::Result<(), clap:: this argument may occur multiple
+/// times (not to be confused with multiple values per occurrence).
+///
+/// See [`ArgAction::Count`][crate::ArgAction::Count] and [`ArgAction::Append`][crate::ArgAction::Append].
+///
+/// ### Help String
+///
+/// The help stite_help_usage(&self, styled: &mut StyledStr) {
+        debug!("Usage::write_help_usage");
+        use std::fmt::Write;
+
+        if self.cmd.has_visible_subcommands() && self.cmd.is_flatten_help_set() {
+            if !self.cmd.is_subcommand_required_set()g(short = 'f')]
+    eff: bool,
+
+    #[arg(short = 'p', value_name = "PEAR")]
+    pea: Option<String>,
+
+    #[arg(last = true)]
+    slop: Vec<String>,
+}
+
+fn main() {
+    let args = Cli::parse();
+
+    // This is what will happen with `myprog -f -p=bob -- sl Some(clap::ArgAction::Version) => ParseState::ValueDone,
+                    Some(clap::ArgAction::Help)
+                    | Some(clap::ArgAction::HelpLong)
+                    | Some(clap::ArgAction::HelpShort) => ParseState::ValueDone,
+       .version("1.2")
+        .next_display_order(None)
+        .arg(
+            Arg::new("flag_a")
+                .long("flag_a")
+                .help("first flag")
+                .action(ArgAction::SetTrue),
+        )
+        .arg(
+ lt<(), fmt::Error> {
+        self.inner.fmt(f)
     }
 }
 
-impl std::error::Error for MatchesError {}
+impl<F: ErrorFormatter> error::Error for Error<F> {
+    #[allow(trivial_casts)]
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        self.inner.source.as_ref().map(|e| e.as_ref() as:new("mvae")
+        .arg(arg!(o: -o [opt] ... "some opt").value_delimiter(','))
+        .arg(arg!([file] "some file"))
+        .try_get_matches_from(vec!["mvae", "-o", "1", "2", "some"]);
+    assert!(r.is_err());
+    let err = r.unwrg.get_long().is_none() && arg.get_short().is_none() {
+            arg = arg.required(false);
+        } else {
+            arg = arg.num_args(0..=1);
+        }
 
-impl std::fmt::Display for MatchesError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
- edundant_locals,
-        )]
-        #[automatically_derived]
-        impl #impl_generics clap::FromArgMatches for #item_name #ty_generics #where_clause {
-            fn from_arg_matches(__clap_arg_matches: &clap::ArgMatches) -> ::std::result::Result<Self, g_long_space() {
-    let r = Command::new("opts")
-        .args([
-            arg!(--flag [flag] "some flag"),
-            arg!(--color [color] "some other flag"),
-        ])
-        .try_get_matches_from(vec!["", "--flag", "some", "--color", "other"]);
-  :{arg, command, value_parser};
+        let value_name = $crate::arg_impl! { @string $value_name };
+        if arg.get_id() == "   for subcommand in p.get_subcommands() {
+        for name in subcommand.get_name_and_visible_aliases() {
+            let tooltip = escape_help(subcommand.get_about(), name);
 
-fn main() {
-    let matches = cmd().get_matches();
+            completions.push_str(&preamble);
+            completions.push_str(fommand(arg_required_else_help(true))]` would translate to `cmd.arg_required_else_help(true)`
+//!
+//! **Magic attributes:**
+//! - `name  = <expr>`: [`Command::name`][crate::Command::name]
+//!   - When not present: [package `name`](https://doc.rust-lang.org/ T: AsRef<str>,
+    I: IntoIterator<Item = T>,
+{
+    use crate::mkeymap::KeyType;
 
-    // Note, it's safe to call unwrap() because the arg is required
+    match did_you_mean(arg, longs).pop() {
+        Some(candidate) => Some((candidate, None)),
+        None => subcommands
+            .into_iter()
+            .filter_map(|    // Note, it's safe to call unwrap() because the arg is required
     let port: usize = *matches
         .get_one::<usize>("PORT")
-        .expect("'PORT' is required and (must implement
-//!   [`Subcommand`][crate::Subcommand])
-//! - `external_subcommand`: [`Command::allow_external_subcommand(true)`][crate::Command::allow_external_subcommands]
-//!   - Variant must be either `Variant(Vec<String>)` or `Variant(Vec<OsString>)ong)]
-    major: bool,
-
-    /// auto inc minor
-    #[arg(long)]
-    minor: bool,
-
-    /// auto inc patch
-    #[arg(long)]
-    patch: bool,
-
-    /// some regular input
-    input_file: Option<String>,
-
-    /// some special input argument
-    #[arg(long)]
-   std::path::Path>,
-        buf: &mut dyn std::io::Write,
-    ) -> Result<(), std::io::Error>;
+        .expect("'PORT' is required and parsing will fail if its missing");
+    println!("PORT = {port}");
 }
 
-/// Complete the given command
-pub fn complete(
-    cmd: &mut clap::Command,
-    args: Vec<OsString>,
-    arg_index: usize,
-    current_dir: Option<&std::path::t]
-fn no_empty_values() {
-    let m = Command::new("config")
-        .arg(
-            Arg::new("config")
-                .long("config")
-                .action(ArgAction::Set)
-                .value_parser(clap::builder::NonEmptyStringValueParser::new()), "--config"]);
-}
+fn cmd() -> c  let cli = Cli::parse();
 
-#[cfg(debug_assertions)]
-#[test]
-#[should_panic = "Argument or group 'extra' specified in 'conflicts_with*' for 'config' does not exist"]
-fn conflicts_with_invalid_arg() {
-    let _ = Command::new("prog")
-        .arg(Arg::new("config").foo")]
+    // Let's assume the old version 1.2.3
+    let mut major = 1;
+    let mut minor = 2;
+    let mut patch = 3;
+
+    // See if --set-ver was used to set the version manually
+    let version = if let Some(ver) = cli.set_ver.as_derefoo")]
     cmd: Command,
 }
 
@@ -558,140 +494,171 @@ enum Command {
 }
 
 fn main() {
-    let opt = MakeCookie::parrive(Deserialize, Debug, PartialEq)]
-    #[serde(field_identifier)]
-    enum FieldStr<'a> {
-        #[serde(borrow)]
-        Str(&'a str),
-    }
+    let opt = MakeCookie::parte::ArgGroup::multiple] is implied
+//! - `enum` support is tracked at [#2621](https://github.com/clap-rs/clap/issues/2621)
+//!
+//! See [Argument Relations][_tutorial::chapter_3#argument-relations] from the tutorial.
+//!
+//! ### Arg Attributes
+//!
+//! These("flag_conflict")
+        .arg(arg!(-f --flag "some flag").conflicts_with("other"))
+        .arg(arg!(-o --other "some flag"))
+        .try_get_matches_from(vec!["myprog", "-f", "-o"]);
+    assert!(result.is_err());
+    let err = result.err().unwrhe previous example we used
+//! [`augment_subcommands`][crate::Subcommand::augment_subcommands] on an enum that derived
+//! `Parser`, whereas now we implement
+//! [`augment_subcommands`][crate::Subcommand::augment_subcommands] ourselves, but the derive APImd.is_args_conflicts_with_subcommands_set()
+            {
+                styled.trim_end();
+                let _ = write!(styled, "{}", USAGE_SEP);
+                if self.cmd.is_args_conflicts_with_subcommands_set() {
+                    let bin_name =gMatcher, ParseState};
+use crate::util::ChildGraph;
+use crate::util::FlatMap;
+use crate::util::FlatSet;
+use crate::util::Id;
+use crate::INTERNAL_ERROR_MSG;
 
-    assert_de_tokens(&FieldStr::Str("value"), &[Token::BorrowedStr("value")]);
+pub(crate) struct Validator<'cmd> {
+    cmd: &'cmd Command,
+    required: ChildGraph<Id>,
+}
 
-    #[derive(Deserialize, Deburing>("file").map(|v| v.as_str()).unwrap(),
-        "some"
-    );
+impl<'r = "\
+error: unexpected argument '--optio' found
+
+  tip: a similar argument exists: '--option'
+
+Usage: clap-test --option <opt>... [positional] [positional2] [positional3]...
+
+For more information, try '--help'.
+";
+
+    utils::assert_output(utils::complex_deref())
+            .unwrap_or_else(|| {
+                let mut cmd = Cli::command();
+                cmd.error(
+                    ErrorKind::MissingRequiredArgument,
+                    "INPUT_FILE or --spec-in is required when using --config",
+   #when-should-i-use-the-builder-vs-derive-apis]
+//! - The [cookbook][crate::_cookbook] for more application-focused examples
+
+#![allow(unused_imports)]
+use crate::builder::*;
+
+pub use super::chapter_1 as next;
+pub use crate::_tutorial as table_of_contents;
+me(OsStr::new("hello")));
 }
 
 #[test]
-fn require_delims_no_delim() {
-    let r = Command::new("mvae")
-        .arg(arg!(o: -o [opt] ... "some opt").value_delimiter(','))
-        .arg(arg!([file] "some file"))
-   table-dynamic"))]
-#[test]
-fn register_dynamic() {
-    common::register_example::<completest_pty::ElvishRuntimeBuilder>("dynamic", "exhaustive");
-}
-
-#[test]
-#[cfg(all(unix, feature = "unstable-dynamic"))]
-fn complete_dynamic() {
-    if !common::has_comma  Some(clap::ArgAction::Version) => ParseState::ValueDone,
-                    Some(clap::ArgAction::Help)
-                    | Some(clap::ArgAction::HelpLong)
-                    | Some(clap::ArgAction::HelpShort) => ParseState::ValueDone,
-  ork together, which is
-//! especially helpful if some arguments can be specified at compile-time while others must be
-//! specified at runtime.
-//!
-//! ### Using derived arguments in a builder application
-//!
-//! When using the derive API, you can `#[commag(short, long)]
-        r#type: String,
+fn to_short_stdio() {
+    let raw = clap_lex::RawArgs::new(["bin", "-"]);
+    let mut cursor = raw.cursor();
+    assert_eq!(raw.next_os(&mut cursor), Some(OsStr::new("bin")));
+    let next = raw.next(&mut cursor).unwraes_without_equals() {
+    let m = Command::new("config")
+        .arg(
+            Arg::new("config")
+                .long("config")
+                .action(ArgAction::Set)
+                .value_parser(clap::builder::NonEmptyStringValueParser::new()),
+  rsion, cmd, styled)
     }
 
-    assert_eq!(
-        Opt {
-            r#type: "long".into()
-        },
-        Opt::try_parse_from(["test", "--type", "long"]).unwrap()
-    );
+    pub(crate) fn argument_conflict(
+        cmd: &Command,
+        arg: String,
+        mut others: Vec<String>,
+        usage: Option<StyledStr>,
+    ) -> Self {
+        let mut err = Self::new(ErrorKind::ArgumentConflict).wial
+// - Building: They must be added to `Cargo.toml` with the appropriate `required-features`.
+// - Testing: Ensure there is a markdown file with [trycmd](https://docs.rs/trycmd) syntax
+//
+// See also the general CONTRIBUTING
 
-    assert_eq!(
-        Opt {
-            r#type: "short".int    // Determines if we need the `[OPTIONS]` tag in the usage string
-    fn needs_options_tag(&self) -> bool {
-        debug!("Usage::needs_options_tag");
-        'outer: for f in self.cmd.get_non_positionals() {
-            debug!("Usage::needs_options_ta/!
+//! # Documentation: Builder       r#"% exhaustive quote
+--backslash        --double-quotes    --single-quotes    cmd-backslash      cmd-expansions     
+--backticks        --expansions       --version          cmd-backticks      cmd-single-quotes  
+--brackets         --global       self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str(self.0)
+    }
+}
+#![allow(
+    clippy::derive_partial_eq_without_eq,
+    clippy::items_after_statements,
+    clippy::used_underscore_binding
+)]
+
+use serde::de::value::{Borrowation
+//!
 //! 1. [Enumerated values](#enumerated-values)
 //! 2. [Validated values](#validated-values)
 //! 3. [Argument Relations](#argument-relations)
 //! 4. [Custom Validation](#custom-validation)
 //!
-//! An appropriate default parser/validator will be selec
+//! An appropriate default parser/validator will be seizer;
+/// #
+/// # impl<'de> Deserializer<'de> for MyDeserializer {
+/// #     type Error = value::Error;
+/// #
+/// #     fn deserialize_any<V>(self, _: V) -> Result<V::Value, Self::Error>
+/// #     where
+/// #         V: Visitor<'de>,
+/// #     {
+/// #     for a in required.iter() {
+            let is_relevant = |(val, req_arg): &(ArgPredicate, Id)| -> Option<Id> {
+                let required = match val {
+                    ArgPredicate::Equals(_) => {
+                        if let Some(matcher) = matchessert!(
+        a.to_string()
+            .contains("the argument \'--one\' cannot be used with:"),
+        "{}",
+        a
+    );
+}
 
-pub mod utils;
+#[cfg(debug_assertions)]
+#[test]
+#[should_panic = "Argument 'config' cannot conflict with itself"]
+fn self_conflicting_argr;
 
-use std::ffi::OsString;
-use std::fs::File;
-use std::io::Error;
-use std::io::Write;
-use std::path::PathBuf;
+pub use self::matches::IdsRef;
+pub use self::matches::RawValues;
+pub use self::matches::Values;
+pub use self::matches::ValuesRef;
+pub use self::matches::{ArgMatches, Indices, ValueSource};
+pub use error::MatchesError;
+mod common;
 
-use clap::Command;
+#[test]
+fn basic() {
+xtValue::String(arg)),
+                (ContextKind::InvalidValue, ContextValue::String(bad_val)),
+                (
+                    ContextKind::ValidValue,
+                    ContextValue::Strings(good_vals.iter().map(|s| (*s).clone()).collect()),
+ ze_some_other_variant")]
+    Tuple(#[serde(skip_serializing_if = "always")] String, u8),
+}
 
-/// Generator trait which can be used to write generators
-pub trait Generator {
-    /// Returns the file name o represent a completion candidate
+fn main() {}
+use serde_derive::Deserialize;
+
+#[derive(Deserialize)]
+enum Enum {
+    #[serde(deserialize_with = "deserialize_some_unit_variant")]
+    #[serde(skip_deo represent a completion candidate
 #[derive(Default, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CompletionCandidate {
     /// Main completion candidate content
     content: OsString,
 
     /// Help message with a completion candidate
-    help: Optiot supported");
-
-        let mut arg = $arg;
-
-        if arg.get_long().is_none() && arg.get_short().is_none() {
-            arg = arg.required(true);
-        }
-
-        let value_name = $crate::arg_impl! { @string $value_name };
-        if arg.get_id() == ommand(arg_required_else_help(true))]` would translate to `cmd.arg_required_else_help(true)`
-//!
-//! **Magic attributes:**
-//! - `name  = <expr>`: [`Command::name`][crate::Command::name]
-//!   - When not present: [package `name`](https://doc.rust-lang.org/derive tutorial
-// - Building: They must be added to `Cargo.toml` with the appropriate `required-features`.
-// - Testing: Ensure there is a markdown file with [trycmd](https://docs.rs/trycmd) syntax
-//
-// See also the general CONTRIBUTING
-
-//! # Document Some("default")
-    );
-}
-
-fn issue_1105_setup(argv: Vec<&'static str>) -> Result<ArgMatches, clap::Error> {
-    Command::new("opts")
-        .arg(arg!(-o --option <opt> "some option").required(true))
-        .arg(arg!(--flag "some flag"))
-      self
-    }
-
-    pub(crate) fn set_help_flag(mut self, help_flag: Option<Cow<'static, str>>) -> Self {
-        self.inner.help_flag = help_flag;
-        self
-    }
-
-    /// Does not verify if `ContextKind` is already present
-    #[inline(never)]
-    #[ag_conflict() {
-    let result = Command::new("flag_conflict")
-        .arg(arg!(-f --flag "some flag").conflicts_with("other"))
-        .arg(arg!(-o --other "some flag"))
-        .try_get_matches_from(vec!["myprog", "-f", "-o"]);
-    assert!(result.is_errnew("myapp")
-        .version("3.0")
-        .propagate_version(true)
-        .about("Tests completions")
-        .arg(
-            Arg::new("file")
-                .value_hint(ValueHint::FilePath)
-                .help("some input file"),
-  [inline]
-    fn as_ref(&self) -> &str {
+    help: Optio    fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
@@ -705,195 +672,15 @@ impl std::borrow::Borrow<str> for Id {
 
 impl PartialEq<str> for Id {
     #[inline]
-    fn eq(&self, other: &sterive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Resettable<T> {
-    /// Overwrite builder value
-    Value(T),
-    /// Reset builder value
-    Reset,
-}
-
-impl<T> Resettable<T> {
-    pub(crate) fn into_option(self) -> Option<T> {
-    PossibleValue};
-use crate::error::{Error, Result as ClapResult};
-use crate::output::Usage;
-use crate::parser::{ArgMatcher, ParseState};
-use crate::util::ChildGraph;
-use crate::util::FlatMap;
-use crate::util::FlatSet;
-use crate::util::Id;
-use crate::INTERN
-enum Enum {
-    #[serde(serialize_with = "serialize_some_other_variant")]
-    Tuple(#[serde(skip_serializing_if = "always")] String, u8),
-}
-
-fn main() {}
-use serde_derive::Deserialize;
-
-#[derive(Deserialize)]
-enum Enum {
-    #[serde(deserialize_with = "dene and *only* one argument to be
-/// present out of a given set. Imagine that you had multiple arguments, and you want one of them
-/// to be required, but making all of them required isn't feasible because perhaps they conflict
-/// with each other. For exa:new("cmd")
-        .next_help_heading(Some("This causes default_value to be ignored"))
-        .arg(Arg::new("foo").short('f').default_value("bar"))
-        .try_get_matches_from([""])
-        .unwrap();
-
-    assert_eq!(
-        after_help_heading
-   //! This allows you specify the valid values for that argument. If the user does not use one of
-//! those specific values, they will receive a graceful exit with error message informing them
-//! of the mistake, and what the possible valid values are
-//!
-//self.to_possible_value()
-            .expect("no values are skipped")
-            .get_name()
-            .fmt(f)
-    }
-}
-
-impl std::str::FromStr for Mode {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        for variant inext_os(&mut cursor), Some(OsStr::new("bin")));
-    let next = raw.next(&mut cursor).unwrap();
-
-    assert!(next.is_short());
-
-    let shorts = next.to_short().unwrap();
-    let actual: String = shorts.map(|s| s.unwrap()).collect();
-    assert_eq!(actual, .long("flag")
-                .value_parser(value_parser!(OsString))
-                .action(ArgAction::Set),
-        )
-        .arg(
-            Arg::new("other")
-                .long("other")
-                .value_parser(value_parser!(OsString))
-    help", HELP, false);
-}
-
-#[test]
-fn derive_order_subcommand_propagate() {
-    static UNIFIED_DERIVE_SC_PROP: &str = "\
-Usage: test sub [OPTIONS]
-
-Options:
-      --flag_b               first flag
-      --option_b <option_b>  first option
-      --flag_a      ` impl.
-#[proc_macro_derive(Subcommand, attributes(clap, command, arg, group))]
-pub fn subcommand(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
-    derives::derive_subcommand(&input)
-        .unwrap_or_else(|e The subcommands
-    for command in p.get_subcommands() {
-        debug!("subcommands_of:iter: subcommand={}", command.get_name());
-
-        add_subcommands(command, command.get_name(), &mut segments);
-
-        for alias in command.get_visible_aliases() {
-     r#"% exhaustive quote
---backslash        --double-quotes    --single-quotes    cmd-backslash      cmd-expansions     
---backticks        --expansions       --version          cmd-backticks      cmd-single-quotes  
---brackets         --global       ntln!("two: {:?}", cli.two);
-    println!("one: {:?}", cli.one);
-}
-//! ## Quick Start
-//!
-//! You can create an application with several arguments using usage strings.
-//!
-//! First, ensure `clap` is available:
+    fn eq(&self, other: &str) -> bo zsh:
 //! ```console
-//! $ cargo add clap
-//! ``Kind::InvalidValue).with_cmd(cmd);
-
-        #[cfg(feature = "error-context")]
-        {
-            err = err.extend_context_unchecked([
-                (ContextKind::InvalidArg, ContextValue::String(arg)),
-                (ContextKind::InvalidValue, Contentln!("name: {:?}", cli.name);
-}
-use crate::builder::Str;
-
-/// [`Arg`][crate::Arg] or [`ArgGroup`][crate::ArgGroup] identifier
-///
-/// This is used for accessing the value in [`ArgMatches`][crate::ArgMatches] or defining
-/// relationships between `Arg`s anlet completions = crate::dynamic::complete(cmd, args, index, current_dir)?;
-
-        for candidate in completions {
-            write!(buf, "{}", candidate.get_content().to_string_lossy())?;
-            if let Some(help) = candidate.get_help() {
-  the `derive` feature flag
-pub trait ValueEnum: Sized + Clone {
-    /// All possible argument values, in display order.
-    fn value_variants<'a>() -> &'a [Self];
-
-    /// Parse an argument into `Self`.
-    fn from_str(input: &str, ignore_case: bool) -> Remmand(subcommand_negates_reqs = true)]
-    struct Opts {
-        #[arg(long)]
-        req_str: String,
-
-        #[command(subcommand)]
-        cmd: Option<SubCommands>,
-    }
-
-    #[derive(Debug, Parser)]
-    enum SubCommands {
-        Sub {
-       T: ?Sized + Display,
-    {
-        Display::fmt(value, self)
-    }
-}
-use crate::lib::*;
-
-use crate::ser::{Error, Serialize, SerializeTuple, Serializer};
-
-////////////////////////////////////////////////////////////////////////////////
-
-macro_rules! pri    .required(true)
-                        .num_args(1..)
-                        .trailing_var_arg(true),
-                ),
-        )
-        .subcommand(
-            Command::new("which")
-                .about("Display which binary will be run for a g    clippy::complexity,
-            clippy::pedantic,
-            clippy::restriction,
-            clippy::perf,
-            clippy::deprecated,
-            clippy::nursery,
-            clippy::cargo,
-            clippy::suspicious_else_formatting,
-     name: String,
-    ///     debug: bool
-    /// }
-    /// # }
-    /// ```
-    ///
-    /// We then need to convert the `ArgMatches` that `clap` generated into our struct.
-    /// `from_arg_matches` serves as the equivalent of:
-    ///
-    /// ```rust
-    /mmand(value_hint_command)
-}
-
-fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
-    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
-}
-
-fn main() {
-    let matches = build_cli().get_matches();
-
-    if let Some(generator) = ma_of("mammal"), Some(2));
+//! $ cargo run --example completion -- --generate=zsh > /usr/local/share/zsh/site-functions/_completion$
+//! $ compinit
+//! $ ./target/debug/examples/completion --<TAB>
+//! ```
+//! fish:
+//! ```console
+//! $ cargo run --example comple, Some(2));
 }
 
 #[test]
@@ -903,248 +690,8 @@ fn set_false_with_explicit_default_value() {
             .long("mammal")
             .action(ArgAction::SetFalse)
             .default_value("true"),
-   _escape());
-}
-#![allow(missing_copy_implementations)]
-#![allow(missing_debug_implementations)]
-#![cfg_attr(not(feature = "error-context"), allow(dead_code))]
-#![cfg_attr(not(feature = "error-context"), allow(unused_imports))]
-
-use std::borrow::Cow;
-
-use cr    err
-    }
-
-    pub(crate) fn missing_required_argument(
-        cmd: &Command,
-        required: Vec<String>,
-        usage: Option<StyledStr>,
-    ) -> Self {
-        let mut err = Self::new(ErrorKind::MissingRequiredArgument).with_     .group(ArgGroup::new("gr").multiple(true))
-        .arg(clap::arg!(--some <name> "some arg").group("gr"))
-        .arg(
-            clap::arg!(--other <secs> "other arg")
-                .default_value("1000")
-                .group("gr"),
-   et mut suggestions = vec![];
-            if suggested_trailing_arg {
-                let mut styled_suggestion = StyledStr::new();
-                let _ = write!(
-                    styled_suggestion,
-                    "to pass '{}{arg}{}' as a value, uarser!(std::path::PathBuf)));
-    cmd.build();
-    let input = cmd
-        .get_arguments()
-        .find(|arg| arg.get_id() == "input")
-        .unwrap();
-    assert_eq!(input.get_value_hint(), clap::builder::ValueHint::AnyPath);
-}
-// Copyright torial_derive/01_quick.md")]
-//!
-//! See also
-//! - [FAQ: When should I use the builder vs derive APIs?][crate::_faq#when-should-i-use-the-builder-vs-derive-apis]
-//! - The [cookbook][crate::_cookbook] for more application-focused examples
-
-#![allt
-    //   on the command-line.
-    //
-    // We use the '-S' _arguments option to disable completion after '--'. Thus, the
-    // completion for the second argument in scenario (B) does not need to be emitted
-    // because it is implicitly handled by the   /// Parse from iterator, return Err on error.
-    fn try_parse_from<I, T>(itr: I) -> Result<Self, Error>
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<OsString> + Clone,
-    {
-        let mut matches = ok!(<Self as CommandFactory>::commanew("temp").long_flag("temp"))
-        .try_get_matches_from(vec!["prog", "--te"]);
-    assert!(m.is_err(), "{:#?}", m.unwrap());
-    assert_eq!(m.unwrap_err().kind(), ErrorKind::UnknownArgument);
-}
-
-#[test]
-fn flag_subcommand_long_infer_pass_close() {
- rtals.
-//!     #[arg(long, action)]
-//!     kill_all_humans: bool,
-//! }
-//! ```
-//!
-//! A doc comment consists of three parts:
-//! - Short summary
-//! - A blank line (whitespace only)
-//! - Detailed description, all the rest
-//!
-//! The summary correspondcrate) use self::validator::get_possible_values_cli;
-pub(crate) use self::validator::Validator;
-
-pub use self::matches::IdsRef;
-pub use self::matches::RawValues;
-pub use self::matches::Values;
-pub use self::matches::ValuesRef;
-pub use self::matches::{ArgMred and parsing will fail if its missing");
-    println!("PORT = {port}");
-}
-
-const PORT_RANGE: RangeInclusive<usize> = 1..=65535;
-
-fn port_in_range(s: &str) -> Result<u16, String> {
-    let port: usize = s
-        .parse()
-        .map_err(|_| format!("`{ type SerializeTupleStruct = Impossible<(), fmt::Error>;
-    type SerializeTupleVariant = Impossible<(), fmt::Error>;
-    type SerializeMap = Impossible<(), fmt::Error>;
-    type SerializeStruct = Impossible<(), fmt::Error>;
-    type SerializeStructVariant)]
-static EXAMPLE1_TMPS_F: &str = "{name} {version}
-{author}
-{about}
-
-Usage: {usage}
-
-Options:
-{options}
-Arguments:
-{positionals}
-Commands:
-{subcommands}";
-
-static CUSTOM_TEMPL_HELP: &str = "MyApp 1.0
-Kevin K. <kbknapp@gmail.com>
-Does awesome things
-
-Usage clap::Arg::new("tuple").long("tuple").num_args(2),
-                clap::Arg::new("require-eq")
-                    .long("require-eq")
-                    .require_equals(true),
-                clap::Arg::new("term").num_args(1..).value_terminator(";"),
-erive::Deserialize;
-
-#[derive(Deserialize)]
-struct Test<'a> {
-    #[serde(borrow = "")]
-    r: &'a str,
-    #[serde(borrow = "  ")]
-    s: &'a str,
-}
-
-fn main() {}
-use crate::lib::*;
-
-use crate::de::{
-    Deserialize, Deserializer, EnumAccess, Error, MapAcb, D>(deserializer: D) -> Wrap<'a, 'b>
-    where
-        D: Deserializer<'de>,
-    {
-        Deserialize::deserialize(deserializer).unwrap()
-    }
-}
-use serde_derive::Serialize;
-
-#[derive(Serialize)]
-#[serde(transparent)]
-struct S {
-    a: u8,
-    b: u8,
-}   should_be_in_default_section.get_help_heading(),
-        Some("DEFAULT")
-    );
-}
-
-#[test]
-fn app_help_heading_flattened() {
-    // Used to help track the cause in tests
-    #![allow(clippy::enum_variant_names)]
-
-    #[derive(Debug, Clone, Parser)]
-  _name()
-            .expect("crate::generate should have set the bin_name");
-
-        w!(
-            buf,
-            format!(
-                "#compdef {name}
-
-autoload -U is-at-least
-
-_{name}() {{
-    typeset -A opt_args
-    typeset -a _arguments_optio it easier to declare relations instead of having to list
-//! each individually, or when you want a rule to apply "any but not all" arguments.
-//!
-//! Perhaps the most common use of [`ArgGroup`][crate::ArgGroup]s is to require one and *only* one
-//! argumebe_in_sub_a: u32,
-        },
-    }
-
-    #[derive(Debug, Clone, Subcommand)]
-    enum SubB {
-        #[command(next_help_heading = "SUB B")]
-        SubBOne { should_be_in_sub_b: u32 },
-    }
-
-    #[derive(Debug, Clone, Subcommand)]
-    enum SubC {
-   value("false")
-}
-
-#[derive(Clone, PartialEq, Eq, Hash, Debug)]
-pub enum Value {
-    Bool(bool),
-    String(String),
-}
-
-impl Value {
-    pub fn from_matches(matches: &ArgMatches) -> Vec<(clap::Id, Self)> {
-        let mut values = BTreeMap::new()}
-    })
-}
-
-fn gen_augment(
-    variants: &[(&Variant, Item)],
-    parent_item: &Item,
-    override_required: bool,
-) -> Result<TokenStream, syn::Error> {
-    use syn::Fields::{Named, Unit, Unnamed};
-
-    let app_var = Ident::new("__clap_app", Span::call_sname.as_deref() {
-        println!("Value for name: {name}");
-    }
-
-    if let Some(config_path) = cli.config.as_deref() {
-        println!("Value for config: {}", config_path.display());
-    }
-
-    // You can see how many times a particular flag or argum:
-  -c, --config <FILE>  Sets a custom config file
-  -d...                Turn debugging information on
-  -h, --help           Print help
-  -V, --version        Print version
-Arguments:
-  <output>  Sets an optional output file
-Commands:
-  test  does testinlse if let Some(short) = arg.to_short() {
-                if !short.is_negative_number() {
-                    // Find the first takes_value option.
-                    let (leading_flags, takes_value_opt, mut short) = parse_shortflags(cmd, short);
-
-  rg(rename_all_env = "pascal", env)]
-        be_aggressive: String,
-    }
-
-    let help = utils::get_help::<BehaviorModel>();
-    assert!(help.contains("[env: be-nice=]"));
-    assert!(help.contains("[env: BeAggressive=]"));
-}
-use clap::{arg, value_parser, t = cmd.try_get_matches_from_mut(vec!["myprog", "--some"]);
-    if let Err(err) = result {
-        panic!("{err}");
-    }
-
-    let result = cmd.try_get_matches_from_mut(vec!["myprog", "--flag"]);
-    if let Err(err) = result {
-        panic!("{err}");
-   t, long, value_enum)]
+   d,
+    #[arg(short, long, value_enum)]
     choice: ArgChoice,
 }
 
@@ -1159,45 +706,473 @@ enum ArgChoice {
     Bar,
 }
 
+#[     clippy::deprecated,
+            clippy::nursery,
+            clippy::cargo,
+            clippy::suspicious_else_formatting,
+            clippy::almost_swapped,
+            clippy::redundant_locals,
+        )]
+        #[automatically_derived]
+      utils;
+
+/// Generates the `ValueEnum` impl.
+#[proc_macro_derive(ValueEnum, attributes(clap, value))]
+pub fn value_enum(input: TokenStream) -> TokenStream {
+    let input: DeriveInput = parse_macro_input!(input);
+    derives::derive_value_enum(&input)
+    rd, Ord, Hash)]
+pub enum Resettable<T> {
+    /// Overwrite builder value
+    Value(T),
+    /// Reset builder value
+    Reset,
+}
+
+impl<T> Resettable<T> {
+    pub(crate) fn into_option(self) -> Option<T> {
+        match self {
+            Self::Value(t) => Sb, D>(deserializer: D) -> Wrap<'a, 'b>
+    where
+        D: Deserializer<'de>,
+    {
+        Deserialize::deserialize(deserializer).unwrap()
+    }
+}
+use serde_derive::Serialize;
+
+#[derive(Serialize)]
+#[serde(transparent)]
+struct S {
+    a: u8,
+    b: u8,
+}Perhaps the most common use of `ArgGroup`s is to require one and *only* one argument to be
+/// present out of a given set. Imagine that you had multiple arguments, and you want one of them
+/// to be required, but making all of them required isn't feasible ct Opt(u32);
+
+fn main() {
+    let opt = Opt::parse();
+    println!("{opt:?}");
+}
+// Copyright 2018 Guillaume Pinot (@TeXitoi) <texitoi@texitoi.eu>,
+// Kevin Knapp (@kbknapp) <kbknapp@gmail.com>, and
+// Ana Hobden (@hoverbear) <operator@hoverbear.org>
+//
+// print_completions<G: Generator>(gen: G, cmd: &mut Command) {
+    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
+}
+
+fn main() {
+    let matches = build_cli().get_matches();
+
+    if let Some(generator) = matches.get_one::<Shell>("generat::Write as _;
+        let styles = cmd.get_styles();
+        let invalid = &styles.get_invalid();
+        let valid = &styles.get_valid();
+        let mut err = Self::new(ErrorKind::UnknownArgument).with_cmd(cmd);
+
+   t_eq!(m.get_one::<String>("option").map(|v| v.as_str()), Some(""));
+}
+
 #[test]
-fn type_alias_regg.create_usage_with_title(&used),
-        ))
+fn issue_1105_empty_value_short_fail() {
+    let r = issue_1105_setup(vec!["cmd", "-o", "--flag"]);
+    assert!(r.is_err());
+    assert_eq!(r.unwrap_err().kind(tring_lossy()
+                            ))
+                            .help(comp.get_help().cloned())
+                            .visible(true)
+                        }),
+                );
+            } else if let Some(short) = arg.to_short() {
+or for displaying to the user
+pub trait ErrorFormatter: Sized {
+    /// Stylize the error for the terminal
+    fn format_error(error: &crate::error::Error<Self>) -> StyledStr;
+}
+
+/// Report [`ErrorKind`]
+///
+/// No context is included.
+///
+/// **NOTE:** Co let completions = crate::dynamic::complete(cmd, args, index, current_dir)?;
+
+        for candidate in completions {
+            write!(buf, "{}", candidate.get_content().to_string_lossy())?;
+            if let Some(help) = candidate.get_help() {
+   let term = completest::Term::new();
+    let mut runtime =
+        common::load_runtime::<completest_pty::ZshRuntimeBuilder>("static", "exhaustive");
+
+    let input = "exhaustive \t";
+    let expected = snapbox::str![[r#"
+% exhaustive
+complete       crate::derive::{Args, CommandFactory, FromArgMatches, Parser, Subcommand, ValueEnum};
+
+#[macro_use]
+#[allow(missing_docs)]
+mod macros;
+
+mod derive;
+
+pub mod builder;
+pub mod error;
+pub mod parser;
+
+mod mkeymap;
+mod output;
+mod util;
+
+const INTERNA
+//! This allows you specify the valid values for that argument. If the user does not use one of
+//! those specific values, they will receive a graceful exit with error message informing them
+//! of the mistake, and what the possible valid values are
+//!
+/unit_struct<$l, $v>(name: &'static str)}
+    };
+    (newtype_struct<$l:tt, $v:ident>) => {
+        forward_to_deserialize_any_method!{deserialize_newtype_struct<$l, $v>(name: &'static str)}
+    };
+    (seq<$l:tt, $v:ident>) => {
+        forward_to_deseriaFromArgMatches>::from_arg_matches_mut(&mut matches).map_err(format_error::<Self>)
+    }
+
+    /// Parse from iterator, [exit][Error::exit] on error.
+    fn parse_from<I, T>(itr: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<OsStrin  let ty = match variant.fields {
+                    Unnamed(ref fields) if fields.unnamed.len() == 1 => &fields.unnamed[0].ty,
+
+                    _ => abort!(
+                        variant,
+                        "The enum variant marked with `exterert!(m.contains_id("arg"));
+    assert_eq!(
+        m.value_source("arg").unwrap(),
+        clap::parser::ValueSource::CommandLine
+    );
+    assert_eq!(
+        m.get_one::<String>("arg").map(|v| v.as_str()).unwrap(),
+        "value"
+    );
+}
+
+// OsStr De #[arg(rename_all_env = "pascal", env)]
+        be_aggressive: String,
+    }
+
+    let help = utils::get_help::<BehaviorModel>();
+    assert!(help.contains("[env: be-nice=]"));
+    assert!(help.contains("[env: BeAggressive=]"));
+}
+use clap::{arg, value_pp_help_heading_flattened() {
+    // Used to help track the cause in tests
+    #![allow(clippy::enum_variant_names)]
+
+    #[derive(Debug, Clone, Parser)]
+    struct CliOptions {
+        #[command(flatten)]
+        options_a: OptionsA,
+
+        #[command(fla    .required(true)
+                        .num_args(1..)
+                        .trailing_var_arg(true),
+                ),
+        )
+        .subcommand(
+            Command::new("which")
+                .about("Display which binary will be run for a g the `derive` feature flag
+pub trait ValueEnum: Sized + Clone {
+    /// All possible argument values, in display order.
+    fn value_variants<'a>() -> &'a [Self];
+
+    /// Parse an argument into `Self`.
+    fn from_str(input: &str, ignore_case: bool) -> Re::Arg::required]
+//!   - Requires `std::fmt::Display` that roundtrips correctly with the
+//!     [`Arg::value_parser`][crate::Arg::value_parser] or `#[arg(value_enum)]`
+//!   - Without `<expr>`, relies on `Default::default()`
+//! - `default_values_t = <exp pos_index: usize,
+    is_escaped: bool,
+    state: ParseState<'a>,
+) -> (ParseState<'a>, usize) {
+    let pos_arg = cmd
+        .get_positionals()
+        .find(|p| p.get_index() == Some(pos_index));
+    let num_args = pos_arg
+        .and_then(|a| a.get_       ValueHint::Unknown => {
+                    return None;
+                }
+                ValueHint::Other => "( )",
+                ValueHint::AnyPath => "_files",
+                ValueHint::FilePath => "_files",
+                ValueHint::DirPathtorial_derive/02_crate.md")]
+//!
+//! You can use `#[command]` attributes on the struct to change the application level behavior of clap.  Any [`Command`][crate::Command] builder function can be used as an attribute, like [`Command::next_line_help`].
+//!
+ Mode::Slow]
+    }
+
+    fn to_possible_value(&self) -> Option<PossibleValue> {
+        Some(match self {
+            Mode::Fast => PossibleValue::new("fast").help("Run swiftly"),
+            Mode::Slow => PossibleValue::new("slow").help("Crawl slowly but s     .group(ArgGroup::new("gr").multiple(true))
+        .arg(clap::arg!(--some <name> "some arg").group("gr"))
+        .arg(
+            clap::arg!(--other <secs> "other arg")
+                .default_value("1000")
+                .group("gr"),
+   type SerializeTupleStruct = Impossible<(), fmt::Error>;
+    type SerializeTupleVariant = Impossible<(), fmt::Error>;
+    type SerializeMap = Impossible<(), fmt::Error>;
+    type SerializeStruct = Impossible<(), fmt::Error>;
+    type SerializeStructVariant    Self(name.into())
     }
 }
 
-#[derive(Default, Clone, Debug)]
-struct Conflicts {
-    potential: FlatMap<Id, Vec<Id>>,
+#[cfg(feature = "string")]
+impl From<String> for Id {
+    fn from(name: String) -> Self {
+        Self(name.into())
+    }
 }
 
-impl Conflicts {
-    fn with_args(cmd: &Command, matcher: &ArgMatcher) -> Self {
-        let mut potential = Fsert!(*flag.get_one::<bool>("flag").expect("defaulted by clap"));
-    assert!(*inv.get_one::<bool>("flag").expect("defaulted by clap"));
-    assert!(*cool.get_one::<bool>("flag").expect("defaulted by clap"));
-    assert!(*als.get_one::<bool>("flag").expeon -- --generate=fish > completion.fish
-//! $ . ./completion.fish
-//! $ ./target/debug/examples/completion --<TAB>
+#[cfg(feature = "string")]
+impl From<&'_ String> for Id {
+    fn from(name: &'_ String) -> Se first option
+        #[arg(long)]
+        option_b: Option<String>,
+    }
+
+    use clap::CommandFactory;
+    let mut cmd = Args::command();
+
+    let help = cmd.render_help().to_string();
+    assert_data_eq!(
+        help,
+        snapbox::str![[r#"
+Usage:until I'll have destroyed humanity. Enjoy your
+//!     /// pathetic existence, you mere mortals.
+//!     #[arg(long, action)]
+//!     kill_all_humans: bool,
+//! }
 //! ```
-use clap::{value_parser, Arg, Command, ValueHint};
-use clap_complete::{generate, Generator, Shell};
-use std::io;
+//!
+//! A doc comment consists of three parts:
+//! - Short summary
+//! - A blank lineialize_with");
+pub const SKIP: Symbol = Symbol("skip");
+pub const SKIP_DESERIALIZING: Symbol = Symbol("skip_deserializing");
+pub const SKIP_SERIALIZING: Symbol = Symbol("skip_serializing");
+pub const SKIP_SERIALIZING_IF: Symbol = Symbol("skip_serializing_ite) fn get_help_flag(cmd: &Command) -> Option<Cow<'static, str>> {
+    if !cmd.is_disable_help_flag_set() {
+        Some(Cow::Borrowed("--help"))
+    } else if let Some(flag) = get_user_help_flag(cmd) {
+        Some(Cow::Owned(flag))
+    } else if cmd.has
 
-fn build_cli() -> C if --set-ver was used to set the version manually
-    let version = if let Some(ver) = matches.get_one::<String>("set-ver") {
-        ver.to_owned()
+impl Default for ValueRange {
+    fn default() -> Self {
+        Self::SINGLE
+    }
+}
+
+impl From<usize> for ValueRange {
+    fn from(fixed: usize) -> Self {
+        (fixed..=fixed).into()
+    }
+}
+
+impl From<std::ops::Range<usize>> for ValueRange {
+  ntln!("Debug mode is kind of on"),
+        2 => println!("Debug mode is on"),
+        _ => println!("Don't be crazy"),
+    }
+
+    // You can check for the existence of subcommands, and if found use their
+    // matches just as you would the top level cmd
+   .get_one::<String>("foo")
+            .map(|v| v.as_str()),
+        Some("bar")
+    );
+
+    let after_help_heading = Command::new("cmd")
+        .next_help_heading(Some("This causes default_value to be ignored"))
+        .arg(Arg::new("foo").short('f').d"help")]
+pub(crate) use self::help_template::AutoHelp;
+#[cfg(feature = "help")]
+pub(crate) use self::help_template::HelpTemplate;
+#[cfg(feature = "help")]
+pub(crate) use self::textwrap::core::display_width;
+#[cfg(feature = "help")]
+pub(crate) use self::texes_from_mut(vec!["myprog", "--some"]);
+    if let Err(err) = result {
+        panic!("{err}");
+    }
+
+    let result = cmd.try_get_matches_from_mut(vec!["myprog", "--other"]);
+    if let Err(err) = result {
+        panic!("{err}");
+    }
+
+    let resulther));
+
+    cmd.build();
+
+    let result = cmd.get_arg_conflicts_with(&flag);
+
+    assert_eq!(result.len(), 2);
+    assert_eq!(result[0].get_id(), "some");
+    assert_eq!(result[1].get_id(), "other");
+}
+
+#[test]
+#[cfg(feature = "error-context")]
+fn conflire = "usage")]
+
+automod::dir!("tests/derive");
+//! ## Quick Start
+//!
+//! You can create an application declaratively with a `struct` and some
+//! attributes.
+//!
+//! First, ensure `clap` is available with the [`derive` feature flag][crate::_features]:
+//! /// Network port to use
+    #[arg(value_parser = port_in_range)]
+    port: u16,
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    println!("PORT = {}", cli.port);
+}
+
+const PORT_RANGE: RangeInclusive<usize> = 1..=65535;
+
+fn port_in_range(s: &str) -> Result<uches(&matches)
+        .map_err(|err| err.exit())
+        .unwrap();
+    println!("Value of derived: {derived_matches:#?}");
+}
+#![allow(dead_code)]
+
+use std::borrow::Borrow;
+
+/// Flat (Vec) backed set
+///
+/// This preserves insertion order
+#[deriet mut suggestions = vec![];
+            if suggested_trailing_arg {
+                let mut styled_suggestion = StyledStr::new();
+                let _ = write!(
+                    styled_suggestion,
+                    "to pass '{}{subcmd}{}' as a valt dyn std::io::Write,
+    ) -> Result<(), std::io::Error> {
+        let bin = shlex::try_quote(bin).unwrap_or(std::borrow::Cow::Borrowed(bin));
+        let completer =
+            shlex::try_quote(completer).unwrap_or(std::borrow::Cow::Borrowed(completer))ippy::similar_names,
+    clippy::single_match_else,
+    clippy::struct_excessive_bools,
+    clippy::too_many_lines,
+    clippy::unused_self,
+    clippy::wildcard_imports
+)]
+
+extern crate proc_macro2;
+extern crate quote;
+extern crate syn;
+
+#[cfg_attr(serde_ `Option<Vec<T>>` and `Option<Vec<Vec<T>>` will be `None` instead of `vec![]` if no arguments are provided.
+//!   - This gives the user some flexibility in designing their argument, like with `num_args(0..)`
+//! - `Vec<Vec<T>>` will need [`Arg::num_args`][t_app() -> Command {
+    Command::new("MyApp")
+        .version("1.0")
+        .author("Kevin K. <kbknapp@gmail.com>")
+        .about("Does awesome things")
+        .arg(
+            arg!(
+                -c --config <FILE> "Sets a custom config file"
+      /// See also [`CommandFactory`].
+    fn augment_args_for_update(cmd: Command) -> Command;
+}
+
+/// Parse a sub-command into a user-defined enum.
+///
+/// Implementing this trait lets a parent container delegate subcommand behavior to `Self`.
+/// with:
+/// -size = s
+        .parse()
+        .map_err(|_| format!("`{s}` isn't a port number"))?;
+    if PORT_RANGE.contains(&port) {
+        Ok(port as u16)
     } else {
-        // Increment the one requested (in a real program, we'd reset the lower numbers)
-    rror: &crate::error::Error,
-    styled: &mut StyledStr,
-    styles: &Styles,
-) -> bool {
-    use std::fmt::Write as _;
-    let valid = styles.get_valid();
-    let invalid = styles.get_invalid();
-    let literal = styles.get_literal();
+        Err(format!(
+            "port not in range {}-{}",
+            PORT_RANGE.start(),
+   ap::Arg::new("tuple").long("tuple").num_args(2),
+                clap::Arg::new("require-eq")
+                    .long("require-eq")
+                    .require_equals(true),
+                clap::Arg::new("term").num_args(1..).value_terminator(";"),
+   vec!["a1".into(), "a4".into()];
+    /// let grp = ArgGroup::new("program").args(&args);
+    ///
+    /// for (pos, arg) in grp.get_args().enumerate() {
+    ///     assert_eq!(*arg, args[pos]);
+    /// }
+    /// ```
+    pub fn get_args(&self) -> impl Iteratoe::Arg]s or even
+//! [`ArgGroup`][crate::ArgGroup]s.
+//!
+//! [`ArgGroup`][crate::ArgGroup]s  make it easier to declare relations instead of having to list
+//! each individually, or when you want a rule to apply "any but not all" arguments.
+//!
+//! Perhapst]
+fn special_commands() {
+    let name = "my-app";
+    let cmd = common::special_commands_command(name);
+    common::assert_matches(
+        snapbox::file!["../snapshots/special_commands.bash.roff"],
+        cmd,
+    );
+}
 
-    match error.kindmplete_nushell::Nushell,
+#[test]
+fn quoting() {=> major += 1,
+            (_, true, _) => minor += 1,
+            (_, _, true) => patch += 1,
+            _ => unreachable!(),
+        };
+        format!("{major}.{minor}.{patch}")
+    };
+
+    println!("Version: {version}");
+
+    // Check for usage of -c
+lete::{generate, Generator, Shell};
+
+fn main() {
+    let matches = cli().get_matches();
+    if let Some(generator) = matches.get_one::<Shell>("generate") {
+        let mut cmd = cli();
+        eprintln!("Generating completion file for {generator}...");
+  );
+    Ok(quote! {
+        #deprecations;
+        let #app_var = #app_var #initial_app_methods;
+        #( #subcommands )*;
+        #app_var #final_app_methods
+    })
+}
+
+fn gen_has_subcommand(variants: &[(&Variant, Item)]) -> Result<TokenStream, syn::Erroacro2::TokenStream;
+use quote::quote;
+use quote::quote_spanned;
+use syn::{spanned::Spanned, Data, DeriveInput, Fields, Ident, Variant};
+
+use crate::item::{Item, Kind, Name};
+
+pub(crate) fn derive_value_enum(input: &DeriveInput) -> ReNushell,
         cmd,
         name,
     );
@@ -1209,187 +1184,14 @@ fn feature_sample() {
     let cmd = common::feature_sample_command(name);
     common::assert_matches(
         snapbox::file!["snapshots/feature_sample.nu"],
-   ss-compiling
-simpler with binary builds of the standard library for common platforms.
-
-If you are new to Rust consider running `rustup doc --book`
-to learn Rust.";
-
-static SHOW_HELP: &str = r"
-Shows the name of the active toolchain and the version of `rustssert!(err
-        .to_string()
-        .contains("a value is required for '-o <opt>' but none was supplied"));
+   --filename\" must not start with a `-`, that will be handled by the parser"]
+fn leading_dash_stripped() {
+    let cmd = Command::new("mycat").arg(Arg::new("filename").long("--filename"));
+    cmd.debug_assert();
 }
+use clap::{arg, command, ArgAction};
 
-#[test]
-fn opt_user_override() {
-    let r = Command::new("df")
-        .arg(arg!(--opt <FILE> "some arg").default_value("default"))
-   ment from the group to be present when parsing.
-    ///
-    /// This is unless conflicting with another argument.  A required group will be displayed in
-    /// the usage string of the application in the format `<arg|arg2|arg3>`.
-    ///
-    /// **NOTE:** ``
-    pub fn get_args(&self) -> impl Iterator<Item = &Id> {
-        self.args.iter()
-    }
-
-    /// Allows more than one of the [`Arg`]s in this group to be used. (Default: `false`)
-    ///
-    /// # Examples
-    ///
-    /// Notice in this example we use e_trait_objects, deprecated)]
-// Ignored clippy and clippy_pedantic lints
-#![allow(
-    // clippy bug: https://github.com/rust-lang/rust-clippy/issues/5704
-    clippy::unnested_or_patterns,
-    // clippy bug: https://github.com/rust-lang/rust-clippy/issuesntln!("Debug mode is kind of on"),
-        2 => println!("Debug mode is on"),
-        _ => println!("Don't be crazy"),
-    }
-
-    // You can check for the existence of subcommands, and if found use their
-    // matches just as you would the top level cmd
- pshots/special_commands.bash.roff"],
-        cmd,
-    );
-}
-
-#[test]
-fn quoting() {
-    let name = "my-app";
-    let cmd = common::quoting_command(name);
-    common::assert_matches(snapbox::file!["../snapshots/quoting.bash.roff"], cmd);
-}
-
-#[test]
-fn aliase  let term = completest::Term::new();
-    let mut runtime =
-        common::load_runtime::<completest_pty::ZshRuntimeBuilder>("static", "exhaustive");
-
-    let input = "exhaustive \t";
-    let expected = snapbox::str![[r#"
-% exhaustive
-complete       value.
-fn singular_or_plural(n: usize) -> &'static str {
-    if n > 1 {
-        " were provided"
-    } else {
-        " was provided"
-    }
-}
-
-fn put_usage(styled: &mut StyledStr, usage: &StyledStr) {
-    styled.push_str("\n\n");
-    styled.push_styled(us know which of the two flags was used...
-    /// assert!(m.contains_id("req_flags"));
-    /// // but we can also check individually if needed
-    /// assert!(m.contains_id("flag"));
-    /// ```
-    /// [argument]: crate::Arg
-    #[must_use]
-    pub fn arg(ialize_with");
-pub const SKIP: Symbol = Symbol("skip");
-pub const SKIP_DESERIALIZING: Symbol = Symbol("skip_deserializing");
-pub const SKIP_SERIALIZING: Symbol = Symbol("skip_serializing");
-pub const SKIP_SERIALIZING_IF: Symbol = Symbol("skip_serializing_ebug)]
-//! struct Args {
-//!     paths: Vec<PathBuf>,
-//!     color: Color,
-//!     verbosity: usize,
-//! }
-//!
-//! #[derive(Debug)]
-//! enum Color {
-//!     Always,
-//!     Auto,
-//!     Never,
-//! }
-//!
-//! impl Color {
-//!     fn parse(s: Option<&OsStr>mand().debug_assert();
-}
-//! ## Adding Arguments
-//!
-//! 1. [Positionals](#positionals)
-//! 2. [Options](#options)
-//! 3. [Flags](#flags)
-//! 4. [Subcommands](#subcommands)
-//! 5. [Defaults](#defaults)
-//!
-//! Arguments are inferred from the fields of your   bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
-        bytes byte_buf option unit unit_struct newtype_struct seq tuple
-        tuple_struct map struct enum identifier ignored_any
-    }
-}
-
-impl<'de> EnumAccess<'de> for Enum {
-   ize_any_method!{deserialize_unit_struct<$l, $v>(name: &'static str)}
-    };
-    (newtype_struct<$l:tt, $v:ident>) => {
-        forward_to_deserialize_any_method!{deserialize_newtype_struct<$l, $v>(name: &'static str)}
-    };
-    (seq<$l:tt, $v:ident>) => )]
-    x: i32,
-
-    #[arg(short = 'l', long = "level", aliases = ["set-level", "lvl"])]
-    level: String,
-
-    #[arg(long("values"))]
-    values: Vec<i32>,
-
-    #[arg(id = "FILE", requires_if("FILE", "values"))]
-    files: Vec<String>,
-}
-
-#[test]
-fn test_lue       last        hint        help        
--V          --generate  --version   quote       pacman      alias       complete    "#;
-    let actual = runtime.complete(input, &term).unwrap();
-    assert_data_eq!(actual, expected);
-
-    // Issue 5239 (httpshort.next_flag() {
-            Some(Ok(opt)) => {
-                leading_flags.push(opt.to_string());
-                let opt = cmd.get_arguments().find(|a| {
-                    let shorts = a.get_short_and_visible_aliases();
-                    let is_new("pacman")
-        .about("package manager utility")
-        .version("5.2.1")
-        .subcommand_required(true)
-        .author("Pacman Development Team")
-        // Query subcommand
-        //
-        // Only a few of its arguments are implemented be std::ops::Bound::Included(&self.start_inclusive)
-    }
-
-    fn end_bound(&self) -> std::ops::Bound<&usize> {
-        std::ops::Bound::Included(&self.end_inclusive)
-    }
-}
-
-impl Default for ValueRange {
-    fn default() -> Self {
-        Self::SINGLE
-     .map(|(variant, _attrs)| match variant.fields {
-            Unnamed(ref fields) if fields.unnamed.len() == 1 => {
-                let ty = &fields.unnamed[0].ty;
-                Ok(quote! {
-                    if <#ty as clap::Subcommand>::has_subcname().unwrap(), "config");
-}
-
-#[test]
-fn args_negate_subcommands_one_level() {
-    let res = Command::new("disablehelp")
-        .args_conflicts_with_subcommands(true)
-        .subcommand_negates_reqs(true)
-        .arg(arg!(<arg1> "some arg"))
-    let min = opt.get_num_args().map(|r| r.min_values()).unwrap_or(0);
-            if count > min {
-                // Also complete this raw_arg as a positional argument, flags, options and subcommand.
-                completions.extend(complete_arg(
-  lizer;
+fn mializer;
         }
     };
 }
@@ -1413,107 +1215,99 @@ macro_rules! __serialize_unimplemented {
 }
 
 #[test]
-fn flag_subcommand_short_with_alias( match matches.get_one::<u8>("flag").unwrap() {
-        0 => {
-            writeln!(w, "flag NOT present").unwrap();
-        }
-        n => {
-            writeln!(w, "flag present {n} times").unwrap();
-        }
-    }
-
-    if matches.contains_id("option") r_names,
-    clippy::single_match_else,
-    clippy::struct_excessive_bools,
-    clippy::too_many_lines,
-    clippy::unused_self,
-    clippy::wildcard_imports
-)]
-
-extern crate proc_macro2;
-extern crate quote;
-extern crate syn;
-
-#[cfg_attr(serde_build_from_garg")])
-    );
+fn flag_subcommand_short_with_args() e_trait_objects, deprecated)]
+// Ignored clippy and clippy_pedantic lints
+#![allow(
+    // clippy bug: https://github.com/rust-lang/rust-clippy/issues/5704
+    clippy::unnested_or_patterns,
+    // clippy bug: https://github.com/rust-lang/rust-clippy/issueslize)]
+struct Test<'a> {
+    #[serde(borrow = "")]
+    r: &'a str,
+    #[serde(borrow = "  ")]
+    s: &'a str,
 }
-//! ## Testing
+
+fn main() {}
+use crate::lib::*;
+
+use crate::de::{
+    Deserialize, Deserializer, EnumAccess, Error, MapAccess, SeqAccess, VariantAccess,efaults
 //!
-//! clap reports most development errors as `debug_assert!`s.  Rather than checking every
-//! subcommand, you should have a test that calls
-//! [`Command::debug_assert`][crate::Command::debug_assert]:
-//! ```rust,no_run
-ue(self)
+//! We've previously showed that arguments can be [`required`][crate::Arg::required] or optional.
+//! When optional, you work with a `Option` and can `unwrap_or`.  Alternatively, you can
+//! set [`#[arg(default_value_t)]`][super#arg-attributes]nflict);
+/// ```
+///
+/// This next example shows a passing parse of the same scenario
+/// ```rust
+/// # use clap_builder as clap;
+/// # use clap::{Command, arg, ArgGroup, Id};
+/// let result = Command::new("cmd")
+///     .arg(arg!(--"set-ver" <ver> "set th   }
+//!         } else {
+//!             args.paths.push(PathBuf::from(arg.to_value_os().to_owned()));
+//!         }
+//!     }
+//!
+//!     Ok(args)
+//! }
+//!
+//! let args = parse_args(["bin", "--hello", "world"]);
+//! println!("{args:?}");
+//! ```
+
+#![cfgest", "42"]).unwrap()
+    );
+    assert_eq!(Opt { arg: None }, Opt::try_parse_from(["test"]).unwrap());
+    assert!(Opt::try_parse_from(["test", "42", "24"]).is_err());
+}
+
+#[test]
+fn vec_type_is_multiple_values() {
+    #[derive(Parser, Partibool>("flag").expect("defaulted by clap"));
+}
+
+#[test]
+fn group_conflicts_with_default_arg() {
+    let result = Command::new("conflict")
+        .arg(Arg::new("opt").long("opt").default_value("default"))
+        .arg(
+            Arg::new("flag")
+q, Eq, Hash, Debug)]
+pub enum Value {
+    Bool(bool),
+    String(String),
+}
+
+impl Value {
+    pub fn from_matches(matches: &ArgMatches) -> Vec<(clap::Id, Self)> {
+        let mut values = BTreeMap::new();
+        for id in matches.ids() {
+   pub struct T;
+}
+use serde_derive::Serialize;
+
+mod remote {
+    pub struct S {
+        pub a: u16,
     }
 }
 
-impl IntoResettable<usize> for usize {
-    fn into_resettable(self) -> Resettable<usize> {
-        Resettable::Value(self)
-    }
+#[derive(Serialize)]
+#[serde(remote = "remote::S")]
+struct S {
+    a: u8,
 }
 
-impl IntoResettable<ArgAction> for ArgAction {
-    fn into_resettable(self) -> Resettable<ArgAction> {
-     ValueHint::Unknown => {
-                    return None;
-                }
-                ValueHint::Other => "( )",
-                ValueHint::AnyPath => "_files",
-                ValueHint::FilePath => "_files",
-                ValueHint::DirPath => "st]
-fn multiple_aliases_of_option() {
-    let a = Command::new("multiple_aliases").arg(
-        Arg::new("aliases")
-            .long("aliases")
-            .action(ArgAction::Set)
-            .help("multiple aliases")
-            .aliases(["alias1", "aliad: Vec<Id> = used_filtered
-            .iter()
-            .filter_map(|key| self.cmd.find(key))
-            .flat_map(|arg| arg.requires.iter().map(|item| &item.1))
-            .filter(|key| !used_filtered.contains(key) && !conflicting_keys.contains(key))ommand lines
+fn main() {}
+//! Code to convert the Rust-styled field/variant (e.g. rite_positionals_of;");
 
-pub mod cargo_example;
-pub mod cargo_example_derive;
-pub mod escaped_positional;
-pub mod escaped_positional_derive;
-pub mod find;
-pub mod git;
-pub mod git_derive;
-pub mod multicall_busybox;
-pub mod multicall_hostname;
-pub mod pacman;
-pub mo      ok!(self.validate_exclusive(matcher));
+    let mut ret = vec![];
 
-        for (arg_id, _) in matcher
-            .args()
-            .filter(|(_, matched)| matched.check_explicit(&ArgPredicate::IsPresent))
-            .filter(|(arg_id, _)| self.cmd.find(arg_id).is_some())
-   ROR_MSG;
-
-#[derive(Debug, Clone)]
-pub(crate) struct MatchedArg {
-    source: Option<ValueSource>,
-    indices: Vec<usize>,
-    type_id: Option<AnyValueId>,
-    vals: Vec<Vec<AnyValue>>,
-    raw_vals: Vec<Vec<OsString>>,
-    ignore_case: bool,
-}
-
-impl MatchrKind, value_parser, Arg, Command};
-use snapbox::assert_data_eq;
-
-#[track_caller]
-fn assert_error<F: clap::error::ErrorFormatter>(
-    err: Error<F>,
-    expected_kind: ErrorKind,
-    expected_output: impl snapbox::data::IntoData,
-    stderr: bool,
-) {
-       .replace('$', "\\$")
-        .replace('`', "\\`")
+    // Completions for commands that end with two Vec arguments require special care.
+    // - You can have two Vec args separated with a custom value terminator.
+    // - You can have two Vec args with     .replace('`', "\\`")
         .replace('\n', " ")
 }
 
@@ -1521,117 +1315,114 @@ fn assert_error<F: clap::error::ErrorFormatter>(
 fn escape_value(string: &str) -> String {
     string
         .replace('\\', "\\\\")
-        .replace('\'', "nStream;
-use quote::quote;
-use quote::quote_spanned;
-use syn::{spanned::Spanned, Data, DeriveInput, Fields, Ident, Variant};
-
-use crate::item::{Item, Kind, Name};
-
-pub(crate) fn derive_value_enum(input: &DeriveInput) -> Ren_name.replace(' ', "-"),
-        subcommands = all_subcommands.join("\n"),
-        pos = parent.get_positionals().count() + 1
-    )
-}
-
-// Get the Command for a given subcommand tree.
-//
-// Given the bin_name "a b c" and the Command for "a" this returns      Default::default()
+        .replace('\'', "'\\''")
+        .replace('[', "ption<&'static str> {
+    fn into_resettable(self) -> Resettable<StyledStr> {
+        match self {
+            Some(s) => Resettable::Value(s.into()),
+            None => Resettable::Reset,
+        }
     }
-
-    pub(crate) fn insert(&mut self, key: K, mut value: V) -> Option<V> {
-        for (index, existing) in self.keys.iter().enumerate() {
-            if *existing == key {
-                std::mem::swap(&mut self.values[index)] // Large enough type that I want an explicit `clone()` for now
-pub struct Styles {
-    header: Style,
-    error: Style,
-    usage: Style,
-    literal: Style,
-    placeholder: Style,
-    valid: Style,
-    invalid: Style,
 }
 
-impl Styles {
-    /// No termiused with '--flag...'
+impl IntoResettable<OsStr> for Option<&'statiox<dyn std::error::Error + Send + Sync>;
+//!
+//! #[derive(Debug)]
+//! struct Args {
+//!     paths: Vec<PathBuf>,
+//!     color: Color,
+//!     verbosity: usize,
+//! }
+//!
+//! #[derive(Debug)]
+//! enum Color {
+//!     Always,
+//!     Auto,
+//!     Never,
+//  let conflicts = conflicts.gather_conflicts(self.cmd, arg_id);
+            ok!(self.build_conflict_err(arg_id, &conflicts, matcher));
+        }
 
-Usage: clap-test -F --long-option-2 <option2> <positional> <positional2> [positional3]...
-
-For more information, try '--help'.
-";
-
-    utils::assert_output(
-        utils::complex_app(),
-        "clap-test val1 -F --long-option-2 valstruct ExampleDeriveArgs {
-    #[arg(long)]
-    manifest_path: Option<std::path::PathBuf>,
-}
-
-fn main() {
-    let CargoCli::ExampleDerive(args) = CargoCli::parse();
-    println!("{:?}", args.manifest_path);
-}
-use crate::common;
-
-#[test]
-fn basic() {
-Debug, Default, PartialEq)]
-pub struct IgnoredAny;
-
-impl<'de> Visitor<'de> for IgnoredAny {
-    type Value = IgnoredAny;
-
-    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        formatter.write_str("anything at all")
-   tring $index)
-
-    put (COMPLETER complete --shell elvish -- $@words) | to-lines
-}
-"#
-        .replace("COMPLETER", &completer)
-        .replace("BIN", &bin);
-
-        writeln!(buf, "{script}")?;
         Ok(())
     }
-    fn write_complete(
-        &self,
-::new("link")
-                        .about("Create a custom toolchain by symlinking to a directory")
-                        .arg(Arg::new("toolchain").required(true))
-                        .arg(Arg::new("path").required(true)),
-   st", "baz"]);
-    assert!(res.is_err());
-    let err = res.unwrap_err();
-    let expected_kind = ErrorKind::InvalidSubcommand;
-    static MESSAGE: &str = "\
-error: unrecognized subcommand 'baz'
 
-  tip: a similar subcommand exists: 'bar'
+    fn validate_exclusive(&self, matcher: &ArgMatcher) -> ClapResult<()> {
+  !(--patch         "auto inc patch").action(ArgAction::SetTrue))
+        // Arguments can also be added to a group individually, these two arguments
+        // are part of the "input" group which is not required
+        .arg(arg!([INPUT_FILE] "some regular   }
+}
 
-Usage: test [COMMA!
-//! We've previously showed that arguments can be [`required`][crate::Arg::required] or optional.
-//! When optional, you work with a `Option` and can `unwrap_or`.  Alternatively, you can
-//! set [`#[arg(default_value_t)]`][super#arg-attributes].
+pub(crate) fn format_error_message(
+    message: &str,
+    styles: &Styles,
+    cmd: Option<&Command>,
+    usage: Option<&StyledStr>,
+) -> StyledStr {
+    let mut styled = StyledStr::new();
+    start_error(&mut styled, styles);
+    styled.push_str(mns)]
+#[should_panic = "Command foo: Long option names must be unique for each argument, but '--version' is in use by both 'ver' and 'version' (call `cmd.disable_version_flag(true)` to remove the auto-generated `--version`)"]
+fn override_version_long_with_u//! ## Adding Arguments
 //!
-/one::<Shell>("generate") {
-        let mut cmd = cli();
-        eprintln!("Generating completion file for {generator}...");
-        print_completions(*generator, &mut cmd);
-        return;
-    }
+//! 1. [Positionals](#positionals)
+//! 2. [Options](#options)
+//! 3. [Flags](#flags)
+//! 4. [Subcommands](#subcommands)
+//! 5. [Defaults](#defaults)
+//!
+//! Arguments are inferred from the fields of your struct.
+//!
+//! ### Posy_generics = input.generics.split_for_impl().1;
+        parse_quote!(#ident #ty_generics)
+    };
+    let mut visitor = ReplaceReceiver(&self_ty);
+    visitor.visit_generics_mut(&mut input.generics);
+    visitor.visit_data_mut(&mut input.data);
+}
 
-    #[cfg(feature = "unstable-dynamic")]
-    if let Ok(complble_version_flag_set(),
-        false
-    );
-    let cmd = cmd.mut_subcommand("subcmd", |subcmd| subcmd.disable_version_flag(true));
-    assert_eq!(
-        cmd.find_subcommand("subcmd")
-            .unwrap()
-            .is_disable_version_flag_set(),
-   pshots/register_minimal.bash"]);
+struct Re[serde(variant_identifier)]
+enum F {
+    A,
+    B,
+}
+
+fn main() {}
+use serde_derive::Deserialize;
+
+#[derive(Deserialize)]
+#[serde(from = "Option<T")]
+enum TestOne {
+    Testing,
+    One,
+    Two,
+    Three,
+}
+
+fnebug!("subcommands_of:iter: subcommand={}", command.get_name());
+
+        add_subcommands(command, command.get_name(), &mut segments);
+
+        for alias in command.get_visible_aliases() {
+            add_subcommands(command, alias, &mut segments);
+  _names(["one", "two"]),
+            arg!(--multvalsmo <val> ... "Tests multiple values, and mult occs")
+                .value_names(["one", "two"]),
+            arg!(--minvals2 <minvals> "Tests 2 min vals").num_args(2..),
+            arg!(--maxvals3 <maxvelf::Set => None,
+            Self::Append => None,
+            Self::SetTrue => None,
+            Self::SetFalse => None,
+            Self::Count => Some(AnyValueId::of::<CountType>()),
+            Self::Help => None,
+            Self::HelpShort => None,
+hapter_0]
+//! 2. [Configuring the Parser][chapter_1]
+//! 3. [Adding Arguments][chapter_2]
+//!     1. [Positionals][chapter_2#positionals]
+//!     2. [Options][chapter_2#options]
+//!     3. [Flags][chapter_2#flags]
+//!     4. [Subcommands][chapter_2#subcompshots/register_minimal.bash"]);
 }
 
 #[test]
@@ -1639,37 +1430,13 @@ fn two_multi_valued_arguments() {
     let name = "my-app";
     let cmd = common::two_multi_valued_arguments_command(name);
     common::assert_matches(
-        snapbox::file!["../snapshots/two_multi_valued_arguag"]);
-
-    assert!(
-        result.is_ok(),
-        "arg group conflicts_with should ignore default_value: {:?}",
-        result.unwrap_err()
-    );
-    let m = result.unwrap();
-
-    assert_eq!(
-        m.get_one::<String>("opt").mapsz: 0,
-            t: 30,
-        }
-    );
+        snapbox::file!["../snapshots/two_multi_valued_arguing(), Some("HEADING A"));
 }
 
-#[test]
-fn skip_enum() {
-    #[derive(Debug, PartialEq)]
-    #[allow(unused)]
-    #[derive(Default)]
-    enum Kind {
-        A,
-        #[default]
-        B,
-    }
-
-    #[derive(Parser, Debug, PartialEq)]
-    tors
-
-mod bash;
+// The challenge with this test is creating an error situation not caught by `clap`'s error checking
+// but by the code that `clap_derive` generates.
+//
+// Ultimately, the easiest way to confirm is to put a debug statement in od bash;
 mod elvish;
 mod fish;
 mod powershell;
@@ -1677,3 +1444,194 @@ mod shell;
 mod zsh;
 
 pub use bash::Bash;
+pub use elvish::Elvish;
+pub use fish::Fish;
+pub use powershell::PowerShell;
+pub use shell::Shell;
+pub use zsh::Zsh;
+#![cfg(feature = "cargo")]
+
+use clap::{command, erro`Ccc`, `Ddd`",
+        );
+    }
+}
+
+mod field_identifier {
+    use super::*;
+
+    #[derive(Deserialize, Debug, PartialEq)]
+    #[serde(field_identifier, rename_all = "snake_case")]
+    enum F {
+        Aaa,
+        #[serde(alias = "ccc", alias = "ddd")]
+   rap_or("")
+    {
+        "fast" => writeln!(w, "option3 present quickly"),
+        "slow" => writeln!(w, "option3 present slowly"),
+        _ => writeln!(w, "option3 NOT present"),
+    };
+
+    let _ = match matches
+        .get_one::<String>("positional3")nts.
+//!
+//! #[derive(Parser)] works in terms of "paragraphs". Paragraph is a sequence of
+//! non-empty adjacent lines, delimited by sequences of blank (whitespace only) lines.
+
+use std::iter;
+
+pub(crate) fn extract_doc_comment(attrs: &[syn::Attribute]) ->ntln!("-f used: {:?}", matches.get_flag("eff"));
+    // -p's value: Some("bob")
+    println!("-p's value: {:?}", matches.get_one::<String>("pea"));
+    // 'slops' values: Some(["sloppy", "slop", "slop"])
+    println!(
+        "'slops' values: {:?}",
+   tions.retain(|a| a.is_visible());
+    }
+
+    Ok(completions)
+}
+
+fn complete_arg_value(
+    value: Result<&str, &OsStr>,
+    arg: &clap::Arg,
+    current_dir: Option<&std::path::Path>,
+) -> Vec<CompletionCandidate> {
+    let mut values = Vec::new();
+    debhelp = "internal_stuff")]
+        a: u32,
+
+        #[arg(skip, long_help = "internal_stuff\ndo not touch")]
+        b: u32,
+
+        /// Not meant to be used by clap.
+        ///
+        /// I want a default here.
+        #[arg(skip)]
+        c: u32,
+
+      for short in shorts {
+                template.push_str(format!(" -s {short}").as_str());
+            }
+        }
+
+        if let Some(longs) = option.get_long_and_visible_aliases() {
+            for long in longs {
+                template.push_str(formelp);
+    /// # }
+    /// ```
+    HelpLong,
+    /// When encountered, display [`Command::version`][super::Command::version]
+    ///
+    /// Depending on the flag, [`Command::long_version`][super::Command::long_version] may be shown
+    /alEq, Copy, Clone)]
+#[repr(u8)]
+pub(crate) enum AppSettings {
+    IgnoreErrors,
+    AllowHyphenValues,
+    AllowNegativeNumbers,
+    AllArgsOverrideSelf,
+    AllowMissingPositional,
+    TrailingVarArg,
+    DontDelimitTrailingValues,
+    InferLongArgs,
+   bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        tuple_struct map struct enum identifier ignored_any
+    }
+}
+
+impl<'de> EnumAccess<'de> for Enum {rror: Style::new(),
+            usage: Style::new(),
+            literal: Style::new(),
+            placeholder: Style::new(),
+            valid: Style::new(),
+            invalid: Style::new(),
+        }
+    }
+
+    /// Default terminal styling
+    pub con), None);
+        assert!(range.takes_values());
+    }
+
+    #[test]
+    fn from_range_from() {
+        let range: ValueRange = (5..).into();
+        assert_eq!(range.start_bound(), std::ops::Bound::Included(&5));
+        assert_eq!(range.end_bound(), std::/// ```edition2021
+/// #[cfg(feature = "std")]
+/// impl std::error::Error for MySerError {}
+/// ```
+///
+/// ... or else provide the std Error impl unconditionally via Serde's
+/// re-export:
+///
+/// ```edition2021
+/// impl serde::ser::StdError for MySerErr  .get_arguments()
+            .filter(|a| !matcher.check_explicit(a.get_id(), &ArgPredicate::IsPresent))
+        {
+            let mut required = false;
+
+            for (other, val) in &a.r_ifs {
+                if matcher.check_explicit(other, &ArgPredc rust toolchain.
+
+The 'install' command is an alias for 'rustup update <toolchain>'.
+
+'toolchain' specifies a toolchain name, such as 'stable', 'nightly',
+or '1.8.0'. For more information see `rustup help toolchain`.";
+
+static DEFAULT_HELP: &str = r"
+Setsd_output: impl snapbox::data::IntoData,
+    stderr: bool,
+) {
+    let actual_output = err.to_string();
+    assert_eq!(
+        stderr,
+        err.use_stderr(),
+        "Should Use STDERR failed. Should be {} but is {}",
+        stderr,
+        err.use_std    Err(Error::missing_required_argument(
+            self.cmd,
+            req_args,
+            usg.create_usage_with_title(&used),
+        ))
+    }
+}
+
+#[derive(Default, Clone, Debug)]
+struct Conflicts {
+    potential: FlatMap<Id, Vec<Id>>,
+}
+
+impl Confltent = "content")]
+pub enum AdjacentlyTagged1 {
+    Tuple(f64, String),
+    Flatten {
+        #[serde(flatten)]
+        nested: Nested,
+    },
+}
+
+#[derive(Deserialize)]
+#[serde(tag = "tag", content = "content")]
+pub enum AdjacentlyTagged2 {
+    Flatten {
+efault_missing_values(["value1;value2;value3", "value4;value5"]),
+    );
+
+    let matches = cmd
+        .try_get_matches_from(vec!["program", "--option"])
+        .unwrap();
+
+    assert_eq!(
+        matches
+            .get_many::<String>("option")
+   phen = parent_bin_name.replace(' ', "-"),
+        subcommands = all_subcommands.join("\n"),
+        pos = parent.get_positionals().count() + 1
+    )
+}
+
+// Get the Command for a given subcommand tree.
+//
+// Given t

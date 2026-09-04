@@ -1,1495 +1,1512 @@
+ub.com/commercialhaskell/stack/issues/2159#issuecomment-477948928
+--
+-- * https://github.com/commercialhaskell/stack/pull/4665
+wUAGE NoFieldSelectors      #-}
+{-# LANGUAGE OverloadedRecordDot   #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE TemplateHaskellimport qualified Data.Aeson.Decoding as Dec
-import qualified Dats #-}
+-- | Types a.Text as T
+import qualified Data.Text.Encoding as TE
+import qualified Data.Text.Lazy          as TL
+import qualified Data.Text.import Test.Tasty (TestTree, testGroup)
+import Test.Tasty.HUnit (testCase, assertEqual)
+import Data.Maybe (fromMaybe)
 
-module CompareWithJSON (benchmark) where
-
-import Prelude.NGUAGE OverloadedStrings #-}
--- >
--- > instance FromJSON Person 
-
-main :: IO ()
-main = do
-  AutoCompare.sanityCheck
-  defaultMai    Stack.Types.Runner ( Runner )
-import           Stack.Types.Vimport           Prelude.Compat
-
-import           Control.DeepSeimport Control.Monad.Catch (MonadThrow (..))
-import Data.Aeson.Tity) where
-    parseJSON = fmap N . parseJSON
-
-instance ToJSON (UAGE NoFieldSelectors      #-}
-{-# LANGUAGE OverloadedRecordDot -- | Functions related to Stack's @unpack@ command.
-module Stackd Data.ByteString as B
-import qualified Data.ByteString.Lazy as port StackTest
-
-main :: IO ()
-main = do
-    stack ["build", "--d Stack.Prelude
-import           Stack.Runners ( ShouldReexec (alue -> BL.ByteString
-encodeJ = toLazyByteString . fromString . lock
-import System.Environment (getArgs)
-import System.IO
-importNGUAGE ScopedTypeVariables #-}
--- |
--- Module:      Data.Aeson
-- = Either PackageName PackageIdentifierRevision
-
--- | Type repreestProperty)
-import Types
-import qualified Data.Text as T
-importString -> Maybe a
-decode' = decode
-{-# INLINE decode' #-}
-
--- | retty\' exceptions thrown by functions exported by the
--- "Stackd Data.Text.Lazy.Builder  as TLB
-import qualified Data.Text.Lazimport Test.Tasty (TestTree, testGroup)
-import Test.Tasty.HUnit  CPP                 #-}
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-ub.com/commercialhaskell/stack/issues/2159#issuecomment-4779489ler
-  -> VersionCheck
-  -> Maybe (Path Abs File)
-  -> RIO env ()(..)
-    , FromJSONKey(..)
-    , FromJSONKeyFunction(..)
-    -- l       :: !URL
-    }
-  deriving (Show)
-
-instance NFData SimpleUoadOpts (..)
-  , SDistOpts (..)
-  , UploadContent (..)
-  , Uploa(HasConfig env, HasPantryConfig env, HasProcessContext env, HasTrimental
+impor
+-- Maintainer:  Bryan O'Sullivan <bos@serpentine.com>
+-- Stability:   experimental
 -- Portability: portable
 --
--- Types and functions for .Types.Config ( Config (..), configL, stackRootL )
-impoGUAGE DuplicateRecordFields #-}
-{NGUAGE RankNTypes #-}
-
-module Data.Aeson.Encoding.Internal
-    (stance Exception AesonException where
-    displayException (Aesooding configuration
-    , Options
-    , defaultOptions
-    -- ** Nothing" ["null"] (Just Nothing :: Maybe (Maybe Int)) Nothing
- .Aeson.Internal.Prelude hiding (empty)
-
-import Data.Aeson.Types.e Functions
-    (
-      approxEq
-    , approxEqWith
-    ) whered Data.Sequence as Seq
-import qualified Data.Set as Set
-imporcoding.Tokens
-import           Data.Aeson.Internal.Prelude
-impor      System.FilePath       ((</>))
-import           System.IO  hunks )
-import           Options.Applicative.Builder.Extra
-     L
-  , rslInLogL
-  ) where
-
-import           RIO.Process ( HasProe
-
--- | Parse any JSON value.
---
--- This is a strict version of g "\"+inf\"" else Encoding "\"-inf\""
-    | otherwise    = e d
-{
--- Maintainer:  Bryan O'Sullivan <bos@serpentine.com>
--- Stabil    )
-import           Path ( (</>), addExtension, parseRelFile .Types.GlobalOptsMonoid ( GlobalOptsMonoid )
-impo  name :: Text
--- >     , age  :: Int
--- >     } deriving (Genering -> Either String a
-eitherDecodeStrict' = eitherDecodeStrict
-
-      ]
-    ]
-
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE GADTs #-}
-{-ase mkObject acc' of
-        Left err -> fail err
-        Right  to a file.
-encodeFile :: (ToJSON a) => FilePath -> a -> IO ()
-eg = fillSep
-        [ flow "To use this"
-        , compiler
-    
-    , True
-    , False
-    , And
-    , Zero
-    , One
-    , Pro=
-  withConfig NoReexec $ do
-    mresolver <- view $ globalOptsLBuildConfig
-                   ( BuildConfig (..), HasBuildConfi fail."
-        <> blankLine
-        <> string
-             ( ca.Aeson
-import GHC.Generics (Generic)
-import Options
-
-data BigPronting command line options for the @stack upload@ command.
-data       , bench "aeson/strict"      $ whnf decodeS enS
-        , b  , StackExecutable (..)
-  , StackTestSuite (..)
-  , StackBenchming -> Bool
-    isIdentifierKey []     = False
-    isIdentifierK]"
-    <> line
-    <> flow "Stack can't find:"
-    <> line
-    <toLocSnapshot ::
-       RawSnapshot
-    -> PackageName
-    -> RIersion to version
--- of either this package or its dependencies catch` \(_ :: SomeException) -> prettyThrowIO $ PackageLocationIordDot #-}
-
--- | The module of this name differs as between Windindows and non-Windows builds.
--- This is the Windows version.
-mArray
-    , empty
-    , (><)
-    , econcat
-    -- ** Decimal numeserved.
---
--- Redistribution and use in source and binary formse
-    buildMsg :: L.ByteString -> [String] -> String -> String
- Config YesReexec $ withDefaultEnvConfig $ do
-  config <- view cod Data.Vector as V
-import qualified Language.Haskell.TH.Syntax a  parseMonth,
-    parseQuarter,
-    parseQuarterOfYear,
-) whereosed" -> pure StateClosed
-        _        -> fail $ "Unknown Iset as S
-import           Distribution.ModuleName
-impor"
-    [ testGroup "omitNothingFields = True"
-      [ testCase "J`
-  stackCheckStdout [defaultResolverArg, "path", "--dist-dir"] .Types.BuildOptsMonoid ( BuildOptsMon
-    Nothing              -> fail "string without end"
-    Just     , parse
-    , parseEither
-    , parseMaybe
-    , parseFail
- { val1 :: Int,
-    val2 :: Int
-  }
-  deriving (Eq, Show)
-
------GUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-      (c) 2011 MailRank, Inc.
--- License:     BSD3
--- Maits a list of relative paths \
-            \to package directorieq, Show, Typeable, Data, Generic)
-
-instance NFData Geo
-
-data StoMonad (unless)
-import Data.List (isInfixOf)
-impoGUAGE BangPatterns #-}
-{-# LANGUAGE RankNTypes   #-}
-moduletError e) $ liftIO $ ioError e
-import Distribution.Simple
-main =gs #-}
-{-# LANGUAGE DataKinds #-}
-
------th Abs Dir]
-    -- ^ Additional paths to search for executablesns
-    { fieldLabelModifier = \x -> case x of
-     Map
-import qualified AutoCompare
-import qualified Compare
-importhNullaryParseJSONTaggedObject :: Value -> Parser (Nullary Int)
-t))
-    -- ^ Project information and stack.yaml file location
-  ,     | Just bs1 <- stripPrefix "rue" 3 bs  = TkLit LitTrue (k bsypes.CompilerPaths
-                   ( CompilerPaths (..), GhcPd Data.HashMap.Strict as H
-import qualified Data.Map as M
-
--- | .Map ( MonoidMap (..) )
-import qualified Data.Yaml as Yaml
-imporified Distribution.PackageDescription as PD
-import  ( ProjectPackage (..), SMWanted (..), ppComponentsMaybe )
-impo Exception
-    , AesonException (..)
-
-    -- * Other types
-    ,.Aeson.KeyMap as KM
-
-keyMapInsertWithTests :: TestTree
-keyMapInsontrol.Applicative (Const)
-import Data.Time.Compat (Day, LocalTiJSON a => ToJSON (HRecordB a) where
-  toJSON = toJSON1
-  toEncodt Data.Functor.Sum (Sum(..))
-import Data.List.NonEmpty (NonEmptysteps.
-
--- $encoding
---
--- In older versions of this library, enCheck ( (===) )
-import Types
-#endif
-import PropUtils
-
-
-genericTeere
-  stylesUpdateL :: Lens' Runner StylesUpdate
-  stylesUpdateL" module.
-newtype ListPrettyException
-  = CouldNotParsePackageSeue" bss        (encode $ toJSON val)
-    for_ bss $ \bs ->
-    Haskell #-}
--- {-# OPTIONS_GHC -ddump-splices #-}
-
-module Auto.T Stack.Constants.Config ( projectDockerSandboxDir )
-imp    :: (Eq a, Show a, ToJSON a, FromJSON a)
-    => String       Compat
-import Bench
-
-import Data.Aeson hiding (Result)
-impor  Data.Text.Encoding.Error    (UnicodeException (..))
-ackages inside the current project.
-listPackages ::
-     HasBuihelloRecB helloNullObj
-      , testCase "JSON decode including oe Main where
-
-import Lib
-
-main = do
-  putStrLn $ "Sample stringsTypes.GHCVariant ( GHCVariant (..), HasGHCVariant (..) )ty
--- 'FromJSON' and 'ToJSON' instances for which the compiler wd ::
-     (HasLogFunc m, HasTerm m)
-  => String -- ^ Hackage bas Stack.Options.BuildParser ( buildOptsParser )
-imGUAGE TypeApplications #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
--de obj) of
-  Nothing -> return ()
-  Just v  -> assertFailure $ "stance Monoid Series where
-    mempty  = Empty
-    mappend = (<> s =
-    case L.parse p s of
-      L.Done _ v -> case to v of
-  SymbolicLink )
-
--- | Find the location of a file matching the giommand. List packages.
-listCmd :: [String] -> RIO Runner ()
-listeption =
-    "Error: [S-3223]\n"
-    ++ "Docker must be enabled  prettyWarnL
-          [ flow "You've set"
-          , style She'Data.Time.Clock.UTCTime' and
--- 'Data.Time.LocalTime.ZonedTime'Types ( FromJSON (..), withText )
-impath.doesFileExist tarGzFile
-      pure $ (if isFile then Right eConfig )
-import           Stack.Types.Docker ( DockerOpts (..) ing as A
-import qualified Data.Attoparsec.Lazy as L
-import7" $ do
-  let ev = DataA 1 2
-      encoding = encode ev
-      s@
-    , withObject
-    , withText
-    , withArray
-    , withSci   :: !SimpleUser
-    , issueTitle       :: !Text
-    , issuePulSetup.hs configure
-  , setupInfoLocations     :: ![String]
-    -)
-
--- | @since 2.2.0.0
-instance IsString (Encoding' a) where
-  f    -- ^ value encoding
-    -> (forall a. (k -> v -> a -> a) -> lified System.FilePath as FilePath
-
--- | An uninterpreted repres Stack.Docker
-  ( dockerCmdName
-  , dockerHelpOptName
-  , docker  $ nf decodeS' enS
-
-          -- attoparsec-aeson package
-     -- like this:
---
--- @
---     'toEncoding' = 'genericToEncoding' OKPackage name, opts) <- Map.toList options]
-
-  cabalConfigOpts'group.WrappedMonoid Int)
-#if !MIN_VERSION_base(4,16,0)
-  , e
-
-benchmark :: Benchmark
-benchmark = bgroup "micro"
-  [ bgroup "    , allowOmittedFields :: Bool
-      -- ^ If 'True', missing fitter.Options
-
-import Data.Aeson (ToJSON (..), FromJSON (..), ge <>
-    -- TODO: if we can determine whether all characters are meterized by the
--- toplevel Value parser to be called recursive  hackageBaseUrl <- view $ configL . to (.hackageBaseUrl)
-    leame ++ ": " ++ show (age*2))
--- >
--- > Just "Dave: 4"
---
--- Consame :: StackUnqualCompName
-  , buildInfo :: !StackBuildInfo
-  , nal
--- Copyright:   (c) 2011-2016 Bryan O'Sullivan
---     installation dir
-  , templateParameters  :: !(Map Text Text)
-  (Show, Typeable)
-
--- | Files that the package depends on, relatieColorL = runnerL . useColorL
-  termWidthL = runnerL . termWidth using the 'Data.Map.Map' type to get a map of
--- 'Int's.
---
--- ndition does not hold, the check is flawed.
-module UnescapePureTict tok" $ nf decT contents
-    ]
-  where
-    decL :: LBS.ByteStectRootL
-  , getProjectWorkDir
-  , wantedCompilerVersionL
-  ) we found at:"
-          , style File (fromString fp) <> "."
-    JSON = withObject "IssueLabel" $ \o -> IssueLabel
-        <$> o Monoid
-    { stackRoot
-    , workDir
-    , buildOpts
-    , dockeomJSON NullableNonEmptyString where
-  parseJSON Null = pure defa Int -> Value
-thNullaryToJSONObjectWithSingleField =
-  $(mkToJSOng.Lazy.Char8 as BL
-
-data Coord = Coord { x :: Double, y :: Dou.HUnit ((@?=), testCase)
-import Test.Tasty.QuickCheck (testProparser, auto, completer, help, listCompleter, long, metavar
-    
-    , fromJSON
-    , ifromJSON
-    , typeMismatch
-    , unexpeclInLogL = globalOptsL . to (.rslInLog)
-{- HLINT ignore -}
-{-# t = fix $ \value_ -> do
-  skipSpace
-  w <- A.peekWord8'
-  case wTypes.GhcPkgId
-  ( GhcPkgId
-  , unGhcPkgId
-  , ghcPkgIdParser
- parseVersion )
-import           Distribution.Version ( mkVersionstants ( globalFooter, osIsWindows, stackProgName )
-imprequireStackVersion :: !IntersectingVersionRange
-    -- ^ See: ', due to allocation of thunks for values
--- that have not yet be'String',
--- representing the root object as @$@.
-formatPath ::  :: !(First Bool)
-   -- ^ Allow users other than the Stack root }" :: Maybe Value
--- > Just (Object (fromList [("foo",Array (frog :: String -> Encoding' a
-string = Encoding . EB.string
-
-------g
-     -- ^ Optional package identifier name, applies only to tht :: Path Abs Dir -> Object -> WarningParser ConfigMonoid
-parseCGUAGE RecordWildCards #-}
-
-module Main (main) wherehes the root directory.
-findInParents ::
-     MonadIO m
-  => (Pa
-
-scientificText :: Scientific -> Encoding' a
-scientificText = EParser a -> Text -> Aeson.Parser a
-run f t = case f t of
-    Lef(liftIO $ removeFile creds.credsFile)
-          _ -> pure ()
-   ata.Semigroup ((<>))
-#endif
-
-import UnitTests.OptionalFields.Comlow "The Docker image does not set the PATH environment variableption Text
-unescapeFromText = unsafeDupablePerformIO . try . un applied.
-newtype Parser a = Parser {
-      runParser :: forall Eq)
-
-data State =
-      StateNone
-    | StateUtf !Utf !Word32
-    RIO.NonEmpty ( nonEmpty )
-import qualified RIO.NonEmpty as NE
-ntation.
-  -> FilePath
-     -- ^ Path to archive file.
-  -> Uplo     ( WithJSONWarnings, (..:), (..:?), (..!=), withO     deriving (Typeable)
-
-pair :: Key -> Encoding -> Series
-pair     (  long "keep-home"
-              <> help "Do not delete sa Map PackageName (Map FlagName Bool)
-  -> FlagSource
-  -> Map P     _ -> error "formatChar: ???"
-              where
-          Text.Read ( Read (..) )
-
--- | Type representing exceptgenericFromJSONKey' opts
-      -- @
-    }
-
--- | Default encodiMaybe String" "\"foo\""          (pure "foo" :: Maybe String)
-   "Could not find package"
-          , style Current (fromPackage #-}
-
-instance Applicative Result where
-    pure  = Success
-    ryExist nonFiles
-      unless (null invalid) $ do
-        prettyckageKey =
-  liftIO $ fmap (HackageKey . T.pack) <$> lookupEnv "--       with the distribution.
---
---     * Neither the name of 'Year' is a type synonym for 'Integer'.
-parseYear :: Text -> Eitet -> IO Text
-        write3bytes !out !b1 !b2 !b3 !inp = do
-   ternal
-import Data.Foldable (toList)
-
--- | Encode a 'Foldable' ackTest
-import System.Directory (withCurrentDirectory)
-
-main       <*> obj .: "required"
-        <*> obj .: "optional"
-        :: !Bool
-    -- ^ Hide the Template Haskell "Loading packagcoding )
-
-#if defined(mingw32_HOST_OS) || defined(__MINGW32__)
-it Data.Word (Word8)
-import Foreign.ForeignPtr (ForeignPtr)
-
-#if bution.System ( Platform )
-import           Path ( (</>), parentnclude those fields encoded as specified. 
-      --
-      -- Noypes        #-}
+-- Types and funde #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-.decodeUtf8 . encodingToLazyByteString . toEncoding
+module Twitter.TH
+    (
+      Metadata(..)
+    ,Stack.Constants ( relDirRoot )
+import           Stack.Prelude
+import           Stack.Runners ( ShouldReexec (..), withConfig )
+iMonoid
+import qualified Data.Semigroup as Semigroup
+import qualified Data.Sequence as Seq
+import qualified Data.Set as Set
+imporConfig env, HasGHCVariant env)
+  => SetupCmdOpts
+  -> WantedCompiler
+  -> VersionCheck
+  -> Maybe (Path Abs File)
+  -> RIO env (       Options.Applicative.Builder.Extra
+                   ( boolFlags, extraHelpOption )
+import           Options.Applic Prelude.Compat
 
--- | Encodes
-defaultJSONKeyOptions = JSONKeyOptions id
+import           Control.DeepSeq (NFData (..))
+import           Data.Text       (Text)
+import           Data.Time
+    putStrLn $ "  " ++ show (diffUTCTime end start)
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{bulletedList (map fromPackageName names)
+  pretty (PackageLocationInvalid pir) =
+    "[S-5170]"
+    <> line
+    <> fillSep
+     tHeader, setRequestHeaders, withResponse
+                   )
+import           Path ( (</>), addExtension, parseRelFile )
+impoyOptions
 
--- | Converts from ntrol.Exception (evaluate, throw, try)
-import Control.Monad (wheackages
-  outputFunc stream $ T.unpack $ T.intercalate "\n" $
-  fig env
-      , HasTerm env
-      , HasRunner env
-      ) => Hass
-    :: (Int -> Text -> Either String r)
-    -> Text
-    -> Eite
-  , haddockHyperlinkSource :: !FirstTrue
-  , haddockForHackagerays containing all
--- associated values from the original list Runners
-                   ( ShouldReexec (..), withConfig, with
-
--- | Options that specify how to encode\/decode your datatype n reverse order
-    -- then the first duplicate key in objects wObjectWarnings
-        "urls"
-        (\o -> First <$> o ..:? "l.Types.NamedComponent
-                   ( NamedComponent, isCBeas used in
--- [canonical-json](https://hackage.haskell.org/packafile_image_url
-    <> "created_at"        .= created_at
-    <> "    }
-
-instance Show Options where
-  show (Options f c a o q s ustem.IO.Error ( isDoesNotExistError )
-import qualified System.Pox (deprecated).
-  , snapshotLocation :: !(First Text)
-    -- ^ Cdo
-    removeDirIgnore ".stack-work"
-    removeFileIgnore "stac601)
---
--- * Seconds are optional (allowed by ISO8601)
---
--- * nser error handling
+    -- * Inspecting @'Value's@
+    , withObject
+    , withText
+    , withArray
+    , withScientific
+    , withBool
+   ommand line command.
+unpackPackages ::
+     forall env.
+       (HasConfig env, HasPantryConfig env, HasProcessContext env, HasTemodule Data.Aeson.Encoding.Internal
+    (
+    -- * Encoding
+      Encoding' (..)
+    , Encoding
+    , encodingToLazyByteString
+ iparseEither
+    , parse
+    , parseEither
+    , parseMaybe
+    , parseFail
     , modifyFailure
     , prependFailure
-    e that a space exists between each module in a module command" $e . TH.lift
-#elif MIN_VERSION_template_haskell(2,16,0)
-    liftT  -- ^ Which packages do --ghc-options on the command line apply      Map.fromList $ map (pkgName . (.packageIdent) &&& id) $ Ma  -> Nothing
-    A.IError _ _      -> Nothing
+    , parse Runner )
+import           System.Directory
+                   ( createDirectoryIfMissing, doesDirectoryExist, doesFileExist
+ tCmd :: [String] -> RIO Runner ()
+listCmd names = withConfig NoReexec $ do
+  mresolver <- view $ globalOptsL . to (.resolver)
+  ackage :: !Bool
+  , tarPath :: !(Maybe FilePath)
+  , uploadVariant :: !UploadVariant
+  }
 
--- | Like 'decodez']
-    , example "cyrillic" $ TE.encodeUtf8 $ T.unwords
-      [- ** Parsing
+-- | Function underlying the @stack uuarter
+    , localTime
+    , utcTime
+    , timeOfDay
+    , zonedTime
+    -- ** value
+    , value
+    -- ** JSON tokens
+    , com 'throwDecode'.
+--
+-- @since 2.1.2.0
+--
+throwDecode' :: forall a m. (FromJSON a, MonadThrow m) => L.ByteString -> m a
+throwDecod toLocSnapshot ::
+       RawSnapshot
+    -> PackageName
+    -> RIO env (Either StyleDoc (PackageLocationImmutable, PackageIdenti      System.Exit           (exitFailure)
+import           System.FilePath       ((</>))
+import           System.IO       Stack.Options.GlobalParser ( globalOptsParser )
+import           Stack.Options.HpcReportParser ( hpcReportOptsParser )
+imN a) => FilePath -> IO (Either String a)
+eitherDecodeFileStrict =
+  fmap eitherDecodeStrict . B.readFile
+{-# INLINE eitherDecode      RIO.Process ( HasProcessContext (..), ProcessContext )
+import           Stack.Prelude hiding ( stylesUpdate )
+imp- "Stack.CLI" module.
+data CliPrettyException
+  = NoArgumentsBug
+  deriving (Show, Typeable)
+
+instance Pretty CliPrettyExcepW8.COMMA
+      then skipSpace >> loop acc'
+      else case mkObject acc' of
+        Left err -> fail err
+        Right obj -> pue -> Encoding
+value = Encoding . EB.encodeToBuilder
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
+{et as S
+import           Distribution.ModuleName
+import           Path
+import           Path.Extra ( pathToLazyByteString )
+impostance Exception AesonException where
+    displayException (AesonException str) = "aeson: " ++ str
+-- We can use Template Haske.Aeson.Parser
+import Data.Attoparsec
+import Data.Time.Clock
+import System.Environment (getArgs)
+import System.IO
+import  stackCheckStdout [defaultResolverArg, "path", "--dist-dir"] $ \(trimEnd -> distDir) -> do
+    stackCheckStdout [defaultResolved)
+
+thSomeTypeParseJSONObjectWithSingleField :: Value -> Parser (SomeType c () Int)
+thSomeTypeParseJSONObjectWithSingleField =
+ deBenchmarks) where
+
+import Prelude.Compat
+import Bench
+
+import Data.Aeson hiding (Result)
+import qualified Data.Aeson.Decoding ontrol.Applicative (Const)
+import Data.Time.Compat (Day, LocalTime, TimeOfDay, UTCTime)
+import Data.Time.Calendar.Compat (DayOfW
+  ( ConfigMonoid (..)
+  , parseConfigMonoid
+  , parseConfigMonoidObject
+  , configMonoidAllowDifferentUserName
+  , configMonoidueState
+    = StateOpen
+    | StateClosed
+  deriving (Show)
+
+instance ToJSON IssueState where
+    toJSON StateOpen   = String "od Data.Vector as V
+import qualified Language.Haskell.TH.Syntax as TH
+import qualified Data.Aeson.Key as Key
+import-------
+
+thNullaryToJSONString :: Nullary Int -> Value
+thNullaryToJSONString = $(mkToJSON defaultOptions 'C1)
+
+thNullaryToEncod.Types.ApplyProgOptions ( ApplyProgOptions (..) )
+import           Stack.Types.BuildOptsMonoid ( BuildOptsMonoid )
+impotDir :: !(Path Abs Dir)
+  , buildConfig :: !BuildConfig
+  , cabalVer :: !Version
+  }
+
+instance HasPlatform GetPackageFileContext6 Bryan O'Sullivan
+--              (c) 2011, 2012 Bas Van Dijk
+--              (c) 2011 MailRank, Inc.
+-- License:     BSD3
+-- MprettyWarn $
+           flow "No HTTP digest prompt found, this will probably fail."
+        <> blankLine
+        <> stringtrings #-}
+-- >
+-- > instance FromJSON Person where
+-- >     parseJSON = withObject "Person" $ \v -> Person
+-- >         <$> v .al"
+    [ bgroup "direct"
+      [ bench "twitter100"  $ nf decodeDirect twitter100
+      , bench "jp100"       $ nf decodeDirectGUAGE BangPatterns #-}
+{-# LANGUAGE CPP          #-}
+{-# LANGUAGE MultiWayIf   #-}
+
+module Data.Aeson.Internal.UnescapeFromText
+aText :: A.Value -> BL.ByteString
+encodeViaText = TLE.encodeUtf8 . encodeToText
+
+benchmark :: Benchmark
+benchmark =
+  env (readLe removeFile fn `catchIO` \ e ->
+    unless (isDoesNotExistError e) $ liftIO $ ioError e
+import Distribution.Simple
+main = defau ]
+    ]
+  where
+    enFile = "twitter100.json"
+    jpFile = "jp100.json"
+{-# LANGUAGE ScopedTypeVariables #-}
+-- |
+-- Module:  adInfo
+      { version
+      , downloadInfo
+      }
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedRecordDot #-}
+
+-ified Distribution.PackageDescription as PD
+import           Distribution.System ( Platform (..) )
+import qualified Pantry.SHA25nux
+import  Lib
+
+main :: IO ()
+main = putStrLn "I am Main1"
+
+import Control.Monad (unless)
+import Data.List (isInfixOf)
+impor.Aeson.KeyMap as KM
+import qualified Data.Attoparsec.ByteString as A
+import qualified Data.Attoparsec.Lazy as L
+imporls"
+        <*> o .: "number"
+        <*> o .: "assignees"
+        <*> o .: "user"
+        <*> o .: "title"
+        <*> o .:? "peq0 <- parseRequest $ concat
+    [ baseUrl
+    , "package/"
+    , packageIdentifierString ident
+    , "/"
+    , packageNameStrint
+  }
+  deriving (Eq, Show)
+
+-------------------------------------------------------------------------------
+-- Instances
+------\t -> case T.toLower t of
+        "open"   -> pure StateOpen
+        "closed" -> pure StateClosed
+        _        -> fail $ "Un if d > 0 then Encoding "\"+inf\"" else Encoding "\"-inf\""
+    | otherwise    = e d
+{-# INLINE realFloatToEncoding #-}
+
+-------.Types.NamedComponent ( NamedComponent (..) )
+
+-- | A type representing (unnamed) main library or sub-library components of a
+-.Tasty.QuickCheck (testProperty)
+import Types
+import PropUtils
+
+
+roundTripFunctorsTests :: TestTree
+roundTripFunctorsTests =
+  tcomma >< x
+
+instance Monoid Series where
+    mempty  = Empty
+    mappend = (<>)
+
+nullEncoding :: Encoding' a -> Bool
+nullEncodinFoldable
+import qualified AesonMap
+import qualified AutoCompare
+import qualified Compare
+import qualified CompareWithJSON
+import     , testCase "JSON decode including optional value" $ decodeCase helloRecC helloNullObj
+      , testCase "JSON decode includ False
+    , And
+    , Zero
+    , One
+    , ProductSize(..)
+    , (:*)(..)
+    ) where
+
+import Data.Kind (Type)
+
+import GHC.Geneontext where
+  configL = buildConfigL . lens (.config) (\x y -> x { config = y })
+  {-# INLINE configL #-}
+
+instance HasBuildComitTH = testGroup "Omit optional fields (TH)"
+  [ testGroup "ordinary"
+    [ testGroup "omitNothingFields = True"
+      [ testCa-----
+
+-- | Parse any JSON value.
+--
+-- The conversion of a parsed value to a Haskell value is deferred
+-- until the Haskell vale
+  , haddockHyperlinkSource :: !FirstTrue
+  , haddockForHackage :: !FirstFalse
+  , installExes :: !FirstFalse
+  , installCompilof
+    Nothing              -> fail "string without end"
+    Just W8.DOUBLE_QUOTE -> A.anyWord8 $> unsafeDecodeASCII s
+    Just nv, HasLogFunc env) => HasRunner env where
+  runnerL :: Lens' env Runner
+
+-- | Class for environment values which have a Docker ption (..))
+import Data.Text.Internal.Private (runText)
+import Data.Text.Unsafe (unsafeDupablePerformIO)
+import Data.Word (Word8
+  , extraIncludeDirs    :: ![FilePath]
+    -- ^ See: 'configExtraIncludeDirs'
+  , extraLibDirs        :: ![FilePath]
+    -- ^ SExist nonFiles
+      unless (null invalid) $ do
+        prettyThrowIO $ ItemsInvalid invalid
+      let sdistOpts = SDistOpts
+   Mismatch
+    , unexpected
+    -- * Type conversion
+    -- ** Parsing
     , Parser
     , Result(..)
     , FromJSON(..)
-       ( ActualCompiler, WhichCompiler (..), compilerVersionText
- Data.Integer.Conversion      (byteStringToInteger)
-impormponent is buildable
-    -- here.
-  , dependency :: !(Map Packag)
-  platformVariantL =
-    lens (.platformVariant) (\x y -> x {  do
-  stack ["clean"]
-  stackCheckStdout ["test", "--coverage", .stack-work"@
-workDirL :: HasConfig env => Lens' env (Path Rel DUAGE ConstraintKinds            #-}
-{-# LANGUAGE DataKinds      on l) = concat
-    [ "Error: [S-5841]\n"
-    , "Invalid 'docker NGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{resented as a Haskell value.
-data Value = Object !Object
-     quire the underlying value.
-    } deriving (Eq, Ord, Read, Show,: !Platform
-    -- ^ The platform we're building for, used in maersion range specified in stack.yaml ("
-    , T.unpack (version    beoMonoid.disableRun
+    , from.Types.EnvConfig ( EnvConfig )
+import           Stack.Types.GlobalOpts ( GlobalOpts (..) )
+import           Stack.Types.Project.Types.SourceMap
+                   ( ProjectPackage (..), SMWanted (..), ppComponentsMaybe )
+import           System.IO ( putStdata StackExecutable = StackExecutable
+  { name :: StackUnqualCompName
+  , buildInfo :: !StackBuildInfo
+  , modulePath :: FilePae:
+--
+-- > >>> decode "{\"foo\": 123}" :: Maybe Value
+-- > Just (Object (fromList [("foo",Number 123)]))
+--
+-- > >>> decode "{\"
+
+checkFlagsUsedThrowing ::
+     (MonadIO m, MonadThrow m)
+  => Map PackageName (Map FlagName Bool)
+  -> FlagSource
+  -> Map Pac HasTerm m => Config -> RIO m HackageCreds
+loadUserAndPassword config = do
+  fp <- liftIO $ credsFile config
+  elbs <- liftIO $ llowOmittedFieds' controls parsing behavior.
+    , allowOmittedFields :: Bool
+      -- ^ If 'True', missing fields of a record wable)
+
+-- | Files that the package depends on, relative to package directory.
+data PackageComponentFile = PackageComponentFile
+ ile" module.
+  , cppOptions :: [String]
+    -- ^ Only used in opts gathering. See usage in "Stack.Package" module.
+  , targetBui      write2bytes (out + 1) b2 b3 inp
+
+        write2bytes :: Int -> Word8 -> Word8 -> Offset -> IO Text
+        write2bytes !ourelude
+
+-- | Used in Stack.Setup for detecting libc.musl-x86_64.so.1, see comments at
+-- use site
+libDirs :: [Path Abs Dir]
+libDiving (Typeable)
+
+pair :: Key -> Encoding -> Series
+pair name val = pair' (key name) val
+{-# INLINE pair #-}
+
+pairStr :: String
     }
 module LibD
     ( someFunc
-    ) won't be encoded. Instead only the contents of the
-    -- constr  -- * Predicates
-    isInfixOf,
-    isPrefixOf,
-    isSuffixOf, do
-  prettyInfoL
-    [ flow "Pulling image from registry:"
-    here
-  mempty = memptydefault
-  mappend = (<>)
+    ) where
 
--- | Where to geon the PATH, but
-    -- Stack's Nix integration is not enabled?
-oDigits $ \d ->
-    case fromGregorianValid y m d of
-        Notterns        #-}
-{-# LANGUAGE OverloadedStrings   #-}stance Semigroup (IResult a) where
-    (<>) = mplus
-    {-# INL     go Null       = []
-        go (Bool b)   = Null : map Bool ed = tkErr $
-    "Unexpected end-of-input, expecting " ++ expect integer fraction exponent
--- integer  := 0 | [1-9][0-9]* | -0 |nfig ( HasConfig )
-import qualified System.Directory as D
-imporazy
-      json
-    , value
-    , jstring
-    , scientific
-    --, "build"]
-      doesExist distDir
-      doesExist localInstallRhere
+import Lib
+import LibC
+
+someFuncD :: IO ()
+someFuncD = do
+  someFunc
+  someFuncC
+ance Show Options where
+  show (Options f c a o q s u t r) =
+       "Options {"
+    ++ intercalate ", "
+      [ "fieldLabelModift Data.Hashable (Hashable)
+import qualified Data.HashMap.Strict as H
+import qualified Data.Map as M
+
+-- | Transform the keys and.Aeson.RFC8785 (
+    encodeCanonical,
+) where
+
+import Data.List (sortBy)
+import Data.Ord (comparing)
+import GHC.Integer (quotRemmGregorian)
+import GHC.Generics
+import Test.QuickCheck (Arbitrary (..), Property, counterexample, scale)
+import Test.QuickCheck.mport Twitter
+import Twitter.Options
+
+import Data.Aeson (ToJSON (..), FromJSON (..), genericToJSON, genericToEncoding, generencodes to some of bytestrings.
+ndExample :: (Eq a, Show a, ToJSON a, FromJSON a)
+          => String -> [L.ByteString] -> a -> 7 :: TestTree
+issue967 = testCase "issue967" $ do
+  let ev = DataA 1 2
+      encoding = encode ev
+      parsedEv = decode encodireStackVersion <-
+    IntersectingVersionRange . (.versionRangeJSON) <$>
+      ( obj ..:? configMonoidRequireStackVersionName
+   stack.yaml file location
+  , allowLocals            :: !Bool
+    -- ^ Are we allowed to build local packages? The script
+    - removeDirIgnore ".stack-work"
+    removeFileIgnore "stack.yaml"
+    stack [defaultResolverArg, "init"]
+    stack ["build", ":al s =
+    case either (IError []) to (A.parseOnly p s) of
+      ISuccess a      -> Right a
+      IError path msg -> Left (path, m    { stackRoot
+    , workDir
+    , buildOpts
+    , dockerOpts
+    , nixOpts
+    , connectionCount
+    , hideTHLoading
+  ooks\/@
+hooksDir :: HasConfig env => RIO env (Path Abs Dir)
+hooksDir = do
+  sr <- view $ configL . to (.stackRoot)
+  pure (sr </ed. To upload"
+         , flow subject
+         , flow "please run"
+         , style Shell "stack upload ."
+         , flow "(wi = runnerL . stylesUpdateL
+
+instance HasTerm Config where
+  useColorL = runnerL . useColorL
+  termWidthL = runnerL . termWidthL
+its)
+      step a w = a * 10 + fromIntegral (w - W8.DIGIT_0)
+
+  dotty <- A.peekWord8
+  SP c e <- case dotty of
+              JusomJSON instances
+    , decodeWith
+    , decodeStrictWith
+    , eitherDecodeWith
+    , eitherDecodeStrictWith
+    ) where
+
+
+imporTypes ( FromJSON (..), withText )
+import           Data.Aeson.WarningParser
+                   ( WithJSONWarnings, (..:), (..:?).Types.Docker
+                  ( DockerException (..), DockerOpts (..), DockerStackExe (..)
+                  , Mount (..), do
+
+#if MIN_VERSION_template_haskell(2,17,0)
+    liftTyped = TH.unsafeCodeCoerce . TH.lift
+#elif MIN_VERSION_template_haskell(2,16es from
+-- the <https://hackage.haskell.org/package/time time> library.
+--
+-- Those instances encode time as JSON strings in
+--    RIO.List ( isPrefixOf, stripSuffix )
+import           RIO.NonEmpty ( nonEmpty )
+import qualified RIO.NonEmpty as NE
+imporreException ["clean", "--stack-yaml", "stack-good.yaml", "--full"]
+  stackErr ["build", "--stack-yaml", "stack-bad.yaml"]
+  stac(<>)
+
+-- | Get the 'Bool', defaulting to 'True'
+fromFirstTrue :: FirstTrue -> Bool
+fromFirstTrue = fromMaybe True . (.firstTrue)"
+    , "One"
+    , "Control"
+    , "Latin Small Letter O With Diaeresis"
+    , "Euro Sign"
+    , "Emoji: Grinning Face"
+    , "  stack ["clean"]
+    stack ["build"]
+import StackTest
+import System.Directory (withCurrentDirectory)
 
 main :: IO ()
-main = putStrLn "This is foo from also-has-ee(4,11,0)
-import GHC.Float (castDoubleToWord64, castWord64ToDoubhspec spec
+main = supe to be passed to ./Setup.hs configure
+  , setupInfoLocations     :: ![String]
+    -- ^ URLs or paths to stack-setup.yaml files, 
+  when (isNothing mpath) $ do
+    prettyWarnL
+      [ flow "The Docker image does not set the PATH environment variable. \
+    ils about the year format.
+--
+parseQuarter :: Text -> Either String Quarter
+parseQuarter = parseQuarter_ $ \y q t ->
+    let !qu| A ghc-pkg id.
 
-spec :: Spec
-spec = do
-    describe "eachSection" $ == W8.COMMA
-        then skipSpace >> loop (v:acc) (len+1)
-     text(2,0,0)
-import Data.Bits (Bits, shiftL, (.&.), (.|.))
-imper of bytes).
--- So use this module with caution.
-module Systemd Data.Conduit.List as CL
-import           Data.Conduit.Process.ing = genericToJSON defaultOptions
+module Stack.Types.GhcPkgId
+  ( GhcPkgId
+  , unGhcPkgId
+  , ghcPkgIdParser
+  , parseGhcPkgId
+  , ghcPkgIdStringJSON
+    , genericLiftToJSON
+    , genericToEncoding
+    , genericLiftToEncoding
+    , genericParseJSON
+    , genericLiftParseJS    -- TODO: if we can determine whether all characters are >=0x20 && <0x80
+    -- we could use underlying ShortByteString direcOptionsByName = coerce $ Map.fromList
+          [(name, opts) | (GOKPackage name, opts) <- Map.toList options]
 
-gNullaryToEncodingString :: Data.Version (Version)
-import Data.Time.Calendar.Compat (Calendaf needed: install Hoogle, build Haddock documentation and \
-    ings     #-}
+  cabalConfigOpt   name <- obj .: "name"
+-- >         return (name ++ ": " ++ show (age*2))
+-- >
+-- > Just "Dave: 4"
+--
+-- Considering that any  !Int
+    !Int !Int !Int !Int !Int
+    deriving (Show, Eq)
 
-module Stack.SourceMap
-  ( mkProjectPackage
-  , sn go (n + 1) bs'
+instance NFData BigProduct where
+  rnf a = a `seq` ()
 
-    -- in goEsc and goSlash we don't need to ch.Time.Calendar.Quarter.Compat (Quarter, QuarterOfYear (..),
-    -- The corresponding Cabal-syntax type is
--- 'Distribution.TypetargetCompleter
-  , flagCompleter
-  , projectExeCompleter
-  ) wha-lib-dirs arguments
-  , customPreprocessorExts :: ![Text]
-    -ific) $
-    QC.shrink (Sci.coefficient s, Sci.base10Exponent s)    (HasProcessContext env, HasLogFunc env)
-  => DockerOpts
-  -> ere
-  pretty NoArgumentsBug = bugPrettyReport "[S-4639]" $
-apeText)
+deriveJSON opString
+showBeginning = show . T.take 30
 
--- | Lex (and parse) strict 'ByteString' into 'Tokens'      (Nothing, Just x) -> pure x
-      (Just x, Nothing) -> do
-' is probably not what
--- you want, because it will truncate uni for packages ppComponents
-  pure $
-    concatMap
-      (filter       (unsafeInterleaveIO)
+-- | Strip leading (ASCII) space
+skipSpace :: Text -> Text
+skipSpace = T.dropWhile $ \ser :: !(First Bool)
+   -- ^ Allow users other than the Stack root owner to use the Stack
+   -- installation.
+  , dumpLogs      e (Maybe Int)) Nothing
+  , example "Just"  "1"  (Just 1 :: Maybe Int)
+  , example "Proxy Int" "null"  (Proxy :: Proxy Int)
+  , e a
 
-import qualified Data.Map as Map
-impoidExtraIncludeDirsName ..!= []
-  extraLibDirs <- map (toFilePatwise
-        = Left "expected year with at least 4 digits"
-     n a JSON value need to be inspected, since the cost of
--- converect configuration, and use the implicit global.
-  deriving Show
-leHpackPackageConfig :: Path Rel File
-relFileHpackPackageConfig ing)
-      , testProperty "[Identity Char]" $ roundTripEq @[I ChpQ)  -- ^ expression with a function to generate bindings
-    ->------
+-- | Run a @text-iso8601@ parser as an aeson parser.
+run :: Parser a -> Text -> Aeson.Parser a
+run f t = case f t of
+    Lefring (Map.keys packages)
+        ListPackageCabalFiles ->
+          map (toFilePath . (.cabalFP)) (Map.elems packages)
+  mapM_ (arser, completeWith, help, long, metavar, option )
+import           Options.Applicative.Types ( readerAsk, readerEpected end-of-input while parsing string literal"
+    errCC  = err "Unespected control character while parsing string literal"
 
--- | A type-level indicator that 'ToJSON' or 'From) ks
+ng.Lazy.Char8 as BL
 
--- | If the inner 'Parser' failed, prepend the given strin   step a w = a * 10 + fromIntegral (w - W8.DIGIT_0)
+data Coord = Coord { x :: Double, y :: Double }
+             deriving (Show)
 
-  dotty <-UNPACK #-} !Int
-                       {-# UNPACK #-} !Int
-      accepts " ++ show inp) $ do
-    case parse (T.pack inp) of
-    a given Stackage snapshot.
+-- A ToJSON instance allows uince 2.0.3.0
+instance QC.CoArbitrary Value where
+    coarbitrary Null       = QC.variant (0 :: Int)
+    coarbitrary (Bool b)   =    candidates <- getHackageTypoCorrections name
+        pure $ Left $ fillSep
+          [ flow "Could not find package"
+    UAGE DataKinds         #-}
+
+-- | Finding files.
+
+module Path.Find
+  ( findFileUp
+  , findDirUp
+  , findFiles
+  , findInParents
+ sL
+  , globalOptsL
+  , stackGlobalConfigL
+  , stackRootL
+  , workDirL
+  -- * Helper logging functions
+  , prettyStackDevL
+  ) whutException l) = concat
+    [ "Error: [S-5841]\n"
+    , "Invalid 'docker images' output line: '"
+    , l
+    , "'."
+    ]
+  dispfrom_user_id_str"  .= from_user_id_str
+    <> "profile_image_url" .= profile_image_url
+    <> "created_at"        .= created_at
+noid ::
+     Path Abs Dir
+  -> Value
+  -> Yaml.Parser (WithJSONWarnings ConfigMonoid)
+parseConfigMonoid = withObjectWarnings "Co stripPrefix "ull" 3 bs  = TkLit LitNull (k bs1)
+    tokenCase W.LOWER_T       bs  _   k
+        | Just bs1 <- stripPrefix "rue"ts.OptionalFields.Generics (omitGenerics)
+import UnitTests.OptionalFields.TH (omitTH)
+import UnitTests.OptionalFields.Manual (omString (BS.take 4 bs) <> "\\u" <> B.byteString (BS.drop 4 bs)
+                _ -> error "formatChar: ???"
+              where  readProcessNull "docker" ["rm", "-f", containerID]
+             `catch` (\(_ :: ExitCodeException) -> pure ())
+         forM_ , HasTerm env)
+  => GhcPkgExe
+  -> RIO env (Map PackageName DumpedGlobalPackage)
+globalsFromDump pkgexe = do
+  let pkgConduit = :
+     HasTerm env
+  => Path Abs Dir -- ^ Path to the global package database
+  -> Path Abs Dir -- ^ Path to the package databsion
+  parseVersion' =
+    fmap fst . listToMaybe . reverse . readP_to_S Data.Version.parseVersion
+
+-- | Remove the project's Do- @
+jsonWith :: ([(Key, Value)] -> Either String Object) -> Parser Value
+jsonWith mkObject = fix $ \value_ -> do
+  skipSpace
+  w Stack.Docker
+  ( dockerCmdName
+  , dockerHelpOptName
+  , dockerPullCmdName
+  , entrypoint
+  , preventInContainer
+  , pull
+  , rhere
+  ghcVariantL = configL . ghcVariantL
+  {-# INLINE ghcVariantL #-}
+
+instance HasProcessContext BuildConfig where
+  processCtring -- ^ Command
+  -> [String] -- ^ Command line arguments
+  -> ConduitM ByteString Void (RIO env) a -- ^ Sink for stdout
+  ->.HYPHEN        bs  _   k       = scanNumberLiteral (\n bs' -> TkNumber (negateNumber n) (k bs')) tkErr bs
+    tokenCase w       rm
+    -- ^ The platform we're building for, used in many directory names
+  , platformVariant        :: !PlatformVariant
+    --ersion \
+                  \combination. Ignoring error and continuing. The full \
+                  \message from Hackage is be    --
+      -- instance 'ToJSONKey' Foo where
+      --   'toJSONKey' = 'genericToJSONKey' opts
+      --
+      -- instance 'From a given Stackage snapshot.
 
 module Stack.BuildPlan
-  ( BuildPlag   -> \_ -> Left $ "invalid day:" ++ show (y, m, d)
-        JusFail.fail
-    {-# INLINE fail #-}
+  ( BuildPlanException (..)
+  , BuildPlanCheck (..)
+  , checkSnapBuildPlan
+ ut -> do
+  packages <- view $ buildConfigL . to (.smWanted.project)
+  comps <- for packages ppComponents
+  pure $
+    concatMap
+alProject
+    -- ^ Do not look for a project configuration, and use the implicit global.
+  deriving Show
+{- HLINT ignore -}
+{-# ON optsTaggedObject
+
+gSomeTypeToEncodingTaggedObject :: SomeType c () Int -> Encoding
+gSomeTypeToEncodingTaggedObject = gene      dockerResetCmd
+          ( switch
+              (  long "keep-home"
+              <> help "Do not delete sandbox's home d)
+#else
+import Data.Bits (Bits, shiftL, shiftR, (.&.), (.|.))
 #endif
 
--- |
---
--- @since 2.1.' -> TkNumber (negateNumber n) (k bs')) tkErr bs
-    tokenCase wff len)
-    | len <= 0  = Nothing
-    | otherwise = Just (w8, TeE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE StandaloneDerivingdable (for_)
-import Data.Maybe (fromJust)
-import Encoders
-impor-
--- The 'json'' and 'value'' parsers combine identification wits)
+-- Different UTF states.
+data Utf =
+      UtfGround
+    | ename used for the Stack project-level configuration file.
+stackDotYaml :: Path Rel File
+stackDotYaml = $(mkRelFile "stack.yaml"ntainerAndExit = do
+  config <- view configL
+  let docker = config.docker
+  checkDockerVersion docker
+  (env, isStdinTerminal, i     }
+-- @
+defaultJSONKeyOptions :: JSONKeyOptions
+defaultJSONKeyOptions = JSONKeyOptions id
 
-    refs <- traverse p' (KM.toMap obj)
-    case Map.lookup "dCompilerCheckName = "compiler-check"
+-- | Converts from CamelCase to ai_
+    :: Array -> Int -> Int
+    -> Either String r                         -- ^ EOF continuation
+    -> (Char -> Int -> Int ->n.Types.Internal
+import Data.Foldable (toList)
 
-configMonoidCompilerRepos, Ord, Show)
-
--- | Warning generated when reading a package
-dataodule.
-data ConstantsException
-  = WiredInPackagesNotParsedBug
- ise a parsing failure with some custom message.
-parseFail :: Stronfig where
-  logFuncL = runnerL . logFuncL
-
-instance HasStylesU env
-  => Path Abs Dir -- ^ Path to the global package databa      \multiple times)."
-        ))
-  <*> firstStrOption
- (Approx String)
-thApproxParseJSONDefault = $(mkParseJSON defaulEitherValue t = unResult (toResultValue t) Left $ \v k -> Right ata.Json.Builder
-import Data.Monoid ((<>))
-import Twitter
-
-instaete build artefacts for the project packages."
-    cleanCmd
-         , openHaddocks
-      , haddockDeps
-      , haddockInternanad.Reader ()
-
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
-ErrBS bs "record key literal or }"
-
-    -- after record pair, exs (word16 byte arrays).
---
--- Note that this has a subtle differ pool for project Stack database
-  , curator :: !(Maybe Curator) buildHaddocks = do
-  (gpd, name, cabalFP) <-
-    loadCabalFileP-----
-
-instance Hashable b => Hashable (Tagged a b) where
-    haord
-  print req
-  let reply = Coord 123.4 20
-  BL.putStrLn (encoSL loc Map.empty Map.empty
-  deps <-
-    Map.traverseWithKey (snDir :: !(Path Abs Dir)
-  , distDir :: !(Path Abs Dir)
-  , omitPato check for control characters as unescapeText verifies that.
-      progName <- liftIO getProgName
-            pure (FP.takeBas  <$> many (strArgument
-              ( metavar "-- ARGUMENT(S)  =
-    unless (msg `isInfixOf` stderr)
-        (error $ "Expecter
-  , stack'
-  , stack
-  , stackCleanFull
-  , stackIgnoreExceptn the case of
-    -- malformed JSON, only an error for the last t Test.QuickCheck (Arbitrary (..), Property, counterexample, sca   )
-  <*> firstBoolFlagsNoDefault
-        (dockerOptName docker> string "null" $> Null
-    _                 | w >= W8.DIGIT_0 s      = True
-                 , sumEncoding             = defau
--- Efficiently and correctly parse a JSON string.  The string mf running in a container.
-preventInContainer :: MonadIO m => m (ption name for the global Stack configuration file.
-stackGlobalCrseJSON2ElemArray = genericParseJSON opts2ElemArray
-
-
-gNullarser, completeWith, help, long, metavar, option )
-iample "Semigroup.Min Int" "2" (pure 2 :: Semigroup.Min Int)
- .)
-  , DockerOptsMonoid (..)
-  , DockerStackExe (..)
-  , Mount (-1512]\n"
-    , "Failed to parse "
-    , show s
-    , ". Expecteen = do
-  s <- OA.readerAsk
-  case s of
-    "never" -> pure Colotainer  :  Julian Ospald <hasufell@posteo.de>
--- Stability   :  "JSON should not include optional value." $ encodeCase helloHRecable)
-
-instance NFData JSONPathElement where
-  rnf (Key t)   = rmber' m
-    | k <= n, n <= 21
-    = Encoding $
-        BP.primMa= fromString <$> QC.arbitrary
-    shrink k  = fromString <$> QC.ng -> IO String
-decodeWithBaseWindows ba = BS16.useAsCWStringLen-detected)."
-  <> hideMods hide
-  )
- where
-  readGHCBuild = do
- bitrary (T.unpack x)
-    coarbitrary (Number x) = QC.variant (3 .dropWhile $ \w -> w == 0x20 || w == 0x0a || w == 0x0d || w == 0nguage extension so that GHC can
--- automatically derive the Gen   <> "iso_language_code" .= iso_language_code
-    <> "to_user_i
+-- | Encode a 'Foldable' as a JSON array.
+foldable :: (Foldable t, ToJSON a)y_
+    , emptyObject_
+    , text
     , lazyText
     , shortText
     , string
     , list
-    , di
-      "from_user_id_str"  .= from_user_id_str
-    , "profile_i    threadDelay 30000000
-            readProcessNull "docker" ["irDotStackProgName
-          buildPlanDirExists <- doesDirExist ut -> do
-  packages <- view $ buildConfigL . to (.smWanted.projewithBool
-    , withEmbeddedJSON
-
-    , pairs
-    , foldable
-    l
-  , relDirCompilerTools
-  , relDirHoogle
-  , relFileDatabaseHooffset of the form @+0000@ or @-08:00@, where the first
--- two d     , project = smw.project
-      , deps = smw.deps
-      , gloJSON v = do
-    s <- parseJSON v
-    case readMaybe s of
-      N
-
-defaultBuildOpts :: BuildOpts
-defaultBuildOpts = BuildOpts
-  {parseResultHandler args f =
-    if isInterpreter
-    then do
-  
-
--- | Get the 'Bool', defaulting to 'True'
-fromFirstTrue :: Fir] :: HM.HashMap Int Int)
-  , ndExample "Map Int Int"
-        [ " as the minus sign is recognized by outer scanner already.
+    , dict
+    , null_
+    , bool
+    --right   :  © 2022 Julian Ospald
+-- License     :  MIT
 --
-sc  = Sci.scientific coef (negate n)
+-- Maintainer  :  Julian Ospald <hasufell@posteo.de>
+-- Stability   : .)
+    -- * Liftings to unary and binary type constructors
+    , FromJSON1(..)
+    , parseJSON1
+    , omittedField1
+    , FromJwise   -> Nothing
+    A.IError _ _      -> Nothing
 
-    go_sci :: Integer -> IntordDot   #-}
+-- | Like 'decodeStrict' but returns an error message when decoding fails.
+e "system-ghc"
 
-module Stack.Types.Runner
-  ( Runn    ( createDirectoryIfMissing, withCurrentDirectory, getCuore executing."
-    <> metavar "DIR"
-    <> completer dirComplethr (fromIntegral c)) (off + 1) (len - 1)
-    | otherwise = Left  | W.LOWER_E == w8 || W.UPPER_E == w8  -> go_sci int 0 bs'
-     e)
+configMonoidInstallGHCName :: Text
+configMonoidInstallGHCName = "install-ghc"
 
-    , castFloatTests
-    , doubleToScientificTests
-    ]
+configMonoidSkipGHCCheckName :: TeithSystemTempDir
+  , withKeepSystemTempDir
+  , sinkProcessStderrStdout
+  , sinkProcessStdout
+  , logProcessStderrStdout
+  , read , toFilePathNoTrailingSep projectRoot ++ ":" ++
+              toFilePathNoTrailingSep projectRoot ++ mountSuffix
+          , "-ersions are incompatible with "
+    , stackProgName
+    , " (you have '"
+    , versionString haveVersion
+    , "'): "
+    , intemodule Main (main) where
 
---ype OptionField = OptionField { optionField :: Option Int }
-  det
--- will not be omitted from the JSON object, unless the field otifyIfNixOnPathName
-  notifyIfGhcUntested <-
-    FirstTrue <$> []
- where
-  utf16Char :: Int -> [Word16] -> [Word16]
-  utf16Charinput while parsing number literal"
-    errUnx w8 = err $ "Unexp, !bs3) -> TkPair (Key.fromText t) $ goT bs3 $ \bs4 -> goR1 bs4 or =
-    let desc = "Data.Text.Internal.Encoding.decodeUtf8: Invial unicode friendly decoding.
+import           Data.Functor.Classes       (liftEq)
+import           Data.Proxy                 (Prox      16 17 18 19 20
+                      21 22 23 24 25
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE RankNTypes   #-}
+moduleout_
+
+-- | Name of home directory within docker sandbox.
+homeDirName :: Path Rel Dir
+homeDirName = relDirUnderHome
+
+-- | Directo -- name is used.
+  , projectStorage :: !ProjectStorage
+  -- ^ Database connection pool for project Stack database
+  , curator : =
+  KM.traverseWithKey unwrap . KM.fromListWith (\_ _ -> Nothing) . (fmap . fmap) Just
+  where
+
+    unwrap k Nothing = Left $ "it'
+    , explicitParseField
+    , explicitParseFieldMaybe
+    , explicitParseFieldMaybe'
+    , explicitParseFieldOmit
+    , exprogate range
 --
--- On windows this decodes as relude
-
--- | Which build log files to dump
-data DumpLogs
-  = DumingException String
+-- Looking up the locale requires IO. If you're not worried about calls
+-- to 'setFileSystemEncoding', then 'unsoxy @RecordB) helloNullObj2 -- fails because Default instance expects only numbers
+      ]
+    , testGroup "defaultOptions"
+    napshotLocationName
+  noRunCompile <- FirstFalse <$> obj ..:? configMonoidNoRunCompileName
+  stackDeveloperMode <- First <$> objng -> Either EncodingException String
 decodeWithTE enc ba = unsafePerformIO $ do
- solute path to executable."
+  r <- try @SomeException $ BS8.useAsCString   -> tkErrEOF ":"
+        Just (W8.COLON, !bs3) -> TkPair (Key.fromText t) $ goT bs3 $ \bs4 -> goR1 bs4 k
+        Just _     lendar.Month.Compat (Month)
+import Data.Time.Calendar.Quarter.Compat (Quarter, QuarterOfYear)
+import Data.Version (Version)
+impo:: !(Set PackageName)
+    -- ^ Packages for which Stack should ignore test suites.
+  , expectTestFailure :: !(Set PackageName)
+ t s < 0 = (Generic, Nothing)
+      | otherwise            = (Fixed,   Just 0)
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+morigStackRoot = origStackHomeDir </> relDirDotStackProgName
+          buildPlanDirExists <- doesDirExist (buildPlanDir origStackRntific -> [Scientific]
+shrScientific s = map (uncurry Sci.scientific) $
+    QC.shrink (Sci.coefficient s, Sci.base10Exponent s)ied.
+newtype Parser a = Parser {
+      runParser :: forall f r.
+                   JSONPath
+                -> Failure f r
+     solute path to executable."
     ]
 
 -- | Docker configuration.
-da( EscapingMode (..)
-  , argsParser
-  , parseArgs
-  , parseArgsFr   Test.Hspec ( Spec, describe, it, shouldBe )
-impng as BS
-import qualified Data.ByteString.Builder as B
-i  , compareBench "BigProduct" T.bigProduct G.bigProduct
-  , compensureConfigureScript dir = do
-  let fp = dir </> relFileConfiguNullObj2
-      ]
-    , testGroup "defaultOptions, higher"
-           (Text)
+data DockerOpts = DockerOpts
+  { enable :: !Bool
+     -- ^ Is usinm)
+        (globalOpts GhciCmdGlobalOpts)
 
--- | A well-formed JSON token stream.
---
--- /Note/me = "package-index"
+  globalOpts :: GlobalOptsContext -> Parser GlobalOptsMonoid
+  globalOpts kind =
+    env DepPackage
+additionalDepPackage buildHaddocks location = do
+  (name, gpd) <-
+    case location of
+      PLMutable dir -> do
+how a) => proxy a -> Value -> IO ()
+counterCase _ obj = case decode @a (encode obj) of
+  Nothing -> return ()
+  Just v  -> asser= LT.decodeUtf8 . encodingToLazyByteString . toEncoding
 
--- Deprecated in favour of package-index
-c    stackRoot = view stackRootL config
-      sandboxHomeDir = sailePathNoTrailingSep sshDir)
-        (toFilePathNoTrailingSep (scmd || "-" `L.isPrefixOf` NE.head args
-     then pure f
-  else d
---
--- Looking up the locale requires IO. If you're not worried g (Show, Eq, Data, Typeable)
+-- | Encode a JSON 'Value' to a "Data.Text" 'Builder', which can be
+-- igureScript dir = do
+  let fp = dir </> relFileConfigure
+  exists <- doesFileExist fp
+  unless exists $ do
+    prettyInfoL
+     nt locale,
+--    but PEP 383 only works properly on UTF-8 encodings, so good luck)
+-- 2. on windows does permissive UTF-16 encode that using this in conjunction with 'unsafeFromChar' to
+-- convert from @[Char]@ to 'OsPath' is probably not what
+-- you want,      (Fixed (..), Pico)
+import           Data.Integer.Conversion           (textToInteger)
+import           Data.Text.Array    LBS.ByteString -> Maybe a
+    decL = decode
 
-data NoConstructors
+    decS :: BS.ByteString -> Maybe a
+    decS = decodeStrict
 
-data OneConstersion as the one that Stack
-    -- depends on as a library and      = ()
-    rnf (Unary n)       = rnf n
-    rnf (Product s c x64)
-import Data.Maybe as X (fromMaybe, catMaybes, mapMaybe)
-impo  toLocNoSnapshot :: PackageName -> RIO env (Either StyleDoc Pacr = do
-    config <- view configL
-    user <-
-        if fromMayeBenchmarks = True
-    , flags
-    , ghcOptions = []
-    , cabal.)
-  , CabalVerbosity (..)
-  , ProgressBarFormat (..)
-  , bu, styles
-    , hideSourcePaths
-    , recommendUpgrade
-    , noti    , "These Docker versions are incompatible with "
-    , stackicative
-                   ( Parser, ParserFailure, ParserHelp, ation for Docker.
-dockerOptsParser :: Bool -> Parser DockerildOptsCLI ( ApplyCLIFlag (..) )
+    decT :: BS.ByteSte = DotNetTime {
+      fromDotNetTime :: UTCTime
+      -- ^ Acquire the underlying value.
+    } deriving (Eq, Ord, Read, Show, Tnteger fraction exponent
+-- integer  := 0 | [1-9][0-9]* | -0 | -[1-9][0-9]*
+-- fraction := "" | . [0-9]+
+-- exponent := "" | E sescapeChar c    = [c]
 
--- | Parser for package:[-]flauser_id" int64 obj 
-    <*> pure Nothing -- our bench corpus doeon
-  , decodeUtf
-  , decodeWith
-  , decodeFS
-  , unpack
+-- | A key\/value pair for an 'Object'.
+type Pair = (Key, Value)
 
-  -- *es/"
-      pure
-        ( baseUrl <> "packages/" <> variant
-    then throwIO OnlyOnHostException
-        else inner
-
--- | Run a   #-}
-
--- | Extra Path utilities.
-module Path.Extra
-  ( toFilelds = False }
-
-omittingOptions :: Options
-omittingOptions = deface c then 0x0200000 else 0
-        , fromEnum c
-        ]
-
-instahing with a predicate
-    find,
-    filter,
-    partition,
-
-    nner )
-
--- | Function underlying the @stack update@ command. Upd initOptsParser
-
-  install = addBuildCommand'
-    "install"
-    .)
-  , GhcPkgExe (..)
-  , HasCompiler (..)
-  , cabalVersionL
-  ,atabase.
-  -> RIO
-       env
-       ( PackageDBStack
-    balOpts ( GlobalOpts (..) )
-import           Stack.Types.Project     ( ExecOpts (..), ExecOptsExtra, SpecialExecCmd (..)
-         -- we accept hours <24 and minutes <60
-        -- this is hoesonQQ :: QuasiQuoter
-aesonQQ = QuasiQuoter
-    { quoteExp  = aeince 2.0.2.0
-fromShortText :: ST.ShortText -> Key
-fromShortText rMonoidImage String
-  deriving Show
-
--- | Newtype for non-orphalObj2 -- fails because Default instance expects only numbers
-       -> tkErrBS bs ", or ]"
-
-    -- Record
-    goR :: Parser TkRew images.
-  , detach :: !FirstFalse
-    -- ^ Whether to run a de  copy "src/Unlisted_FAIL.hs" "src/Unlisted.hs"
-    stackErr ["b.Types.ApplyProgOptions
-  ( ApplyProgOptions (..)
-  ) w present in the output, oranges is omitted if 'Nothing'
--- instason.Key as Key
-import qualified Data.Aeson.KeyMap as KM
-import Stack working directories (.stack-work by \
-    \default). Shor -> [Text] -- ^ GHC options
-  -> [Text] -- ^ Cabal configure optor
+-- | Create a 'Value' from a list of nale "Semigroup.WrappedMonoid Int" "2" (Semigroup.WrapMonoid 2 :: Semigroup.WrappedMonoid Int)
+#if !MIN_VERSION_base(4,16,0)
+  , eor
 
 unescapeText' :: ByteString -> Text
-unescapeText' bs = runTe Stability:   experimental
--- Portability: portable
---
--- Mostdigest) to
-    -- ensure binaries/libraries aren't shared betwee"Stack.Package" module.
-  , targetBuildDepends :: [Dependency]
- (..), (.=), object )
-import           Data.Aeson.WarningParser
-Space #-}
+unescapeText' bs = runText $ \done -> do
+    dest <- A.new len
 
-tkErrEOF :: AsError t =>String ->  t k String
-tkErrEO++ stackYaml
-              , "-v",stackYaml++ ":" ++ stackYaml +wed as expression only, used as a declaration)"
-  }
-#else
-  { qu  , flow "is on the path in Stack's MSYS2"
-     rjSomeBase (createDirIfMissing True) path_dir
-             liftIble
+    (pos, finalState) <-piler <- either throwIO pure $ wantedToActual $ snapshotCompiler snapshot
+    pure
+      SMActual
+        { compiler
+        , pcting , or }"
 
-deriving instance Show NewPrettyException
+    -- key of record (after double quote)
+    goRK :: Parser TkRecord k
+    goRK bs1 k = scanStringLiteral (\t bsdCommands = do
+    unless isInterpreter $ do
+      build
+      install
+      uninstall
+      test
+      bench
+      haddock
+    CmdName )
+import           Stack.Prelude
+import           Stack.Options.Utils ( hideMods )
+import           Stack.Types.VersioStrip
+      , exeStrip
+      , buildHaddocks
+      , haddockOpts
+      , openHaddocks
+      , haddockDeps
+      , haddockInternaoJSON a => ToJSON (HRecordA a) where
+  toJSON = toJSON1
+  toEncoding = toEncoding1
 
-instance Pretty ontain an error message and a json path to failed element.
---
--- .= next_page
-    , "results_per_page" .= results_per_page
-    ,cative as X (Alternative (..), Const(..), liftA2)
-impor-- The resulting components do not contain the separators.  Two (</>), mkRelDir, mkRelFile, parseAbsFile )
-impine
-  , putUtf8Builder
-  , putBuilder
-  , ppException
-  , prettyerPathsL . to (.compilerVersion)
+instance FromJSON1 HRecordA where
+  liftParsef (exp10 + exp10')
 
-cpWhich :: (MonadReader env m, using 'encode'.
---
--- You can use the conversions to 'Builder's and that the least significant digit of s
--- is not necessarily
-  ]
+    go_sci_neg :: Integer -> Int -> Text -> Int -> Text -> r
+    go_sci_neg !coef !exp10 !bs2 !n !bs = casele)
+    , testProperty "Int" $ roundTripEq @Int
+    , testProperty "NonEmpty Char" $ roundTripEq @(NonEmpty Char)
+    , testPro <>
+      row "completed_in" completed_in <>
+      row "since_id_str" since_id_str <>
+      row "max_id_str" max_id_str <>
+          exePath <- resolveFile' =<< liftIO getExecutablePath
+              cmdArgs args exePath
+          | otherwise -> throwIO UnShell "autoreconf" <> "."
+             ]
+        <> blankLine
+        <> flow "Stack encountered the following error:"
+     Data.Scientific           (Scientific)
+import           Data.Text                 (Text)
 
--- c.f. https://github.com/haskell/aeson/pull/839#issuecomon
-    (Just versionString')
-    hpackVersion
-    "stack - The Hror about the undefined flags
-            else pure $ Just $ UFF m => Path absrel File -> Builder -> m ()
-writeBinaryFileAtomicctions to parse command line arguments for Stack's @eval@ comma)
-  -- Integral values are truncated, and overflowed
-  -- https:rr offS lenS) = start offS lenS where
-    start :: Int -> Int ->f _ HRecordC {..} = pairs  $ "required" .= required <> explicitTimport Network.URI (URI)
-import Numeric.Natural (Natural)
-impor flow "While downloading, Stack encountered"
-         , msg
-    k)
-        . Map.delete "GHC_PACKAGE_PATH"
-        . Map.insert t =  "Please report this bug at Stack's repository."
-
--- | Maybent
-    (do s <- O.str
-        either O.readerError pure (parseTeitle constr =
-    addCommand
-      cmd
-      title
-      globalarator _ = False
-
--- | If given file in 'Maybe' does not exist,   , runProcess, runProcess_, setStderr, setStdin, setStdout
-   : Word8 -> Word16
-decodeHex x
-  | 48 <= x && x <=  57 = fromIn  , configCacheKey
-  , loadConfigCache
-  , saveConfigCache
-  ,  value from a lazy 'L.ByteString'.
--- If this fails due to incomof
-    [] -> pure Nothing
-    [(_,i)] -> pure (Just i)
-    _ -.preFetch
-  , keepGoing = Nothing
-  , keepTmpFiles = defaultFirsd .&. 0x7) `shiftL` 18)
-{-# INLINE setByte4 #-}
-
-decode :: Utf - in  case maybeCommon of
-        -- Package is not available as ermissive UTF-16 encoding, where coding errors generate
---    Chect :: SomeType c () Int -> Encoding
-thSomeTypeToEncodingTaggedOaySeparator kont = unconsAscii (unexpectedEOF "a day separator, Types.Internal           (AesonException (..), formatError)
-
-impParser currentDir kind
+-- | A well-formed JSON token stream.ocalBins)
    where
-    hide = kind /= OuterGlobalOreterCommand path stackArgs fileArgs = do
-    progName <- getProches of the build plans are stored.
-buildPlanCacheDir ::
-     Pa     ( doesDirExist, doesFileExist, ensureDir, getCurrentDir )
-iption
+    onlyLocalBins =
+         (lowercase progName /= lowercase stackProgName)
+      && not ( osIsWindows
+     Opts, dirCompleter, firstBoolFlagsFalse
+                   , firstBoolFlagsNoDefault, firstBoolFlagsTrue, optionalFirst
+   pure Map.empty
+    Left e -> throwIO e
+ where
+  missingImagePrefixes = ["Error: No such image", "Error: No such object:"]
 
--- | Helper for build and install commands
-buildCmd :: Bu| unsafePackLenLiteral |]
-    `TH.appE` TH.litE (TH.integerL (fr ]"
-        Just (W8.RIGHT_SQUARE, !bs1) -> TkArrayEnd (k bs1)
-       => a -> IO ()
-check x = do
-  unless (Success x == (fromJSO
-  -> [Path Rel File] -- ^ Top-level file names to exclude from | Like `withSystemTempDir`, but the temporary directory is not d(Maybe Version, Set PackageName)) -- truly unknown
-      (Map PakerOptsFromMonoid ::
-     MonadThrow m
-  => Maybe Project
-  -> Miving (Data, Eq, Generic, Hashable, IsString, NFData, Ord,  r
-munchDigits kontEOF kontC (Text arr off len) =
-    munchDigititraverse f g (TkRecordOpen ts) = TkRecordOpen <$> bitraverse f  Just (34, _)     -> ok (unsafeDecodeASCII (lbsTake n bs0)) (lbs    -> m (Maybe (Path Abs Dir))   -- ^ Absolute directory path.
-Name
-  -> SnapshotPackage
-  -> RIO env DepPackage
-snapToDepPackaxp = \s -> do
-      osp' <- either (fail . show) (pure . OsStrinUserConfigPathDeprecated = (</> $(mkRelFile "stack.yaml"))
+-- |    isInfixOf,
+    isPrefixOf,
+    isSuffixOf,
 
--- |stem.PosixCompat.Types ( GroupID )
+    -- ** Search for arbitrary substrings
+    breakSubstring,
 
-handleSetGroups :: [GroupID]System.OsPath.Data.ByteString.Short as BS8
-import <- jsonSubWarnings (o ..:? haddockOptsArgName ..!= mempty)
-    c -- ^ Override project stack.yaml
-  , lockFileBehavior :: !Lock liftToEncoding = genericLiftToEncoding defaultOptions { omitNote W8.HYPHEN        bs  _   k      = scanNumberLiteral (\n bs' ->  buildFrac :: Int64 -> Builder
+    -- * Searchinample "Maybe String" "\"foo\""          (pure "foo" :: Maybe String)
+  , example "Maybe [Identity Char]" "\"xy\""  (pure [pure 'here
+  displayException WiredInPackagesNotParsedBug = bugReport "[S-6057]"
+    "Parse error in wiredInPackages."
+
+-- = W.DIGIT_9    -> state_dec (n + 1) bs'
+                | W.LOWER_E == w8 || W.UPPER_E == w8  -> go_sci coef (negate n) bs'
+     <> "refresh_url" .= refresh_url
+    <> "next_page" .= next_page
+    <> "results_per_page" .= results_per_page
+    <> "page" .= d
+  , compareBench "BigRecord" T.bigRecord G.bigRecord
+  , compareBench "BigProduct" T.bigProduct G.bigProduct
+  , compareBench  Stack working directories (.stack-work by \
+    \default). Shortcut for 'stack clean --full'."
+    cleanCmd
+    (cleanOptsPa, isEOFError )
+import           System.Process
+                   ( CreateProcess (..), StdStream (..), createProcess, proc
+    sUntaggedValue :: Options
+optsUntaggedValue = optsDefault
+    { sumEncoding = UntaggedValue
+    }
+
+optsTagSingleConstructors :: Just path -> pure (Just path)
+    Nothing | Just dir == upperBound -> pure Nothing
+            | parent dir == dir -> pure Nothi.)
+  , HaddockOptsMonoid (..)
+  , TestOptsMonoid (..)
+  , BenchmarkOptsMonoid (..)
+  , CabalVerbosity (..)
+  , ProgressBarFormatc)
+  where
+    (real,frac) = s `quotRem` pico
+
+    buildFrac :: Int64 -> Builder
     buildFrac 0 = mempty
-    bName
-  rebuildGhcOptions <- FirstFalse <$> obj ..:? configMen ba $ \fp -> peekFilePathPosix fp
+    buildFrac i = char.!= mempty)
+    <*> fmap (Set.map unCabalString) (o ..:? "skip-bench" ..!= mempty)
+    <*> fmap
+          (Set.map unCabalStringnapshots
+  , relDirGlobalHints
+  , relFileGlobalHintsYaml
+  , relDirInstall
+  , relDirCompilerTools
+  , relDirHoogle
+  , relFileINE munchDigits #-}
+munchDigits
+    :: (Text -> Either String r)
+    -> (Text -> Char -> Text -> Either String r)
+    -> Text
+   -- in goEsc and goSlash we don't need to check for control characters as unescapeText verifies that.
+    goEsc :: Int -> ByteSt    { quoteExp  = aesonExp
+    , quotePat  = const $ error "No quotePat defined for jsonQQ"
+    , quoteType = const $ error "No      ( ActualCompiler, WhichCompiler (..), compilerVersionText
+                   , whichComail $ "Mount read failed: " ++ s
+      Just x -> pure x
 
--- | This mimics the filepa-compatible Stack executable
-  , setUser :: !(Maybe Bool)
-    -ring . packageNameString
-{-# LANGUAGE NoImplicitPrelude     #-  -- ^ Name of the project to create.
-  , createBare   :: Boo go.resolver
+-- | Options for Docker repository or image.
+data DockerMonoidRepoOrIm (Word8)
+import Foreign.ForeignPtr (ForeignPtr)
 
--- | Create a new project with the given options.
-eption ["clean", "--stack-yaml", "stack-good.yaml", "--full"]
-  s True
-    <$> boolFlags True
-          "ghc-package-path"
-     " "[1,2,3]" (Set.fromList [3, 2, 1] :: Set.Set Int)
-  , example t' :: Parser Value
-jsonLast' = jsonWith' (pure . KM.fromListWithDefault
-instance Bifunctor TkRecord where bimap = bimapDefault
+#if !MIN_VERSION_bytestring(0,11,0)
+import GHC.ForeignPtr (plusForeignPtr)
+#endlong "cwd"
+    <> help "Sets the working directory before executing."
+    <> metavar "DIR"
+    <> completer dirCompleter
+    ))
+uto'.")
 
- (Key)
-import           Data.Scientific            (Scientific)
-SON v of
-    A.ISuccess x
-        | bsSpace bs' -> pure x
-      
-  <*> optionalFirst (option (eitherReader' parseDockerStackExe)")]
+readColorWhen :: ReadM ColorWhen
+readColorWhen = do
+  s <- OA.readerAsk
+  case s of
+    "never" -> pure ColorNever
+    ise          -> Left $ "Unexpected '" ++ show c ++ ", expecting -, +, or a digit"
 
--- | Used in Stack.Setup for detecting libtinfo, see commen  Generics.Deriving.Monoid ( mappenddefault, memptydefault )
-imp HH:MM[:SS[.SSS]]@.
--- The space may be replaced with a @T@.  Thding (encodingToLazyByteString)
-import Data.Aeson.TH (deriveJSONteral
-    :: forall r. (Number -> ByteString -> r)
-    -> (Strin8 <= W8.DIGIT_9   -> err "Number literal with leading zero"
-    e.unsafeTake n bs1)
-            coef = int * 10 ^ n + frac
-         -- other disabled, they are interesting for comparison only.    , localTime
-    , utcTime
-    , timeOfDay
-    , zonedTime
+    loop :: (Integer -> Integer) -> IntldOpts (..) )
+import           Stack.Types.BuildOptsCLI
+                   ( BuildCommand (..), BuildOptsCLI (..), FileWatchOptsbution.Types.MungedPackageId ( MungedPackageId (..) )
+import           Distribution.Types.MungedPackageName ( MungedPackagitrary Key where
+    arbitrary = fromString <$> QC.arbitrary
+    shrink k  = fromString <$> QC.shrink (toString k)
 
-  de = do
-  entrypointMVar <- view dockerEntrypointMVarL
-  modifyypes.ColorWhen
-  ( ColorWhen (..)
-  , readColorWhen
-  ) whTypes.Resolver ( AbstractResolver, Snapshots (..)figL . lens (.config) (\x y -> x { config = y })
-  {-# INLINE coString String
-lbsToTokens bs0 = goT bs0 id where
-    goT :: ParL.toStrict <$> proc "docker" args readProcessStdout_
+-- | @sincefaultBuildOpts :: BuildOpts
+defaultBuildOpts = BuildOpts
+  { libProfile = defaultFirstFalse buildMonoid.libProfile
+  , exeProfilp "Mount volumes from host in container (can be specified \
+                \multiple times)."
+        ))
+  <*> firstStrOption
+ here
+  (<>) = mappenddefault
 
--- | Name re package candidates, locally."
-    unpackCmd
-    unpackOptsParstring (displayException e)
-  pretty (SingleFileDBUnsupported p   , coverage
-      , disableRun
-      , maximumTimeSeconds
-     do
-  mres <- lookupEnv "STACK_TEST_SPEED"
-  case mres of
-    Jutories used by Stack for building"
-    , "extra-include-dirs: [/License as SPDX
-import           Distribution.License ( License t k) <> TB.singleton ':' <> go v
+-- | Left-biased combine Docker options
+instance Monoid DockerOptsMonoid where
+  mempty = memptydeack $ utf8BuilderToText $ display blob
+    ]
+  pretty (PrettyRawSnapshotLocation (RSLFilePath resolved)) =
+    style File (fromSN t4
+       in t2 `deepseq` t3 `deepseq` t4 `deepseq`
+          v2 `deepseq` v3 `deepseq` v4 `deepseq`
+            defaultMain
+      , map go (Map.toList unknown)
+          , case mapMaybe goRecommend $ Map.toList unknown of
+              [] -> []
+   String String
+bsToTokens bs0 = goT bs0 id where
+    goT :: Parser Tokens k
+    goT (skipSpace -> bs) k = case BS.uncons bs of
+ (varE, ExpQ, Name, Q, newName, runIO)
+import System.IO.Unsafe        (unsafeInterleaveIO)
 
-string :: T.Text -> Builder
-st)
+import qualified Data.Map as Map
+imptall the latest version"
+          mpir <- getLatestHackageVersion YesRequireHackageIndex hooglePackageName UsePreferredVersionst's
+  , requireDockerVersion :: !VersionRange
+    -- ^ Require a version of Docker within this range.
+  }
+  deriving Show
 
-    outer = inner <?> Key "outer"
-    inner = parserThrowErro     , intercalate ", " $ map packageNameString $ Set.toList usedo
-    args <- getArgs
-    (a, (b, c)) <- let parserPrefs = prefShow)
-
-data DepLibrary = DepLibrary
-  { main :: !Bool
-  , subLibT.pack . toFilePath . (.compiler)
-    )
-  , ( "Directory contaie that using this in conjunction with 'unsafeFromChar' to
--- conSON . toJSON $ i of
-      (ISuccess v)      -> v `eq` i
-      (I     | not (v' `withinRange` docker.requireDockerVersion) ->
-   n "Stack.ComponentFile" module.
-  , jsSources :: [FilePath]
-    ectory used when outside of a project.
-implicitGlobalProjectDirDing existing files:"
-    <> line
-    <> bulletedList (map (styleject where
-  -- Expanding the constructor fully to ensure we don    -> kont (NumScientific sci) bs
-        Just (w8, bs')
-   | E sign [0-9]+ | e sign [0-9]+
+-- | E sign [0-9]+ | e sign [0-9]+
 -- sign     := "" | - | +
 --
--- ing -> Integer
--- decodeViaRead = read . LBS8.unpack
+-- This scanner doesn't recognize the leading minus sign, we recognizd (newOpts, initOpts) =
+  withGlobalProject $ withConfig YesReexec $ do
+    dir <- new newOpts initOpts.forceOverwrite
+    existSystem.OsPath.Data.ByteString.Short as BS8
+import qualified System.OsPath.Data.ByteString.Short.Word16 as BS16
 
-generate : (ShortByteString, fromShort)
-import Data.ByteString.Short.Inter    <> indent 4 (style Shell $ flow "stack exec where.exe -- aut* consistency checks are not performed,
--- * use Stack program nflow "and not the version that was just installed."
-    arget] }
-    runRIO config $ withEnvConfig NeedTargets boptsCLI UntaggedValue = optsDefault
-    { sumEncoding = UntaggedValue
-   Currently pos gets only increased over time, so this check shoution.Text ( display, simpleParse )
-import           "Cabal" DishcVariantParser hide = option readGHCVariant
-  (  long "ghc-vari    if os - ow < 4 then done OutputUnderflow ir ow else do
-   then AsUnitId else AsDefault
+import GHC.Base
+ hspec, it, shouldBe )
+import           Test.Hspec.QuickCheck ( prop )
 
--- | Type representing \'pretty\'tty file
-    ]
-  BS.readFile (toFilePath file) >>= fmap fst . panner ( HasRunner (..), Runner, globalOptsL )
-impe-docker-version"
+main :: IO ()
+main = hspec spec
 
--- | Argument name used to pass docker entryp    -- using it.
-    , "integer-simple"
-      -- A magic packagples = map getDefault (C.genPackageFlags gpd)
-    in  Map.singleystem.Process
-import Text.ParserCombinators.ReadP (readP_to_S)
+spec :: Spec
+spec = do
+String.Short (ShortByteString, fromShort)
+import Data.ByteString.Short.Internal (createFromPtr)
+import GHC.Exts (Addr#, Ptr (PtrlerBuild ( CompilerBuild )
+import           Stack.Types.DumpPackage ( DumpPackage )
 
-------
--- Decimal numbers as Text
-------      (UTCTime (..))
+-- | Paths on the filesystem for the compil pkgName $ PD.package $ PD.packageDescription gpd
+              pkgFlags = Set.fromList $ map PD.flagName $ PD.genPackageFlags greq
+  let reply = Coord 123.4 20
+  BL.putStrLn (encode reply)
+-- |
+-- Module:      Data.Aeson.Internal.Time
+-- Copyright:   (c) e an initialisation."
+    newCmd
+    newOptsParser
 
-import qualified Data.Text      orall a m. (A.FromJSON a, MonadThrow m) => T.Text -> m a
-throwDe      11 12 13 14 15
-                      16 17 18 19 20
-     e image, adjust its UID/GID
-        -- and home directory
-     o ..: dockerImageArgName)
-      <|> (Just . DockerMonoidRepo <$whereas on Unix the
-  -- location is passed to the binary using ckages are shadowed by local packages:"]
-          , map go (Maphttp://docs.haskellstack.org/en/stable/yaml_configuration/"
-    ompName (..), fromCabalName )
+  path = addCommand'
+    "path"
+    "Print out handy path information."
+    cutables
+exeExt :: String
+exeExt = if isWindows then ".exe" else ""
 
--- | The value for a map from depPath
-  -> NonEmpty String
-  -> ParserFailure ParserHelp
-  -> IO drianStackDotYaml = relDirHadrian </> stackDotYaml
+-- | Is the OS Windows?
+isWindows :: Bool
+isWindows = os ==NE fmap #-}
 
--- | Relativ     ( HasProcessContext (..), ProcessConfig, ProcessContext
-   IO env Text
-  loadLocalFile path extract = do
-    logDebug $
-   kages and extra-deps")
-    , ("extra-package-dbs", "# Extra packgs #-}
+instance Functor Result where
+    fmap f (Success a) = Success (f a)
+    fmap _ (Error err) = Error err
+    {-# INLvalue from a lazy 'L.ByteString'.
+-- If this fails due to incomplete or invalid input, 'Nothing' is
+-- returned.
+decode :: (A.Fr --extra-lib-dirs=... (set by
+  -- nix-shell) - we need to find the first argument which is a file, everything
+  -- afterwards iglobal project directory used when outside of a project.
+implicitGlobalProjectDirDeprecated :: Path Abs Dir -- ^ Stack root.
+   B <- packageDatabaseDeps
+  localDB <- packageDatabaseLocal
+  snapInstallRoot <- installationRootDeps
+  localInstallRoot <- instaecoding.Tokens
 
-module Stack.Types.TemplateNameSpec
-  ( spec
-  ) wh   Database.Persist.Sql
-                   ( PersistField (..),zero "y"]
-         in toJSON subject @?= expected
-    ]
+-- | Helper type-class for constructing errors.
+class    AsError t        where tkErr :: e -> t k e
+instance AsEt (W8.RIGHT_SQUARE, !bs1) -> TkArrayEnd (k bs1)
+        Just (w,  !bs1) -> TkItem $ tokenCase w bs1 bs $ \bs2 -> goA1 bs2 k
 
-  , tes -- ^ Command
-  -> [String] -- ^ Command line arguments
-  -> Con help "Override the target directory for 'stack build --copy-bin  Data.Char                         (chr)
-impode #-}
+   , [Mount (toFilePath exePath) mountPath])
 
-module PropertyTH ( templateHaskellTests ) wheraccept space instead of T
-        -- RFC3339 has a note suggestirt GHC.Stack ( HasCallStack )
-import GHC.Exts ( inline )
+-- | Error if running in a container.
+preventInContainer :: MonadIO m => m () -> m ()   -> O.Parser TemplateName
+templateNameArgument =
+  O.argument
+    (do s <- O.str
+        either O.readerError pure (parseTempd.
+defaultUserConfigPath :: Path Abs Dir -> Path Abs File
+defaultUserConfigPath = (</> $(mkRelFile "config.yaml"))
 
-impoUnique ConfigCacheParent
+-- | Deprecaault_" .= default_
+  toEncoding RecordB {..} = pairs  $ "required" .= required <> "optional" .= optional <> "default_" .= defauling -> IO String
+decodeWithBaseWindows ba = BS16.useAsCWStringLen ba $ \fp -> peekFilePathWin fp
 
--- | Build key used to retrieve configalOpts
+-- | This mimics the filepath se we write UTF-16LE
+    | otherwise = create (w * 2) (`go` 0)
+  where
+    go mba ix
+      | ix < 0 || ix >= w * 2 = pure ()
+   he Cabal-syntax type is
+-- 'Distribution.Types.UnqualComponentName.UnqualComponentName'.
+
+-- Ideally, we would use the Cabal-syn(Maybe (Maybe Int)))
+  -- Integral values are truncated, and overflowed
+  -- https://github.com/bos/aeson/issues/317
+  , MaybeExhat 'stack.cabal' is generated from
+    -- 'package.yaml'.
+    _ <- readProcess "stack" ["build", "--dry-run"] ""
+    gStackPackt GHC.IO.Encoding.Failure ( CodingFailureMode(..) )
+#if defined(mingw32_HOST_OS) || defined(__MINGW32__)
+import GHC.IO.Encodistall Hoogle, build Haddock documentation and \
+              \generate a Hoogle database."
+              idm
+        <*> switch      Network.HTTP.Client ( applyBasicAuth )
+import           Network.HTTP.StackClient
+                   ( HttpExceptiust p) = bool Nothing (Just p) <$> doesFileExist p
+
+-- | See 'rejectMissingFile'.
+
+rejectMissingDir ::
+     MonadIO m
+  => Maybe Shell (flow "stack ghc") <> ","
+         , style Shell (flow "stack runghc") <> ","
+         , "or"
+         , style Shell (flob = a * 10 + fromIntegral (b - 48) -- 48 = '0'
+{-# LANGUAGE TypeApplications #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
+module UnitTe    -- Check final state. Currently pos gets only increased over time, so this check should catch overflows.
+    when ( finalSmmand.
+data InitOpts = InitOpts
+  { searchDirs     :: ![T.Text]
+    -- ^ List of sub directories to search for .cabal files
+ utable.
+newtype ExeName
+  = ExeName { exeName :: Text }
+  deriving (Data, Eq, Generic, Hashable, IsString, NFData, Ord, Shos decodes as UTF16-LE (strictly), which is a pretty good guess.
+-- On unix this decodes as UTF8 (strictly), which is a good guesg ->  t k String
+tkErrBS bs expected = tkErr $
+    "Unexpected " ++ showBeginning bs ++ ", expecting " ++ expected
+{-# INLINE tko components delimited by
+-- separators, where the predicate returns True for a separator element.
+-- The resulting components dr ( AbstractResolver, Snapshots (..) )
+import           Stack.Types.Version ( stackMajorVersion )
+
+-- | Type representing exceptNFData T1 where
+    rnf (T1 t) = rnf t
+instance Hashable T1 where
+    hashWithSalt salt (T1 t) = hashWithSalt salt t
+
+instal.Monad.Trans.Writer ( runWriter, tell )
+import           Options.Applicative
+                   ( Parser, ParserFailure, Parserr ["init", "--snapshot", "lts-22.21"]
+  stack ["init", "--snapshot", "lts-22.21", "--omit-packages"]
+  contents <- lines <$> reMonoid.splitObjs
+  , skipComponents = []
+  , interleavedOutput = defaultFirstTrue buildMonoid.interleavedOutput
+  , progressBar enerics (Generic)
+import Options
+
+data D a = Nullary
+         | Unary Int
+         | Product String Char a
+         | Record { tcord
+    { field01 :: !Int, field02 :: !Int, field03 :: !Int, field04 :: !Int, field05 :: !Int
+    , field06 :: !Int, field07 ::ker.runArgs
+        , [image]
+        , [cmnd]
+        , args
+        ]
+      )
+  e <- handleSignals docker keepStdinOpen contaiodule System.Info.ShortPathName
+  ( getShortPathName
+  ) where
+
+import           System.Win32.Info ( getShortPathName )
+{-# e of a field is declared as a type variable, it
+-- will not be omitted from the JSON object, unless the field is
+-- specialized gistryUsername <-
+      First <$> o ..:? dockerRegistryUsernameArgName
+    registryPassword <-
+      First <$> o ..:? dockerRegiple "Set Int" "[1,2,3]" (Set.fromList [3, 2, 1] :: Set.Set Int)
+  , example "IntSet"  "[1,2,3]" (IntSet.fromList [3, 2, 1])
+  , r or value and leftover.
+toEitherValue t = unResult (toResultValue t) Left $ \v k -> Right (v, k)
+
+toResultValue
+    :: Tokens k</> binaryName </> stackExeFileName) "--version"
+    when (not global.gAllowDirty && "dirty" `isInfixOf` lower versionOut) $
+       -- only)
+  , logLevel     :: !LogLevel -- ^ Log level
+  , timeInLog    :: !Bool -- ^ Whether to include timings in logs.
+  ,ons 'GADT)
+
+thGADTToEncodingDefault :: GADT String -> Encoding
+thGADTToEncodingDefault = $(mkToEncoding defaultOptions 'GADT)
+
+t     in runParser a path kf' ks
+    {-# INLINE mplus #-}
+
+instance Semigroup (Parser a) where
+    (<>) = mplus
+    {-# INLINE (<S_GHC -O2 #-}
+-- | Parser from strict 'ByteString' to 'Tokens'.
+module Data.Aeson.Decoding.ByteString (
+    bsToTokens,
+) whe , "iso_language_code" .= iso_language_code
+    , "to_user_id_str"    .= to_user_id_str
+    , "source"            .= source
+    
+  <*> optionalFirst (option (eitherReader' parseDockerStackExe)
+        ( let specialOpts = [ dockerStackExeDownloadVal
+    eASCII bs = withBS bs $ \_fp len -> if len == 0 then T.empty else
+  let !(SBS.SBS arr) = SBS.toShort bs in T.Text (A.ByteArray a      (Right (), m) -> hsubparser (m <> metavar commandMetavar)
+          (Left b, _) -> pure (b, mempty)
+
+-- | Non-hidden help be null" $
+        let subject = object ["x" .= Null, zero "y", zero "z"]
+            expected = Just fullP {x = Nullable Nothincation :: !(SomeBase Dir)
+    -- We only need possibly-relative package db location. The relative
+    -- location is used as an CollapsedAbsFile :: MonadThrow m => FilePath -> m (Path Abs File)
+parseCollapsedAbsFile = parseAbsFile . collapseFilePath
+
+-- | kStderr ["test", "--coverage"] $ \out -> do
+        unless ("The coverage report for multi-test-suite's test-suite multi-test-su0 -> do
+                P.writePrimArray arr out 10
+                state_start (out + 1) (inp + 1)
+
+              114 -> do
+   p "roundTrip" [
+            testProperty "2ElemArray" (toParseJSON gSomeTypeParseJSON2ElemArray gSomeTypeToJSON2ElemArray)
+     = do
+  mres <- lookupEnv "STACK_TEST_SPEED"
+  case mres of
+    Just "NORMAL" -> logInfo "Skipping superslow test"
+    Just "SUPE-- Efficiently and correctly parse a JSON string.  The string must be
+-- encoded as UTF-8.
+--
+-- It can be useful to think of party "ApproxUnwrap" $
+      --   gApproxToJSONUnwrap `sameAs` gApproxToEncodingUnwrap
+      , testProperty "ApproxDefault" $
+    Proxy a)) ++ " rejects " ++ show inp) $ do
+    case parse (T.pack inp) of
+        Left _  -> return ()
+        Right a -> assertsMonoid" $ \o -> do
+    rerunTests <- FirstTrue <$> o ..:? rerunTestsArgName
+    additionalArgs <- o ..:? testAdditionalArgsNameth
+    Right res -> toFilePath res
+module Main where
+
+main :: IO ()
+main = putStrLn "This is foo from also-has-exe-foo"
+impo Map.null errs
+    then pure $ BuildPlanCheckOk f
+    else if Map.null cerrs
+      then pure $ BuildPlanCheckPartial f errs
+    VariantParser hide = option readGHCVariant
+  (  long "ghc-variant"
+  <> metavar "VARIANT"
+  <> help "Specialized GHC variant, e.ch "Optim"      $ whnf bsToInteger (LBS.toStrict input)
+        -- , bench "Read"       $ whnf decodeViaRead input
+        -- ,  =
+  liftIO $
+  forM_
+    (M.toList files)
+    (\(fp,bytes) ->
+      do ensureDir (parent fp)
+         writeBinaryFileAtomic fp ies used by Stack for building"
+    , "extra-include-dirs: [/path/to/dir]"
+    , "extra-lib-dirs: [/path/to/dir]"
+    , ""
+    ,lOpts
   <$> eoArgsParser
   <*> execOptsExtraParser
  where
-  eoA f    _ (pos, StateBackslash) 117 = return (pos, StateU0)           , rejects T.parseUTCTime "2023-06-09T02:35:33z"
-        , re@< 0x80@).
---   We use TE.decodeLatin1 here because TE.decodeASze $ Map.unions (Map.elems (fmap (.neededBy) e))
-  in  compare ( `Set.member` wiredInPackages
-  ghcErrors = Map.filterWithKey ise}"
-    , "{\"That\":false,\"This\":\"y\"}"
-    ]
-    (These 'y't =
-  case eitherDecodeStrict $ TE.encodeUtf8 $ T.pack txt of
-  StrictText' but returns an error message when decoding fails.f project root not set.
-getProjectRoot :: HasConfig env => RIO edidate <- loadProjectSnapshotCandidate loc NoPrintWarnings False   , readCreateProcessWithExitCode, readProcessWithExitCode
-   n args =
-  if isWindows
-    then void (stack' args) `catch` (\(_ -- ** Generating and unfolding ByteStrings
-    replicate,
-    uptions.Utils ( GlobalOptsContext (..), hideMods )
-imp but PEP 383 only works properly on UTF-8 encodings, so good lucquired :: String
-  , optional :: NullableNonEmptyString
-  , defmodule Twitter.Manual
-    (
-      Metadata(..)
-    , Geo(..)
-  ame name) <> ","
-         , "as"
-         , why
-         ]
-  preckage Cabal files instead of package \
-                    \namebs, Dir, File, Path, Rel, toFilePath )
-import qualified Path.IO
- = "haddock-for-hackage"
-
-installExesArgName :: Text
-installExes)
-  , PackageDatabase (..)
-  , PackageDbVariety (..)
-  , Packages.StackYamlLoc ( StackYamlLoc )
-
--- | Parsed global command-linst (W8.DOUBLE_QUOTE,  !bs1) -> goRK bs1 k           -- "
-      'Just' @(a,b)@, in which case, @a@ is the next byte in the strirseOldFileStyleDatabase mode path = do
-  -- assumes we've alread.Types.EnvConfig
-                   ( EnvConfig (..), HasEnvConf< -1000" "\"-1234-01-01\""       (fromGregorian (-1234) 1  1)
-
- dates" [
-      bgroup "decode" [
-        bgroup "UTCTime" [
-    long.
-    vs' = filter (not . predicate) $ take 50 vs
-
-    -- sh  , "--system-ghc"
-                   , "--no-install-ghc"
-     Help
-    [ "User packages to be built."
-    , "Various formats ce3Top :: (Num a, Bits b, Bits a, Integral b) => a -> b -> a
-setBOnCodingFailure
-
-mkUTF16le_b :: CodingFailureMode -> TextEncodind -> stripped
-
--- | String representation of Stack package versiStack.Storage.Util ( handleMigrationException, updateSet )
-imploat Int, +Infinity" "{\"-inf\":1}"  (HM.singleton (negate 1/0)     | inp == end = throwDecodeError
-          | otherwise = do
-     -- In the middle of parsing a UTF string.
-      f dest (pos,d the following note,
--- which is no longer true as these tests 
-{- stack script
-   --resolver lts-22.21
-   --ghc-options -Wall
-guments to pass to all 'stack' invocations.
-stackArgs :: Global a.Char
-import Language.Haskell.TH.Quote
-    ( QuasiQuoter (..) )d as a pattern)"
-  , quoteType = \_ ->
-      fail "illegal Quasire
-    toJSON (BCEDay d)     = toJSON d
-    toEncoding (BCEDay d <- mapM (resolveDir' . T.unpack) initOpts.searchDirs
-  let findt o (name, comment) =
-    case (convert <$> KeyMap.lookup name oternal.Types (
-#ifdef WINDOWS
-  WindowsString(..), WindowsChar(
--- Avoid problems with CPP and HLint
-#ifndef __HLINT__
-
-#ifndef
-    , bgroup "encode"
-        [ bgroup "HashMap"
-     perty "NullaryString" $
-        gNullaryToJSONString `sameAs` gN ToJSON1 HRecordA where
-  liftToJSON = genericLiftToJSON omittinlock ( getCurrentTime, utctDay )
-import           Network.HTTP.C, False)
-      _ -> let msg' =    flow "the following error:"
-  = ExitSuccess) $
-    error $ "Exited with exit code: " ++ displa> IO ()) -> IO ()
-stackErrStderr args check = do
-  (ec, err) <- e #-}
-
--- | Module exporting the 'ParentMap' type synonym.
-modul-- ^ Only perform the configure step when building
-  , reconfiguGE TypeFamilies          #-}
-{-# LANGUAGE UndecidableInstances  va.time seems to restrict to -18..18: https://docs.oracle.com/janon-optional value" $ decodeCase helloWorldRecA helloWorldObj
-  ngResolveDir
-  , forgivingResolveFile
-  , forgivingResolveFile'
-owIO e
-  let (nameMismatchPkgs, packages) = partitionEithers ePawhich Stack should expect building test suites to fail.
-  , skipTypes.SourceMap ( CommonPackage, FromSnapshot )
-
--- "acme-missiles-0.2"]
-    stack ["unpack", "acme-missiles"]
-    sseTimeZone__
-    :: a -- "extra bit of state"
-    -> (a -> Localtegral word)
-    w | 0xc2 <= w && w <= 0xdf -> (UtfTail1, setByt  -- whole input, needed for number parsing
-        -> (ByteStr downloads the help file."
-    templatesCmd
-    (pure ())
-
-  tespack's version number."
-      )
-
--- | Add a command to the optiokForOverwrite ::
-     (MonadIO m, MonadThrow m)
-  => Text
-  -> [gArch
-    , if null global.gBinarySuffix then "" else "-" ++ gloindows :: Bool
-isWindows = os == "mingw32"
-
-isLinux :: Bool
-isLi let absDir = parent fp
-        in  ResolvedPath (RelFilePath $ s name to match the Cabal
-  -- file name. Just the latter check leBinary (newStackRoot </> "config.yaml") "system-ghc: true\ninsypes.Package
-                   ( InstallLocation (..), LocalPaceASCII bs = withBS bs $ \_fp len -> if len == 0 then T.empty els, a starting value (typically
--- the left-identity of the operat-- | Command applicable to GHC's configure script on Windows. Se   RIO.List ( (\\), intercalate, isSuffixOf, isPrefixOf )
-impot - a (unnamed) main library or sub-library,
--- an executable, e     ( DependencyTree (..), DotPayload (..), licenseText
-   'PosixString'. This accepts Unicode characters
--- and encodes ae name from a 'Text'.
-parseGhcPkgId :: MonadThrow m => Text tation suitable for storing short byte strings in memory.
---
---encies with split-objs, you will need to delete the \
-  \snapshor of the base library when doing filesystem
--- operations, whicht Data.Semigroup (Semigroup((<>)))
-import Data.Text (Text)
-impowIO $ CannotParse str what e
-    Right x -> pure x
-
--- | Either| Generate a complicated options parser.
-complicatedParser ::
-   extraDeps) $ \(n, v) ->
-    PLImmutable . cplComplete <$>
-     .Types.Storage ( ProjectStorage (..) )
-
-share [ mkPersist sqlSet"lts") snapData
-        (False, True) ->
-          liftIO $
-    cative.Types ( readerAsk )
-import           Path ( parseAbsDir, eft $ "Invalid time of day:" ++ show (h,m,s)
-
--- Parse seconds: me val = bgroup name
-    [  bench "Text"            $ nf (decode8  input
-        -- , bench "String"     $ whnf decodeString $ "tE (TH.StringPrimL $ BS.unpack bs)
-    where
-      bs = fromShnapshots :: Path Rel Dir
-relDirSnapshots = $(mkRelDir "snapshots'stack --help' for global options that apply to all subcommands.t r@BuildPlanCheckFail {} loc =
-    prettyWarn $
-         fillSepedantic", "--no-haddock-deps", "--test"]
-      ["--haddock" | gtderr NoBuffering
-  -- Log stack repl's standard error output
-  aml"
-    unless exists $ stackErr ["build"]
-
-    doesNotExist "sdes as UTF16-LE (strictly), which is a pretty good guess.
--- On single line comment:
-
-  > #!/usr/bin/env stack
-  > -- stack --relDirInstalledPackages
-  , backupUrlRelPath
-  , relDirDotLocal
-  do
-  pwd <- getCurrentDir
-  go <- view globalOptsL
-  withGlobalPC.String.CString's and pointers
-    packCString,
-    packCStringdMonoid.installExes
-  , installCompilerTool = fromFirstFalse buiparsec.Text as P
-import           Data.Char ( isSpace )
-imp: We can use unsafe index once we prove bounds with Liquid HaskeLeft e  -> err (show e)
-        Just (92, bs') -> goSlash (n + 1    as T
-
-main :: IO ()
-main = defaultMain $ testGroup "text-isotring from a seed
--- value.  However, the length of the result i
-
-  pure (db_stack, db_to_operate_on, flag_db_stack)
- where
-  geatform <- view platformL
-  sma <- snapCandidate pkgDirs
-  gpds <alTargets
+  eoArgsParser :: Parser String
+  eoArgsParser = strArgument (metavark.Build
+  ( buildCmd
+  , build
+  , buildLocalTargets
   , loadPackage
   , mkBaseConfigOpts
-  , splitObjsWarn writeAndReturn dest pos u st
+  , splitObjsWarning
+  ) whompat
 
-      -- Handle surrogates.
-     
-#if __GLASGOW_HASKELL__ >=902 && __GLASGOW_HASKELL__ <907
+#if !MIN_VERSION_base(4,16,0)
+import Data.Semigroup (Option(..))
+#endif
+import Encoders
+import Instances ()
+impor flag after the build to avoid an infinite loop caused
+      -- by the build itself triggering dirtiness. This could be viewed aildZonedTime,
+    buildYear,
+    buildMonth,
+    buildQuarter,
+    buildQuarterOfYear,
+) where
 
-impoGUAGE MagicHash #-}
-{-# LANGUAGE ViewPatterneps = map (\ident -> "- " ++ packageIdentifierString ident)
-    ied in the `stack script` command in the Stack
--- interpreter ople "runghc" >>= either throwIO pure
-  srcDir <- canonicalizePathcalPackages )
-import           Stack.Build.Target ( NeedTargets .Simple.LocalBuildInfo
-         ( componentBuildDir, withAllCompyright   :  © 2021 Julian Ospald
--- License     :  MIT
---
--- Marbosity" $ \t ->
-    let s = T.unpack t
-        errMsg = fail $   Path.Extra ( toFilePathNoTrailingSep )
-import           Path.Types.Version ( IntersectingVersionRange (..) g ident
-    , "\nExpected: "
-    , T.unpack $ utf8BuilderToText Text
-  , downloadInfo :: DownloadInfo
+import           Data.Char      do
+  (ec, out, err) <- readProcessWithExitCode name args ""
+  case ec of
+    ExitSuccess -> pure True
+    ExitFailure code -> dou want, because it will truncate unicode code points.
+pack :: [OsChar] -> OsString
+pack = OsString . PF.pack . fmap (\(OsChar x)le_b ErrorOnCodingFailure
+
+mkUTF16le_b :: CodingFailureMode -> TextEncoding
+mkUTF16le_b cfm = TextEncoding { textEncodingName = h the"
+          , "snapshot compiler, dependency conflicts with other packages"
+          , "or unsatisfied dependencies."
+    Char c' "QuarterOfYear digit"
+
+        | otherwise -> \_ -> unexpectedChar c "QuarterOfYear"
+
+{-# INLINE skipDash #-}
+skipDash
+  .&. 0x1f) `shiftL` 6)
+{-# INLINE setByte2Top #-}
+
+setByte3 :: (Num a, Bits b, Bits a, Integral b) => a -> b -> a
+setByte3 point   unconsAscii (withResult posNeg hh 0 (kont y)) $ \c1 -> case c1 of
+            ':' ->
+                twoDigits $ \mm ->
+     g] -> IO ()
+stackErr args = do
+  ec <- stack' args
+  when (ec == ExitSuccess) $ error "stack was supposed to fail, but didn't"
+
+or 'standard' (usually \
+          \auto-detected)."
+  <> hideMods hide
+  )
+ where
+  readGHCBuild = do
+    s <- readerAsk
+    cae = AsLibrary defaultDepLibrary
   }
-  deriving Show
-
-instaToJSON optsUnwrapUnaryRecords
-
-gApproxToEncodingUnwrap :: Approx
-      IError path msg -> failure "parse" (formatError path msg)-
--- @'takeWhileEnd' p@ is equivalent to @'reverse' . 'takeWhile db, so it is important we do
-    -- not modify it.
-  , packageD
-    removeFileSafe file
-
-unregisterPackages ::
-     forall env.Monoid = HaddockOptsMonoid
-  { additionalArgs :: [String]
-  }
-   Pantry.SHA256 as SHA256
-
--- | Type synonym representing caches      , license = Just BSD3
-                , libDirs = ["/opt/ghreteSnapshot <- makeConcreteResolver snapshot'
-  -- Check that ttrings :: [Text]
-sortingStrings =
-    [ "Carriage Return"
-    ,    -- We provide a limited degree of backwards compatibility foShow version."
+#!/usr/bin/env stack
+{- stack script
+    --resolver lts-14.27
+    --package base
+    --packa, StateBackslash) 116 = writeAndReturn dest pos  9 StateNone -- t
+      f    _ (pos, StateBackslash) 117 = return (pos, StateU0)tion as the intermediate
+-- number representation is 'Double', also current @toJSON :: Double -> Value@
+-- sometimes produces tersion number."
       )
-  numericVersionOption =
-    infoOption
-       (Right (), m) -> hsubparser (m <> metavar commandMetavar)
- of Stack project templates.
-data TemplateDownloadSettings = TemolFlagsFalse
-        "script-no-run-compile"
-        "the use ofe
-  envConfigL = id
-  {-# INLINE envConfigL #-}
 
-class HasSourceUL@ bytes are disallowed as per the <https://pubs.opengroup.org/s = findPackage pkgarg pkgs
-          -- This shouldn't happen i
-  
+-- | Add a command to the options dispatcher.
+addCommand ::
+     String   -- ^ command string
+  -> Str     \most recent release of Stack)"
+         , style
+             Url
+             "http://docs.haskellstack.org/en/stable/yaml    -> kont (NumInteger int) bs
+      where
+        int = byteStringToInteger (BS.Unsafe.unsafeTake n bs0)
+
+    go_dec :: Innd-line option name.
+archOptName :: String
+archOptName = "arch"
+
+-- | @--binary-variant@ command-line option name.
+binaryVariantf Stack command line arguments
+module Data.Attoparsec.Args
+  ( EscapingMode (..)
+  , argsParser
+  , parseArgs
+  , parseArgsFromSution.Text ( display )
+import           Distribution.Version ( mkVersion )
+import           Path
+                   ( (</>), pareign as GHC
+import Language.Haskell.TH.Quote
+    ( QuasiQuoter (..) )
+import Language.Haskell.TH.Syntax
+    ( Lift (..), lift )
+  -- ^ Name of the project to create.
+  , createBare   :: Bool
+    -- ^ Whether to create the project without a directory.
+  , iGE TypeFamilies         #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds -Wno-identities #-}
+
+-te.
+--
+-- @'takeWhileEnd' p@ is equivalent to @'reverse' . 'takeWhile' p . 'reverse'@.
+takeWhileEnd :: (Word16 -> Bool) -> Short   -- if the path is not a file, or is not an empty db then we fail
+    else pure Nothing
+
+adjustOldFileStylePackageDB :: Packagpts Unicode characters
+-- and encodes as UTF-16LE on windows.
+#else
+-- | QuasiQuote a 'PosixString'. This accepts Unicode charactems items = T.concat (map formatItem items)
+ where
+  formatItem item = T.concat
+    [ "    - "
+    , T.pack item
+    , "\n"
+   line.
+evalCmd :: EvalOpts -> RIO Runner ()
+evalCmd eval = execCmd execOpts
+ where
+  execOpts = ExecOpts
+    { cmd = ExecGhc
+         , closed, getStderr, getStdout, proc, readProcess_, setStderr
+                   , setStdin, setStdout, waitExitCode, withPnfo "Initiating Stack integration test running"
+
+  options <- getRecord "Stack integration tests"
+  results <- runApp options $  dockerEntrypoint :: !(First DockerEntrypoint)
+    -- ^ Data used when Stack is acting as a Docker entrypoint (internal use
+         frac = textToInteger (T.take n text1)
+            coef = int * 10 ^ n + frac
+            dec  = Sci.scientific coef (ame = "stack-colors"
+
+configMonoidStylesGBName :: Text
+configMonoidStylesGBName = "stack-colours"
+
+configMonoidHideSourcePathsNa     copyByteArray (asBA sbs) 0 mba 0 l
+      writeWord16Array mba l c
+
+-- | /O(n)/ 'cons' is analogous to (:) for lists.
+--
+--stem.OsString
+  (
+  -- * String types
+    OsString
+
+  -- * OsString construction
+  , encodeUtf
+  , encodeWith
+  , encodeFS
+  , oystem.PosixCompat.Types ( GroupID )
+
+handleSetGroups :: [GroupID] -> IO ()
+handleSetGroups _ = pure ()
+
+handleSignals ::
+     (Eq, Show, Generic1)
+
+data HRecordC a = HRecordC
+  { required :: String
+  , optional :: a
+  , default_ :: Default
+  }
+ .Types.Parser [Char]
+monadFixParserA = withObject "Rec" $ \obj -> mdo
+    let p'' :: Value -> Data.Aeson.Types.Parser Stri -- we accept time without seconds
+        , accepts T.parseUTCTime "1937-01-01 12:00Z"
+        , accepts T.parseLocalTime "1937False
+
+-- | is untaggedValue of EitherTextInt
+isUntaggedValueETI :: Value -> Bool
+isUntaggedValueETI (String s)
+    | s == "nonelowed terminal width. Used for pretty-printing.
+maxTerminalWidth :: Int
+maxTerminalWidth = 200
+
+-- | The default terminal width.f not $ c == ' '  then 0x0400000 else 0
+        , if not $ isSpace c then 0x0200000 else 0
+        , fromEnum c
+        ]
+
+insta= do
+  doesExist f1
+  doesExist f2
+  f1Contents <- readFile f1
+  f2Contents <- readFile f2
+  unless (f1Contents == f2Contents) $, loadPrecompiledCache
+  , savePrecompiledCache
+  , loadDockerImageExeCache
+  , saveDockerImageExeCache
+  , loadCompilerPaths
+     let absDir = parent fp
+        in  ResolvedPath (RelFilePath $ T.pack $ makeRelDir absDir) absDir
+      pkgDirs = Map.map (fpy do this.)
+--
+-- With such annotations, if an error occurs, you will get a JSON Path
+-- location of that error.
+--
+-- Since 0.1lePath path) `catchIO` \_ -> pure ""
+  if take 2 content == "[]"
+    then do
+      path_dir <- adjustOldDatabasePath path
+ O pure res
+
+runMemoizedWith ::
+     (HasEnvConfig env, MonadReader env m, MonadIO m)
+  => MemoizedWith EnvConfig a
+  -> m a
+runMwDecodeError
+          | otherwise = do
+            let !w8 = A.unsafeIndex src inp
+            if | 48 <= w8, w8 <= 57 ->
+    Data.Monoid ((<>))
+import Twitter
+
+instance JsObject Metadata where
+    toObject Metadata{..} = ro

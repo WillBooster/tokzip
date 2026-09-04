@@ -39,8 +39,8 @@ the closest one.
 - **Codec**: LZ77 over the document plus the segment's dictionary (128 KB for prose
   languages; for code, a 64 KB part shared by every programming language plus 48 KB per
   language; COVER-trained: the fragments of the public corpus whose 8-byte grams occur in the
-  most documents — counted over the public corpus and, for the languages it holds, the
-  private production corpus, so every dictionary byte is a substring of a public document
+  most documents — counted over the public corpus and, for the languages it holds at least
+  1 MiB of, the private production corpus, so every dictionary byte is a substring of a public document
   while the selection follows production usage; segment size picked by coding held-out
   documents), price-based parse (a bounded
   shortest-path over 4 KB chunks, not a global optimum), adaptive binary range coder
@@ -88,18 +88,18 @@ compressed size as a percentage of the input:
 
 | documents  | tokzip    | brotli -11 | zstd -19 | gzip -9 |
 | ---------- | --------- | ---------- | -------- | ------- |
-| all        | **20.8%** | 26.3%      | 31.1%    | 31.9%   |
+| all        | **20.9%** | 26.3%      | 31.1%    | 31.9%   |
 | ≤ 1 KB     | **28.7%** | 47.6%      | 60.2%    | 61.1%   |
 | 1–4 KB     | **23.1%** | 33.9%      | 42.1%    | 42.2%   |
 | 4–16 KB    | **20.8%** | 25.8%      | 30.4%    | 31.2%   |
-| > 16 KB    | **19.1%** | 21.6%      | 24.5%    | 25.6%   |
-| ja-JP      | **25.0%** | 35.6%      | 42.8%    | 43.3%   |
+| > 16 KB    | **19.2%** | 21.6%      | 24.5%    | 25.6%   |
+| ja-JP      | **24.9%** | 35.6%      | 42.8%    | 43.3%   |
 | zh-CN      | **26.6%** | 36.8%      | 45.3%    | 46.1%   |
 | typescript | **15.0%** | 17.7%      | 19.8%    | 20.6%   |
-| java       | **14.0%** | 23.3%      | 28.2%    | 28.6%   |
-| html       | **17.7%** | 21.3%      | 25.4%    | 26.1%   |
+| java       | **13.8%** | 23.3%      | 28.2%    | 28.6%   |
+| html       | **17.9%** | 21.3%      | 25.4%    | 26.1%   |
 
-Throughput through the wasm build in Bun on an Apple M-series laptop: compression ~2.9 MB/s
+Throughput through the wasm build in Bun on an Apple M-series laptop: compression ~2.8 MB/s
 (the price-based parse is the cost; a 4 KB document takes ~1.3 ms), decompression ~90 MB/s.
 Cloudflare's free plan allows 10 ms of CPU per request, so a document above ~20 KB (or the
 first `compress` in an isolate, ~10 ms) needs a paid plan or a place outside the request path.
