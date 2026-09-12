@@ -1,0 +1,63 @@
+import { describe, expect, test } from 'bun:test';
+import { compress, decompress, TokzipDecodeError } from '../../src/index.ts';
+
+const SAMPLE = 'const answer = 42; // the answer\n'.repeat(20) + 'ゲームの仕様を以下に示します。'.repeat(10);
+
+describe('malformed frames', () => {
+  test('garbage and truncated frames throw TokzipDecodeError', () => {
+    expect(() => decompress(new Uint8Array())).toThrow(TokzipDecodeError);
+    expect(() => decompress(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]))).toThrow(TokzipDecodeError);
+    const frame = compress(SAMPLE);
+    for (const cut of [1, 5, 8, frame.length >> 1]) {
+      expect(() => decompress(frame.subarray(0, cut))).toThrow(TokzipDecodeError);
+    }
+    // The range coder's final bytes carry slack, so a short truncation may still decode —
+    // but only ever to the exact original (the CRC catches everything else).
+    // The same holds for an appended zero byte, which the coder may consume as padding.
+    for (const candidate of [frame.subarray(0, -1), frame.subarray(0, -2), new Uint8Array([...frame, 0])]) {
+      let decoded: string | undefined;
+      try {
+        decoded = decompress(candidate);
+      } catch (error) {
+        expect(error).toBeInstanceOf(TokzipDecodeError);
+        continue;
+      }
+      expect(decoded).toBe(SAMPLE);
+    }
+  });
+
+  test('a forged coded body is rejected, not a trap', () => {
+    // A valid header (version 1, single segment, 2 bytes, zero CRC, language 0) over a body
+    // crafted to code a match whose distance overflows 32-bit arithmetic: on the wasm32 build
+    // `distance as usize + 1` used to wrap to 0 and trap the module.
+    const forged = Uint8Array.from(
+      'd4020000000000b8a0572bfffc54be70'.match(/../g)!.map((byte) => Number.parseInt(byte, 16))
+    );
+    expect(() => decompress(forged)).toThrow(TokzipDecodeError);
+  });
+
+  test('other format versions are rejected, never misdecoded', () => {
+    const frame = compress(SAMPLE);
+    for (const version of [0, 2, 3]) {
+      const other = Uint8Array.from(frame);
+      other[0] = (other[0]! & ~(3 << 2)) | (version << 2);
+      expect(() => decompress(other)).toThrow(/unsupported format version/);
+    }
+  });
+
+  test('every single-byte mutation either throws or decodes to the original', () => {
+    const frame = compress(SAMPLE);
+    for (let i = 0; i < frame.length; i++) {
+      const mutated = Uint8Array.from(frame);
+      mutated[i] = mutated[i]! ^ 0x5A;
+      let decoded: string | undefined;
+      try {
+        decoded = decompress(mutated);
+      } catch (error) {
+        expect(error).toBeInstanceOf(TokzipDecodeError);
+        continue;
+      }
+      expect(decoded).toBe(SAMPLE);
+    }
+  });
+});

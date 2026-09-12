@@ -1,0 +1,39 @@
+name: Benchmark
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TOKZIP_CORPUS_DIR: tokzip-corpus/corpus
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check out pinned benchmark corpus
+        uses: actions/checkout@v6
+        with:
+          repository: WillBooster/tokzip-corpus
+          ref: c121336e2a874fa1279498996de3919581021bc3
+          path: tokzip-corpus
+      - uses: jdx/mise-action@v2
+      - run: bun install --frozen-lockfile
+      - name: Run benchmark (size + speed + round-trip verification)
+        run: bun scripts/bench/bench.ts --speed --json .tmp/bench.json
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: benchmark-result
+          path: .tmp/bench.json
+          if-no-files-found: ignore

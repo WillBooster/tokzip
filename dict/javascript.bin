@@ -1,0 +1,1766 @@
+() {
+  beforeEach(function () {
+    jasmine.Ajax.install();
+  });
+
+  afterEach(function () {
+    jasmine.Ajax.uninstall();
+  rom '../../../lib/utils';
+
+const {kindOf} = utils;
+
+describe('utils::kindOf', function () {
+  it('should return object tag', fune`.
+ *
+ * @private
+ * @param {string} text The link text.
+ * @param {string} [title] The link title.
+ * @returns {string} Return./data/var/dataPriv.js";
+import { nodeName } from "./core/nodeName.js";
+
+import "./core/init.js";
+import "./selector.js";
+
+var rttached( elem ) ) {
+			ret = jQuery.style( elem, name );
+		}
+	}
+
+	return ret !== undefined ?
+
+		// Support: IE <=9 - 11+
+		// IE[ 2 ];
+	if ( !jQueryModuleInputSpecifier ) {
+		throw new Error( "jQuery module specifier not passed" );
+	}
+
+	return jQueryModuleefined ) {
+			if ( this.length ) {
+				data = dataUser.get( elem );
+
+				if ( elem.nodeType === 1 && !dataPriv.get( elem, "hasDaict';
+
+var _ = require('../lodash'),
+    fs = require('fs'),
+    path = require('path');
+
+var args = (args = process.argv)
+  .sl
+const util = require('../common/util');
+
+const basePath = path.join(__dirname, '..', '..');
+const docPath = path.join(basePath,  }, null, { synchronous: true });
+
+    axios('/foo');
+    asyncFlag = true;
+
+    getAjaxRequest().then(function (request) {
+ .event.remove( this, types, fn, selector );
+		} );
+	}
+} );
+
+export { jQuery, jQuery as $ };
+jQuery( function() {
+	var scrit AxiosError from '../core/AxiosError.js';
+import utils from '../utils.js';
+
+/**
+ * A `CanceledError` is an object that is throw
+module.exports = minify;
+/**
+ * The default argument placeholder value for methods.
+ *
+ * @type {Object}
+ */
+module.exports = {terEach: moduleTeardown } );
+
+QUnit.test( "empty set", function( assert ) {
+	assert.expect( 2 );
+	assert.strictEqual( jQuery().o data;
+}
+
+jQuery.extend( {
+	hasData: function( elem ) {
+		return dataUser.hasData( elem ) || dataPriv.hasData( elem );
+	},
+
+	datort { document } from "./var/document.js";
+import { rcssNum } from "./var/rcssNum.js";
+import { rnothtmlwhite } from "./var/rnot(arr) {
+    return callback.apply(null, arr);
+  };
+}
+import Axios from "../../../lib/core/Axios.js";
+import assert from "assert" from "node:assert/strict";
+import { JSDOM } from "jsdom";
+
+const { window } = new JSDOM( "" );
+
+const { jQueryFactory: factor{fileURLToPath} from 'url';
+import path from 'path';
+import util from "util";
+import cp from "child_process";
+import fs from 'fs( data ) {
+	if ( data === "true" ) {
+		return true;
+	}
+
+	if ( data === "false" ) {
+		return false;
+	}
+
+	if ( data === "null" ) {;
+	} else if ( fn == null ) {
+		if ( typeof selector === "string" ) {
+
+			// ( types, selector, fn )
+			fn = data;
+			data = undame, computed ) {
+	var ret,
+		isCustomProp = rdoubleDash.test( name );
+
+	computed = computed || getStyles( elem );
+
+	// getProperopertyValue( name ) || computed[ name ];
+
+		if ( isCustomProp && ret ) {
+
+			// Support: Firefox 105 - 135+
+			// Spec requirrt axios from '../../../index.js';
+import stream from "stream";
+import {AbortController} from "abortcontroller-polyfill/dist/cjsa...
+			this.each( function() {
+
+				// We always store the camelCased key
+				dataUser.set( this, key, value );
+			} );
+		}, nuked;
+} );
+
+} )();
+"use strict";
+
+const { JSDOM } = require( "jsdom" );
+
+const { ensureJQuery } = require( "../lib/ensure_jquery. props;
+  let i;
+  let prop;
+  const merged = {};
+
+  destObj = destObj || {};
+  // eslint-disable-next-line no-eq-null,eqeqeq
+  ];
+					matchedSelectors = {};
+					for ( i = 0; i < delegateCount; i++ ) {
+						handleObj = handlers[ i ];
+
+						// Don't conmport transformData from '../../../lib/core/transformData.js';
+import assert from 'assert';
+
+describe('transformResponse', fuensure_global_not_created.cjs" );
+const { getJQueryModuleSpecifier } = require( "../lib/jquery-module-specifier.cjs" );
+
+c }
+    postMessage(_.VERSION);
+  }
+});
+'use strict';
+
+const _ = require('lodash');
+const async = require('async');
+const path =ceptor', function (done) {
+    const instance = axios.create({
+      baseURL: 'http://test.com/'
+    });
+
+    instance.interce.
+ */
+function build(type) {
+  const options = _.defaults({}, config.base, config[type]);
+  const markdown = docdown(options);
+tEqual(typeof axios, 'function');
+assert.strictEqual(typeof CanceledError, 'function');
+assert.strictEqual(typeof AxiosError, 'f from "fs/promises";
+import {colorize} from "./helpers/colorize.js";
+
+const exec = util.promisify(cp.exec);
+
+const ONE_MB = 1024" ).match( rnothtmlwhite ) || [ "" ];
+		t = types.length;
+		while ( t-- ) {
+			tmp = rtypenamespace.exec( types[ t ] ) || [];
+		us', function (done) {
+    let asyncFlag = false;
+    axios.interceptors.request.use(function (config) {
+      config.headers.fo, document)
+		if ( selector ) {
+			jQuery.find.matchesSelector( documentElement, selector );
+		}
+
+		// Make sure that the handleodeName( el, "input" ) ) {
+
+					// dataPriv.set( el, "click", ... )
+					leverageNative( el, "click", true );
+				}
+
+				// Retexpando if it's no longer used
+		if ( jQuery.isEmptyObject( events ) ) {
+			dataPriv.remove( elem, "handle events" );
+		}
+	},
+
+	uery requires a window with a document" );
+}
+
+// @CODE
+// build.js inserts compiled jQuery here
+
+return jQuery;
+
+}
+
+exp() {
+
+if ( !includesModule( "offset" ) ) {
+	return;
+}
+
+var alwaysScrollable,
+	forceScroll = supportjQuery( "<div></div>" ).css( should exist" );
+console.assert( /^jQuery/.test( $imported.expando ),
+	"jQuery.expando should be detected on full jQuery" );
+
+cCount--;
+					}
+					if ( special.remove ) {
+						special.remove.call( elem, handleObj );
+					}
+				}
+			}
+
+			// Remove gener const {data} = await fetchAxios.get('/', {
+        responseType: 'blob'
+      });
+
+      assert.deepStrictEqual(data, new Blob(*/
+  if (typeof globalThis !== "undefined") return globalThis;
+  return typeof self !== "undefined" ? self : (typeof window !== param {Object} $ The Cheerio object.
+ */
+function removeHorizontalRules($) {
+  $('hr').remove();
+}
+
+/**
+ * Removes marky-markdow, event );
+		}
+
+		return event.result;
+	},
+
+	handlers: function( event, handlers ) {
+		var i, handleObj, sel, matchedHandlers, m$ };
+import { pnum } from "../var/pnum.js";
+
+export var rcssNum = new RegExp( "^(?:([+-])=|)(" + pnum + ")([a-z%]*)$", "i" );
+ted value from there
+			if ( hooks && "get" in hooks &&
+				( ret = hooks.get( elem, false, extra ) ) !== undefined ) {
+
+				retype ) {
+				continue;
+			}
+
+			// If event changes its type, use the special event handlers for the changed type
+			special = js, type, {
+					value: jQuery.event.trigger(
+						saved[ 0 ],
+						saved.slice( 1 ),
+						this
+					)
+				} );
+
+				// Abort index ];
+		if ( Array.isArray( value ) ) {
+			easing = value[ 1 ];
+			value = props[ index ] = value[ 0 ];
+		}
+
+		if ( index !=
+ * jQuery JavaScript Library v@VERSION
+ * https://jquery.com/
+ *
+ * Copyright OpenJS Foundation and other contributors
+ * Releamport CanceledError from '../cancel/CanceledError.js';
+import platform from '../platform/index.js';
+import fromDataURI from 'jQuery.guid++ );
+	}
+	return elem.each( function() {
+		jQuery.event.add( this, types, fn, data, selector );
+	} );
+}
+
+/*
+ * HelperQuery.contains( elem.ownerDocument, elem ) ||
+			elem.getRootNode( composed ) === elem.ownerDocument;
+	},
+	composed = { composed false ) {
+			return;
+		}
+
+		// Determine handlers
+		handlerQueue = jQuery.event.handlers.call( this, event, handlers );
+
+		// Rk( assert );
+				} );
+			}
+		);
+	};
+
+QUnit.module( "offset", { beforeEach: function( assert ) {
+	if ( typeof checkSupport === "fxpect( 4 );
+
+	var node = jQuery( "<div style='display: none'></div>" ).appendTo( "#qunit-fixture" ),
+		result = node.offsops[ prop ];
+		if ( rfxtypes.test( value ) ) {
+			delete props[ prop ];
+			toggle = toggle || value === "toggle";
+			if ( value var hasOwnProperty = Object.prototype.hasOwnProperty,
+      object = exports.aliasToReal,
+      result = {};
+
+  for (var key in  'function' && typeof _.runInContext == 'function') {
+  _ = browserConvert(_.runInContext());
+}
+module.exports = browserConvert;];
+
+const ignored = [
+  '_*.js',
+  'core.js',
+  'core.min.js',
+  'fp.js',
+  'index.js',
+  'lodash.js',
+  'lodash.min.js'
+];
+
+/** {
+				var target = event.target;
+				return rcheckableType.test( target.type ) &&
+					target.click && nodeName( target, "inpu }
+
+  const prototype = getPrototypeOf(val);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototyst
+			if ( !( handlers = events[ type ] ) ) {
+				handlers = events[ type ] = [];
+				handlers.delegateCount = 0;
+
+				// Only udleObj.handler.apply( this, arguments );
+				event.type = fix;
+			}
+			return ret;
+		}
+	};
+} );
+
+jQuery.fn.extend( {
+
+	on: functyncIterator]) {
+    yield* blob[asyncIterator]();
+  } else {
+    yield blob;
+  }
+}
+
+export default readBlob;
+"use strict";
+
+impoctory.
+http.createServer(function(req, res) {
+  // See http://msdn.microsoft.com/en-us/library/ff955275(v=vs.85).aspx.
+  if (comait setTimeoutAsync(500);
+
+        assert.strictEqual(data, content);
+
+        assert.deepStrictEqual(samples, Array.from(functieaders});
+
+    const base64 = Buffer.from(user + ':', 'utf8').toString('base64');
+    assert.equal(res.data, 'Basic ' + base64);w, this );
+		}
+
+		if ( hooks && hooks.set ) {
+			hooks.set( this );
+		} else {
+			Tween.propHooks._default.set( this );
+		}
+		rethe job.
+ *
+ * @memberOf Job
+ * @param {Function} callback The function called once the job is removed.
+ * @param {Object} Returstener ) {
+		elem.removeEventListener( type, handle );
+	}
+};
+
+jQuery.Event = function( src, props ) {
+
+	// Allow instantiation w    cancel = c;
+      });
+      cancel('Operation has been canceled.');
+      expect(token.reason).toEqual(jasmine.any(CanceleThis.window = window;
+
+const jQuery = require( jQueryModuleSpecifier );
+
+ensureJQuery( jQuery );
+ensureGlobalNotCreated( module.   })
+    }, /timeout/);
+
+    const passed = Date.now() - ts;
+
+    assert.ok(passed >= timeout - 5, `early cancellation detectedfor https://www.npmjs.com/package/form-data api
+    } else if (utils.isFormData(data) && utils.isFunction(data.getHeaders)) {
+   value to check.
+ * @returns {boolean} Returns `true` if `value` is a job ID, else `false`.
+ */
+function isJobId(value) {
+  retalEvent ) {
+						return hook( this.originalEvent );
+					}
+				} :
+				function() {
+					if ( this.originalEvent ) {
+						retu const key = path.basename(filePath, path.extname(filePath));
+    result[key] = _.template(fs.readFileSync(filePath, 'utf8'));
+ rs.test).toBe('special get headers');
+      done();
+    });
+  });
+
+  it('does not run the interceptor if runWhen function is protest
+ *
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+const isArrayBuffer = kindOfTest('ArrayBufferconfig.cancelToken || config.signal) {
+      config.cancelToken && config.cancelToken.subscribe(abort);
+      if (config.signal)d );
+		};
+
+		if ( typeof type !== "string" ) {
+			gotoEnd = clearQueue;
+			clearQueue = type;
+			type = undefined;
+		}
+		if ( clrom "./manipulation/setGlobalEval.js";
+import { dataPriv } from "./data/var/dataPriv.js";
+import { dataUser } from "./data/
+  res.writeHead(200, {
+    'Content-Type': 'text/json'
+  });
+  res.write(JSON.stringify(people));
+  res.end();
+};
+import resolvassert.ok(data instanceof FormData, 'data is not instanceof FormData');
+
+      assert.deepStrictEqual(Object.fromEntries(data.');
+
+  fs.writeFile(path.join(docPath, version + '.html'), html, util.pitch);
+}
+
+build();
+#!/usr/bin/env node
+'use strict';
+
+/**eturn tween;
+		}
+	}
+}
+
+function defaultPrefilter( elem, props, opts ) {
+	var prop, value, toggle, hooks, oldfire, propTween, resckify.js";
+import {progressEventReducer, progressEventDecorator, asyncDecorator} from "../helpers/progressEventReducer.js";
+
+confragment = context.createDocumentFragment(),
+		nodes = [],
+		i = 0,
+		l = elems.length;
+
+	for ( ; i < l; i++ ) {
+		elem = elems[t";
+
+const {AxiosHeaders} = axios;
+
+function testHeaderValue(headers, key, val) {
+  let found = false;
+
+  for (const k in headere job instance.
+ */
+Job.prototype.reset = function(callback) {
+  this.once('reset', _.iteratee(callback));
+  if (this.resetting));
+
+			assert.strictEqual( jQuery.expr[ ":" ], jQuery.expr.pseudos,
+				"jQuery.expr[ \":\" ] is an alias of jQuery.expr.pseudosrc;
+	}
+
+	// Put explicitly provided properties onto the event object
+	if ( props ) {
+		jQuery.extend( this, props );
+	}
+
+	// Crebject} [properties] The properties to initialize the tunnel with.
+ */
+function Tunnel(properties) {
+  EventEmitter.call(this);
+
+aults, { foo: 'bar' });
+    expect(merged.foo).toEqual('bar');
+  });
+
+  it('should allow setting custom default options', funptions ) {
+	var result,
+		stopped,
+		index = 0,
+		length = Animation.prefilters.length,
+		deferred = jQuery.Deferred().always( fase();
+  return (thing) => kindOf(thing) === type
+}
+
+const typeOfTest = type => thing => typeof thing === type;
+
+/**
+ * Determinport { wrapMap } from "./wrapMap.js";
+import { getAll } from "./getAll.js";
+import { setGlobalEval } from "./setGlobalEval.js";
+ccess === true) {
+  jobOptions['public'] = 'public';
+}
+if (tunneled) {
+  jobOptions['tunnel-identifier'] = tunnelId;
+}
+
+/*-------Type'] = 'application/custom';
+
+    instance.patch('/foo', "");
+
+    const expectedHeaders = {
+      'Content-Type': "applicadProp );
+
+jQuery.each( { focus: "focusin", blur: "focusout" }, function( type, delegateType ) {
+
+	// Support: IE 11+
+	// Attach  throw AxiosError.from(err, AxiosError.ERR_BAD_REQUEST, config);
+      }
+
+      if (responseType === 'text') {
+        converc props
+jQuery.each( {
+	altKey: true,
+	bubbles: true,
+	cancelable: true,
+	changedTouches: true,
+	ctrlKey: true,
+	detail: true,
+	length;
+  }
+  position -= searchString.length;
+  const lastIndex = str.indexOf(searchString, position);
+  return lastIndex !== -eferred.resolveWith( elem, [ animation ] );
+			return false;
+		},
+		animation = deferred.promise( {
+			elem: elem,
+			props: jQuprops && Object.assign(constructor.prototype, props);
+}
+
+/**
+ * Resolve object with deep prototype chain to a flat object
+ * @parn bulk.call( jQuery( elem ), value );
+				};
+			}
+		}
+
+		if ( fn ) {
+			for ( ; i < len; i++ ) {
+				fn(
+					elems[ i ], key, unprefixed version
+		hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
+
+		// Check if we're setting a value
+		if (akeReadableStream(), {
+          responseType: 'stream',
+          signal: controller.signal
+        });
+      }, /CanceledErrort( this ),
+				queue = data[ type + "queue" ],
+				hooks = data[ type + "queueHooks" ],
+				timers = jQuery.timers,
+				lengjQuery.param( params ), "someName%5B%5D=1&someName%5B%5D=2&someName%5B%5D=3&regularThing=blah", "with array" );
+
+	params = { "fopportedProtocols.indexOf(protocol) === -1) {
+      return reject(new AxiosError(
+        'Unsupported protocol ' + protocol,
+   " +
+			"import( `${ parentUrl }/src/jquery.js` )\n" +
+			"	.then( ( { jQuery } ) => {\n" +
+			"		window.jQuery = jQuery;\n" +
+		dth ? 1 : 0;
+	for ( ; i < 4; i += 2 - includeWidth ) {
+		which = cssExpand[ i ];
+		attrs[ "margin" + which ] = attrs[ "padding" urn len ? fn( elems[ 0 ], key ) : emptyGet;
+}
+import { jQuery } from "./core.js";
+import { access } from "./core/access.js";
+, {
+		namespace: false,
+		handler: function( event ) {
+			var result,
+				saved = dataPriv.get( this, type );
+
+			// This controry to load. */
+  var other = (other = /other=([^&]+)/.exec(location.search)) && decodeURIComponent(other[1]);
+
+  /** The `ui` obported && function httpAdapter(config) {
+  return wrapAsync(async function dispatchHttpRequest(resolve, reject, onDone) {config.timeout + 'ms exceeded' : 'timeout exceeded';
+        const transitional = config.transitional || transitionalDefaults;
+ s(bytes));
+
+  return Handlebars.compile(String(await fs.readFile(template)))(data);
+}
+
+console.log(await generateBody({
+  files:byteLength(chunk);
+        const contentLength = count * chunkLength;
+
+        const readable = stream.Readable.from(async functoptions;
+		this.start = this.now = this.cur();
+		this.end = end;
+		this.unit = unit || ( isAutoPx( prop ) ? "px" : "" );
+	},
+	cu() {
+		assert.equal( jQuery( this.id, doc ).offset().top,  this.top,  "jQuery('" + this.id + "').offset().top" );
+		assertetc. was not
+// created in a CommonJS environment.
+// `global` is always checked in addition to passed parameters.
+const ensureGp>`
+    );
+
+  const $ = cheerio.load(marky(markdown, {
+    'enableHeadingLinkIcons': false,
+    'sanitize': false
+  }));
+
+  constoFiniteNumber = (value, defaultValue) => {
+  return value != null && Number.isFinite(value = +value) ? value : defaultValue;
+}
+
+		// Don't set styles on text and comment nodes
+		if ( !elem || elem.nodeType === 3 || elem.nodeType === 8 || !elem.style ) {
+	s FP modules at the `target` path.
+ *
+ * @private
+ * @param {string} target The output directory path.
+ */
+function build(targetation.opts );
+		if ( result ) {
+			if ( typeof result.stop === "function" ) {
+				jQuery._queueHooks( animation.elem, animat.each( [ "toggle", "show", "hide" ], function( _i, name ) {
+	var cssFn = jQuery.fn[ name ];
+	jQuery.fn[ name ] = function( speedshould default common headers', function (done) {
+    const headers = axios.defaults.headers.common;
+
+    axios('/foo');
+
+    };
+}
+
+const isHttpAdapterSupported = typeof process !== 'undefined' && utils.kindOf(process) === 'process';
+
+// temporary hotfom "../core/AxiosError.js";
+
+const knownAdapters = {
+  http: httpAdapter,
+  xhr: xhrAdapter,
+  fetch: fetchAdapter
+}
+
+utils.f }
+};
+
+utils.forEach(['delete', 'get', 'head', 'post', 'put', 'patch'], (method) => {
+  defaults.headers[method] = {};
+});
+
+expoouseover",
+	mouseleave: "mouseout",
+	pointerenter: "pointerover",
+	pointerleave: "pointerout"
+}, function( orig, fix ) {
+	jQueryir.js";
+import { siblings } from "./traversing/var/siblings.js";
+import { rneedsContext } from "./traversing/var/rneedsContext.jne('Please wait' + _.repeat('.', (++waitCount % 3) + 1));
+}
+
+/**
+ * Converts a comma separated option value into an array.
+ *
+ *lace(/^\W+/, ''),
+    runnerUrl = getOption('runnerUrl', 'http://localhost:' + port + '/' + runner),
+    statusInterval = getOptotjQuery.ready !== undefined ?
+				rootjQuery.ready( selector ) :
+
+				// Execute immediately if ready is not present
+				selectse,
+
+	// A counter to track how many items to wait for before
+	// the ready event fires. See trac-6781
+	readyWait: 1,
+
+	ready: f targetKey = caseless && findKey(result, key) || key;
+    if (isPlainObject(result[targetKey]) && isPlainObject(val)) {
+  Query.inArray( "script", s.dataTypes ) > -1 &&
+				jQuery.inArray( "json", s.dataTypes ) < 0 ) {
+				s.converters[ "text script"
+    }).catch(done);
+  });
+
+  it('should use application/json when posting an object', function (done) {
+    axios.post('/foo/baelectorError } from "./selectorError.js";
+import { filterMatchExpr } from "./filterMatchExpr.js";
+
+var tokenCache = createCache(sert';
+import axios, {CanceledError, AxiosError, AxiosHeaders} from 'axios';
+import settle from 'axios/unsafe/core/settle.js';
+
+= "\\[" + whitespace + "*(" + identifier + ")(?:" + whitespace +
+
+	// Operator (capture 2)
+	"*([*^$|!~]?=)" + whitespace +
+
+	// rue;
+  });
+}
+// The platforms for Backbone tests.
+if (isBackbone) {
+  platforms = _.filter(platforms, function(platform) {
+   ssword = parsed.password;
+      auth = urlUsername + ':' + urlPassword;
+    }
+
+    auth && headers.delete('authorization');
+
+ is.pushStack(
+			jQuery.uniqueSort(
+				jQuery.merge( this.get(), jQuery( selector, context ) )
+			)
+		);
+	},
+
+	addBack: function forEach(obj, fn, {allOwnKeys = false} = {}) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'u.each(function() {
+    const $p = $(this);
+    let node = this.prev;
+    while ((node = node.prev) && node.name != 'h3' && node.;
+
+// original code
+// https://github.com/DigitalBrainJS/AxiosPromise/blob/16deab13710ec09779922131f3fa5954320f83ab/lib/utils.js	for ( prop in orig ) {
+
+		// General show/hide setup for this element animation
+		if ( !propTween ) {
+			if ( dataShow ) {
+		
+
+	node.remove();
+
+	assert.notEqual( result.top, 0, "Retrieving offset on 0 sized elements (gh-3167)" );
+	assert.notEqual( resulonsole.error('Failed to start job; status: %s, body: %s', statusStr, bodyStr);
+    if (error) {
+      console.error(error);
+  p, (value) => utils.isArray(value) ? value : [value]);
+      // hotfix to support opt.all option which is required for node 20.ximport isCancel from './cancel/isCancel.js';
+import {VERSION} from './env/data.js';
+import toFormData from './helpers/toFormDroxy.username || '') + ':' + (proxy.password || '');
+    }
+
+    if (proxy.auth) {
+      // Support proxy auth object form
+      ptions) {
+  const _Blob = options && options.Blob || platform.classes.Blob;
+  const protocol = parseProtocol(uri);
+
+  if (asBlobly shouldn't reduce any functionality.
+					event.preventDefault();
+				}
+			}
+		}
+	} )
+};
+
+// Ensure the presence of an event leaders({
+        xFoo: 'foo',
+        xBar: 'bar'
+      })
+    });
+
+    instance.get('/foo', {
+      headers: {
+        XFOO: 'fe, true );
+
+			if ( isIE ) {
+				this.addEventListener( delegateType, focusMappedHandler );
+			} else {
+
+				// Return false to ../core.js";
+import { toType } from "../core/toType.js";
+
+// Multifunctional method to get and set valse;
+
+		// Combinators
+		if ( ( match = rleadingCombinator.exec( soFar ) ) ) {
+			matched = match.shift();
+			tokens.push( {
+		rn new Promise(function (resolve) {
+        // do something async
+        setTimeout(function () {
+          config.headers.asynresolves to the same file inside utils from
+// a subdirectory. Otherwise, leave it as-is as we may be testing `exports`
+// so weOnDefaultConfig).toEqual(true);
+    expect(merged.nestedConfig.propertyOnRequestConfig).toEqual(true);
+  });
+
+  describe('headerconst __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function listDirs(root) {
+  y" );
+		}
+		display = jQuery.css( elem, "display" );
+		if ( display === "none" ) {
+			if ( restoreDisplay ) {
+				display = restvent )
+					.ajaxSuccess( event );
+			},
+			requests: [ {
+				url: url( "name.html" ),
+				context: context,
+				beforeSend: calls.js";
+
+export const progressEventReducer = (listener, isDownloadStream, freq = 3) => {
+  let bytesNotified = 0;
+  const _speeduery(document).scrollLeft()" );
+
+	// test jQuery using parent window/document
+	// jQuery reference here is in the iframe
+	windowsed to convert Sauce Labs browser identifiers to their formal names. */
+var browserNameMap = {
+  'googlechrome': 'Chrome',
+  'ie&& result.value;
+					}
+
+				// If this is an inner synthetic event for an event with a bubbling
+				// surrogate (focus or blurrCase(), "b", "correct element" );
+		} )
+		.trigger( "click", [ 42 ] )
+		.unbind( "click" )
+		.trigger( "click" )
+		.removeh.join(fpPath, moduleName + '.js'), getTemplate(moduleName));
+  });
+
+  actions.unshift(file.copy(path.join(__dirname, '../../fp    try{
+      await fetchAxios('http://notExistsUrl.in.nowhere');
+      assert.fail('should fail');
+    } catch (err) {
+  + suffix ] = {
+		expand: function( value ) {
+			var i = 0,
+				expanded = {},
+
+				// Assumes a single number if not a string
+		",
+			"test/data/support/csp.js",
+			"test/data/support/getComputedSupport.js",
+			"test/data/core/jquery-iterability-transpiled		},
+		set: function( tween ) {
+
+			// Use step hook for back compat.
+			// Use cssHook if its there.
+			// Use .style if availa  this.starting = true;
+  request.post(_.template('https://saucelabs.com/rest/v1/${user}/js-tests')(this), {
+    'auth': { 'user{};
+
+      Object.entries(axiosFactory).forEach(([key, value]) => {
+        if (!utils.hasOwnProp(Axios, key) && !(key in instaned = mergeConfig(defaults, config);
+    expect(merged.url).toEqual(config.url);
+    expect(merged.method).toEqual(config.method)	tmp = getAll( fragment.appendChild( elem ), "script" );
+
+		// Preserve script evaluation history
+		if ( attached ) {
+			setGlob
+  let result;
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    result = ArrayBuffer.isView(val);
+  }       platform = options.platforms[0];
+
+  if (_.isObject(jobResult)) {
+    var message = _.get(jobResult, 'message');
+  } elsay}
+ */
+// eslint-disable-next-line func-names
+const isTypedArray = (TypedArray => {
+  // eslint-disable-next-line func-names
+  for use when handling the inner native event
+					// There will always be at least one argument (an event object),
+					// so thrame" )[ 0 ].contentDocument;
+
+	// Tests scrollTop/Left with iframes
+	jQuery( "#iframe" ).css( "width", "50px" ).css( "height", esponses ) {
+
+	var ct, type, finalDataType, firstDataType,
+		contents = s.contents,
+		dataTypes = s.dataTypes;
+
+	// Remove auto content
+		if ( !s.hasContent ) {
+
+			// Remember the hash so we can put it back
+			uncached = s.url.slice( cacheURL.length );
+
+	ta).toEqual(undefined);
+  });
+
+  ['auth', 'headers', 'params', 'proxy'].forEach(function(key) {
+    it('should set new config fosert = require('assert');
+const axios = require('axios');
+const { CanceledError, AxiosError, AxiosHeaders, formToJSON, spread, i( cur = this[ i ]; cur && cur !== context; cur = cur.parentNode ) {
+
+					// Always skip document fragments
+					if ( cur.nodeTye is a URLSearchParams object, otherwise false
+ */
+const isURLSearchParams = kindOfTest('URLSearchParams');
+
+const [isReadablta).not.toBe(data);
+    });
+
+    it('should set as config2 in other cases', function() {
+      const obj = Object.create({});
+  ction parseProtocol(url) {
+  const match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url);
+  return match && match[1] || '';
+}
+lue;
+}
+
+function boxModelAdjustment( elem, dimension, box, isBorderBox, styles, computedVal ) {
+	var i = dimension === "width" ?{
+			val = elem[ offsetProp ];
+		}
+	}
+
+	// Normalize "" and auto
+	val = parseFloat( val ) || 0;
+
+	// Adjust for the element's bootocol + ':';
+});
+
+const flushOnFinish = (stream, [throttled, flush]) => {
+  stream
+    .on('end', flush)
+    .on('error', flushery( "#form" ).serialize(),
+		"action=Test&radio2=on&check=on&hidden=&foo%5Bbar%5D=&name=name&search=search&email=dave%40jquery.*
+ * @param {string} srcPath The path of the file to minify.
+ * @param {string} [destPath] The path to write the file to.
+ * @p." );
+	jQuery( "#qunit-fixture" ).css( "position", "" );
+
+	jQuery( "#nothiddendiv" ).css( "position", "relative" );
+
+	div = jQuestrict" );
+
+// Check if the object we got is the jQuery object by invoking a basic API.
+const ensureJQuery = ( jQuery ) => {
+	as// Use the handy event callback
+	document.addEventListener( "DOMContentLoaded", completed );
+
+	// A fallback to window.onload, tvar push = Array.prototype.push;
+
+/** Used to detect error messages. */
+var reError = /(?:\be|E)rror\b/;
+
+/** Used to detect val   if (message === undefined) {
+        message = 'Results are unavailable. ' + details;
+      }
+      console.error(label, descx.js';
+
+export default platform.hasStandardBrowserEnv ?
+
+// Standard browser envs have full support of the APIs needed to test
+/(pathname === '/') {
+    pathname = '/index.html';
+  }
+
+  if (pathname === '/index.html') {
+    pipeFileToResponse(res, './clien
+  },
+  protocols: ['http', 'https', 'file', 'blob', 'url', 'data']
+};
+import assert from 'assert';
+import http from 'http';
+impons",
+	"mock.php?action=cspFrame",
+	function( assert, jQuery, window, document, support ) {
+		var done = assert.async();
+
+		asser middleware. */
+var mount = ecstatic({
+  'cache': 'no-cache',
+  'root': process.cwd()
+});
+
+/** Used as the list of ports suppor   taskId = _.first(_.get(body, 'js tests'));
+
+  if (error || !taskId || statusCode != 200) {
+    if (this.attempts < this.retri_VALUES = [ "static", "relative", "absolute", "fixed" ],
+
+		// Use shorthands for describing an element's relevant properties
+					try {
+							response = conv( response );
+						} catch ( e ) {
+							return {
+								state: "parsererror",
+								error: essData &&
+			( s.contentType || "" ).indexOf( "application/x-www-form-urlencoded" ) === 0 ) {
+			s.data = s.data.replace( r20, /**
+ * If the thing is a FormData object, return true, otherwise return false.
+ *
+ * @param {unknown} thing - The thing to cherable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+   			var parent = expectations[ props.parent ],
+
+				// position() relates an element's margin box to its offset parent's paddinport "../deferred.js";
+
+// These usually indicate a programmer mistake during development,
+// warn about them ASAP rather than sll"
+	);
+
+} );
+}
+/* global startIframeTest */
+
+var timeoutId, type;
+
+function finalize() {
+	startIframeTest( type, window.downloaesolve(),
+        commonjs()
+      ]
+    }
+  ]
+};
+import defaults from '../../../lib/defaults';
+import mergeConfig from '.search.replace(/^\?|&?(?:build|other)=[^&]*&?/g, '');
+
+      if (event.stopPropagation) {
+        event.stopPropagation() {
+    utils.forEach({
+      'http://username:password@example.com/': 'http',
+      'ftp:google.com': 'ftp',
+      'sms:+1510555eturn p1.toUpperCase() + p2;
+    }
+  );
+};
+
+/* Creating a function that will check if an object has a property. */
+const hasOwno modify the value if it is a CSS custom property
+		// since they are user-defined.
+		if ( !isCustomProp ) {
+			name = finalProp			// For each dataType in the dataTypeExpression
+			while ( ( dataType = dataTypes[ i++ ] ) ) {
+
+				// Prepend if requested
+		Type ] || [] ).unshift( func );
+
+				// Otherwise append
+				} else {
+					( structure[ dataType ] = structure[ dataType ] || []uery.makeArray( value ),
+					i = options.length;
+
+				while ( i-- ) {
+					option = options[ i ];
+
+					if ( ( option.select = {
+				readyState: 0,
+
+				// Builds headers hashtable if needed
+				getResponseHeader: function( key ) {
+					var match;
+					// IE sometimes throws a "Permission denied" error when strict-comparing
+				// two documents; shallow comparisons work.
+				//ut': {
+    'path': distPath,
+    'filename': 'mapping.fp.js',
+    'library': 'mapping',
+    'libraryTarget': 'umd'
+  }
+};
+
+/*---    process.exit(2);
+  }
+  logInline();
+  console.log('Sauce Connect tunnel opened');
+
+  var jobs = this.jobs;
+  push.apply(jobse undefined', function() {
+      expect(mergeConfig({transformRequest: undefined}, {transformRequest: undefined})).toEqual({});
+ort formDataToJSON from '../helpers/formDataToJSON.js';
+
+/**
+ * It takes a string, tries to parse it, and if it fails, it returntance;
+}
+
+// Create the default instance to be exported
+const axios = createInstance(defaults);
+
+// Expose Axios class to allow ptions object. */
+var jobOptions = {
+  'build': build,
+  'command-timeout': commandTimeout,
+  'custom-data': customData,
+  'devirs.post['X-CUSTOM-HEADER'];
+    document.cookie = XSRF_COOKIE_NAME + '=;expires=' + new Date(Date.now() - 86400000).toGMTString(pect( 1 );
+
+	var oldTraditional = jQuery.ajaxSettings.traditional;
+	jQuery.ajaxSettings.traditional = true;
+	assert.equal(
+		jQutunnel if all active jobs have restarted.
+    var threshold = Math.min(all.length, _.isFinite(throttled) ? throttled : 3);
+    ;
+
+    emitter.once('abort', err => {
+      reject(err);
+      req.destroy(err);
+    });
+
+    // Handle errors
+    req.on('erld not set xsrf header if xsrfCookieName is null', function (done) {
+    document.cookie = axios.defaults.xsrfCookieName + '=123ream, chunkSize, onProgress, onFinish, encode) => {
+  const iterator = readBytes(stream, chunkSize, encode);
+
+  let bytes = 0;
+  ).stop =
+					result.stop.bind( result );
+			}
+			return result;
+		}
+	}
+
+	jQuery.map( props, createTween, animation );
+
+	if ( tn } from "./ajax/var/location.js";
+import { nonce } from "./ajax/var/nonce.js";
+import { rquery } from "./ajax/var/rquery.js";
+
+ {
+			ie_11: {
+				reliableColDimensions: 11,
+				reliableTrDimensions: false
+			},
+			chrome: {
+				reliableColDimensions: true/ For CommonJS and CommonJS-like environments where a proper `window`
+		// is present, execute the factory and get jQuery.
+		modAndExpect(function () {
+          expect(interceptor1).toHaveBeenCalled();
+          expect(interceptor2).toHaveBeenCalled();
+  n buildURL(fullPath, config.params, config.paramsSerializer);
+  }
+}
+
+// Provide aliases for supported request methods
+utils..first().attr('class').split(' ');
+    const ext = _(classes).intersection(exts).last();
+
+    $parent.addClass(ext);
+
+    // Remrror, res, body) {
+  this.id = this.taskId = this.url = null;
+  this.removing = false;
+  this.emit('remove');
+}
+
+/**
+ * The `Jobect} thisArg The object to bind function to
+ *
+ * @param {Boolean} [allOwnKeys]
+ * @returns {Object} The resulting value of objfied
+			.end().animate( { opacity: to }, speed, easing, callback );
+	},
+	animate: function( prop, speed, easing, callback ) {
+		858)
+				// Strip and collapse whitespace
+				// https://html.spec.whatwg.org/#strip-and-collapse-whitespace
+				stripAndCollaps((cache) => async (id) => {
+  if(cache[id] !== undefined) {
+    return cache[id];
+  }
+
+  try {
+    const {data} = await axios.geon( entry ) {
+				config[ entry.id ] = QUnit.config[ entry.id ] != null ?
+					QUnit.config[ entry.id ] :
+					QUnit.urlParams[ &&
+				!jQuery.isXMLDoc( elem ) ) {
+
+			// We eschew jQuery#find here for performance reasons:
+			// https://jsperf.com/getall-vhAxios.post('/', readable, {
+          onDownloadProgress: ({loaded, total, progress, bytes, download}) => {
+ion toFormData(obj, formData, options) {
+  if (!utils.isObject(obj)) {
+    throw new TypeError('target must be an object');
+  }
+ssert( !( "expando" in jQueryFactorySlimImported ),
+	"jQuery.expando should not be attached to the slim factory" );
+const $fromF );
+		event.rnamespace = event.namespace ?
+			new RegExp( "(^|\\.)" + namespaces.join( "\\.(?:.*\\.|)" ) + "(\\.|$)" ) :
+			nullM is ready
+		jQuery.isReady = true;
+
+		// If a normal DOM Ready event fired, decrement, and wait if need be
+		if ( wait !== true AxiosTransformStream({
+        maxRate: utils.toFiniteNumber(maxUploadRate)
+      })], utils.noop);
+
+      onUploadProgress && headers).toEqual(config2.headers);
+      expect(merged.headers).not.toBe(config2.headers);
+    });
+
+    it('should clone configction settle(resolve, reject, response) {
+  const validateStatus = response.config.validateStatus;
+  if (!response.status || !va
+ * Connection: keep-alive
+ * Transfer-Encoding: chunked
+ * ```
+ *
+ * @param {String} rawHeaders Headers needing to be parsed
+ *
+			// will dequeue but only if they were gotoEnd.
+			if ( dequeue || !gotoEnd ) {
+				jQuery.dequeue( this, type );
+			}
+		} );stment(
+						elem,
+						dimension,
+						extra,
+						isBorderBox,
+						styles
+					) :
+					0;
+
+			// Convert to pixels if turn iterator.return();
+    }
+  }, {
+    highWaterMark: 2
+  })
+}
+import AxiosHeaders from '../../../lib/core/AxiosHeaders.js';
+i)[0];
+  } catch(e) {
+  }
+}
+
+export {
+  renderContributorsList,
+  getReleaseInfo,
+  renderPRsList,
+  getTagRef
+}
+va ; ( node = nodes[ i ] ) != null; i++ ) {
+		if ( !keepData && node.nodeType === 1 ) {
+			jQuery.cleanData( getAll( node ) );
+		}ptors = Object.getOwnPropertyDescriptors(obj);
+  const reducedDescriptors = {};
+
+  forEach(descriptors, (descriptor, name) => {
+white );
+		}
+
+		var prop,
+			index = 0,
+			length = props.length;
+
+		for ( ; index < length; index++ ) {
+			prop = prop = ({minified}) => ({
+    input: namedInput,
+    ...config,
+    output: {
+      ...config.output,
+      file: `${path.dirname(fi   it('returns undefined if cancellation has not been requested', function() {
+      const token = new CancelToken(funcrror('Request aborted', AxiosError.ECONNABORTED, config, request));
+
+      // Clean up request
+      request = nullequesting but not forcing parseFloat
+					jQuery.css( elem, type, extra ) :
+
+					// Set width or height on the element
+					jQusError('Unsupported protocol ' + protocol, AxiosError.ERR_NOT_SUPPORT);
+}
+import cookies from '../../lib/helpers/cookies';
+
+deseturn utils.isArray(arr) && !arr.some(isVisitable);
+}
+
+const predicates = utils.toFlatObject(utils, {}, null, function filter(pr		"* text": String,
+
+			// Text to html (true = no transformation)
+			"text html": true,
+
+			// Evaluate text as a json expres* Released under the MIT license
+ * https://jquery.com/license/
+ *
+ * Date: @DATE
+ */
+// For ECMAScript module envi (this.timeout) {
+    this._timeoutId = _.delay(onStart, this.timeout * 1000, false);
+  }
+  this.connection.start(onStart);
+  refset( function( i, val ) {
+			assert.equal( val.top, top, "Verify incoming top position." );
+			assert.equal( val.left, left, "Vypeof support[ prop ] === "function" ) {
+			result[ prop ] = support[ prop ]();
+		} else {
+			result[ prop ] = support[ prop _.bind(this.stop, this, onGenericRestart)),
+      stop = _.after(active.length, _.partial(_.invokeMap, all, 'reset', reset));
+
+ tion copy(srcPath, destPath) {
+  return _.partial(fs.copy, srcPath, destPath);
+}
+
+/**
+ * Creates an object of base name and compe.from(readBlob(data));
+    } else if (data && !utils.isStream(data)) {
+      if (Buffer.isBuffer(data)) {
+        // Nothing t	}
+				break;
+			}
+
+			// Viewport scroll affects position:fixed elements, except when the page is
+			// unscrollable.
+			if ( prt': 1 },
+  'without': { 'start': 1 },
+  'zipAll': { 'start': 0 }
+};
+
+/** Used to identify methods which mutate arrays or objectorm {
+  __transform(chunk, encoding, callback) {
+    this.push(chunk);
+    callback();
+  }
+
+  _transform(chunk, encoding, callbaturn path.concat(key).map(function each(token, i) {
+    // eslint-disable-next-line no-param-reassign
+    token = removeBracketsect(isAbsoluteURL('custom-scheme-v1.0://example.com/')).toBe(true);
+    expect(isAbsoluteURL('HTTP://example.com/')).toBe(true);ref,
+		type: "GET",
+		isLocal: rlocalProtocol.test( location.protocol ),
+		global: true,
+		processData: true,
+		async: true,
+		cactory( window );
+	const elem = jQuery( "<div></div><span></span><a></a>" );
+
+	ensureJQuery( jQuery );
+
+	let result = "";
+	for of the url (e.g., http://www.google.com)
+ * @param {object} [params] The params to be appended
+ * @param {?object} options
+ *
+ *can be used
+	 * 5) execution will start with transport dataType and THEN continue down to "*" if needed
+	 */
+	prefilters = {},
+with a known content-type
+	if ( ct ) {
+		for ( type in contents ) {
+			if ( contents[ type ] && contents[ type ].test( ct ) ) {
+ery( "#check1" ).click( function() {
+		assert.ok( true, "click event handler for checkbox gets fired twice, see trac-815" );
+	}rryN', 'curryRightN',
+    'debounce', 'defaults', 'defaultsDeep', 'defaultTo', 'delay', 'difference',
+    'divide', 'drop', 'droils', function (done) {
+    const rejectedSpy = jasmine.createSpy('rejectedSpy');
+    const error = new Error('deadly error');
+ RT = 4666;
+
+
+describe('Server-Side Request Forgery (SSRF)', () => {
+  let fail = false;
+  let proxy;
+  let server;
+  let locatioquery object" );
+	assert.notEqual( $().scrollTop( null ), null, "jQuery().scrollTop(null) testing setter on empty jquery object"ect(response.data).toBe('OK - modified by interceptor');
+        done();
+      }, 100);
+    });
+  });
+
+  it('should add a respoction} fn
+ * @param {Number} freq
+ * @return {Function}
+ */
+function throttle(fn, freq) {
+  let timestamp = 0;
+  let threshp left  marginTop marginLeft  borderTop borderLeft  paddingTop paddingLeft" +
+			"  style  parent" ).split( /\s+/g ),
+		props = tions,
+					index = elem.selectedIndex,
+					one = elem.type === "select-one",
+					values = one ? null : [],
+					max = one ? iom "../ajax.js";
+
+jQuery._evalUrl = function( url, options, doc ) {
+	return jQuery.ajax( {
+		url: url,
+
+		// Make this explicit,xt($element.text());
+    });
+    // Collapse nested spans.
+    while (($spans = $parent.find('span:not([class])')).length) {
+    build() {
+  async.series([
+    file.copy(baseLodash, distLodash),
+    file.min(distLodash)
+  ], util.`+changelog\n*(.+?)?\n*```/gms;
+
+        while((match = reg.exec(body))) {
+          match[1] && pr.messages.push(match[1]);
+   border
+		// Assuming integer scroll gutter, subtract the rest and round down
+		delta += Math.max( 0, Math.ceil(
+			elem[ "offsete.
+	if ( rnumnonpx.test( val ) ) {
+		if ( !extra ) {
+			return val;
+		}
+		val = "auto";
+	}
+
+
+	if (
+		(
+
+			// Fall back to offseffset
+				supportjQuery.each( expectations, function( id, descriptor ) {
+					assert.deepEqual(
+						supportjQuery.extend( {},  this, function( elem, type, value ) {
+				var doc;
+
+				if ( isWindow( elem ) ) {
+
+					// $( window ).outerWidth/Height retururn;
+			}
+
+			completed = true;
+
+			// Clear timeout if it exists
+			if ( timeoutTimer ) {
+				window.clearTimeout( timeoutTimerst silentJSONParsing = transitional && transitional.silentJSONParsing;
+      const strictJSONParsing = !silentJSONParsing && JSOion f(x, y, z) {}
+ *  var args = [1, 2, 3];
+ *  f.apply(null, args);
+ *  ```
+ *
+ * With `spread` this example can be re-written.nd abort() will be invoked before connection, then get "socket hang up" and code ECONNRESET.
+      // At this time, if we have aParsing: validators.transitional(validators.boolean),
+        forcedJSONParsing: validators.transitional(validators.boolean),
+   this;
+				},
+
+				// Cancel the request
+				abort: function( statusText ) {
+					var finalText = statusText || strAbort;
+					ingleTag } from "./var/rsingleTag.js";
+import { isObviousHtml } from "./isObviousHtml.js";
+
+import "../traversing/findFilter.js";sRequest,
+  isResponse,
+  isHeaders,
+  isUndefined,
+  isDate,
+  isFile,
+  isBlob,
+  isRegExp,
+  isFunction,
+  isStream,
+  isURLSleList(data)) || contentType.indexOf('multipart/form-data') > -1) {
+        const _FormData = this.env && this.env.FormData;
+
+  onst parsedZero = parseHeaders('');
+    const parsedSingle = parseHeaders(
+      'Set-Cookie: key=val;'
+    );
+    const parsedMngth < throttled)) {
+    var job = queue.shift();
+    active.push(job);
+    _.delay(_.bind(job.start, job), ++count * 1000);
+  }return helpers.defaultVisitor.apply(this, arguments);
+    }
+  }, options));
+}
+import Handlebars from "handlebars";
+inst keys = Object.keys(arr);
+  let i;
+  const len = keys.length;
+  let key;
+  for (i = 0; i < len; i++) {
+    key = keys[i];
+ {}, {validateStatus: undefined})).toEqual({validateStatus: undefined});
+    });
+
+    it('should merge if both config1 and confignes scheme name as a sequence of characters beginning with a letter and followed
+  // by any combination of letters, digits, plun an iframe. Open ../gh-1764-fullscreen.html." );
+		jQuery( mainSelector + " .toggle-fullscreen" ).remove();
+		return;
+	}
+
+	var core/camelCase.js";
+import { rnothtmlwhite } from "../var/rnothtmlwhite.js";
+import { acceptData } from "./var/acceptData.js";
+
+tion( fn ) {
+	whenReady( fn );
+	return this;
+};
+
+jQuery.extend( {
+
+	// Is the DOM ready to be used? Set to true once it occurs.
+\]$/,
+	rCRLF = /\r?\n/g,
+	rsubmitterTypes = /^(?:submit|button|image|reset|file)$/i,
+	rsubmittable = /^(?:input|select|textarea|adapters/adapters.js";
+
+/**
+ * Throws a `CanceledError` if cancellation has been requested.
+ *
+ * @param {Object} config The con mergeMap = {
+    url: valueFromConfig2,
+    method: valueFromConfig2,
+    data: valueFromConfig2,
+    baseURL: defaultToConfig2) {
+			options = url;
+			url = undefined;
+		}
+
+		// Force options to be an object
+		options = options || {};
+
+		var transport,
+
+ce (no duplicate in the list)
+ *
+ *	stopOnFalse:	interrupt callings when a callback returns false
+ *
+ */
+jQuery.Callbacks = funck( defaultHook, "_default propHook exists" );
+
+	testObject = { test: 0 };
+	fakeTween = { elem: testObject, prop: "test", now: 10ur, data );
+			}
+
+			// Native handler
+			handle = ontype && cur[ ontype ];
+			if ( handle && handle.apply && acceptData( cur ) espace } from "./var/whitespace.js";
+import { isIE } from "./var/isIE.js";
+import { rleadingCombinator } from "./selector/var/rl});
+
+  describe('given you add multiple response interceptors', function () {
+
+    describe('and when the response was fulfilled      beforeRedirect: dispatchBeforeRedirect,
+      beforeRedirects: {}
+    };
+
+    // cacheable-lookup integration hotfix
+    !n && _config.cancelToken.unsubscribe(onCanceled);
+
+      _config.signal && _config.signal.removeEventListener('abort', onCancele	tmp = conv2.split( " " );
+						if ( tmp[ 1 ] === current ) {
+
+							// If prev can be converted to accepted input
+							convenario (trac-15118)
+		fireGlobals = jQuery.event && s.global;
+
+		// Watch for a new set of requests
+		if ( fireGlobals && jQueryument || document ) ) {
+				eventPath.push( tmp.defaultView || tmp.parentWindow || window );
+			}
+		}
+
+		// Fire handlers on thed input.
+	try {
+		xml = ( new window.DOMParser() ).parseFromString( data, "text/xml" );
+	} catch ( e ) {}
+
+	parserErrorElem = xm"../../var/whitespace.js";
+import { identifier } from "./identifier.js";
+
+// Attribute selectors: https://www.w3.org/TR/select or capture 5)
+	"('((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\")|" +
+
+	// 2. simple (capture 6)
+	"((?:\\\\.|[^\\\\()[\\]]|"ropertyOf': 'get',
+  'rangeStep': 'range',
+  'rangeStepRight': 'rangeRight',
+  'restFrom': 'rest',
+  'spreadFrom': 'spread',
+  '
+const glob = require('glob');
+const path = require('path');
+
+const file = require('../common/file');
+const mapping = requconst CONTRIBUTORS_TEMPLATE = path.resolve(__dirname, '../templates/contributors.hbs');
+const PRS_TEMPLATE = path.resolve(__dirn => {
+		console.log( "Running Webpack" );
+
+		const { default: config } = await import( "../webpack.config.cjs" );
+
+		webpack( co '<li onclick="document.location=\'' + url + '\'"><a href="' + url + '">' + url + '</a></li>';
+  });
+
+  return (
+    '<!doctyRR_BAD_OPTION_VALUE',
+  'ERR_BAD_OPTION',
+  'ECONNABORTED',
+  'ETIMEDOUT',
+  'ERR_NETWORK',
+  'ERR_FR_TOO_MANY_REDIRECTS',
+  'Eors differently by element position
+			// fixed: ignore them
+			// absolute: offset includes offsetParent offset+border
+			// reactory } from "jquery/factory";
+import { jQueryFactory as jQueryFactorySlim } from "jquery/factory-slim";
+
+co
+	},
+
+	// Piggyback on a donor event to simulate a different one
+	// Used only for `focus(in | out)` events
+	simulate: futest( unquoted ) &&
+
+			// Get excess from tokenize (recursively)
+			( excess = tokenize( unquoted, true ) ) &&
+
+			// advance tfiles: {
+    'Browser build (UMD)' : './dist/axios.min.js',
+    'Browser build (ESM)' : './dist/esm/axios.min.js',
+  }
+}));
+
+length ?
+        (reasons.length > 1 ? 'since :\n' + reasons.map(renderReason).join('\n') : ' ' + renderReason(reasons[0])) :
+  rt: IE 9 - 11+
+		// Treat the template element as a regular one in browsers that
+		// don't support it.
+		if ( nodeNa
+	},
+
+	cleanData: function( elems ) {
+		var data, elem, type,
+			special = jQuery.event.special,
+			i = 0;
+
+		for ( ; ( elem = y && !firing ) {
+						firingIndex = list.length - 1;
+						queue.push( memory );
+					}
+
+					( function add( args ) {
+						jQk1" ).on( "click", function() {
+		var checkbox = this;
+
+		assert.ok(
+		checkbox.checked, "Checkbox's state is erased after wrap(
+const renderPRsList = async (tag, template, {comments_threshold= 5, awesome_threshold= 5, label = 'add_to_changelog'} = {}) => div>" +
+			"	<span></span>" +
+			"</form>"
+		),
+		div = form.find( "div" )[ 0 ],
+		span = form.find( "span" )[ 0 ];
+
+	form.appenpoint
+jQuery.fx.step = {};
+QUnit.module( "deprecated", { afterEach: moduleTeardown } );
+
+if ( includesModule( "deprecated" ) ) { we're done firing for good
+			if ( locked ) {
+
+				// Keep an empty list if we have data for future add calls
+				if ( memory ) "node:process" );
+
+if ( typeof Symbol === "undefined" ) {
+	console.log( "Symbols not supported, skipping the test..." );
+	proce 'restFrom', 'result', 'sampleSize', 'some', 'sortBy', 'sortedIndex',
+    'sortedIndexOf', 'sortedLastIndex', 'sortedLastIndexOfreturn _.includes(categories, name);
+}
+
+/**
+ * Checks if `name` belongs to a method that's passed thru and not wrapped.
+ *
+     ticksRate: 2,
+      samplesCount: 15
+    }, null, (prop, source) => {
+      return !utils.isUndefined(source[prop]);
+   {
+					throw e;
+				}
+
+				// Propagate others as results
+				done( -1, e );
+			}
+		}
+
+		// Callback for when everything is done				globalEventContext.trigger( "ajaxComplete", [ jqXHR, s ] );
+
+				// Handle the global AJAX counter
+				if ( !( --jQuery.actillback list can only be fired once (like a Deferred)
+ *
+ *	memory:			will keep track of previous values and will call any callbath': [1, 2, 0],
+  'isEqualWith': [1, 2, 0],
+  'isMatchWith': [2, 1, 0],
+  'mergeAllWith': [1, 0],
+  'mergeWith': [1, 2, 0],
+  'ped.host === originURL.host);
+    };
+  })() :
+
+  // Non standard browser envs (web workers, react-native) lack needed support.
+  ict';
+
+self.console || (self.console = { 'log': function() {} });
+
+addEventListener('message', function(e) {
+  if (e.data) {onse = data;
+    });
+
+    getAjaxRequest().then(function (request) {
+      request.respondWith({
+        status: 200,
+   /repos/axios/axios/issues/${id}`);
+
+    return cache[id] = data;
+  } catch (err) {
+    return null;
+  }
+})({});
+
+const getUserInle.log(command);
+
+  const {stdout} = await exec(command, {maxBuffer: 10 * ONE_MB});
+
+  const release = JSON.parse(stdout)[0];
+
+ create( null );
+
+			// We can accept data for non-element nodes in modern browsers,
+			// but we should not, see trac-8335.
+			/atch[3] whether quoted or unquot

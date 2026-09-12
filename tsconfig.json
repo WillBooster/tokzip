@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "alwaysStrict": true,
+    "esModuleInterop": true,
+    "importHelpers": false,
+    "noEmit": true,
+    "noUncheckedIndexedAccess": true,
+    "paths": {
+      "undici-types": ["./node_modules/undici-types/index.d.ts"]
+    },
+    "resolveJsonModule": true,
+    "rootDir": ".",
+    "types": ["bun"]
+  },
+  "exclude": ["test/fixtures"],
+  "extends": "@tsconfig/bun/tsconfig.json",
+  "include": ["*.config.ts", "bench/**/*", "scripts/**/*", "src/**/*", "test/**/*"]
+}

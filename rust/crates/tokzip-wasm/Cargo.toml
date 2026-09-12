@@ -1,0 +1,11 @@
+[package]
+name = "tokzip-wasm"
+version = "0.0.0"
+edition.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+tokzip = { path = "../tokzip" }
