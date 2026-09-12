@@ -5,8 +5,8 @@ edition.workspace = true
 publish = false
 
 [dependencies]
-crc32fast = { version = "1", default-features = false }
-serde_json = { version = "1", optional = true }
+crc32fast = { version = "=1.5.0", default-features = false }
+serde_json = { version = "=1.0.151", optional = true }
 
 [features]
 train = ["dep:serde_json"]
