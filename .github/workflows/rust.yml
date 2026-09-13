@@ -29,12 +29,12 @@ jobs:
       run:
         working-directory: rust
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       # mise installs the toolchain mise.toml pins: the committed wasm is byte-compared
       # below and rustc embeds version-specific bytes, so a floating toolchain would fail
       # the comparison at every Rust release.
-      - uses: jdx/mise-action@v2
-      - uses: Swatinem/rust-cache@v2
+      - uses: jdx/mise-action@v2.4.4
+      - uses: Swatinem/rust-cache@v2.9.2
         with:
           workspaces: rust
       - run: cargo fmt --check
