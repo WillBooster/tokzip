@@ -6759,5 +6759,2027 @@
       "wrangler": "4.128.0",
       "deleted": true
     }
+  },
+  "prepublicationSearch": {
+    "date": "2026-10-03",
+    "baselineCommit": "7642bd9d7bdc8bb85cb0782762bad14932f1d6f9",
+    "host": "Apple M2 Pro, macOS arm64",
+    "rustVersion": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+    "corpusCommits": {
+      "public": "bf20d2b03a39442eb04b952152384925369c2a94",
+      "private": "aa06eb6c43b96ec778bb00ad2efb7d3686ff809e"
+    },
+    "method": [
+      "Screening uses the existing corpus benchmark, with warmup and two repetitions per candidate. The baseline has three repetitions. Screening guides selection only; the initial baseline overlapped a candidate build. Paired results are the final speed evidence.",
+      "Paired measurements instantiate the original and candidate Wasm in one process, cross-decode both encoders with both decoders over all 3514 documents, then run six paired full-corpus passes, reversing codec order per pass. The last four passes are measured; the first two stabilize the runtime. Each timed round trip compares the restored string with the input outside the timing interval.",
+      "Corpus fingerprints include all document contents; reports contain only aggregate measurements. This corpus guided optimization and is not an untouched holdout.",
+      "Throughput counts UTF-8 input bytes. Compression includes the encoder recovery check. No Workers CPU, cold-start, or peak-memory measurement was performed.",
+      "The repeated-text benchmark decodes the same baseline frames with both modules: 262144 ASCII bytes per input, periods 1, 2, 3, 4, 7, 16, 257, one warmup and 30 alternating-order paired rounds. Every result is compared with the input."
+    ],
+    "experimentDefinitions": {
+      "chunk1024": "Parse chunk 1024 instead of 4096.",
+      "cap8": "Short-length relaxation cap 8 instead of 16.",
+      "chunk8192": "Parse chunk 8192 instead of 4096.",
+      "nice32": "Long-match threshold 32 instead of 64.",
+      "depth16": "History search depth 16 and dictionary search depth 32 instead of 32 and 64.",
+      "cap32": "Short-length relaxation cap 32 instead of 16.",
+      "nice128": "Long-match threshold 128 instead of 64.",
+      "prefix": "Reject a differing first byte before common-prefix scanning.",
+      "copy": "Grow the initialized periodic prefix geometrically when copying overlapping matches.",
+      "literalbound": "Skip literal pricing when its nonnegative lower bound cannot improve the destination.",
+      "cap64": "Short-length relaxation cap 64 instead of 16.",
+      "combined48": "Literal lower bound, geometric match copying, threshold 48, relaxation cap 32.",
+      "combined64": "Literal lower bound, geometric match copying, threshold 64, relaxation cap 64.",
+      "simplified48": "Literal lower bound, geometric match copying, threshold 48, all short lengths via plain ranges. Selected search policy; the final source iterates over length prices to satisfy Clippy.",
+      "simplified64": "Literal lower bound, geometric match copying, threshold 64, all short lengths via plain ranges. Saves more bytes but has a smaller encoder speed gain."
+    },
+    "experiments": [
+      {
+        "name": "baseline",
+        "repeat": 3,
+        "wasmBytes": 1147923,
+        "wasmSha256": "047a5a5ce857ddfb7e5498b5212c5ab8c0eecee974de08ad23f870d821afe55c",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3387121
+            },
+            "ratios": {
+              "tokzip": 0.20825114818399743
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1206578
+            },
+            "ratios": {
+              "tokzip": 0.1910976277076023
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202354
+            },
+            "ratios": {
+              "tokzip": 0.2870179937647336
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 553570
+            },
+            "ratios": {
+              "tokzip": 0.2308702227167591
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1424619
+            },
+            "ratios": {
+              "tokzip": 0.2080377798345358
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2933364
+            },
+            "ratios": {
+              "tokzip": 0.21220429098633597
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 453757
+            },
+            "ratios": {
+              "tokzip": 0.18586733680280343
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.548439492955161,
+          "decompressMBps": 75.1985450287595
+        }
+      },
+      {
+        "name": "chunk1024",
+        "repeat": 2,
+        "wasmBytes": 1147963,
+        "wasmSha256": "93418fb3173f01d1a2b37669d756c381d5a2288aa8797560caa4d5b0e82353e1",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3391211
+            },
+            "ratios": {
+              "tokzip": 0.20850261460520664
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1207985
+            },
+            "ratios": {
+              "tokzip": 0.191320468139124
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202354
+            },
+            "ratios": {
+              "tokzip": 0.2870179937647336
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 554451
+            },
+            "ratios": {
+              "tokzip": 0.23123764990069873
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1426421
+            },
+            "ratios": {
+              "tokzip": 0.20830092673855843
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2936863
+            },
+            "ratios": {
+              "tokzip": 0.21245741429941992
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 454348
+            },
+            "ratios": {
+              "tokzip": 0.1861094214341159
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.53545117048725,
+          "decompressMBps": 75.08884149931113
+        }
+      },
+      {
+        "name": "cap8",
+        "repeat": 2,
+        "wasmBytes": 1148683,
+        "wasmSha256": "3c4465d08c22112348a4f103a8fe2981db146c830790aedd0f150fd262a51938",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3409995
+            },
+            "ratios": {
+              "tokzip": 0.2096575156457919
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1214651
+            },
+            "ratios": {
+              "tokzip": 0.19237622813665328
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 203436
+            },
+            "ratios": {
+              "tokzip": 0.2885526976463146
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 557580
+            },
+            "ratios": {
+              "tokzip": 0.23254262113628005
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1434328
+            },
+            "ratios": {
+              "tokzip": 0.20945558965204736
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2953768
+            },
+            "ratios": {
+              "tokzip": 0.2136803493116189
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 456227
+            },
+            "ratios": {
+              "tokzip": 0.1868790949065967
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.657756252148117,
+          "decompressMBps": 74.89870734961721
+        }
+      },
+      {
+        "name": "chunk8192",
+        "repeat": 2,
+        "wasmBytes": 1148220,
+        "wasmSha256": "eb2b680b429af6ae8a2d4c9f8b2dc64cd30f0d35f445da7ad7112cb118fec1ae",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3387085
+            },
+            "ratios": {
+              "tokzip": 0.20824893478762493
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1206764
+            },
+            "ratios": {
+              "tokzip": 0.19112708635739836
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202354
+            },
+            "ratios": {
+              "tokzip": 0.2870179937647336
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 553570
+            },
+            "ratios": {
+              "tokzip": 0.2308702227167591
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1424397
+            },
+            "ratios": {
+              "tokzip": 0.2080053610705552
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2933342
+            },
+            "ratios": {
+              "tokzip": 0.21220269947079215
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 453743
+            },
+            "ratios": {
+              "tokzip": 0.1858616021414864
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.5872203917606234,
+          "decompressMBps": 75.43137414904177
+        }
+      },
+      {
+        "name": "nice32",
+        "repeat": 2,
+        "wasmBytes": 1148139,
+        "wasmSha256": "b6f9083084e83ee2703fe78725e6181540b75665f961ec26e60824b736c4daf0",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3401038
+            },
+            "ratios": {
+              "tokzip": 0.209106810331667
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1213236
+            },
+            "ratios": {
+              "tokzip": 0.19215212066643067
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202557
+            },
+            "ratios": {
+              "tokzip": 0.2873059280419618
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 555312
+            },
+            "ratios": {
+              "tokzip": 0.2315967359453889
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1429933
+            },
+            "ratios": {
+              "tokzip": 0.20881378574351267
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2945247
+            },
+            "ratios": {
+              "tokzip": 0.21306392640484886
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 455791
+            },
+            "ratios": {
+              "tokzip": 0.18670050116843726
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 4.020328673604109,
+          "decompressMBps": 75.4691739924678
+        }
+      },
+      {
+        "name": "depth16",
+        "repeat": 2,
+        "wasmBytes": 1150333,
+        "wasmSha256": "12e48f8ff216df06930348f9e66881f979e5217b2a7a78d3d782dfacd4020a62",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3411264
+            },
+            "ratios": {
+              "tokzip": 0.20973553786792257
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1215756
+            },
+            "ratios": {
+              "tokzip": 0.1925512378572158
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 203796
+            },
+            "ratios": {
+              "tokzip": 0.28906332000987206
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 557534
+            },
+            "ratios": {
+              "tokzip": 0.23252343651600624
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1434178
+            },
+            "ratios": {
+              "tokzip": 0.2094336850817902
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2954768
+            },
+            "ratios": {
+              "tokzip": 0.21375269092724733
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 456496
+            },
+            "ratios": {
+              "tokzip": 0.1869892823276171
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.89090777808255,
+          "decompressMBps": 75.01636864052175
+        }
+      },
+      {
+        "name": "cap32",
+        "repeat": 2,
+        "wasmBytes": 1147771,
+        "wasmSha256": "9bd16e8bfbfd268bb34a39e59503eba68d36375ae999e0010ea09a6085e31ed6",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3380978
+            },
+            "ratios": {
+              "tokzip": 0.20787345668632307
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1204005
+            },
+            "ratios": {
+              "tokzip": 0.19069011638542366
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202151
+            },
+            "ratios": {
+              "tokzip": 0.28673005948750535
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 552734
+            },
+            "ratios": {
+              "tokzip": 0.23052156309613078
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1422088
+            },
+            "ratios": {
+              "tokzip": 0.20766817671906337
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2928450
+            },
+            "ratios": {
+              "tokzip": 0.21184880428713776
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 452528
+            },
+            "ratios": {
+              "tokzip": 0.18536391546289982
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.5458283307333245,
+          "decompressMBps": 75.45226321110866
+        }
+      },
+      {
+        "name": "nice128",
+        "repeat": 2,
+        "wasmBytes": 1147904,
+        "wasmSha256": "5fbbd57c1ab9e031a57b6be10d09518b327f7dd0cff14db4d982a8bc6dc6b6e1",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3383539
+            },
+            "ratios": {
+              "tokzip": 0.20803091524493353
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1204723
+            },
+            "ratios": {
+              "tokzip": 0.19080383310882992
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202287
+            },
+            "ratios": {
+              "tokzip": 0.28692296126929373
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 553277
+            },
+            "ratios": {
+              "tokzip": 0.2307480250267542
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1423252
+            },
+            "ratios": {
+              "tokzip": 0.2078381561842589
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2930381
+            },
+            "ratios": {
+              "tokzip": 0.2119884959469163
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 453158
+            },
+            "ratios": {
+              "tokzip": 0.18562197522216692
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.3433863534456454,
+          "decompressMBps": 75.25206770761433
+        }
+      },
+      {
+        "name": "prefix",
+        "repeat": 2,
+        "wasmBytes": 1148280,
+        "wasmSha256": "c17c4851f35d3bec8414a4338163c0aea95ae3b6e502f95f8054b80322f0a510",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3387121
+            },
+            "ratios": {
+              "tokzip": 0.20825114818399743
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1206578
+            },
+            "ratios": {
+              "tokzip": 0.1910976277076023
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202354
+            },
+            "ratios": {
+              "tokzip": 0.2870179937647336
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 553570
+            },
+            "ratios": {
+              "tokzip": 0.2308702227167591
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1424619
+            },
+            "ratios": {
+              "tokzip": 0.2080377798345358
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2933364
+            },
+            "ratios": {
+              "tokzip": 0.21220429098633597
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 453757
+            },
+            "ratios": {
+              "tokzip": 0.18586733680280343
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.565918109148611,
+          "decompressMBps": 75.79228214559417
+        }
+      },
+      {
+        "name": "copy",
+        "repeat": 2,
+        "wasmBytes": 1147930,
+        "wasmSha256": "31121f8d86fcc54f589e51a1a50658d07f9548ea35614b0602ea8d350f281412",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3387121
+            },
+            "ratios": {
+              "tokzip": 0.20825114818399743
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1206578
+            },
+            "ratios": {
+              "tokzip": 0.1910976277076023
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202354
+            },
+            "ratios": {
+              "tokzip": 0.2870179937647336
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 553570
+            },
+            "ratios": {
+              "tokzip": 0.2308702227167591
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1424619
+            },
+            "ratios": {
+              "tokzip": 0.2080377798345358
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2933364
+            },
+            "ratios": {
+              "tokzip": 0.21220429098633597
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 453757
+            },
+            "ratios": {
+              "tokzip": 0.18586733680280343
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.566224003211005,
+          "decompressMBps": 75.40096843390653
+        }
+      },
+      {
+        "name": "literalbound",
+        "repeat": 2,
+        "wasmBytes": 1148017,
+        "wasmSha256": "47c45a86ad7ce1f67f2017160d9c69e5f6611e66dad58451f8622392658f7db3",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3387121
+            },
+            "ratios": {
+              "tokzip": 0.20825114818399743
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1206578
+            },
+            "ratios": {
+              "tokzip": 0.1910976277076023
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202354
+            },
+            "ratios": {
+              "tokzip": 0.2870179937647336
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 553570
+            },
+            "ratios": {
+              "tokzip": 0.2308702227167591
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1424619
+            },
+            "ratios": {
+              "tokzip": 0.2080377798345358
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2933364
+            },
+            "ratios": {
+              "tokzip": 0.21220429098633597
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 453757
+            },
+            "ratios": {
+              "tokzip": 0.18586733680280343
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.631032625184405,
+          "decompressMBps": 75.5952987371253
+        }
+      },
+      {
+        "name": "cap64",
+        "repeat": 2,
+        "wasmBytes": 1147743,
+        "wasmSha256": "e08d6a0b8786ff197b749b493eeded138b84014d744b46a7f245d801b1eeb5df",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3378705
+            },
+            "ratios": {
+              "tokzip": 0.20773370529869262
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1203057
+            },
+            "ratios": {
+              "tokzip": 0.1905399722993664
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202097
+            },
+            "ratios": {
+              "tokzip": 0.2866534661329717
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 552389
+            },
+            "ratios": {
+              "tokzip": 0.23037767844407725
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1421162
+            },
+            "ratios": {
+              "tokzip": 0.20753295250534254
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2926456
+            },
+            "ratios": {
+              "tokzip": 0.21170455510557462
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 452249
+            },
+            "ratios": {
+              "tokzip": 0.1852496318552244
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.5633791404295305,
+          "decompressMBps": 76.71376392176606
+        }
+      },
+      {
+        "name": "combined48",
+        "repeat": 2,
+        "wasmBytes": 1147932,
+        "wasmSha256": "7a143fc1fbba9fa3e11a18b8b07ad8675c252a7620174d0c5e47b6258db12b03",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3384265
+            },
+            "ratios": {
+              "tokzip": 0.20807555207177897
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1205801
+            },
+            "ratios": {
+              "tokzip": 0.1909745665737769
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202201
+            },
+            "ratios": {
+              "tokzip": 0.2868009792602217
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 553081
+            },
+            "ratios": {
+              "tokzip": 0.2306662818621093
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1423182
+            },
+            "ratios": {
+              "tokzip": 0.20782793405147224
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2931425
+            },
+            "ratios": {
+              "tokzip": 0.2120640205936324
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 452840
+            },
+            "ratios": {
+              "tokzip": 0.18549171648653687
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.7639660564087642,
+          "decompressMBps": 75.67643086796132
+        }
+      },
+      {
+        "name": "combined64",
+        "repeat": 2,
+        "wasmBytes": 1147844,
+        "wasmSha256": "59d66a7304b66907cffdeddcddb4cfdd95b93b3157c4714457b43ad2c70e0b09",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3378705
+            },
+            "ratios": {
+              "tokzip": 0.20773370529869262
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1203057
+            },
+            "ratios": {
+              "tokzip": 0.1905399722993664
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202097
+            },
+            "ratios": {
+              "tokzip": 0.2866534661329717
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 552389
+            },
+            "ratios": {
+              "tokzip": 0.23037767844407725
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1421162
+            },
+            "ratios": {
+              "tokzip": 0.20753295250534254
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2926456
+            },
+            "ratios": {
+              "tokzip": 0.21170455510557462
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 452249
+            },
+            "ratios": {
+              "tokzip": 0.1852496318552244
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.606375335867047,
+          "decompressMBps": 75.99869804205535
+        }
+      },
+      {
+        "name": "simplified48",
+        "repeat": 2,
+        "wasmBytes": 1147750,
+        "wasmSha256": "366ad9d7bc9ed36aa28fc141ca1a8c95b471fbf7c7632b65102de35df2768c4a",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3382884
+            },
+            "ratios": {
+              "tokzip": 0.2079906437276005
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1205218
+            },
+            "ratios": {
+              "tokzip": 0.19088223112844843
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202159
+            },
+            "ratios": {
+              "tokzip": 0.28674140665113995
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 552876
+            },
+            "ratios": {
+              "tokzip": 0.2305807851848021
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1422631
+            },
+            "ratios": {
+              "tokzip": 0.20774747126339427
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2930251
+            },
+            "ratios": {
+              "tokzip": 0.2119790915368846
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 452633
+            },
+            "ratios": {
+              "tokzip": 0.18540692542277767
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.8293613572612917,
+          "decompressMBps": 76.22923543150952
+        }
+      },
+      {
+        "name": "simplified64",
+        "repeat": 2,
+        "wasmBytes": 1147682,
+        "wasmSha256": "745efa4ad911f6c96c49f1904920ce13baf2c60a67b9334e794fc029d5cea8cf",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": {
+              "tokzip": 3378705
+            },
+            "ratios": {
+              "tokzip": 0.20773370529869262
+            }
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": {
+              "tokzip": 1203057
+            },
+            "ratios": {
+              "tokzip": 0.1905399722993664
+            }
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": {
+              "tokzip": 202097
+            },
+            "ratios": {
+              "tokzip": 0.2866534661329717
+            }
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": {
+              "tokzip": 552389
+            },
+            "ratios": {
+              "tokzip": 0.23037767844407725
+            }
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": {
+              "tokzip": 1421162
+            },
+            "ratios": {
+              "tokzip": 0.20753295250534254
+            }
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": {
+              "tokzip": 2926456
+            },
+            "ratios": {
+              "tokzip": 0.21170455510557462
+            }
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": {
+              "tokzip": 452249
+            },
+            "ratios": {
+              "tokzip": 0.1852496318552244
+            }
+          }
+        },
+        "speed": {
+          "compressMBps": 3.6548026117277947,
+          "decompressMBps": 76.09203091572218
+        }
+      }
+    ],
+    "paired": {
+      "bun": {
+        "runtime": {
+          "node": "26.3.0",
+          "bun": "1.4.2",
+          "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+          "openssl": "1.1.0",
+          "llhttp": "9.3.0",
+          "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+          "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+          "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+          "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+          "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+          "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+          "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+          "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+          "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+          "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+          "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+          "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+          "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+          "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+          "v8": "14.6.202.34-node.20",
+          "uv": "1.48.0",
+          "napi": "10",
+          "icu": "78.1",
+          "unicode": "17.0",
+          "sqlite": "3.54.0",
+          "modules": "147"
+        },
+        "assets": [
+          {
+            "bytes": 1147923,
+            "sha256": "047a5a5ce857ddfb7e5498b5212c5ab8c0eecee974de08ad23f870d821afe55c"
+          },
+          {
+            "bytes": 1148210,
+            "sha256": "e803eace8bb7f9412d4c6cdd94468426dd2ae4d951a59ea0b09c4ed52f6a8f3a"
+          }
+        ],
+        "corpusFingerprint": "51ef7c7036cceecf7faf1aed46409a8078f1f57a2ba516d1cd13ffd81f3905f4",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": [3387121, 3382884]
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": [2933364, 2930251]
+          },
+          "language c": {
+            "docs": 109,
+            "raw": 914214,
+            "packed": [158142, 157604]
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": [1424619, 1422631]
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": [1206578, 1205218]
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": [553570, 552876]
+          },
+          "language cpp": {
+            "docs": 67,
+            "raw": 231445,
+            "packed": [30663, 30690]
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": [202354, 202159]
+          },
+          "language csharp": {
+            "docs": 213,
+            "raw": 911287,
+            "packed": [114611, 114488]
+          },
+          "language css": {
+            "docs": 42,
+            "raw": 125019,
+            "packed": [20736, 20625]
+          },
+          "language dart": {
+            "docs": 44,
+            "raw": 173477,
+            "packed": [27013, 26900]
+          },
+          "language en-US": {
+            "docs": 863,
+            "raw": 2418152,
+            "packed": [643360, 643083]
+          },
+          "language haskell": {
+            "docs": 117,
+            "raw": 342337,
+            "packed": [70281, 70168]
+          },
+          "language html": {
+            "docs": 169,
+            "raw": 1339356,
+            "packed": [239476, 238840]
+          },
+          "language ja-JP": {
+            "docs": 187,
+            "raw": 620381,
+            "packed": [154669, 154381]
+          },
+          "language java": {
+            "docs": 73,
+            "raw": 332594,
+            "packed": [46019, 45913]
+          },
+          "language javascript": {
+            "docs": 64,
+            "raw": 148116,
+            "packed": [33520, 33497]
+          },
+          "language jsp": {
+            "docs": 61,
+            "raw": 225583,
+            "packed": [28519, 28490]
+          },
+          "language php": {
+            "docs": 101,
+            "raw": 574967,
+            "packed": [89758, 89460]
+          },
+          "language python": {
+            "docs": 70,
+            "raw": 419968,
+            "packed": [71326, 71227]
+          },
+          "language ruby": {
+            "docs": 124,
+            "raw": 756272,
+            "packed": [124486, 124319]
+          },
+          "language rust": {
+            "docs": 70,
+            "raw": 340891,
+            "packed": [50967, 50931]
+          },
+          "language text": {
+            "docs": 455,
+            "raw": 3165427,
+            "packed": [720620, 719912]
+          },
+          "language typescript": {
+            "docs": 171,
+            "raw": 923880,
+            "packed": [137920, 137785]
+          },
+          "language zh-CN": {
+            "docs": 175,
+            "raw": 518956,
+            "packed": [137699, 137602]
+          },
+          "language zh-TW": {
+            "docs": 306,
+            "raw": 1401494,
+            "packed": [418665, 418455]
+          },
+          "language zig": {
+            "docs": 33,
+            "raw": 380781,
+            "packed": [68671, 68514]
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": [453757, 452633]
+          }
+        },
+        "passes": [
+          [
+            {
+              "compressMs": 4472.866356999939,
+              "decompressMs": 212.99609300001612
+            },
+            {
+              "compressMs": 4176.340997999965,
+              "decompressMs": 212.3235569999597
+            }
+          ],
+          [
+            {
+              "compressMs": 4480.3783209999165,
+              "decompressMs": 210.4321979999222
+            },
+            {
+              "compressMs": 4193.161254000228,
+              "decompressMs": 213.94732399987333
+            }
+          ],
+          [
+            {
+              "compressMs": 4475.989056000304,
+              "decompressMs": 212.6606349998474
+            },
+            {
+              "compressMs": 4181.076844000159,
+              "decompressMs": 212.3220319996799
+            }
+          ],
+          [
+            {
+              "compressMs": 4465.548769999972,
+              "decompressMs": 211.1526990001512
+            },
+            {
+              "compressMs": 4179.3118300000715,
+              "decompressMs": 213.90935200023523
+            }
+          ],
+          [
+            {
+              "compressMs": 4497.04299900015,
+              "decompressMs": 213.36123899984523
+            },
+            {
+              "compressMs": 4203.395039000163,
+              "decompressMs": 212.54395599978307
+            }
+          ],
+          [
+            {
+              "compressMs": 4475.400377000282,
+              "decompressMs": 212.3334839998206
+            },
+            {
+              "compressMs": 4187.181175000231,
+              "decompressMs": 213.7354429995612
+            }
+          ]
+        ],
+        "measuredPasses": [
+          [
+            {
+              "compressMs": 4475.989056000304,
+              "decompressMs": 212.6606349998474
+            },
+            {
+              "compressMs": 4181.076844000159,
+              "decompressMs": 212.3220319996799
+            }
+          ],
+          [
+            {
+              "compressMs": 4465.548769999972,
+              "decompressMs": 211.1526990001512
+            },
+            {
+              "compressMs": 4179.3118300000715,
+              "decompressMs": 213.90935200023523
+            }
+          ],
+          [
+            {
+              "compressMs": 4497.04299900015,
+              "decompressMs": 213.36123899984523
+            },
+            {
+              "compressMs": 4203.395039000163,
+              "decompressMs": 212.54395599978307
+            }
+          ],
+          [
+            {
+              "compressMs": 4475.400377000282,
+              "decompressMs": 212.3334839998206
+            },
+            {
+              "compressMs": 4187.181175000231,
+              "decompressMs": 213.7354429995612
+            }
+          ]
+        ],
+        "throughput": [
+          {
+            "compressMBps": 3.631710185825918,
+            "decompressMBps": 76.58360325595558
+          },
+          {
+            "compressMBps": 3.8838591349805696,
+            "decompressMBps": 76.31385936388386
+          }
+        ]
+      },
+      "node": {
+        "runtime": {
+          "node": "24.21.0",
+          "acorn": "8.18.0",
+          "ada": "4.0.0",
+          "amaro": "1.1.11",
+          "ares": "1.34.8",
+          "brotli": "1.2.0",
+          "cldr": "48.0",
+          "icu": "78.3",
+          "llhttp": "9.4.3",
+          "merve": "1.2.2",
+          "modules": "137",
+          "napi": "10",
+          "nbytes": "0.1.4",
+          "ncrypto": "0.0.1",
+          "nghttp2": "1.70.0",
+          "nghttp3": "",
+          "ngtcp2": "",
+          "openssl": "3.5.8",
+          "simdjson": "4.6.7",
+          "simdutf": "6.4.0",
+          "sqlite": "3.53.4",
+          "tz": "2026c",
+          "undici": "7.29.1",
+          "unicode": "17.0",
+          "uv": "1.52.1",
+          "uvwasi": "0.0.23",
+          "v8": "13.6.233.17-node.53",
+          "zlib": "1.3.2.1-motley-8002e91",
+          "zstd": "1.5.7"
+        },
+        "assets": [
+          {
+            "bytes": 1147923,
+            "sha256": "047a5a5ce857ddfb7e5498b5212c5ab8c0eecee974de08ad23f870d821afe55c"
+          },
+          {
+            "bytes": 1148210,
+            "sha256": "e803eace8bb7f9412d4c6cdd94468426dd2ae4d951a59ea0b09c4ed52f6a8f3a"
+          }
+        ],
+        "corpusFingerprint": "51ef7c7036cceecf7faf1aed46409a8078f1f57a2ba516d1cd13ffd81f3905f4",
+        "groups": {
+          "all": {
+            "docs": 3514,
+            "raw": 16264597,
+            "packed": [3387121, 3382884]
+          },
+          "corpus tokzip-corpus": {
+            "docs": 3288,
+            "raw": 13823302,
+            "packed": [2933364, 2930251]
+          },
+          "language c": {
+            "docs": 109,
+            "raw": 914214,
+            "packed": [158142, 157604]
+          },
+          "bucket 4–16K": {
+            "docs": 793,
+            "raw": 6847886,
+            "packed": [1424619, 1422631]
+          },
+          "bucket >16K": {
+            "docs": 272,
+            "raw": 6313935,
+            "packed": [1206578, 1205218]
+          },
+          "bucket 1–4K": {
+            "docs": 1071,
+            "raw": 2397754,
+            "packed": [553570, 552876]
+          },
+          "language cpp": {
+            "docs": 67,
+            "raw": 231445,
+            "packed": [30663, 30690]
+          },
+          "bucket ≤1K": {
+            "docs": 1378,
+            "raw": 705022,
+            "packed": [202354, 202159]
+          },
+          "language csharp": {
+            "docs": 213,
+            "raw": 911287,
+            "packed": [114611, 114488]
+          },
+          "language css": {
+            "docs": 42,
+            "raw": 125019,
+            "packed": [20736, 20625]
+          },
+          "language dart": {
+            "docs": 44,
+            "raw": 173477,
+            "packed": [27013, 26900]
+          },
+          "language en-US": {
+            "docs": 863,
+            "raw": 2418152,
+            "packed": [643360, 643083]
+          },
+          "language haskell": {
+            "docs": 117,
+            "raw": 342337,
+            "packed": [70281, 70168]
+          },
+          "language html": {
+            "docs": 169,
+            "raw": 1339356,
+            "packed": [239476, 238840]
+          },
+          "language ja-JP": {
+            "docs": 187,
+            "raw": 620381,
+            "packed": [154669, 154381]
+          },
+          "language java": {
+            "docs": 73,
+            "raw": 332594,
+            "packed": [46019, 45913]
+          },
+          "language javascript": {
+            "docs": 64,
+            "raw": 148116,
+            "packed": [33520, 33497]
+          },
+          "language jsp": {
+            "docs": 61,
+            "raw": 225583,
+            "packed": [28519, 28490]
+          },
+          "language php": {
+            "docs": 101,
+            "raw": 574967,
+            "packed": [89758, 89460]
+          },
+          "language python": {
+            "docs": 70,
+            "raw": 419968,
+            "packed": [71326, 71227]
+          },
+          "language ruby": {
+            "docs": 124,
+            "raw": 756272,
+            "packed": [124486, 124319]
+          },
+          "language rust": {
+            "docs": 70,
+            "raw": 340891,
+            "packed": [50967, 50931]
+          },
+          "language text": {
+            "docs": 455,
+            "raw": 3165427,
+            "packed": [720620, 719912]
+          },
+          "language typescript": {
+            "docs": 171,
+            "raw": 923880,
+            "packed": [137920, 137785]
+          },
+          "language zh-CN": {
+            "docs": 175,
+            "raw": 518956,
+            "packed": [137699, 137602]
+          },
+          "language zh-TW": {
+            "docs": 306,
+            "raw": 1401494,
+            "packed": [418665, 418455]
+          },
+          "language zig": {
+            "docs": 33,
+            "raw": 380781,
+            "packed": [68671, 68514]
+          },
+          "corpus tokzip-corpus-private": {
+            "docs": 226,
+            "raw": 2441295,
+            "packed": [453757, 452633]
+          }
+        },
+        "passes": [
+          [
+            {
+              "compressMs": 4946.629154999926,
+              "decompressMs": 226.32547400006843
+            },
+            {
+              "compressMs": 4622.439905000063,
+              "decompressMs": 223.48919100003513
+            }
+          ],
+          [
+            {
+              "compressMs": 4930.871025000168,
+              "decompressMs": 224.6054369998019
+            },
+            {
+              "compressMs": 4623.523570999976,
+              "decompressMs": 225.69654000001537
+            }
+          ],
+          [
+            {
+              "compressMs": 4932.388380000091,
+              "decompressMs": 224.55432199981806
+            },
+            {
+              "compressMs": 4622.2979110001,
+              "decompressMs": 222.73267099988516
+            }
+          ],
+          [
+            {
+              "compressMs": 4926.229106999897,
+              "decompressMs": 222.66018099999928
+            },
+            {
+              "compressMs": 4620.170858000238,
+              "decompressMs": 223.4291959999391
+            }
+          ],
+          [
+            {
+              "compressMs": 4933.074340000137,
+              "decompressMs": 224.34709699986706
+            },
+            {
+              "compressMs": 4621.249981999987,
+              "decompressMs": 222.06155800003762
+            }
+          ],
+          [
+            {
+              "compressMs": 4921.44147099994,
+              "decompressMs": 222.92008199996053
+            },
+            {
+              "compressMs": 4618.710248000178,
+              "decompressMs": 223.6815289998267
+            }
+          ]
+        ],
+        "measuredPasses": [
+          [
+            {
+              "compressMs": 4932.388380000091,
+              "decompressMs": 224.55432199981806
+            },
+            {
+              "compressMs": 4622.2979110001,
+              "decompressMs": 222.73267099988516
+            }
+          ],
+          [
+            {
+              "compressMs": 4926.229106999897,
+              "decompressMs": 222.66018099999928
+            },
+            {
+              "compressMs": 4620.170858000238,
+              "decompressMs": 223.4291959999391
+            }
+          ],
+          [
+            {
+              "compressMs": 4933.074340000137,
+              "decompressMs": 224.34709699986706
+            },
+            {
+              "compressMs": 4621.249981999987,
+              "decompressMs": 222.06155800003762
+            }
+          ],
+          [
+            {
+              "compressMs": 4921.44147099994,
+              "decompressMs": 222.92008199996053
+            },
+            {
+              "compressMs": 4618.710248000178,
+              "decompressMs": 223.6815289998267
+            }
+          ]
+        ],
+        "throughput": [
+          {
+            "compressMBps": 3.3002560788548156,
+            "decompressMBps": 72.73305793647971
+          },
+          {
+            "compressMBps": 3.520012872957242,
+            "decompressMBps": 72.94318493046818
+          }
+        ]
+      }
+    },
+    "repeatedText": {
+      "runtime": {
+        "node": "26.3.0",
+        "bun": "1.4.2",
+        "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+        "openssl": "1.1.0",
+        "llhttp": "9.3.0",
+        "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+        "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+        "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+        "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+        "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+        "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+        "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+        "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+        "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+        "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+        "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+        "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+        "v8": "14.6.202.34-node.20",
+        "uv": "1.48.0",
+        "napi": "10",
+        "icu": "78.1",
+        "unicode": "17.0",
+        "sqlite": "3.54.0",
+        "modules": "147"
+      },
+      "results": [
+        {
+          "period": 1,
+          "bytes": 262144,
+          "rounds": 30,
+          "decompressMs": [33.16320899999998, 6.481084000000038]
+        },
+        {
+          "period": 2,
+          "bytes": 262144,
+          "rounds": 30,
+          "decompressMs": [18.498124000000075, 4.6892500000000155]
+        },
+        {
+          "period": 3,
+          "bytes": 262144,
+          "rounds": 30,
+          "decompressMs": [16.519500999999906, 5.148957000000081]
+        },
+        {
+          "period": 4,
+          "bytes": 262144,
+          "rounds": 30,
+          "decompressMs": [10.946545999999785, 4.847913999999946]
+        },
+        {
+          "period": 7,
+          "bytes": 262144,
+          "rounds": 30,
+          "decompressMs": [8.052000999999734, 5.03250300000002]
+        },
+        {
+          "period": 16,
+          "bytes": 262144,
+          "rounds": 30,
+          "decompressMs": [6.0124190000000794, 4.803461000000084]
+        },
+        {
+          "period": 257,
+          "bytes": 262144,
+          "rounds": 30,
+          "decompressMs": [5.42770900000005, 5.4886670000001345]
+        }
+      ]
+    },
+    "compatibility": "Decoding rules, dictionaries, and priors are unchanged. Both modules decode both encoders on every corpus document in Bun and Node."
   }
 }
