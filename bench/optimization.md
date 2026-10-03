@@ -6,7 +6,7 @@ shared code dictionary in [#44](https://github.com/WillBooster/tokzip/pull/44), 
 precomputed detection table in [#43](https://github.com/WillBooster/tokzip/pull/43).
 Measurements and exploratory results are in [optimization.json](optimization.json).
 The main tables describe the SIMD milestone (`assets.simd` in the JSON). The subsequent
-literal-cache revision and current module (`assets.final`) are recorded separately below.
+literal-cache milestone (`assets.final`) is recorded separately below.
 
 ## Data and method
 

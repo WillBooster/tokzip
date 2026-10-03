@@ -30,9 +30,7 @@ const HASH3_BITS: u32 = 15;
 const MAX_DIST_LEN3: usize = 1 << 14;
 const SEARCH_DEPTH: usize = 32;
 const DICT_SEARCH_DEPTH: usize = 64;
-const NICE_LEN: usize = 64;
-/// The optimal parse relaxes every match length up to this bound plus the full length.
-const RELAX_LEN_CAP: usize = 16;
+const NICE_LEN: usize = 48;
 const EMPTY: i32 = -1;
 
 // ---------------------------------------------------------------------------
@@ -1348,18 +1346,19 @@ fn run_encode_optimal(
             let base = nodes[i].price;
             let max_len = MATCH_MAX.min(end - gpos);
 
-            let lit_price = base
-                + state_prices[state].literal
-                + models.price_literal(&mf.win, gpos, state, &reps);
-            relax(
-                &mut nodes,
-                i,
-                1,
-                lit_price,
-                Step::Literal,
-                state_after_literal(state) as u8,
-                reps,
-            );
+            let literal_base = base + state_prices[state].literal;
+            if literal_base < nodes[i + 1].price {
+                let lit_price = literal_base + models.price_literal(&mf.win, gpos, state, &reps);
+                relax(
+                    &mut nodes,
+                    i,
+                    1,
+                    lit_price,
+                    Step::Literal,
+                    state_after_literal(state) as u8,
+                    reps,
+                );
+            }
 
             let mut long_rep = false;
             for idx in 0..4usize {
@@ -1390,17 +1389,16 @@ fn run_encode_optimal(
                 new_reps.copy_within(0..idx, 1);
                 new_reps[0] = rep;
                 let st = state_after_rep(state) as u8;
-                // Relax the short lengths (where a shorter match can enable a better
-                // continuation) and the full length; intermediate lengths rarely win.
+                // Keep every short-match length: ending earlier can enable a cheaper
+                // continuation. Long matches only contribute their full length to bound work.
                 let from = if l >= NICE_LEN { l } else { 2 };
-                for len in (from..=l.min(RELAX_LEN_CAP))
-                    .chain((l > RELAX_LEN_CAP.max(from - 1)).then_some(l))
+                for (len, &length_price) in rep_len_price.iter().enumerate().take(l + 1).skip(from)
                 {
                     relax(
                         &mut nodes,
                         i,
                         len,
-                        choice + rep_len_price[len],
+                        choice + length_price,
                         Step::Rep {
                             idx: idx as u8,
                             len: len as u32,
@@ -1450,15 +1448,13 @@ fn run_encode_optimal(
                     *p = prices.price(ls, value);
                 }
                 let from = if plen >= NICE_LEN { plen } else { len_from };
-                for len in (from..=plen.min(RELAX_LEN_CAP))
-                    .chain((plen > RELAX_LEN_CAP.max(from - 1)).then_some(plen))
-                {
+                for (len, &length_price) in len_price.iter().enumerate().take(plen + 1).skip(from) {
                     let len_state = (len - 2).min(NUM_LEN_TO_POS - 1);
                     relax(
                         &mut nodes,
                         i,
                         len,
-                        base + kind_bit + len_price[len] + dist_price[len_state],
+                        base + kind_bit + length_price + dist_price[len_state],
                         Step::Match {
                             len: len as u32,
                             dist_m1,
@@ -1791,10 +1787,13 @@ fn copy_match(out: &mut Vec<u8>, base: usize, dict: &[u8], dist: usize, mut len:
         out.extend_from_slice(&dict[start..start + from_dict]);
         len -= from_dict;
     }
-    // The source is now inside the output: copy in non-overlapping runs of `dist` bytes.
+    if len == 0 {
+        return;
+    }
+    // Reuse the growing periodic prefix so short distances need logarithmically many copies.
+    let src = out.len() - dist;
     while len > 0 {
-        let src = out.len() - dist;
-        let run = dist.min(len);
+        let run = (out.len() - src).min(len);
         out.extend_from_within(src..src + run);
         len -= run;
     }
