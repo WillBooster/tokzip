@@ -6,10 +6,13 @@
   "baselineCommit": "2b57d057f3f5faa6b86a2740ccc07277dc974abe",
   "method": {
     "corpus": "Existing public and private bench splits, fixed for all variants; optimization data, not an untouched holdout. No retraining.",
-    "paired": "Six complete passes per runtime after round-trip and cross-decode warmup. Alternate codec order within batches of 32 documents and reverse each pass. Summaries use the last four passes. CPU time is process.cpuUsage; throughput uses UTF-8 input bytes. Encoding includes its recovery check.",
+    "paired": "Six complete passes per runtime after round-trip and cross-decode warmup. Alternate codec order within batches of 32 documents and reverse each pass. Summaries take the median of the last four passes separately for each codec and metric. For four values, the median is the arithmetic mean of the two central sorted values. Arrays use index 0 for baseline and index 1 for candidate. CPU time is process.cpuUsage; throughput uses UTF-8 input bytes. Encoding includes its recovery check.",
     "timingLimit": "Other workloads ran on this machine. Do not interpret sub-percent differences as a reliable speedup. No Cloudflare Workers measurement in this iteration.",
-    "repetitive": "262144-byte ASCII inputs, six alternating paired rounds after warmup per period. Period unit byte i is 33 + i % 90.",
-    "reproduction": "Use the baseline and candidate Wasm with createCodec from src/core.ts on manifest split=bench entries. Standard unpaired check: bun run bench --codec-only --speed --repeat 3 --json .tmp/bench.json."
+    "repetitive": "262144-byte ASCII inputs, six alternating paired rounds after warmup per period. Period unit byte i is 33 + i % 90. Each times entry is the total CPU milliseconds across all six rounds, not a per-round value. Index 0 is baseline and index 1 is candidate; divide by rounds for a per-round value.",
+    "reproduction": "Use the baseline and candidate Wasm with createCodec from src/core.ts on manifest split=bench entries. Standard unpaired check: bun run bench --codec-only --speed --repeat 3 --json .tmp/bench.json.",
+    "screening": "Each isolated variant starts from baselineCommit. One corpus warmup precedes two timed encode/decode repetitions per document. packedBytes counts one frame per document. exploratoryWallThroughputMBps is input bytes times two divided by the summed wall time, not CPU time; these heavily contended, unpaired timings do not establish comparative speed. CPU rejection evidence is recorded separately in searchComparison.",
+    "experimentReproduction": "In a disposable checkout of baselineCommit, apply the named experiment patch with git apply, then run its buildCommand from the repository root. Patches are relative to baselineCommit, not cumulative. Use the pinned toolchain from mise.toml. Keep corpus checkouts at corpusCommits; the standard benchmark auto-pulls the private corpus, so verify the checkout revisions and corpusFingerprint afterward. For simd, the empty patch is omitted. Candidate sources are available directly at candidateRevision. Re-run the same manifest split=bench inputs through createCodec; throughput varies with the host.",
+    "artifactProvenance": "Experimental patches preserve the original screening source, including formatting. sourceSha256 identifies the resulting lz.rs bytes. Wasm hashes and sizes are included for artifacts still retained locally; an absent wasm field means the original binary was not retained, not that its hash was inferred. Rebuilding from the patch and recorded command supplies that binary."
   },
   "compatibility": "Unchanged decoding rules, dictionary bytes, and priors; every corpus frame cross-decodes in both directions.",
   "baselineRebuild": "Byte-identical to the committed module.",
@@ -702,108 +705,389 @@
   },
   "screening": [
     {
+      "variant": "baseline",
+      "sourceRevision": "2b57d057f3f5faa6b86a2740ccc07277dc974abe",
+      "packedBytes": 3382884,
+      "buildCommand": "bun run build/wasm",
+      "wasm": {
+        "bytes": 1148210,
+        "sha256": "e803eace8bb7f9412d4c6cdd94468426dd2ae4d951a59ea0b09c4ed52f6a8f3a"
+      }
+    },
+    {
       "variant": "chunk512",
-      "packedBytes": 3397079
+      "packedBytes": 3397079,
+      "patch": "bench/prepublicationVariants/chunk512.patch",
+      "sourceSha256": "f8aa2ad7ac1e4d92965c4787191dc5dad80b41866a3a1c7f55e1c2446bb6b5ca",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.560680647583718,
+        "decompress": 72.54130394680969
+      }
     },
     {
       "variant": "chunk1024",
-      "packedBytes": 3387752
+      "packedBytes": 3387752,
+      "patch": "bench/prepublicationVariants/chunk1024.patch",
+      "sourceSha256": "adfcc2a1913377679e5c2aecffa88cb766b94a0759f7c88264d0f36cc4ee2478",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 2.9562200411085224,
+        "decompress": 58.418749315094516
+      }
     },
     {
       "variant": "chunk2048",
-      "packedBytes": 3383976
+      "packedBytes": 3383976,
+      "patch": "bench/prepublicationVariants/chunk2048.patch",
+      "sourceSha256": "ae08a26f7b03053ef8beb44f45f8a943806e6cc0310f7031c06e6c6345a57309",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.103626918614685,
+        "decompress": 66.43859832382016
+      }
     },
     {
       "variant": "chunk8192",
-      "packedBytes": 3382793
+      "packedBytes": 3382793,
+      "patch": "bench/prepublicationVariants/chunk8192.patch",
+      "sourceSha256": "2fabdb045a7503fbc9d3672b7d5eb9f13c36c78018ce27e89de401490b43682c",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.594493623802948,
+        "decompress": 72.08639707372362
+      }
     },
     {
       "variant": "chunk16384",
-      "packedBytes": 3383138
+      "packedBytes": 3383138,
+      "patch": "bench/prepublicationVariants/chunk16384.patch",
+      "sourceSha256": "34ee6048d3cd5ef78729f32ef564dcfb9f8d885300922f0ffa44bf1438f28214",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.5006545791686587,
+        "decompress": 70.25688003170825
+      }
     },
     {
       "variant": "depth128",
-      "packedBytes": 3373977
+      "packedBytes": 3373977,
+      "patch": "bench/prepublicationVariants/depth128.patch",
+      "sourceSha256": "2791ec68c36367388faa2cc2853c8d7619edd0d3be60642dd018d5e85bb369cb",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 0.7838531675176474,
+        "decompress": 14.810633489169119
+      }
     },
     {
       "variant": "cache",
-      "packedBytes": 3382884
+      "packedBytes": 3382884,
+      "patch": "bench/prepublicationVariants/cache.patch",
+      "sourceSha256": "31969393c6323397008165857f09f78d65318fa1e34b3b4e27dcc96ad34493bf",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 0.6306969768392041,
+        "decompress": 11.810866929368462
+      }
     },
     {
       "variant": "firstbyte",
-      "packedBytes": 3382884
+      "packedBytes": 3382884,
+      "patch": "bench/prepublicationVariants/firstbyte.patch",
+      "sourceSha256": "3f2e76e8de96ceb55691a34040b78e1261a2efb5b93a783404eb1711e2cf0a33",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 1.0132899361752261,
+        "decompress": 19.985154600359177
+      }
     },
     {
       "variant": "nice24",
-      "packedBytes": 3411932
+      "packedBytes": 3411932,
+      "patch": "bench/prepublicationVariants/nice24.patch",
+      "sourceSha256": "74b6949a5746ce82b8936d0a5eb18d146b79a7410eb61778e52bf64bedfb4bf6",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 1.3025906512545369,
+        "decompress": 22.906124505080875
+      }
     },
     {
       "variant": "nice64",
-      "packedBytes": 3378705
+      "packedBytes": 3378705,
+      "patch": "bench/prepublicationVariants/nice64.patch",
+      "sourceSha256": "6e5abcd860adab9f9d67e6079e2ee17b3a09c7bfd79fd2a5dd02490aa2eff56c",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.4170085610950043,
+        "decompress": 70.81791790837744
+      }
     },
     {
       "variant": "nice96",
-      "packedBytes": 3376156
+      "packedBytes": 3376156,
+      "patch": "bench/prepublicationVariants/nice96.patch",
+      "sourceSha256": "7f8543bacce9ab5e76b424bd68544edede35660dbcc3274c88fa7c50fab7369c",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.1156200843227695,
+        "decompress": 68.15652275769945
+      }
     },
     {
       "variant": "dict32",
-      "packedBytes": 3398683
+      "packedBytes": 3398683,
+      "patch": "bench/prepublicationVariants/dict32.patch",
+      "sourceSha256": "9a05dc90be7e02013549cddf3ac13979e4ad319113fee695f9f5c4e723638d02",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.5569891585230007,
+        "decompress": 67.70285642659789
+      }
     },
     {
       "variant": "repbound",
-      "packedBytes": 3382884
+      "packedBytes": 3382884,
+      "patch": "bench/prepublicationVariants/repbound.patch",
+      "sourceSha256": "954e0293071888a64fcd2302b4cf51782de7b0b7d85bb78b4e679d7728fb7174",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.328040024601379,
+        "decompress": 65.68353896411026
+      }
     },
     {
       "variant": "prices",
-      "packedBytes": 3382884
+      "packedBytes": 3382884,
+      "patch": "bench/prepublicationVariants/prices.patch",
+      "sourceSha256": "7a4395f92742425eb0b7e58e86fa93159fb7f44f662fc240ace246e573e44c22",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.1514496143239255,
+        "decompress": 62.445778760593434
+      },
+      "wasm": {
+        "bytes": 1148188,
+        "sha256": "104d11641e30567e90a46c8750832c0bf02a03736d961a3dafd4551255989990"
+      }
     },
     {
       "variant": "first128",
-      "packedBytes": 3373977
+      "packedBytes": 3373977,
+      "patch": "bench/prepublicationVariants/first128.patch",
+      "sourceSha256": "d52ff08d244bf40c35204d326c94f1d20e508d69fb79fdfb56cda7ee820661c7",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 2.932623742858863,
+        "decompress": 65.06204565808704
+      },
+      "wasm": {
+        "bytes": 1147864,
+        "sha256": "d4d39e900206cf8d88e4df548588be2fa1b757b77c6c3a62d150535f190c251c"
+      }
     },
     {
       "variant": "firstcache128",
-      "packedBytes": 3373977
+      "packedBytes": 3373977,
+      "patch": "bench/prepublicationVariants/firstcache128.patch",
+      "sourceSha256": "cfe2b53462261bebb1b1765c4df6ebc12aad73770a44e9ca9149560dcb2654f4",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.2411756350327643,
+        "decompress": 71.59061669060607
+      },
+      "wasm": {
+        "bytes": 1148065,
+        "sha256": "541b745b7986d91afceb77fad672d1a74d81cad610184dabb76d020ad580f89b"
+      }
     },
     {
       "variant": "widecache128",
-      "packedBytes": 3373977
+      "packedBytes": 3373977,
+      "patch": "bench/prepublicationVariants/widecache128.patch",
+      "sourceSha256": "ce7752f3f4992bdddbd1c306cd886bc42bf5d76339f9976fde8237a4490cdcc2",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.1113884772504727,
+        "decompress": 68.53101661943478
+      },
+      "wasm": {
+        "bytes": 1148084,
+        "sha256": "92c1d115de899a346f67a63552713eab876ac1db647f875ff0065074fba86bc6"
+      }
     },
     {
       "variant": "hash32",
-      "packedBytes": 3393276
+      "packedBytes": 3393276,
+      "patch": "bench/prepublicationVariants/hash32.patch",
+      "sourceSha256": "2b597a9bf223dfbe90cb411a873d6c1da9d68cc1b31f7efedb01bcf22aeab2a8",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.515607762512154,
+        "decompress": 68.35036523197358
+      },
+      "wasm": {
+        "bytes": 1149090,
+        "sha256": "c3b67b67aa9da221d3dbc5305e55b8a15028f781f7ad5183f7d47ecf742020e3"
+      }
     },
     {
       "variant": "hash64",
-      "packedBytes": 3380272
+      "packedBytes": 3380272,
+      "patch": "bench/prepublicationVariants/hash64.patch",
+      "sourceSha256": "fa0fa5737fa5cf21f5f29415286fc0edd48ca912530567bb988c8f988bcccda2",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.1238253191265057,
+        "decompress": 63.033828784331725
+      },
+      "wasm": {
+        "bytes": 1148980,
+        "sha256": "b7a109428be0f7a80300914d16c8731ad7eebe844b0a81037c8bfd3406a8fc95"
+      }
     },
     {
       "variant": "simd",
-      "packedBytes": 3382884
+      "packedBytes": 3382884,
+      "sourceSha256": "b6af0d4d28cf483d89b58f633e48e6083ee82307be9d8ceaefd71e8330173319",
+      "buildCommand": "cargo build --release --target wasm32-unknown-unknown --manifest-path rust/Cargo.toml -p tokzip-wasm --config 'target.wasm32-unknown-unknown.rustflags=[\"-C\",\"target-feature=+simd128\"]'",
+      "wasmOutput": "rust/target/wasm32-unknown-unknown/release/tokzip_wasm.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.3718426180534937,
+        "decompress": 65.39331450836912
+      },
+      "wasm": {
+        "bytes": 1151682,
+        "sha256": "0261a6a81b5591fcd175293a36e833de24a8adda54eea391d93b115d3558927f"
+      }
     },
     {
       "variant": "simdinline",
-      "packedBytes": 3382884
+      "packedBytes": 3382884,
+      "patch": "bench/prepublicationVariants/simdinline.patch",
+      "sourceSha256": "38503e7e81a92fd51d2e21a0dceadbb6b06ef77eb386337b0677dc8c233a7048",
+      "buildCommand": "cargo build --release --target wasm32-unknown-unknown --manifest-path rust/Cargo.toml -p tokzip-wasm --config 'target.wasm32-unknown-unknown.rustflags=[\"-C\",\"target-feature=+simd128\"]'",
+      "wasmOutput": "rust/target/wasm32-unknown-unknown/release/tokzip_wasm.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.4003630310412483,
+        "decompress": 70.56437396358439
+      },
+      "wasm": {
+        "bytes": 1148174,
+        "sha256": "b5854003ddcccb1b6a8d804d7e7633f1b8b4e86bf0c90f49987204f77ff500c6"
+      }
     },
     {
       "variant": "simdinline128",
-      "packedBytes": 3373977
+      "packedBytes": 3373977,
+      "patch": "bench/prepublicationVariants/simdinline128.patch",
+      "sourceSha256": "a1e6abb944d42424b0f4bf474f596a3e26cbc21a5df255bde341deb271d70fb6",
+      "buildCommand": "cargo build --release --target wasm32-unknown-unknown --manifest-path rust/Cargo.toml -p tokzip-wasm --config 'target.wasm32-unknown-unknown.rustflags=[\"-C\",\"target-feature=+simd128\"]'",
+      "wasmOutput": "rust/target/wasm32-unknown-unknown/release/tokzip_wasm.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.014158245970345,
+        "decompress": 67.87187513888469
+      },
+      "wasm": {
+        "bytes": 1148090,
+        "sha256": "dbbd0fae33c46e664e51769d7467ea05dc75efcd973f88dbcb57f31571728a62"
+      }
     },
     {
       "variant": "average",
-      "packedBytes": 3381439
+      "packedBytes": 3381439,
+      "patch": "bench/prepublicationVariants/average.patch",
+      "sourceSha256": "de48a80061652548658514430f57f6eb1f1b8d8f7c9b669556caa982496f5e2d",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.2892045973300243,
+        "decompress": 63.02782082260263
+      },
+      "wasm": {
+        "bytes": 1148038,
+        "sha256": "3cb1062b892f47431163bab4e6d8416c06f14bb39199840f823ce8045e692d9f"
+      }
     },
     {
       "variant": "tail16",
-      "packedBytes": 3381652
+      "packedBytes": 3381652,
+      "patch": "bench/prepublicationVariants/tail16.patch",
+      "sourceSha256": "856c66e23919dec63a1d5e3a87f57b38f2611a462eab66b0687a38e60289cc35",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.4028979497371368,
+        "decompress": 68.33876546493094
+      },
+      "wasm": {
+        "bytes": 1148144,
+        "sha256": "0b4dd4791da07046dde4bb674483aa6a0c4ef402db5b7c90146a2a26dcc273c1"
+      }
     },
     {
       "variant": "tail32",
-      "packedBytes": 3381439
+      "packedBytes": 3381439,
+      "patch": "bench/prepublicationVariants/tail32.patch",
+      "sourceSha256": "2c99d4d3904fa8646cd75bc397e0dbae0f19a0e39e96806a9833ed864ffb86ce",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.3219696362948947,
+        "decompress": 66.7671160706478
+      },
+      "wasm": {
+        "bytes": 1148088,
+        "sha256": "302b9a324130a65ce859c0831474befc741fd4b28694eabcf49464960e5b5a8b"
+      }
     },
     {
       "variant": "fast",
-      "packedBytes": 3382878
+      "packedBytes": 3382878,
+      "patch": "bench/prepublicationVariants/fast.patch",
+      "sourceSha256": "3a6d2fed6e7a903c2fc5bf8e0c4cdf0b5a070600455b036ff473f8f7649e88db",
+      "buildCommand": "bun run build/wasm",
+      "wasmOutput": "wasm/tokzip.wasm",
+      "exploratoryWallThroughputMBps": {
+        "compress": 3.0439417419896633,
+        "decompress": 61.435523390069946
+      },
+      "wasm": {
+        "bytes": 1146322,
+        "sha256": "27ab6a4c971c8c75170badaee30cf9372a76c6c2c65f745e45382698b9fa45fd"
+      }
+    },
+    {
+      "variant": "candidate",
+      "sourceRevision": "a52dceca9dbf2eca99a0e8da553c76cd4b130f79",
+      "components": ["average", "fast", "one-byte direct storage"],
+      "packedBytes": 3381437,
+      "buildCommand": "bun run build/wasm",
+      "wasm": {
+        "bytes": 1146148,
+        "sha256": "9e241d16f760a8514852593a2f83e4442af6493bd6bfd172a2b09a0b53259f79"
+      },
+      "retained": true
     }
   ],
   "repetitive": {
@@ -942,10 +1226,281 @@
     ],
     "rejected": [
       "Shorter parse chunks and reduced search depth increase compressed size.",
-      "Deeper dictionary search improves ratio but costs about 10% encoder CPU in paired measurements; repeat caches do not offset it.",
+      "searchComparison measures 10.2% more encoder CPU for first128, 10.3% for firstcache128, and 11.5% for widecache128 against baseline (medians). Deeper search saves bytes, but the repeat caches do not recover the added CPU cost.",
       "Additional dictionary hash index adds memory without a compelling speed/ratio benefit.",
       "Global SIMD compilation, inlining hints, and alternative price table construction did not show a compelling improvement.",
       "Retain existing search limits and chunk length."
     ]
+  },
+  "corpusCommits": {
+    "public": "bf20d2b03a39442eb04b952152384925369c2a94",
+    "private": "aa06eb6c43b96ec778bb00ad2efb7d3686ff809e"
+  },
+  "corpusTrees": {
+    "public": "399e4d279d138bae0c4597517fac873b40c99c9d",
+    "private": "e62fbf074b1ddbab29bd6a850513eaae70cd9ca2"
+  },
+  "corpusRepositories": {
+    "public": "WillBooster/tokzip-corpus",
+    "private": "WillBooster/tokzip-corpus-private"
+  },
+  "corpusFingerprint": "51ef7c7036cceecf7faf1aed46409a8078f1f57a2ba516d1cd13ffd81f3905f4",
+  "candidateRevision": "a52dceca9dbf2eca99a0e8da553c76cd4b130f79",
+  "experimentDefinitions": {
+    "baseline": "Unmodified baselineCommit; no experiment patch.",
+    "depth128": "Raise DICT_SEARCH_DEPTH from 64 to 128.",
+    "cache": "Cache repeat lengths per repeat slot as (distance, end, exact). Reuse a suffix only for the same distance when its mismatch or requested extent is known.",
+    "firstbyte": "Return zero from Window.common_len before prefix scanning when max is zero or the first source and target bytes differ.",
+    "dict32": "Lower DICT_SEARCH_DEPTH from 64 to 32.",
+    "repbound": "Skip a repeat slot if the same distance appeared earlier and the earlier frozen repeat-choice price is no greater.",
+    "prices": "Build distance footer and alignment leaf prices once per tree, then reverse the leaf bit indices instead of walking each reverse tree separately.",
+    "first128": "Combine firstbyte and depth128.",
+    "firstcache128": "Combine firstbyte, cache, and depth128.",
+    "widecache128": "Extend firstcache128: after a capped repeat match, scan up to 4096 remaining segment bytes, cache that endpoint, and cap the returned match length to max_len.",
+    "hash32": "Use dictionary depth 32 and a 32768-entry eight-byte hash table storing the lowest dictionary offset. Probe it after the ordinary dictionary scan for a longer match.",
+    "hash64": "Use hash32 with DICT_SEARCH_DEPTH restored to 64.",
+    "simd": "Compile the unchanged baseline with global wasm SIMD enabled through the recorded Cargo config override.",
+    "simdinline": "Combine simd with an inline hint on common_prefix_simd.",
+    "simdinline128": "Combine simdinline and depth128.",
+    "average": "Choose the parse chunk endpoint with minimum price per byte using 64-bit cross-products instead of minimum total price.",
+    "tail16": "Choose a reachable chunk endpoint minimizing price + (max_reach - endpoint) * 16, in 1/16-bit price units.",
+    "tail32": "Use tail16 with a penalty of 32 instead of 16.",
+    "fast": "At a committed parse position, directly emit a MATCH_MAX-length repeat if available, choosing the repeat slot with the lowest current choice price.",
+    "candidate": "Retained combination of average and fast, plus direct storage for one-byte input. The measured production sources are committed at sourceRevision; formatting and comments differ from isolated screening patches.",
+    "chunk512": "Set parse CHUNK to 512 instead of 4096.",
+    "chunk1024": "Set parse CHUNK to 1024 instead of 4096.",
+    "chunk2048": "Set parse CHUNK to 2048 instead of 4096.",
+    "chunk8192": "Set parse CHUNK to 8192 instead of 4096.",
+    "chunk16384": "Set parse CHUNK to 16384 instead of 4096.",
+    "nice24": "Set NICE_LEN to 24 instead of 48, affecting both search stopping and relaxed match lengths.",
+    "nice64": "Set NICE_LEN to 64 instead of 48, affecting both search stopping and relaxed match lengths.",
+    "nice96": "Set NICE_LEN to 96 instead of 48, affecting both search stopping and relaxed match lengths."
+  },
+  "searchComparison": {
+    "method": "Six full-corpus passes after round-trip and cross-decode warmup. Each codec processes the whole corpus before the next codec; reverse codec order each pass. This differs from the final 32-document batch comparison. Median CPU milliseconds of the last four passes per codec determine the summary. Arrays are ordered by variants. Encoding includes its recovery check.",
+    "variants": ["baseline", "first128", "firstcache128", "widecache128"],
+    "runtime": {
+      "node": "26.3.0",
+      "bun": "1.4.2",
+      "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+      "openssl": "1.1.0",
+      "llhttp": "9.3.0",
+      "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+      "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+      "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+      "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+      "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+      "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+      "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+      "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+      "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+      "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+      "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+      "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+      "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+      "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+      "v8": "14.6.202.34-node.20",
+      "uv": "1.48.0",
+      "napi": "10",
+      "icu": "78.1",
+      "unicode": "17.0",
+      "sqlite": "3.54.0",
+      "modules": "147"
+    },
+    "assets": [
+      {
+        "bytes": 1148210,
+        "sha256": "e803eace8bb7f9412d4c6cdd94468426dd2ae4d951a59ea0b09c4ed52f6a8f3a"
+      },
+      {
+        "bytes": 1147864,
+        "sha256": "d4d39e900206cf8d88e4df548588be2fa1b757b77c6c3a62d150535f190c251c"
+      },
+      {
+        "bytes": 1148065,
+        "sha256": "541b745b7986d91afceb77fad672d1a74d81cad610184dabb76d020ad580f89b"
+      },
+      {
+        "bytes": 1148084,
+        "sha256": "92c1d115de899a346f67a63552713eab876ac1db647f875ff0065074fba86bc6"
+      }
+    ],
+    "corpusFingerprint": "51ef7c7036cceecf7faf1aed46409a8078f1f57a2ba516d1cd13ffd81f3905f4",
+    "passes": [
+      [
+        {
+          "compressMs": 4629.679791999999,
+          "decompressMs": 250.2352920000012,
+          "compressCpuMs": 4586.697,
+          "decompressCpuMs": 247.918
+        },
+        {
+          "compressMs": 5123.8035839999975,
+          "decompressMs": 250.56612499999756,
+          "compressCpuMs": 5084.193,
+          "decompressCpuMs": 249.022
+        },
+        {
+          "compressMs": 5058.610667000001,
+          "decompressMs": 247.19029199999932,
+          "compressCpuMs": 5027.631,
+          "decompressCpuMs": 246.794
+        },
+        {
+          "compressMs": 5089.528915999996,
+          "decompressMs": 252.72070800000074,
+          "compressCpuMs": 5061.173,
+          "decompressCpuMs": 249.712
+        }
+      ],
+      [
+        {
+          "compressMs": 4600.147583000005,
+          "decompressMs": 244.39904199999,
+          "compressCpuMs": 4573.577,
+          "decompressCpuMs": 244.349
+        },
+        {
+          "compressMs": 5102.158458999998,
+          "decompressMs": 238.05370799999946,
+          "compressCpuMs": 5088.039,
+          "decompressCpuMs": 238.03
+        },
+        {
+          "compressMs": 5056.513625,
+          "decompressMs": 247.58933299999626,
+          "compressCpuMs": 5039.093,
+          "decompressCpuMs": 246.121
+        },
+        {
+          "compressMs": 5071.153749999998,
+          "decompressMs": 250.27829099999508,
+          "compressCpuMs": 5047.732,
+          "decompressCpuMs": 249.488
+        }
+      ],
+      [
+        {
+          "compressMs": 4666.221749999997,
+          "decompressMs": 252.9821660000016,
+          "compressCpuMs": 4635.619,
+          "decompressCpuMs": 251.121
+        },
+        {
+          "compressMs": 5317.930375000011,
+          "decompressMs": 260.73579099999915,
+          "compressCpuMs": 5147.341,
+          "decompressCpuMs": 252.879
+        },
+        {
+          "compressMs": 5220.205207999999,
+          "decompressMs": 258.4677079999965,
+          "compressCpuMs": 5134.185,
+          "decompressCpuMs": 253.186
+        },
+        {
+          "compressMs": 5360.914124999996,
+          "decompressMs": 254.94920900001307,
+          "compressCpuMs": 5175.36,
+          "decompressCpuMs": 251.702
+        }
+      ],
+      [
+        {
+          "compressMs": 4756.398042000001,
+          "decompressMs": 252.36441700000432,
+          "compressCpuMs": 4668.727,
+          "decompressCpuMs": 250.766
+        },
+        {
+          "compressMs": 5214.531833000001,
+          "decompressMs": 252.65004100000078,
+          "compressCpuMs": 5127.15,
+          "decompressCpuMs": 250.069
+        },
+        {
+          "compressMs": 5223.222207999992,
+          "decompressMs": 253.7254169999942,
+          "compressCpuMs": 5149.816,
+          "decompressCpuMs": 250.44
+        },
+        {
+          "compressMs": 5224.07587500001,
+          "decompressMs": 260.4961250000051,
+          "compressCpuMs": 5142.953,
+          "decompressCpuMs": 252.037
+        }
+      ],
+      [
+        {
+          "compressMs": 4683.16350000001,
+          "decompressMs": 254.1751249999943,
+          "compressCpuMs": 4655.247,
+          "decompressCpuMs": 251.382
+        },
+        {
+          "compressMs": 5165.994124999997,
+          "decompressMs": 248.0219170000055,
+          "compressCpuMs": 5127.998,
+          "decompressCpuMs": 247.573
+        },
+        {
+          "compressMs": 5102.174375000002,
+          "decompressMs": 259.8133749999979,
+          "compressCpuMs": 5074.763,
+          "decompressCpuMs": 260.472
+        },
+        {
+          "compressMs": 5312.1547500000015,
+          "decompressMs": 269.4476250000007,
+          "compressCpuMs": 5216.469,
+          "decompressCpuMs": 254.794
+        }
+      ],
+      [
+        {
+          "compressMs": 5010.648541999981,
+          "decompressMs": 261.6242499999935,
+          "compressCpuMs": 4760.228,
+          "decompressCpuMs": 251.962
+        },
+        {
+          "compressMs": 7228.646624999994,
+          "decompressMs": 355.49158400000306,
+          "compressCpuMs": 5355.781,
+          "decompressCpuMs": 259.845
+        },
+        {
+          "compressMs": 6819.645042000018,
+          "decompressMs": 300.433291000023,
+          "compressCpuMs": 5348.14,
+          "decompressCpuMs": 254.799
+        },
+        {
+          "compressMs": 5608.535834000009,
+          "decompressMs": 247.0313750000205,
+          "compressCpuMs": 5302.089,
+          "decompressCpuMs": 246.291
+        }
+      ]
+    ],
+    "summary": {
+      "baseline": {
+        "compressCpuMs": 4661.987,
+        "changePercent": 0.0
+      },
+      "first128": {
+        "compressCpuMs": 5137.6695,
+        "changePercent": 10.203428280688032
+      },
+      "firstcache128": {
+        "compressCpuMs": 5142.0005,
+        "changePercent": 10.296328582640847
+      },
+      "widecache128": {
+        "compressCpuMs": 5195.9145,
+        "changePercent": 11.452788263888337
+      }
+    }
   }
 }

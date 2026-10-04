@@ -1,0 +1,63 @@
+--- a/rust/crates/tokzip/src/lz.rs
++++ b/rust/crates/tokzip/src/lz.rs
+@@ -29,7 +29,7 @@
+ // A length-3 match further away than this costs more than three modeled literals.
+ const MAX_DIST_LEN3: usize = 1 << 14;
+ const SEARCH_DEPTH: usize = 32;
+-const DICT_SEARCH_DEPTH: usize = 64;
++const DICT_SEARCH_DEPTH: usize = 32;
+ const NICE_LEN: usize = 48;
+ const EMPTY: i32 = -1;
+ 
+@@ -812,6 +812,13 @@
+     (v.wrapping_mul(0x9E37_79B1) >> (32 - bits)) as usize
+ }
+ 
++#[inline]
++fn hash8(bytes: &[u8], pos: usize) -> usize {
++    let first = u32::from_le_bytes(bytes[pos..pos + 4].try_into().unwrap());
++    let second = u32::from_le_bytes(bytes[pos + 4..pos + 8].try_into().unwrap());
++    (first.wrapping_mul(0x9E37_79B1).wrapping_add(second.wrapping_mul(0x85EB_CA77)) >> (32 - HASH3_BITS)) as usize
++}
++
+ /// Hash chains over the document, built incrementally as the parse advances.
+ pub struct Chains {
+     bits: u32,
+@@ -870,6 +877,7 @@
+     offsets: Vec<u32>,
+     positions: Vec<u32>,
+     head3: Vec<i32>,
++    head8: Vec<i32>,
+ }
+ 
+ impl DictIndex {
+@@ -897,7 +905,12 @@
+         for pos in (0..bytes.len().saturating_sub(2)).rev() {
+             head3[hash3(bytes, pos, HASH3_BITS)] = pos as i32;
+         }
++        let mut head8 = vec![EMPTY; 1 << HASH3_BITS];
++        for pos in (0..bytes.len().saturating_sub(7)).rev() {
++            head8[hash8(bytes, pos)] = pos as i32;
++        }
+         Self {
++            head8,
+             bits,
+             offsets,
+             positions,
+@@ -1060,6 +1073,16 @@
+                     if l >= NICE_LEN || l == max_len {
+                         return;
+                     }
++                }
++            }
++        }
++        if max_len >= 8 && dlen >= 8 {
++            let c = self.dict.index.head8[hash8(doc, pos)];
++            if c >= 0 {
++                let dist = pos + dlen - c as usize;
++                let l = self.win.common_len(pos, dist, max_len);
++                if l > best_len && l >= 8 {
++                    pairs.push((l as u32, dist as u32));
+                 }
+             }
+         }

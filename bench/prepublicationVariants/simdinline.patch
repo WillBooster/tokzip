@@ -1,0 +1,10 @@
+--- a/rust/crates/tokzip/src/lz.rs
++++ b/rust/crates/tokzip/src/lz.rs
+@@ -760,6 +760,7 @@
+ }
+ 
+ #[cfg(target_arch = "wasm32")]
++#[inline]
+ #[target_feature(enable = "simd128")]
+ unsafe fn common_prefix_simd(a: &[u8], b: &[u8]) -> usize {
+     use std::arch::wasm32::{i8x16_bitmask, i8x16_ne, v128_load};

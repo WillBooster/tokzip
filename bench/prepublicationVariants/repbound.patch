@@ -1,0 +1,25 @@
+--- a/rust/crates/tokzip/src/lz.rs
++++ b/rust/crates/tokzip/src/lz.rs
+@@ -1362,6 +1362,13 @@
+ 
+             let mut long_rep = false;
+             for idx in 0..4usize {
++                let minimum = base + state_prices[state].reps[idx];
++                if idx > 0 && reps[..idx].contains(&reps[idx]) {
++                    let earlier = reps[..idx].iter().position(|&rep| rep == reps[idx]).unwrap();
++                    if state_prices[state].reps[earlier] <= state_prices[state].reps[idx] {
++                        continue;
++                    }
++                }
+                 let l = mf.len_at(gpos, reps[idx] as usize + 1, max_len);
+                 if l >= NICE_LEN {
+                     long_rep = true;
+@@ -1383,7 +1390,7 @@
+                 if l < 2 {
+                     continue;
+                 }
+-                let choice = base + state_prices[state].reps[idx];
++                let choice = minimum;
+                 let mut new_reps = reps;
+                 let rep = new_reps[idx];
+                 new_reps.copy_within(0..idx, 1);

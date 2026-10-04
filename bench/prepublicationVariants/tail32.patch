@@ -1,0 +1,11 @@
+--- a/rust/crates/tokzip/src/lz.rs
++++ b/rust/crates/tokzip/src/lz.rs
+@@ -1469,7 +1469,7 @@
+ 
+         let mut best = end_target - pos;
+         for j in (end_target - pos)..=n {
+-            if nodes[j].price < nodes[best].price {
++            if nodes[j].price != INF && nodes[j].price + ((n - j) as u32) * 32 < nodes[best].price + ((n - best) as u32) * 32 {
+                 best = j;
+             }
+         }
