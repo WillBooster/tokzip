@@ -1,0 +1,951 @@
+{
+  "host": {
+    "cpu": "Apple M2 Pro",
+    "macOS": "27.0.1"
+  },
+  "baselineCommit": "2b57d057f3f5faa6b86a2740ccc07277dc974abe",
+  "method": {
+    "corpus": "Existing public and private bench splits, fixed for all variants; optimization data, not an untouched holdout. No retraining.",
+    "paired": "Six complete passes per runtime after round-trip and cross-decode warmup. Alternate codec order within batches of 32 documents and reverse each pass. Summaries use the last four passes. CPU time is process.cpuUsage; throughput uses UTF-8 input bytes. Encoding includes its recovery check.",
+    "timingLimit": "Other workloads ran on this machine. Do not interpret sub-percent differences as a reliable speedup. No Cloudflare Workers measurement in this iteration.",
+    "repetitive": "262144-byte ASCII inputs, six alternating paired rounds after warmup per period. Period unit byte i is 33 + i % 90.",
+    "reproduction": "Use the baseline and candidate Wasm with createCodec from src/core.ts on manifest split=bench entries. Standard unpaired check: bun run bench --codec-only --speed --repeat 3 --json .tmp/bench.json."
+  },
+  "compatibility": "Unchanged decoding rules, dictionary bytes, and priors; every corpus frame cross-decodes in both directions.",
+  "baselineRebuild": "Byte-identical to the committed module.",
+  "measurements": {
+    "node": {
+      "runtime": {
+        "node": "24.21.0",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.8",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.3",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "137",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "3.5.8",
+        "simdjson": "4.6.7",
+        "simdutf": "6.4.0",
+        "sqlite": "3.53.4",
+        "tz": "2026c",
+        "undici": "7.29.1",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "13.6.233.17-node.53",
+        "zlib": "1.3.2.1-motley-8002e91",
+        "zstd": "1.5.7"
+      },
+      "assets": [
+        {
+          "bytes": 1148210,
+          "sha256": "e803eace8bb7f9412d4c6cdd94468426dd2ae4d951a59ea0b09c4ed52f6a8f3a"
+        },
+        {
+          "bytes": 1146148,
+          "sha256": "9e241d16f760a8514852593a2f83e4442af6493bd6bfd172a2b09a0b53259f79"
+        }
+      ],
+      "corpusFingerprint": "51ef7c7036cceecf7faf1aed46409a8078f1f57a2ba516d1cd13ffd81f3905f4",
+      "groups": {
+        "all": {
+          "docs": 3514,
+          "raw": 16264597,
+          "packed": [3382884, 3381437]
+        },
+        "corpus tokzip-corpus": {
+          "docs": 3288,
+          "raw": 13823302,
+          "packed": [2930251, 2929070]
+        },
+        "language c": {
+          "docs": 109,
+          "raw": 914214,
+          "packed": [157604, 157509]
+        },
+        "bucket 4\u201316K": {
+          "docs": 793,
+          "raw": 6847886,
+          "packed": [1422631, 1421978]
+        },
+        "bucket >16K": {
+          "docs": 272,
+          "raw": 6313935,
+          "packed": [1205218, 1204424]
+        },
+        "bucket 1\u20134K": {
+          "docs": 1071,
+          "raw": 2397754,
+          "packed": [552876, 552876]
+        },
+        "language cpp": {
+          "docs": 67,
+          "raw": 231445,
+          "packed": [30690, 30675]
+        },
+        "bucket \u22641K": {
+          "docs": 1378,
+          "raw": 705022,
+          "packed": [202159, 202159]
+        },
+        "language csharp": {
+          "docs": 213,
+          "raw": 911287,
+          "packed": [114488, 114453]
+        },
+        "language css": {
+          "docs": 42,
+          "raw": 125019,
+          "packed": [20625, 20624]
+        },
+        "language dart": {
+          "docs": 44,
+          "raw": 173477,
+          "packed": [26900, 26890]
+        },
+        "language en-US": {
+          "docs": 863,
+          "raw": 2418152,
+          "packed": [643083, 642866]
+        },
+        "language haskell": {
+          "docs": 117,
+          "raw": 342337,
+          "packed": [70168, 70138]
+        },
+        "language html": {
+          "docs": 169,
+          "raw": 1339356,
+          "packed": [238840, 238699]
+        },
+        "language ja-JP": {
+          "docs": 187,
+          "raw": 620381,
+          "packed": [154381, 154338]
+        },
+        "language java": {
+          "docs": 73,
+          "raw": 332594,
+          "packed": [45913, 45889]
+        },
+        "language javascript": {
+          "docs": 64,
+          "raw": 148116,
+          "packed": [33497, 33484]
+        },
+        "language jsp": {
+          "docs": 61,
+          "raw": 225583,
+          "packed": [28490, 28480]
+        },
+        "language php": {
+          "docs": 101,
+          "raw": 574967,
+          "packed": [89460, 89405]
+        },
+        "language python": {
+          "docs": 70,
+          "raw": 419968,
+          "packed": [71227, 71195]
+        },
+        "language ruby": {
+          "docs": 124,
+          "raw": 756272,
+          "packed": [124319, 124250]
+        },
+        "language rust": {
+          "docs": 70,
+          "raw": 340891,
+          "packed": [50931, 50897]
+        },
+        "language text": {
+          "docs": 455,
+          "raw": 3165427,
+          "packed": [719912, 719584]
+        },
+        "language typescript": {
+          "docs": 171,
+          "raw": 923880,
+          "packed": [137785, 137673]
+        },
+        "language zh-CN": {
+          "docs": 175,
+          "raw": 518956,
+          "packed": [137602, 137585]
+        },
+        "language zh-TW": {
+          "docs": 306,
+          "raw": 1401494,
+          "packed": [418455, 418331]
+        },
+        "language zig": {
+          "docs": 33,
+          "raw": 380781,
+          "packed": [68514, 68472]
+        },
+        "corpus tokzip-corpus-private": {
+          "docs": 226,
+          "raw": 2441295,
+          "packed": [452633, 452367]
+        }
+      },
+      "passes": [
+        [
+          {
+            "compressMs": 5715.28400399999,
+            "decompressMs": 288.56308700001136,
+            "compressCpuMs": 5289.171000000003,
+            "decompressCpuMs": 278.58700000000005
+          },
+          {
+            "compressMs": 5489.789710000014,
+            "decompressMs": 281.21811700000217,
+            "compressCpuMs": 5263.549999999997,
+            "decompressCpuMs": 276.225
+          }
+        ],
+        [
+          {
+            "compressMs": 5368.525538000002,
+            "decompressMs": 282.81783400001586,
+            "compressCpuMs": 5254.4980000000005,
+            "decompressCpuMs": 278.76399999999995
+          },
+          {
+            "compressMs": 5441.748372999951,
+            "decompressMs": 285.875664999985,
+            "compressCpuMs": 5224.257,
+            "decompressCpuMs": 281.75299999999993
+          }
+        ],
+        [
+          {
+            "compressMs": 5258.036910999996,
+            "decompressMs": 274.27087300001585,
+            "compressCpuMs": 5201.102,
+            "decompressCpuMs": 273.07500000000005
+          },
+          {
+            "compressMs": 5266.830500999975,
+            "decompressMs": 272.85895400001027,
+            "compressCpuMs": 5218.143000000001,
+            "decompressCpuMs": 271.719
+          }
+        ],
+        [
+          {
+            "compressMs": 5077.820210999947,
+            "decompressMs": 264.91565500000434,
+            "compressCpuMs": 5050.167000000003,
+            "decompressCpuMs": 265.52599999999995
+          },
+          {
+            "compressMs": 5076.48128999996,
+            "decompressMs": 264.46120599999267,
+            "compressCpuMs": 5043.400999999999,
+            "decompressCpuMs": 266.00100000000003
+          }
+        ],
+        [
+          {
+            "compressMs": 5226.658837999923,
+            "decompressMs": 275.1898769999025,
+            "compressCpuMs": 5132.941999999999,
+            "decompressCpuMs": 267.655
+          },
+          {
+            "compressMs": 5214.067048000026,
+            "decompressMs": 270.62920900001336,
+            "compressCpuMs": 5125.068000000001,
+            "decompressCpuMs": 268.94700000000006
+          }
+        ],
+        [
+          {
+            "compressMs": 5050.037118000022,
+            "decompressMs": 267.8012449999078,
+            "compressCpuMs": 5031.950000000001,
+            "decompressCpuMs": 265.67900000000003
+          },
+          {
+            "compressMs": 5064.590877000053,
+            "decompressMs": 264.3289979999099,
+            "compressCpuMs": 5053.857999999999,
+            "decompressCpuMs": 264.0490000000001
+          }
+        ]
+      ],
+      "measuredPasses": [
+        [
+          {
+            "compressMs": 5258.036910999996,
+            "decompressMs": 274.27087300001585,
+            "compressCpuMs": 5201.102,
+            "decompressCpuMs": 273.07500000000005
+          },
+          {
+            "compressMs": 5266.830500999975,
+            "decompressMs": 272.85895400001027,
+            "compressCpuMs": 5218.143000000001,
+            "decompressCpuMs": 271.719
+          }
+        ],
+        [
+          {
+            "compressMs": 5077.820210999947,
+            "decompressMs": 264.91565500000434,
+            "compressCpuMs": 5050.167000000003,
+            "decompressCpuMs": 265.52599999999995
+          },
+          {
+            "compressMs": 5076.48128999996,
+            "decompressMs": 264.46120599999267,
+            "compressCpuMs": 5043.400999999999,
+            "decompressCpuMs": 266.00100000000003
+          }
+        ],
+        [
+          {
+            "compressMs": 5226.658837999923,
+            "decompressMs": 275.1898769999025,
+            "compressCpuMs": 5132.941999999999,
+            "decompressCpuMs": 267.655
+          },
+          {
+            "compressMs": 5214.067048000026,
+            "decompressMs": 270.62920900001336,
+            "compressCpuMs": 5125.068000000001,
+            "decompressCpuMs": 268.94700000000006
+          }
+        ],
+        [
+          {
+            "compressMs": 5050.037118000022,
+            "decompressMs": 267.8012449999078,
+            "compressCpuMs": 5031.950000000001,
+            "decompressCpuMs": 265.67900000000003
+          },
+          {
+            "compressMs": 5064.590877000053,
+            "decompressMs": 264.3289979999099,
+            "compressCpuMs": 5053.857999999999,
+            "decompressCpuMs": 264.0490000000001
+          }
+        ]
+      ],
+      "summary": {
+        "compressCpuMs": {
+          "baseline": 5091.554500000001,
+          "candidate": 5089.463,
+          "changePercent": -0.04107782799931403,
+          "MBps": [3.1944265744381206, 3.1957393147371347]
+        },
+        "decompressCpuMs": {
+          "baseline": 266.66700000000003,
+          "candidate": 267.47400000000005,
+          "changePercent": 0.30262462171923854,
+          "MBps": [60.992162509796856, 60.80814209979287]
+        }
+      }
+    },
+    "bun": {
+      "runtime": {
+        "node": "26.3.0",
+        "bun": "1.4.2",
+        "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+        "openssl": "1.1.0",
+        "llhttp": "9.3.0",
+        "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+        "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+        "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+        "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+        "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+        "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+        "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+        "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+        "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+        "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+        "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+        "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+        "v8": "14.6.202.34-node.20",
+        "uv": "1.48.0",
+        "napi": "10",
+        "icu": "78.1",
+        "unicode": "17.0",
+        "sqlite": "3.54.0",
+        "modules": "147"
+      },
+      "assets": [
+        {
+          "bytes": 1148210,
+          "sha256": "e803eace8bb7f9412d4c6cdd94468426dd2ae4d951a59ea0b09c4ed52f6a8f3a"
+        },
+        {
+          "bytes": 1146148,
+          "sha256": "9e241d16f760a8514852593a2f83e4442af6493bd6bfd172a2b09a0b53259f79"
+        }
+      ],
+      "corpusFingerprint": "51ef7c7036cceecf7faf1aed46409a8078f1f57a2ba516d1cd13ffd81f3905f4",
+      "groups": {
+        "all": {
+          "docs": 3514,
+          "raw": 16264597,
+          "packed": [3382884, 3381437]
+        },
+        "corpus tokzip-corpus": {
+          "docs": 3288,
+          "raw": 13823302,
+          "packed": [2930251, 2929070]
+        },
+        "language c": {
+          "docs": 109,
+          "raw": 914214,
+          "packed": [157604, 157509]
+        },
+        "bucket 4\u201316K": {
+          "docs": 793,
+          "raw": 6847886,
+          "packed": [1422631, 1421978]
+        },
+        "bucket >16K": {
+          "docs": 272,
+          "raw": 6313935,
+          "packed": [1205218, 1204424]
+        },
+        "bucket 1\u20134K": {
+          "docs": 1071,
+          "raw": 2397754,
+          "packed": [552876, 552876]
+        },
+        "language cpp": {
+          "docs": 67,
+          "raw": 231445,
+          "packed": [30690, 30675]
+        },
+        "bucket \u22641K": {
+          "docs": 1378,
+          "raw": 705022,
+          "packed": [202159, 202159]
+        },
+        "language csharp": {
+          "docs": 213,
+          "raw": 911287,
+          "packed": [114488, 114453]
+        },
+        "language css": {
+          "docs": 42,
+          "raw": 125019,
+          "packed": [20625, 20624]
+        },
+        "language dart": {
+          "docs": 44,
+          "raw": 173477,
+          "packed": [26900, 26890]
+        },
+        "language en-US": {
+          "docs": 863,
+          "raw": 2418152,
+          "packed": [643083, 642866]
+        },
+        "language haskell": {
+          "docs": 117,
+          "raw": 342337,
+          "packed": [70168, 70138]
+        },
+        "language html": {
+          "docs": 169,
+          "raw": 1339356,
+          "packed": [238840, 238699]
+        },
+        "language ja-JP": {
+          "docs": 187,
+          "raw": 620381,
+          "packed": [154381, 154338]
+        },
+        "language java": {
+          "docs": 73,
+          "raw": 332594,
+          "packed": [45913, 45889]
+        },
+        "language javascript": {
+          "docs": 64,
+          "raw": 148116,
+          "packed": [33497, 33484]
+        },
+        "language jsp": {
+          "docs": 61,
+          "raw": 225583,
+          "packed": [28490, 28480]
+        },
+        "language php": {
+          "docs": 101,
+          "raw": 574967,
+          "packed": [89460, 89405]
+        },
+        "language python": {
+          "docs": 70,
+          "raw": 419968,
+          "packed": [71227, 71195]
+        },
+        "language ruby": {
+          "docs": 124,
+          "raw": 756272,
+          "packed": [124319, 124250]
+        },
+        "language rust": {
+          "docs": 70,
+          "raw": 340891,
+          "packed": [50931, 50897]
+        },
+        "language text": {
+          "docs": 455,
+          "raw": 3165427,
+          "packed": [719912, 719584]
+        },
+        "language typescript": {
+          "docs": 171,
+          "raw": 923880,
+          "packed": [137785, 137673]
+        },
+        "language zh-CN": {
+          "docs": 175,
+          "raw": 518956,
+          "packed": [137602, 137585]
+        },
+        "language zh-TW": {
+          "docs": 306,
+          "raw": 1401494,
+          "packed": [418455, 418331]
+        },
+        "language zig": {
+          "docs": 33,
+          "raw": 380781,
+          "packed": [68514, 68472]
+        },
+        "corpus tokzip-corpus-private": {
+          "docs": 226,
+          "raw": 2441295,
+          "packed": [452633, 452367]
+        }
+      },
+      "passes": [
+        [
+          {
+            "compressMs": 4875.752996000014,
+            "decompressMs": 266.9881639999858,
+            "compressCpuMs": 4804.423999999999,
+            "decompressCpuMs": 265.65299999999996
+          },
+          {
+            "compressMs": 4961.494081000001,
+            "decompressMs": 261.26753899998766,
+            "compressCpuMs": 4821.456000000001,
+            "decompressCpuMs": 260.813
+          }
+        ],
+        [
+          {
+            "compressMs": 4674.104592000003,
+            "decompressMs": 255.6890880000101,
+            "compressCpuMs": 4626.854999999999,
+            "decompressCpuMs": 254.57800000000006
+          },
+          {
+            "compressMs": 4698.075449,
+            "decompressMs": 262.4035390000208,
+            "compressCpuMs": 4662.112000000001,
+            "decompressCpuMs": 260.339
+          }
+        ],
+        [
+          {
+            "compressMs": 4711.4932100000005,
+            "decompressMs": 259.04491599995526,
+            "compressCpuMs": 4667.569,
+            "decompressCpuMs": 257.25299999999993
+          },
+          {
+            "compressMs": 4738.791544999989,
+            "decompressMs": 256.4019190000399,
+            "compressCpuMs": 4689.909,
+            "decompressCpuMs": 254.57099999999997
+          }
+        ],
+        [
+          {
+            "compressMs": 4626.422124999997,
+            "decompressMs": 252.17494999997143,
+            "compressCpuMs": 4602.517999999999,
+            "decompressCpuMs": 251.69299999999996
+          },
+          {
+            "compressMs": 4630.005414999992,
+            "decompressMs": 252.58587500002614,
+            "compressCpuMs": 4614.490999999999,
+            "decompressCpuMs": 252.11599999999999
+          }
+        ],
+        [
+          {
+            "compressMs": 4696.861712999977,
+            "decompressMs": 255.80283799999597,
+            "compressCpuMs": 4660.024,
+            "decompressCpuMs": 255.3430000000001
+          },
+          {
+            "compressMs": 4713.554666999989,
+            "decompressMs": 259.51387400000385,
+            "compressCpuMs": 4676.1849999999995,
+            "decompressCpuMs": 257.833
+          }
+        ],
+        [
+          {
+            "compressMs": 4587.740498999934,
+            "decompressMs": 251.56749999998283,
+            "compressCpuMs": 4578.057000000002,
+            "decompressCpuMs": 251.61400000000003
+          },
+          {
+            "compressMs": 4588.932498999959,
+            "decompressMs": 253.49208300006285,
+            "compressCpuMs": 4579.450000000003,
+            "decompressCpuMs": 252.01099999999994
+          }
+        ]
+      ],
+      "measuredPasses": [
+        [
+          {
+            "compressMs": 4711.4932100000005,
+            "decompressMs": 259.04491599995526,
+            "compressCpuMs": 4667.569,
+            "decompressCpuMs": 257.25299999999993
+          },
+          {
+            "compressMs": 4738.791544999989,
+            "decompressMs": 256.4019190000399,
+            "compressCpuMs": 4689.909,
+            "decompressCpuMs": 254.57099999999997
+          }
+        ],
+        [
+          {
+            "compressMs": 4626.422124999997,
+            "decompressMs": 252.17494999997143,
+            "compressCpuMs": 4602.517999999999,
+            "decompressCpuMs": 251.69299999999996
+          },
+          {
+            "compressMs": 4630.005414999992,
+            "decompressMs": 252.58587500002614,
+            "compressCpuMs": 4614.490999999999,
+            "decompressCpuMs": 252.11599999999999
+          }
+        ],
+        [
+          {
+            "compressMs": 4696.861712999977,
+            "decompressMs": 255.80283799999597,
+            "compressCpuMs": 4660.024,
+            "decompressCpuMs": 255.3430000000001
+          },
+          {
+            "compressMs": 4713.554666999989,
+            "decompressMs": 259.51387400000385,
+            "compressCpuMs": 4676.1849999999995,
+            "decompressCpuMs": 257.833
+          }
+        ],
+        [
+          {
+            "compressMs": 4587.740498999934,
+            "decompressMs": 251.56749999998283,
+            "compressCpuMs": 4578.057000000002,
+            "decompressCpuMs": 251.61400000000003
+          },
+          {
+            "compressMs": 4588.932498999959,
+            "decompressMs": 253.49208300006285,
+            "compressCpuMs": 4579.450000000003,
+            "decompressCpuMs": 252.01099999999994
+          }
+        ]
+      ],
+      "summary": {
+        "compressCpuMs": {
+          "baseline": 4631.271,
+          "candidate": 4645.338,
+          "changePercent": 0.30373951340787464,
+          "MBps": [3.5119078542369904, 3.5012731043467666]
+        },
+        "decompressCpuMs": {
+          "baseline": 253.51800000000003,
+          "candidate": 253.34349999999998,
+          "changePercent": -0.06883140447623282,
+          "MBps": [64.15559053006098, 64.19978014040227]
+        }
+      }
+    }
+  },
+  "screening": [
+    {
+      "variant": "chunk512",
+      "packedBytes": 3397079
+    },
+    {
+      "variant": "chunk1024",
+      "packedBytes": 3387752
+    },
+    {
+      "variant": "chunk2048",
+      "packedBytes": 3383976
+    },
+    {
+      "variant": "chunk8192",
+      "packedBytes": 3382793
+    },
+    {
+      "variant": "chunk16384",
+      "packedBytes": 3383138
+    },
+    {
+      "variant": "depth128",
+      "packedBytes": 3373977
+    },
+    {
+      "variant": "cache",
+      "packedBytes": 3382884
+    },
+    {
+      "variant": "firstbyte",
+      "packedBytes": 3382884
+    },
+    {
+      "variant": "nice24",
+      "packedBytes": 3411932
+    },
+    {
+      "variant": "nice64",
+      "packedBytes": 3378705
+    },
+    {
+      "variant": "nice96",
+      "packedBytes": 3376156
+    },
+    {
+      "variant": "dict32",
+      "packedBytes": 3398683
+    },
+    {
+      "variant": "repbound",
+      "packedBytes": 3382884
+    },
+    {
+      "variant": "prices",
+      "packedBytes": 3382884
+    },
+    {
+      "variant": "first128",
+      "packedBytes": 3373977
+    },
+    {
+      "variant": "firstcache128",
+      "packedBytes": 3373977
+    },
+    {
+      "variant": "widecache128",
+      "packedBytes": 3373977
+    },
+    {
+      "variant": "hash32",
+      "packedBytes": 3393276
+    },
+    {
+      "variant": "hash64",
+      "packedBytes": 3380272
+    },
+    {
+      "variant": "simd",
+      "packedBytes": 3382884
+    },
+    {
+      "variant": "simdinline",
+      "packedBytes": 3382884
+    },
+    {
+      "variant": "simdinline128",
+      "packedBytes": 3373977
+    },
+    {
+      "variant": "average",
+      "packedBytes": 3381439
+    },
+    {
+      "variant": "tail16",
+      "packedBytes": 3381652
+    },
+    {
+      "variant": "tail32",
+      "packedBytes": 3381439
+    },
+    {
+      "variant": "fast",
+      "packedBytes": 3382878
+    }
+  ],
+  "repetitive": {
+    "runtime": {
+      "node": "26.3.0",
+      "bun": "1.4.2",
+      "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+      "openssl": "1.1.0",
+      "llhttp": "9.3.0",
+      "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+      "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+      "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+      "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+      "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+      "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+      "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+      "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+      "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+      "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+      "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+      "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+      "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+      "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+      "v8": "14.6.202.34-node.20",
+      "uv": "1.48.0",
+      "napi": "10",
+      "icu": "78.1",
+      "unicode": "17.0",
+      "sqlite": "3.54.0",
+      "modules": "147"
+    },
+    "results": [
+      {
+        "period": 1,
+        "bytes": 262144,
+        "rounds": 6,
+        "packed": [81, 81],
+        "times": [
+          {
+            "compressCpuMs": 192.785,
+            "decompressCpuMs": 1.6179999999999999
+          },
+          {
+            "compressCpuMs": 20.897,
+            "decompressCpuMs": 1.625
+          }
+        ]
+      },
+      {
+        "period": 2,
+        "bytes": 262144,
+        "rounds": 6,
+        "packed": [90, 90],
+        "times": [
+          {
+            "compressCpuMs": 93.313,
+            "decompressCpuMs": 1.2930000000000001
+          },
+          {
+            "compressCpuMs": 21.393,
+            "decompressCpuMs": 1.391
+          }
+        ]
+      },
+      {
+        "period": 3,
+        "bytes": 262144,
+        "rounds": 6,
+        "packed": [88, 88],
+        "times": [
+          {
+            "compressCpuMs": 88.348,
+            "decompressCpuMs": 2.8099999999999996
+          },
+          {
+            "compressCpuMs": 15.553999999999998,
+            "decompressCpuMs": 1.054
+          }
+        ]
+      },
+      {
+        "period": 7,
+        "bytes": 262144,
+        "rounds": 6,
+        "packed": [90, 90],
+        "times": [
+          {
+            "compressCpuMs": 92.019,
+            "decompressCpuMs": 0.972
+          },
+          {
+            "compressCpuMs": 18.599,
+            "decompressCpuMs": 1.117
+          }
+        ]
+      },
+      {
+        "period": 16,
+        "bytes": 262144,
+        "rounds": 6,
+        "packed": [97, 97],
+        "times": [
+          {
+            "compressCpuMs": 93.50600000000001,
+            "decompressCpuMs": 1.048
+          },
+          {
+            "compressCpuMs": 18.053,
+            "decompressCpuMs": 1.0599999999999998
+          }
+        ]
+      },
+      {
+        "period": 257,
+        "bytes": 262144,
+        "rounds": 6,
+        "packed": [478, 478],
+        "times": [
+          {
+            "compressCpuMs": 96.011,
+            "decompressCpuMs": 1.2329999999999999
+          },
+          {
+            "compressCpuMs": 98.75999999999999,
+            "decompressCpuMs": 1.5010000000000001
+          }
+        ]
+      }
+    ]
+  },
+  "decisions": {
+    "retained": [
+      "Directly emit full-length reps at committed positions.",
+      "Compare chunk endpoint cost per encoded byte.",
+      "Store one-byte inputs without initializing the codec models."
+    ],
+    "rejected": [
+      "Shorter parse chunks and reduced search depth increase compressed size.",
+      "Deeper dictionary search improves ratio but costs about 10% encoder CPU in paired measurements; repeat caches do not offset it.",
+      "Additional dictionary hash index adds memory without a compelling speed/ratio benefit.",
+      "Global SIMD compilation, inlining hints, and alternative price table construction did not show a compelling improvement.",
+      "Retain existing search limits and chunk length."
+    ]
+  }
+}
