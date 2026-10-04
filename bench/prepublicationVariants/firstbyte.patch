@@ -1,0 +1,12 @@
+--- a/rust/crates/tokzip/src/lz.rs
++++ b/rust/crates/tokzip/src/lz.rs
+@@ -715,6 +715,9 @@
+     /// `max` never exceeds the document end.
+     #[inline]
+     fn common_len(&self, pos: usize, dist: usize, max: usize) -> usize {
++        if max == 0 || self.byte_at(pos, dist) != self.doc[pos] {
++            return 0;
++        }
+         let target = &self.doc[pos..pos + max];
+         if dist <= pos {
+             // Overlapping sources are fine: the encoder holds the whole document, and the

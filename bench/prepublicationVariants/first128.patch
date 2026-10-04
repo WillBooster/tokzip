@@ -1,0 +1,21 @@
+--- a/rust/crates/tokzip/src/lz.rs
++++ b/rust/crates/tokzip/src/lz.rs
+@@ -29,7 +29,7 @@
+ // A length-3 match further away than this costs more than three modeled literals.
+ const MAX_DIST_LEN3: usize = 1 << 14;
+ const SEARCH_DEPTH: usize = 32;
+-const DICT_SEARCH_DEPTH: usize = 64;
++const DICT_SEARCH_DEPTH: usize = 128;
+ const NICE_LEN: usize = 48;
+ const EMPTY: i32 = -1;
+ 
+@@ -715,6 +715,9 @@
+     /// `max` never exceeds the document end.
+     #[inline]
+     fn common_len(&self, pos: usize, dist: usize, max: usize) -> usize {
++        if max == 0 || self.byte_at(pos, dist) != self.doc[pos] {
++            return 0;
++        }
+         let target = &self.doc[pos..pos + max];
+         if dist <= pos {
+             // Overlapping sources are fine: the encoder holds the whole document, and the

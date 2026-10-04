@@ -1,0 +1,19 @@
+--- a/rust/crates/tokzip/src/lz.rs
++++ b/rust/crates/tokzip/src/lz.rs
+@@ -1302,6 +1302,16 @@
+     let mut steps: Vec<Step> = Vec::new();
+     let mut nodes: Vec<Node> = Vec::new();
+     while pos < end {
++        if end - pos >= MATCH_MAX {
++            let long_rep = (0..4).filter(|&idx| {
++                mf.len_at(pos, cs.reps[idx] as usize + 1, MATCH_MAX) == MATCH_MAX
++            }).min_by_key(|&idx| models.price_rep_choice(cs.state, idx));
++            if let Some(idx) = long_rep {
++                emit_rep(rc, models, cs, idx, MATCH_MAX);
++                pos += MATCH_MAX;
++                continue;
++            }
++        }
+         let end_target = (pos + CHUNK).min(end);
+         let max_reach = (end_target + MATCH_MAX).min(end);
+         let n = max_reach - pos;

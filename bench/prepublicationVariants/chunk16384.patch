@@ -1,0 +1,11 @@
+--- a/rust/crates/tokzip/src/lz.rs
++++ b/rust/crates/tokzip/src/lz.rs
+@@ -1296,7 +1296,7 @@
+     end: usize,
+     inserted: &mut usize,
+ ) {
+-    const CHUNK: usize = 4096;
++    const CHUNK: usize = 16384;
+     let mut pos = start;
+     let mut pairs: Vec<(u32, u32)> = Vec::new();
+     let mut steps: Vec<Step> = Vec::new();

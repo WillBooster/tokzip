@@ -1284,9 +1284,7 @@ impl StatePrices {
 
 const INF: u32 = u32::MAX;
 
-/// Price-based optimal parse of `[start, end)` — the only parse: a forward shortest path over
-/// positions using rounded model bit prices, refreshed every `CHUNK` positions (each chunk's
-/// chosen path is replayed through the adaptive coder before the next chunk is parsed).
+// Freeze prices within a search chunk so speculative paths never adapt the shared models.
 fn run_encode_optimal(
     rc: &mut Encoder,
     models: &mut DocModels,
@@ -1302,6 +1300,18 @@ fn run_encode_optimal(
     let mut steps: Vec<Step> = Vec::new();
     let mut nodes: Vec<Node> = Vec::new();
     while pos < end {
+        // A full-length rep at a committed position needs neither speculative states nor
+        // price tables. The next ordinary parse inserts the skipped history positions.
+        if end - pos >= MATCH_MAX {
+            let long_rep = (0..4)
+                .filter(|&idx| mf.len_at(pos, cs.reps[idx] as usize + 1, MATCH_MAX) == MATCH_MAX)
+                .min_by_key(|&idx| models.price_rep_choice(cs.state, idx));
+            if let Some(idx) = long_rep {
+                emit_rep(rc, models, cs, idx, MATCH_MAX);
+                pos += MATCH_MAX;
+                continue;
+            }
+        }
         let end_target = (pos + CHUNK).min(end);
         let max_reach = (end_target + MATCH_MAX).min(end);
         let n = max_reach - pos;
@@ -1467,9 +1477,11 @@ fn run_encode_optimal(
             }
         }
 
+        // Endpoints cover different byte counts. Comparing total prices alone favors
+        // stopping early even when a slightly dearer match covers more input cheaply.
         let mut best = end_target - pos;
         for j in (end_target - pos)..=n {
-            if nodes[j].price < nodes[best].price {
+            if (nodes[j].price as u64) * (best as u64) < (nodes[best].price as u64) * (j as u64) {
                 best = j;
             }
         }

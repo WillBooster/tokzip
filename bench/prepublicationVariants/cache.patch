@@ -1,0 +1,27 @@
+--- a/rust/crates/tokzip/src/lz.rs
++++ b/rust/crates/tokzip/src/lz.rs
+@@ -1297,6 +1297,7 @@
+     inserted: &mut usize,
+ ) {
+     const CHUNK: usize = 4096;
++    let mut rep_matches = [(u32::MAX, 0usize, false); 4];
+     let mut pos = start;
+     let mut pairs: Vec<(u32, u32)> = Vec::new();
+     let mut steps: Vec<Step> = Vec::new();
+@@ -1362,7 +1363,15 @@
+ 
+             let mut long_rep = false;
+             for idx in 0..4usize {
+-                let l = mf.len_at(gpos, reps[idx] as usize + 1, max_len);
++                let (distance, match_end, exact) = rep_matches[idx];
++                let l = if distance == reps[idx] && gpos <= match_end
++                    && (exact || gpos + max_len <= match_end) {
++                    (match_end - gpos).min(max_len)
++                } else {
++                    let len = mf.len_at(gpos, reps[idx] as usize + 1, max_len);
++                    rep_matches[idx] = (reps[idx], gpos + len, len < max_len);
++                    len
++                };
+                 if l >= NICE_LEN {
+                     long_rep = true;
+                     skip_until = skip_until.max(i + l);

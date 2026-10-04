@@ -1,0 +1,69 @@
+--- a/rust/crates/tokzip/src/lz.rs
++++ b/rust/crates/tokzip/src/lz.rs
+@@ -511,17 +511,6 @@
+     u32::from(PROB_PRICES[p as usize])
+ }
+ 
+-fn price_tree_reverse(probs: &[u16], base: usize, bits: u32, symbol: u32) -> u32 {
+-    let mut price = 0;
+-    let mut m = 1usize;
+-    for i in 0..bits {
+-        let bit = (symbol >> i) & 1;
+-        price += price_bit(probs[base + m - 1], bit);
+-        m = (m << 1) | bit as usize;
+-    }
+-    price
+-}
+-
+ impl DocModels<'_> {
+     /// Price of the literal at `pos` (excluding the `is_match` decision bit).
+     fn price_literal(&mut self, win: &Window, pos: usize, state: usize, reps: &[u32; 4]) -> u32 {
+@@ -591,26 +580,32 @@
+         // The footer bits of a value below `FULL_DIST` are priced independently of the length
+         // state, so each value's footer price is computed once and added to every slot row.
+         let mut full = [[0u32; FULL_DIST]; NUM_LEN_TO_POS];
+-        for value in 0..FULL_DIST as u32 {
+-            let sl = dist_slot(value);
+-            let mut footer_price = 0;
+-            if sl >= START_POS_MODEL {
+-                let footer = (sl >> 1) - 1;
+-                let base = (2 | (sl & 1)) << footer;
+-                footer_price = price_tree_reverse(
+-                    &models.probs,
+-                    spec_base + (base - sl) as usize,
+-                    footer,
+-                    value - base,
+-                );
+-            }
++        for value in 0..4 {
+             for (ls, row) in full.iter_mut().enumerate() {
+-                row[value as usize] = slot[ls][sl as usize] + footer_price;
++                row[value] = slot[ls][value];
++            }
++        }
++        let mut footer_prices = [0u32; FULL_DIST / 4];
++        for sl in START_POS_MODEL..END_POS_MODEL {
++            let footer = (sl >> 1) - 1;
++            let base = (2 | (sl & 1)) << footer;
++            tree_prices(
++                &models.probs,
++                spec_base + (base - sl) as usize - 1,
++                0,
++                &mut footer_prices[..1 << footer],
++            );
++            for value in 0u32..1 << footer {
++                let price = footer_prices[(value.reverse_bits() >> (32 - footer)) as usize];
++                for (ls, row) in full.iter_mut().enumerate() {
++                    row[(base + value) as usize] = slot[ls][sl as usize] + price;
++                }
+             }
+         }
+         let mut align = [0u32; 1 << ALIGN_BITS];
+-        for (v, price) in align.iter_mut().enumerate() {
+-            *price = price_tree_reverse(&models.probs, align_base, ALIGN_BITS, v as u32);
++        tree_prices(&models.probs, align_base - 1, 0, &mut footer_prices[..1 << ALIGN_BITS]);
++        for (value, price) in align.iter_mut().enumerate() {
++            *price = footer_prices[((value as u32).reverse_bits() >> (32 - ALIGN_BITS)) as usize];
+         }
+         Self { full, slot, align }
+     }

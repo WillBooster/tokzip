@@ -2,8 +2,8 @@
 //! encoder detects the language(s) of the input itself and picks the best of its embedded
 //! dictionaries per segment.
 //!
-//! Frame layout (format v1; every change to the codec — algorithm, dictionaries, or priors —
-//! is a new version, and a decoder reads every version released before it):
+//! Frame layout (format v1; released decoding rules, dictionaries, and priors must be
+//! preserved for existing frames, while encoder search can improve independently):
 //!   [0]    header byte: high nibble 0b1101 (magic), bits 3–2 = version (1; 3 is reserved for
 //!          an extension byte), bits 1–0 = layout (0 single-segment, 1 multi-segment,
 //!          2 blocked, 3 stored)
@@ -88,7 +88,8 @@ pub fn compress(content: &[u8]) -> Vec<u8> {
 /// stored frame. A block that does not shrink or fails its decode check is stored inside a
 /// blocked frame; single-block content falls back to a stored frame instead.
 fn coded_frame(content: &[u8], crc: u32) -> Option<Vec<u8>> {
-    if content.is_empty() {
+    // Even an empty coded body needs a language byte, so it cannot shrink one byte.
+    if content.len() < 2 {
         return None;
     }
     let mut frame = vec![header(LAYOUT_SINGLE)];
