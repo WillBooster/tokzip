@@ -1,0 +1,63 @@
+//! Per-step timing on the small documents (at most 1 KiB) of the bench split (codec iteration
+//! aid); the one-time asset decode and every language's match index are built before timing.
+//!
+//!   cargo run --release --features train --example prof -- <corpus root>:<language> ...
+use std::path::Path;
+use std::time::Instant;
+fn main() {
+    let mut docs = Vec::new();
+    for arg in std::env::args().skip(1) {
+        let (root, lang) = arg.split_once(':').expect("<corpus root>:<language>");
+        docs.extend(
+            tokzip::train::bench_docs(Path::new(root), lang)
+                .filter(|d| d.len() <= 1024 && !d.is_empty()),
+        );
+    }
+    let n = docs.len() as f64;
+    let time = |f: &dyn Fn(&[u8])| {
+        let t = Instant::now();
+        for d in &docs {
+            f(d);
+        }
+        1e6 * t.elapsed().as_secs_f64() / n
+    };
+    let Some(first) = docs.first() else {
+        eprintln!("no non-empty bench document of at most 1 KiB in the given <corpus root>:<language> arguments");
+        std::process::exit(1);
+    };
+    println!("{} docs", docs.len());
+    let t = Instant::now();
+    tokzip::segments(first);
+    println!(
+        "first call (asset decode + gram table) {:.1} ms",
+        1e3 * t.elapsed().as_secs_f64()
+    );
+    // A language's match index is built on its first encode; keep that out of the timings.
+    for lang in 0..tokzip::language_names().len() {
+        tokzip::frame_len_with_language(first, lang);
+    }
+    println!(
+        "segments   {:>8.1} us",
+        time(&|d| {
+            tokzip::segments(d);
+        })
+    );
+    println!(
+        "parse(0)   {:>8.1} us",
+        time(&|d| {
+            tokzip::frame_len_with_language(d, 0);
+        })
+    );
+    println!(
+        "compress   {:>8.1} us",
+        time(&|d| {
+            tokzip::compress(d);
+        })
+    );
+    let frames: Vec<Vec<u8>> = docs.iter().map(|d| tokzip::compress(d)).collect();
+    let t = Instant::now();
+    for f in &frames {
+        tokzip::decompress(f, usize::MAX).unwrap();
+    }
+    println!("decompress {:>8.1} us", 1e6 * t.elapsed().as_secs_f64() / n);
+}
