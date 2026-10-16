@@ -12,10 +12,11 @@ const frames = new Map(
   Object.entries(SAMPLES).map(([sample, text]) => [sample, Buffer.from(compress(text)).toString('base64')])
 );
 const resultSchema = z.object({
-  ok: z.literal(true),
-  warmed: z.boolean().optional(),
-  fresh: z.boolean().optional(),
-  iterations: z.number().optional(),
+  ok: z.boolean(),
+  isolateWarm: z.boolean(),
+  warmed: z.boolean(),
+  fresh: z.boolean(),
+  iterations: z.number().int().positive(),
 });
 const tailEventSchema = z.object({
   event: z.object({ request: z.object({ url: z.string() }) }),
@@ -69,7 +70,8 @@ async function measure(path: string): Promise<void> {
     const ttfbMs = performance.now() - start;
     if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
     const result = resultSchema.parse(await response.json());
-    if (result.warmed === false && !result.fresh) {
+    if (!result.ok) throw new Error(`${path}: worker reported a failed round trip`);
+    if (!result.isolateWarm || (!result.warmed && !result.fresh)) {
       continue;
     }
     let cpuMs: number;
@@ -83,9 +85,7 @@ async function measure(path: string): Promise<void> {
       await subscribe();
       continue;
     }
-    console.log(
-      JSON.stringify({ path, cpuMs, cpuMsPerIteration: cpuMs / (result.iterations ?? 1), ttfbMs, ...result })
-    );
+    console.log(JSON.stringify({ path, cpuMs, cpuMsPerIteration: cpuMs / result.iterations, ttfbMs, ...result }));
     return;
   }
   throw new Error(`${path}: could not collect a prepared CPU measurement after five attempts`);

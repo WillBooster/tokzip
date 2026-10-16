@@ -136,9 +136,11 @@ and the detection table of every dictionary's 4-grams), `scripts/train` (wrapper
 benchmark), `bench/cloudflare` (Workers benchmark: `bunx wrangler deploy --config
 bench/cloudflare/wrangler.jsonc`, then `node bench/cloudflare/measure.ts <worker-url>`). The
 Workers driver records request CPU from `wrangler tail` and client time-to-first-byte for
-prose, code, JSON responses, and a large mixed document. `fresh-*` rows include a fresh Wasm
-instance and dictionary initialization, excluding module compilation; other codec rows use
-prepared samples and discard requests that land on an unprepared isolate.
+prose, code, JSON responses, and a large mixed document. The driver discards requests on an
+isolate's first invocation. `fresh-*` rows create a fresh
+Wasm instance and initialize its dictionaries; other codec rows additionally require the
+sample to be prepared. Decoder frames are prepared locally, so a fresh decode never needs a
+compression in the measured request.
 
 Codec iteration aids (`--features train`): `cargo run --release --features train --example
 eval -- <corpus>:<language> ...` reports ratio and speed per language (`TOKZIP_COST=1` adds

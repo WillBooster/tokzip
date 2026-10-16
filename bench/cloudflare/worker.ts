@@ -6,12 +6,15 @@ import { SAMPLES } from './samples.ts';
 const codec = createCodec(() => wasmModule);
 const warmedSamples = new Set<string>();
 const MAX_ITERATIONS = 1000;
+let isolateUsed = false;
 
 export default {
   fetch(request: Request): Response {
+    const isolateWarm = isolateUsed;
+    isolateUsed = true;
     const url = new URL(request.url);
     const [route, sample = ''] = url.pathname.split('/').filter(Boolean);
-    if (!route || route === 'noop') return Response.json({ ok: true });
+    if (!route || route === 'noop') return Response.json({ ok: true, isolateWarm });
     const text = SAMPLES[sample];
     if (!text) return new Response('unknown sample', { status: 404 });
     const iterations = Math.min(Math.max(1, Math.trunc(Number(url.searchParams.get('iters')) || 1)), MAX_ITERATIONS);
@@ -26,6 +29,7 @@ export default {
     if (!fresh) warmedSamples.add(sample);
     return Response.json({
       ok,
+      isolateWarm,
       warmed,
       fresh,
       iterations: count,
