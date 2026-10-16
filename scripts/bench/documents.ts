@@ -1,6 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
-import { z } from 'zod';
 import { corpusDirs, manifestEntrySchema } from '../corpus.ts';
 
 export interface Doc {
@@ -24,7 +23,7 @@ export function loadBenchDocs(inputPath?: string): Doc[] {
       .split(/\r?\n/)
       .filter((line) => line.trim())
       .map((content) => {
-        z.json().parse(JSON.parse(content));
+        JSON.parse(content);
         return document(content, 'input', 'json');
       });
   }

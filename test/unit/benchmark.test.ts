@@ -27,6 +27,7 @@ test('benchmarks complete JSON records and reports grouped latency without copyi
   const directory = mkdtempSync('.tmp/benchmark-');
   try {
     const documents = [
+      '{"text":"large JSON exponent stays byte-for-byte intact","value":1e999}',
       JSON.stringify({ text: '日本語の回答です。'.repeat(20), reasoning: 'A reason.\n'.repeat(20) }),
       JSON.stringify({
         text: 'export const answer = 42;\n'.repeat(200),
