@@ -143,7 +143,7 @@ export function createCodec(loadModule: () => WebAssembly.Module): Codec {
   };
 }
 
-/** Copies the module-owned output buffer out of wasm memory (it is reused by the next call). */
+/** Copies the output before `tokzip_free` releases the module-owned buffers. */
 function takeOutput(exports: Exports): Uint8Array {
   return new Uint8Array(exports.memory.buffer, exports.tokzip_out_ptr(), exports.tokzip_out_len()).slice();
 }

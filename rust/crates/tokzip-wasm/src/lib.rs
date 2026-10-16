@@ -1,7 +1,7 @@
 //! C-ABI exports for the wasm build. The JS side copies input into a buffer obtained from
 //! `tokzip_alloc`, calls `tokzip_compress`/`tokzip_decompress`, and reads the result from the
-//! module-owned output buffer (`tokzip_out_ptr`/`tokzip_out_len`), which stays valid until the
-//! next call. wasm32-unknown-unknown is single-threaded, so the output buffer is a thread-local.
+//! module-owned output buffer (`tokzip_out_ptr`/`tokzip_out_len`), then releases both buffers
+//! with `tokzip_free`. wasm32-unknown-unknown is single-threaded, so the output buffer is a thread-local.
 
 use std::cell::RefCell;
 
@@ -21,11 +21,14 @@ pub extern "C" fn tokzip_alloc(len: usize) -> *mut u8 {
     ptr
 }
 
+/// Releases the input and the last output, after the JS side has copied or decoded it.
+///
 /// # Safety
 /// `ptr` must come from `tokzip_alloc(len)` with the same `len` and not have been freed.
 #[no_mangle]
 pub unsafe extern "C" fn tokzip_free(ptr: *mut u8, len: usize) {
     std::alloc::dealloc(ptr, input_layout(len));
+    OUT.with(|out| *out.borrow_mut() = Vec::new());
 }
 
 fn input_layout(len: usize) -> std::alloc::Layout {

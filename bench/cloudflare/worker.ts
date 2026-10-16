@@ -1,63 +1,52 @@
-/**
- * Cloudflare Workers benchmark for the wasm build. Workers freeze the clock during CPU work,
- * so this worker only does the work; times come from `wrangler tail --format json` (per-request
- * `cpuTime`) and from the client's time-to-first-byte.
- *
- *   /noop                       nothing (baseline)
- *   /load                       import the module and pre-compress every sample
- *   /compress/<sample>?iters=N  compress the sample N times
- *   /decompress/<sample>?iters=N
- *
- *   wrangler deploy --config bench/cloudflare/wrangler.jsonc
- *   bun bench/cloudflare/measure.ts
- */
-import samples from './samples.json';
+import { Buffer } from 'node:buffer';
+import { createCodec, type Codec } from '../../src/core.ts';
+import wasmModule from '../../wasm/tokzip.wasm';
+import { SAMPLES } from './samples.ts';
 
-// A committed JSON module: the compiler checks its inferred shape against this annotation, so
-// there is no runtime input to validate.
-const SAMPLES: Record<string, string> = samples;
-/** Frames pre-compressed by /load so the /decompress route never times a compression. */
-const FRAMES = new Map<string, Uint8Array>();
+const codec = createCodec(() => wasmModule);
+const warmedSamples = new Set<string>();
 const MAX_ITERATIONS = 1000;
-/** False until the first request on this isolate has paid the module import + wasm instantiate. */
-let warm = false;
 
 export default {
-  async fetch(request: Request): Promise<Response> {
+  fetch(request: Request): Response {
     const url = new URL(request.url);
     const [route, sample = ''] = url.pathname.split('/').filter(Boolean);
-    if (route === undefined || route === 'noop') return new Response('ok');
-    // A request landing on a cold isolate pays the import + wasm instantiate below inside its
-    // own timing; `warm=false` tells the driver to discard that row (except the first /load,
-    // which is meant to be cold).
-    const wasWarm = warm;
-    const codec = await import('../../src/workers.ts');
-    warm = true;
-    if (route === 'load') {
-      for (const [name, text] of Object.entries(SAMPLES)) FRAMES.set(name, codec.compress(text));
-      return new Response(`loaded: ${FRAMES.size} samples warm=${wasWarm}`);
-    }
+    if (!route || route === 'noop') return Response.json({ ok: true });
     const text = SAMPLES[sample];
     if (!text) return new Response('unknown sample', { status: 404 });
-    // Untrusted, so clamped: an unbounded iteration count would run until the CPU limit.
     const iterations = Math.min(Math.max(1, Math.trunc(Number(url.searchParams.get('iters')) || 1)), MAX_ITERATIONS);
-    if (route === 'compress') {
-      let size = 0;
-      for (let i = 0; i < iterations; i++) size = codec.compress(text).length;
-      return new Response(`${sample}: ${text.length} chars -> ${size} bytes warm=${wasWarm} x${iterations}`);
-    }
-    if (route === 'decompress') {
-      // Pre-compressed by /load (which the driver calls first) so this request times only
-      // decompression. If the isolate differs from the one /load warmed, `cached` is false and
-      // the request also compressed once — the driver must discard that contaminated row.
-      const cached = FRAMES.has(sample);
-      const frame = FRAMES.get(sample) ?? codec.compress(text);
-      let ok = true;
-      for (let i = 0; i < iterations && ok; i++) ok = codec.decompress(frame) === text;
-      return new Response(
-        `${sample}: ${ok ? 'round-trip ok' : 'MISMATCH'} cached=${cached} warm=${wasWarm} x${iterations}`
-      );
-    }
-    return new Response('unknown route', { status: 404 });
+    const fresh = route.startsWith('fresh-');
+    const operation = route.replace('fresh-', '');
+    if (operation !== 'compress' && operation !== 'decompress') return new Response('unknown route', { status: 404 });
+    const warmed = warmedSamples.has(sample);
+    const active = fresh ? createCodec(() => wasmModule) : codec;
+    const count = fresh ? 1 : iterations;
+    const input = operation === 'decompress' ? Buffer.from(url.searchParams.get('frame') ?? '', 'base64') : undefined;
+    const { frame, ok } = measure(active, text, input, operation, count);
+    if (!fresh) warmedSamples.add(sample);
+    return Response.json({
+      ok,
+      warmed,
+      fresh,
+      iterations: count,
+      bytes: Buffer.byteLength(text),
+      packed: frame.length,
+    });
   },
 };
+
+function measure(
+  active: Codec,
+  text: string,
+  cached: Uint8Array | undefined,
+  operation: 'compress' | 'decompress',
+  count: number
+): { frame: Uint8Array; ok: boolean } {
+  let frame = cached ?? new Uint8Array();
+  let ok = true;
+  for (let i = 0; i < count; i++) {
+    if (operation === 'compress') frame = active.compress(text);
+    else ok &&= active.decompress(frame, { maxLength: Buffer.byteLength(text) }) === text;
+  }
+  return { frame, ok };
+}

@@ -88,16 +88,16 @@ compressed size as a percentage of the input:
 
 | documents  | tokzip    | brotli -11 | zstd -19 | gzip -9 |
 | ---------- | --------- | ---------- | -------- | ------- |
-| all        | **20.7%** | 26.3%      | 31.1%    | 31.9%   |
-| ≤ 1 KB     | **28.4%** | 47.6%      | 60.2%    | 61.1%   |
-| 1–4 KB     | **22.9%** | 33.9%      | 42.1%    | 42.2%   |
-| 4–16 KB    | **20.7%** | 25.8%      | 30.4%    | 31.2%   |
-| > 16 KB    | **19.0%** | 21.6%      | 24.5%    | 25.6%   |
-| ja-JP      | **24.8%** | 35.6%      | 42.8%    | 43.3%   |
+| all        | **20.8%** | 26.3%      | 31.1%    | 31.9%   |
+| ≤ 1 KB     | **28.5%** | 47.6%      | 60.2%    | 61.1%   |
+| 1–4 KB     | **23.0%** | 33.9%      | 42.1%    | 42.2%   |
+| 4–16 KB    | **20.8%** | 25.8%      | 30.4%    | 31.2%   |
+| > 16 KB    | **19.1%** | 21.6%      | 24.5%    | 25.6%   |
+| ja-JP      | **24.9%** | 35.6%      | 42.8%    | 43.3%   |
 | zh-CN      | **26.4%** | 36.8%      | 45.3%    | 46.1%   |
-| typescript | **14.8%** | 17.7%      | 19.8%    | 20.6%   |
-| java       | **13.8%** | 23.3%      | 28.2%    | 28.6%   |
-| html       | **17.6%** | 21.3%      | 25.4%    | 26.1%   |
+| typescript | **14.9%** | 17.7%      | 19.8%    | 20.6%   |
+| java       | **13.9%** | 23.3%      | 28.2%    | 28.6%   |
+| html       | **17.8%** | 21.3%      | 25.4%    | 26.1%   |
 
 Cloudflare Workers allow [128 MB per isolate and 10 ms of CPU per request on the free plan](https://developers.cloudflare.com/workers/platform/limits/).
 Dictionary initialization and larger documents can exceed the free CPU budget; local throughput
@@ -105,8 +105,13 @@ is not a reliable way to predict production Workers CPU.
 
 Run it yourself: `bun run bench` (add `--speed` for throughput and `--json <file>` for a
 machine-readable report). `--codec-only --repeat 3` measures tokzip alone after warming the
-corpus. Reports include the runtime, corpus fingerprint, and Wasm hash; every measured frame
-is checked for lossless round-trip recovery.
+corpus. With `--speed`, JSON reports include throughput and p50/p95/p99/max latency for the whole
+corpus and each language, size band, and corpus. Reports include the runtime, corpus
+fingerprint, and Wasm hash; every measured frame is checked for lossless round-trip recovery.
+To measure serialized application responses, pass `--input <documents.jsonl>`: each non-blank
+line is one complete JSON value, compressed as written, without the line separator. This uses
+only the supplied file. Reports contain aggregate measurements and fingerprints, not the input
+records.
 
 ## Development
 
@@ -128,9 +133,12 @@ Cloudflare Workers), `dict/` (the wrapper, the code group's shared part, and eac
 suffix) and `priors/` (each group's packed literal priors and each language's own model
 nodes; the build embeds them as committed, each dictionary part coded by the codec itself,
 and the detection table of every dictionary's 4-grams), `scripts/train` (wrapper dictionary + trainer entry), `scripts/bench` (corpus
-benchmark), `bench/cloudflare` (Workers benchmark; needs a `wrangler` on `PATH`, which this
-repository does not declare: `wrangler deploy --config bench/cloudflare/wrangler.jsonc`, then
-`bun bench/cloudflare/measure.ts`).
+benchmark), `bench/cloudflare` (Workers benchmark: `bunx wrangler deploy --config
+bench/cloudflare/wrangler.jsonc`, then `node bench/cloudflare/measure.ts <worker-url>`). The
+Workers driver records request CPU from `wrangler tail` and client time-to-first-byte for
+prose, code, JSON responses, and a large mixed document. `fresh-*` rows include a fresh Wasm
+instance and dictionary initialization, excluding module compilation; other codec rows use
+prepared samples and discard requests that land on an unprepared isolate.
 
 Codec iteration aids (`--features train`): `cargo run --release --features train --example
 eval -- <corpus>:<language> ...` reports ratio and speed per language (`TOKZIP_COST=1` adds
