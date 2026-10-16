@@ -7,8 +7,9 @@
 
 Lossless compressor for **prompts, LLM outputs, and source code** stored at rest — one
 function in, one function out, no compression options (only an optional decode length limit).
-The codec is Rust compiled to a single **wasm module (~1.15 MB, all 21 dictionaries and models
-included)** with a thin TypeScript wrapper; it runs on Node, Bun, and Cloudflare Workers.
+The codec is Rust compiled to a single **wasm module (~1.84 MB, with 21 current dictionaries
+and models plus retained v1 assets)** with a thin TypeScript wrapper; it runs on Node, Bun,
+and Cloudflare Workers.
 The module requires WebAssembly SIMD, which [Workers supports](https://developers.cloudflare.com/workers/runtime-apis/webassembly/#simd).
 
 ```ts
@@ -27,9 +28,9 @@ decompress(untrustedFrame, { maxLength: 8 * 1024 * 1024 }); // throws instead of
   `nodejs_compat` compatibility flag. The first call in an isolate decodes the dictionary of
   each language it uses and initializes shared model priors lazily; later calls reuse them.
   First-use CPU depends on the languages and the runtime, so measure it separately from warm calls.
-- `FORMAT_VERSION` is the version `compress` writes. During pre-release development, this
-  number does not distinguish dictionary/prior revisions; see [FORMAT.md](FORMAT.md).
-  `TokzipDecodeError` carries a numeric `code`.
+- `FORMAT_VERSION` is 2: `compress` writes v2 frames and `decompress` reads v1 and v2.
+  The v1.0.0 generation's dictionaries and priors are retained, so stored v1 frames remain
+  readable. `TokzipDecodeError` carries a numeric `code`. See [FORMAT.md](FORMAT.md).
 
 There is nothing to configure: the encoder **detects the language of the input itself,
 segment by segment** — a Japanese prompt, a Markdown answer with an HTML block whose
@@ -45,8 +46,8 @@ the closest one.
   most documents — counted over the public corpus and, for the languages it holds at least
   1 MiB of, the private production corpus, so every dictionary byte is a substring of a public document
   while the selection follows production usage; segment size picked by coding held-out
-  documents), price-based parse (a bounded
-  shortest-path over 4 KB chunks, not a global optimum), adaptive binary range coder
+  documents), price-based parse (a bounded shortest-path over 1 KB chunks, committing early
+  on long matches), adaptive binary range coder
   (LZMA-style symbol layout, terminated on the shortest representation of its final interval)
   whose literals are modeled by an order-2 context (128 trained classes of the previous byte
   × 32 of the one before) and whose models start from trained priors — short documents get
@@ -57,8 +58,9 @@ the closest one.
   dictionary are coded as absolute dictionary offsets, so the same fragment costs the same
   wherever it is referenced.
 - **Detection without a parser**: one table maps every 4-gram hash to the languages whose
-  dictionary contains it; the input is scored per 64-byte window (labeled code fences add a
-  hint), and a Viterbi pass with a switch penalty turns the scores into segments, whose
+  dictionary contains it; the input is scored per 64-byte window, sampling alternate positions
+  on documents of at least 128 bytes. Labeled code fences add a hint. A Viterbi pass with a
+  switch penalty turns the scores into segments, whose
   boundaries snap to the nearest line start. The table stores 16-bit indices into a palette
   of language sets; dense sets are scored by subtracting misses instead of adding hits. On mixed
   prose + code documents this codes ~4 pp smaller than the best single language. When the
@@ -78,11 +80,10 @@ the closest one.
   bounds a frame's expansion only relative to its size (a small frame of repetitive content
   legitimately expands thousands of times), so pass `maxLength` when decompressing frames from
   an untrusted source.
-- **Format v1**: decoding rules, dictionaries, and priors define a codec generation. Encoder
-  search and implementation optimizations can evolve without changing those rules. This is
-  still a pre-release format: retraining currently replaces v1 assets and invalidates frames
-  from earlier development builds. Released generations will need distinct versions and
-  retained decoders before assets can change. See [FORMAT.md](FORMAT.md).
+- **Versioned storage**: decoding rules, dictionaries, and priors define a codec generation.
+  Encoder search can improve within a generation. Retraining requires a new version and a
+  retained decoder for every released generation. Both generations share the token grammar;
+  the module restores v1 assets lazily from deltas against the current assets. See [FORMAT.md](FORMAT.md).
 
 ## Results
 
@@ -92,16 +93,16 @@ compressed size as a percentage of the input:
 
 | documents  | tokzip    | brotli -11 | zstd -19 | gzip -9 |
 | ---------- | --------- | ---------- | -------- | ------- |
-| all        | **20.8%** | 26.3%      | 31.1%    | 31.9%   |
-| ≤ 1 KB     | **28.7%** | 47.6%      | 60.2%    | 61.1%   |
-| 1–4 KB     | **23.1%** | 33.9%      | 42.1%    | 42.2%   |
-| 4–16 KB    | **20.8%** | 25.8%      | 30.4%    | 31.2%   |
-| > 16 KB    | **19.1%** | 21.6%      | 24.5%    | 25.6%   |
-| ja-JP      | **24.9%** | 35.6%      | 42.8%    | 43.3%   |
-| zh-CN      | **26.5%** | 36.8%      | 45.3%    | 46.1%   |
-| typescript | **14.9%** | 17.7%      | 19.8%    | 20.6%   |
+| all        | **20.7%** | 26.3%      | 31.1%    | 31.9%   |
+| ≤ 1 KB     | **28.4%** | 47.6%      | 60.2%    | 61.1%   |
+| 1–4 KB     | **22.9%** | 33.9%      | 42.1%    | 42.2%   |
+| 4–16 KB    | **20.7%** | 25.8%      | 30.4%    | 31.2%   |
+| > 16 KB    | **19.0%** | 21.6%      | 24.5%    | 25.6%   |
+| ja-JP      | **24.8%** | 35.6%      | 42.8%    | 43.3%   |
+| zh-CN      | **26.4%** | 36.8%      | 45.3%    | 46.1%   |
+| typescript | **14.8%** | 17.7%      | 19.8%    | 20.6%   |
 | java       | **13.8%** | 23.3%      | 28.2%    | 28.6%   |
-| html       | **17.9%** | 21.3%      | 25.4%    | 26.1%   |
+| html       | **17.6%** | 21.3%      | 25.4%    | 26.1%   |
 
 Cloudflare Workers allow [128 MB per isolate and 10 ms of CPU per request on the free plan](https://developers.cloudflare.com/workers/platform/limits/).
 Dictionary initialization and larger documents can exceed the free CPU budget; local throughput
@@ -124,9 +125,9 @@ bun run train         # retrain dict/*.bin and priors/*.bin from ../tokzip-corpu
                       # a sibling ../tokzip-corpus-private checkout scores the training
 ```
 
-Layout: `rust/crates/tokzip` (codec: `lz.rs` parse + coder, `lang.rs` dictionaries +
-detection, `languages.rs` the language table, `train.rs` dictionary + priors trainer,
-`pack.rs` + `build.rs` asset packing), `rust/crates/tokzip-wasm` (C-ABI exports), `src/`
+Layout: `rust/crates/tokzip` (codec: `lz.rs` token coding + `lz/parse.rs` price-based search,
+`lang.rs` dictionaries + detection, `languages.rs` the language table, `train.rs` dictionary + priors trainer,
+`pack.rs` + `build.rs` asset packing, `legacy.rs` v1 asset restoration), `rust/crates/tokzip-wasm` (C-ABI exports), `src/`
 (wrapper: `core.ts` over a compiled module, `index.ts` for Node and Bun, `workers.ts` for
 Cloudflare Workers), `dict/` (the wrapper, the code group's shared part, and each language's
 suffix) and `priors/` (each group's packed literal priors and each language's own model

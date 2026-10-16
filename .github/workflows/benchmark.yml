@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v7.0.1
         with:
           repository: WillBooster/tokzip-corpus
-          ref: c121336e2a874fa1279498996de3919581021bc3
+          ref: c94a981059f7e3433b5ed0c99d2b14e008d29b71
           path: tokzip-corpus
       - uses: jdx/mise-action@v5.0.1
       - run: bun install --frozen-lockfile

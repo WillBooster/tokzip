@@ -44,3 +44,11 @@ jobs:
         run: |
           cargo build --locked --release --target wasm32-unknown-unknown -p tokzip-wasm
           cmp target/wasm32-unknown-unknown/release/tokzip_wasm.wasm ../wasm/tokzip.wasm
+      - name: Upload the rebuilt module when verification fails
+        if: failure()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: rebuilt-wasm
+          path: rust/target/wasm32-unknown-unknown/release/tokzip_wasm.wasm
+          retention-days: 1
+          if-no-files-found: ignore

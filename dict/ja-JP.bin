@@ -1,2393 +1,2364 @@
-��コードとして抽出することができます。これうするコンポーネントは次のようになります:
+�を実装したいとします。このビューを処理するコンポーネントは次のようになります:
 
-```/) で構築されています。サイトのコンテンツは する必要があります。
+```js
+// sする必要があります。
 
-同じ論理的な関心事に開かもしれません。
+同じ論理的な関心事に関連するコードを並べることができれば、より良��解決される前に呼び出されるため、`setup` の中では利用できません。
+:::
 
-![Vue Options API: オプションの��でしょう。そして、これはまさに Composition API :
-
-<!--
+`setup` オプションは `<!--
 <span class="filename">Filename: src/main.rs</span>
 -->
-��トのインスタンスを参照しないため、`setup` のd)の両方にすでに精通しているはずです。
-:::
+<span class="filename">ファイル名: src/main.rs</span>
 
-<V��それを `value` プロパティを持つオブジェクト� を使用してユーザーのリポジトリを取得します) を参照してください。
+```rust�築されています。サイトのコンテンツは `src` ディレクトリにあるマークダウンフォーマットでhQuery` 文字列を使用してリポジトリを検索する
+3. `filters` オブジェクトを使用してリポジトリを�からは、リポジトリのリストは空のままになっていることを意味します。これを直しましょう�er` プロパティが変更されるたびに、それを実行するようにウォッチャを設定することです。
 
-**例に適用しましょう:�参照ではなく、値によって渡されるからです:
+�では、このように新しい `ref` 関数にとってあらゆる変数をリアクティブにすることができます:``
 
-っていることを意味します。これを直しましょするためです。
+`watch` についての詳細は、[詳細ガイド](reactivity-computed-watchers.md#watch) を参照してください。
 
-これらの変更が行われたので、利用できるようにすること
+�のスコープでコンパイルされ、子のテンプレート内の全てのものは子のスコープでコンパイル�を追加するのと同じように、Vue からインポートした `watch` 関数を使用することができます。そ�**を作成します。 **参照**を操作するという概念は Composition API 全体で頻繁に使用されます。
+:::�になります。特に、スロットが多くのプロパティを提供している場合はそうです。また、プロれ算出された変数の**値**にアクセスするためには、`ref` と同様に `.value` プロパティを使う必要�の機能が別々のファイルにあるので、コンポーネントでそれらを使い始められます。これを行ぁ�あるかもしれません。- _これはコードを `setup` オプションに移動させて肥大させるだけではあアプリケーションでは、公式にサポートされている [vue-router ライブラリ](https://github.com/vuejs/vue-��ブなインスタンスの [`setup()`](composition-api-setup.html) 中にのみ呼び出すことが可能です。
 
-```js
-// src/components/Us��用されます。
-:::
+## シレンダリングする時、 `<slot></slot>` は「Add todo」に置換されるでしょう:
 
-例に戻って、リアクティブ�の 2 つの機能が別々のファイルにあるので、コ�追加するのと同じように、Vue からインポート�ML を含む任意のテンプレートコードを含めるこ�呼び出されるときに実行されるコールバックを�の機能を完全にするには、ライフサイクルフッ�れを使うことで次のようなコンポーネントを作漉`<template>` にしか指定できないことに注意してレンダリングスコープ
+```html
+<!-- レンダリングす。
 
-スロットの中でデータをisting-07-01/src/lib.rs}}
+これらの変更が行われたので、最初の論理的な関心事全体を 1 つの場所に移動しました。�## モジュールシステム
+
+もし `import`/`require` を使用したモジュールシステムを使わないのであれ�しかない場合の省略記法) を除き）`<template>` にしか指定できないことに注意してください。
+
+## ��トとして使うことができます。つまり、コンポーネントに対して `v-slot` を直接使えます:nclude ../listings/ch07-managing-growing-projects/quick-reference-example/src/garden/vegetables.rs}}
 ```
 
 <!--
-<span class="caption">Listi子のスコープでコンパイルされる。
-
-## フォーフらに、`setup` から返される全てのものは、コン�ename">ファイル名: src/garden.rs</span>
-
-```rust,noplaygrouthis.counter)
-    }
-  }
-}
+Now let’s get io
+</todo-button>
 ```
 
-`watch` についての詳細は�ィを提供している場合はそうです。また、プロを使っている場合、デフォルトで有効になって�させるだけではありませんか？_ そのため他の聮説明図">
-
-この例では、すべてのスロットプロ�ルページアプリケーションでは、公式にサポー�
-```
-
-これにより、`<template>` 要素の中身はすべて�この方法で十分な速度が得られますが、アプす。そうしておけば、これを呼び出すことで、�*にアクセスするためには、`ref` と同様に `.value`ティが変更されるたびに、それを実行するよ�、以下のコードを書き直そうとしているとしまめに、この変数を上書きする方法を提�t>
-```
-
-しかし、これは動作しません。というのゟめに必要
-              { global: true },
-              envi��いのであれば、このセクションはスキップす�代わりにレンダリングされます:
+そして、 `<todo-button>` のテンプレートはこうなります:
 
 ```html
-<button typムのリストを内部に持ってます。
+<!-- todo-button コンこれにより、 Minifier は環境変数の条件ブロックに含まれた Vue のソースコードのすべての警告を�を呼び出すことで、注入された値をコンポーネントに公開する方法を定義することができるよ�機能を移行しましょう。このガイドの目的ではないため、実装の詳細には立ち入りません。
 
-```js
-app.componename>` のようにケバブケースを用いなければなり,ignore
-{{#rustdoc_include ../listings/ch07-managing-growing-proビルドを使う場合、つまりビルドツールを使わがある場合は常に _すべての_ スロットに対して �ニメーションを付けるのに役立つ、いくつかのィを更新する責務を持つメソッドを提供する�追跡していない状態に依存している可能性があことは **できません**。例えば、`action` へのアク
-この言葉はここ最近のプログラミングで頻繁に��れないようにしたい場合は、提供するプロ�ちらかのプロパティに何か変更があった場合、�いう特別な属性を持っていて、それぞれのスロ�おいてください。より詳しく知りたい場合は、され、そしてキャッシュされることを保証する�e out of scope</span>
--->
-
-<span class="caption">リスト10-16:e you want to show.
-- For Rust code, use the `{{#rustdoc_includeンツを指定すると便利な場合があります。例㽜成しました:
-
-```js
-Vue.createApp({...}).component('my-com�うな多くの JS ライブラリは、ハードウェアア�ositories'
-import { ref } from 'vue'
-
-export default {
-  componereturn {
-      // 絞り込まれていないリポジトリは�itories` という名前で返して良いでしょう
-      repと一緒にこのフックを活用するのはよいアイデートされた `computed` 関数を使用して Vue コン� バンドルにグローバルな [envify](https://github.com/htProps">
-    <i class="fas fa-check"></i>
-    <span class="green��を使用すると、パフォーマンス向上のために冁�。このガイドの目的ではないため、実装の詳�をチェックしてみてください。
-
-## サードパーチ�ては、各ビルドツールのドキュメントを参�}</span>
+```
+              { global: true },
+              envify({ NODE_ENV: 'production' })
+            )
+            .bundle()
+      }
+  ck"></i>
+  <span class="green">{{ item }}<span>
 </todo-list>
 ```
 
-さらに短くすることもでき�
+しかし、これは動作しません。というのも、 `
+以下のヒントのほとんどは、 [Vue CLI](https://cli.vuejs.org) を使っている場合、デフォルトで有効に```
 
-<!--
-In this section, we’ll talk about modules and other par <MigrationBadges :badges="$frontmatter.badges" />
-
-## 概要
-
-�な参照を作成するために `toRefs` を使用します
-  I) と組み合わせることで、とても基本的ですが彿うと:
-
-  ```js
-  // envify のカスタムモジュールでン内に使用したいコンポーネントを定義します:�が付いています。
-
-```rust,ignore,does_not_compile
-{{#ru
-もしまだこの記事を読んでいるということは、
-
-> このセクションでは、コード例に [単一ファ�="false" :preview="false" />
-
-## スタイルバインディン�:
-
-```console
-{{#include ../listings/ch10-generic-types-traits-�あるもの、またはより多くのステップや状態変 all the time and we want to make the documentation accessible tの場合は以下のようになります:
-
-```js
-const app = V引数の関数で囲むことで動作させています:
-
-```jクセラレーションが必要であることを認識しま�ートファイルを JavaScript の Render 関数に変換す�用可能にしたいときは、以下のように使用する�traits-and-lifetimes/listing-10-20/src/main.rs:here}}
+こういった場合のために、 `<slot>` 要素は `name` という特別な属性を持っていて、それぞれの。そのような場合、リアクティブなプロパティを更新する責務を持つメソッドを提供する�ve
+</button>
 ```
-�らのケースでは、このようにルート要素に `v-onこの問題を解決するには、`expose` を呼び出して�うなビルドシステムを利用した場合、全てのコ�。
+
+## 名前付きスロット
+
+複数のスロットがあると便利なときもあります。例えば、 `<ust code, use the `{{#rustdoc_include [fileame:some_tag]}}` directive within the code blocks
+  in the text. The `rustdoc_include�、そのカスタム要素を参照する際も `<my-component-name>` のようにケバブケースを用いなければなゃ�ッシュ化をすることができます。
+
+その方法については、各ビルドツールのドキュメントを参�ojects/listing-07-01/src/lib.rs}}
+```
 
 <!--
-First, we’re going to start with a list of rules for��る振る舞いをします。 これは、`setup()` を他の��トについていくつかの重要なことを知ってお�
+<span class="caption">Listing 7-1: A `front_of_house` module containing other
+module�たデータが、注入されたコンポーネント内で変更されないようにしたい場合は、提供するプロす。Vue CLI では事前設定されていますが、どのように行われているか知っておくことはよいでし�ックを明示的に定義する必要はありません。言い換えれば、これらのフック内のコードは、 `set
+  }
 }
-</script>
-```
-
-しかし、データが注入されたコンしたり、バグを修正したりする能力において重覛が少なくなります。
-
-## イージング
-
-イージン�ub.com/vuejs/docs/issues/478) so that the rest of the co�トは、以下のようにリファクタリングす�作し、動的なスロット名の定義が可能です:
-
-`�単体テストフレームワークが有用なエラーを提 of the various translation initiatives happening in the communi��新されたとき、常に更新されます。つまり、�`
-
-それぞれの引数がどのように使われるのか、惼ドは、 `setup` 内に直接書くべきです。
-:::
-
-こ�。例を見てみましょう:
-
-```html
-<div id="demo">
-  <div
- ルーティング
-
-## 公式ルータ
-
-ほとんどのシン�が空と説明するメッセージの間で行うものがあ�rameters and return values in the context of functions.
--->
-
-今して新しいルートレベルのリアクティブなプロ�し、同じイベントループで起こる全てのデータ�ート内で利用できるようになりました。# ライ�に存在するそして将来的に定義される HTML 要素でいないのなら、先に読みましょう。
-
-:::tip Note/) と呼ばれるアニメーションのテクニックによ�きることです。この機能を利用するための概念、スプレッドシートは SUM の結果を返してくれま��の状態のスキーマのようなものです。前もっ�nsition-group>
-</div>
 ```
 
 ```js
 const Demo = {
   data() {
-  ��たもので、 Vue 3 では以前のバージョンの Vue � enter the code in Listing 7-1 into *src/lib.rs* to
-define some �そうするわけにはいかない場合や、より複雑なponents: {
+    return {
+      noActivated: false
+    }
+  }
+}
+
+Vue.createApp(Demo).mount('#demo'
+
+> このセクションでは、コード例に [単一ファイルコンポーネント](../guide/single-file-component.html)�。
+
+<!--
+First, we’re going to start with a list of rules for easy reference when you’re
+organizing your code in the futur�ランタイムエラーが発生した場合、グローバルの `app.config.errorHandler` に設定した関数があれば�
+Vue は何らかの変化に応じてトランジションやアニメーションを付けるのに役立つ、いくつかの��
+
+```rust,ignore,does_not_compile
+{{#rustdoc_include ../listings/ch10-generic-types-traits-and-lifetimes/listing-10-16/src/maief } from 'vue'
+import MyMarker from './MyMarker.vue'
+
+export default {
+  components: {
     MyMarker
   },
   setup() {
-    const location = re��ディレクティブと同様に、省略記法は引数が�k)# リストのトランジション
+    const ��を含んでいる</span>
 
-ここまでで、私た�tion as shown in Listing 10-20, it
+<!--
+We define a module with the `mod` keyword followed by the name of the module
+(in this case, `f�� `message` を宣言していないと、Vue は Render 関数が存在しないプロパティにアクセスしようとし㠴合には、問題となります。
+
+この問題を解決するには、`expose` を呼び出して、外部コン�:
+
+```console
+{{#include ../listings/ch10-generic-types-traits-and-lifetimes/listing-10-16/output.txt}}
+```
+
+<!--
+The variable `� ...
+}
+```
+
+これは、`v-slot` の値が関数定義の引数部分で有効な任意の JavaScript 式を受け付けるこ� attempt to print the value in `r`. This code won’t
+compile because what the value `r` is referring to has gone out of scope b�引数がどのように使われるのか、深く掘り下げてみましょう。
+
+### プロパティ
+
+`setup` 関数の第�ライフサイクルフックに関する無料ビデオを視聴する</VideoLesson>
+
+ライフサイクルフックの前にルドに含まれてしまいます。これはユーザーがダウンロードしなければならない JavaScript の量�---
+badges:
+  - breaking
+---
+
+# イベント API <MigrationBadges :badges="$frontmatter.badges" />
+
+## 概要
+
+インを読んでいるということは、Webpack や Babel のようなモジュールシステムを利用している可能性がらのケースでは、このようにルート要素に `v-once` ディレクティブを加えることによって一度�
+<!--
+If we try to implement the `longest` function as shown in Listing 10-20, it
 won’t compile.
 -->
 
-リスィブの追加
+リスト10-20に示す�n different timezones. The community is growing all the time and we want to make the documentation accessible to as many people  defining this function, we don’t know the concrete values that will
+be passed into this function, so we don’t know whether ��ブとは何か？
 
-提供された値と注入された値をリアateApp(Demo).mount('#demo')
+この言葉はここ最近のプログラミングで頻繁に目にしますが、それにつ�ん。代わりに、 `display: inline-block` を利用するか、または flex コンテキスト内に要素を配置するng 10-19: A `main` function that calls the `longest`
+function to find the longer of two string slices</span>
+-->
+
+<span あるもの、またはより多くのステップや状態変化があるものの場合、0.25 秒ではうまく機能せずo')
 ```
 
-<common-codepen-snippet title="��ドの個々のユニットを分離してテストする�to generated from the `name` attribute or configured with the `mt to print the value in `r`. This code won’t
-compile because wトして、それが完了したら、新しい要素がトラ�ue 3 Guide' })
-    // ここでは明示的に ref の値を使�ブの一部でどのように機能するか既に理解して�ウンロードしなければならないアセットのサイて異なります。DOM を直接操作する場合 (文字列ッ�ストールして、より検査しやすいインターフ�が関数を含んでいる</span>
+<common-codepen-snippet title="Interpolation with style bindings" slug="JjGezQY" :editable="false" />
+
+この例では�` などのプロパティにより、ブラウザはハードウェアアクセラレーションが必要であることを認��プとプライバシーを制御する
 
 <!--
-We define a module with the reference doesn’t live as long as the reference.
+In this section, we’ll talk about modules and other parts of the module system�ンを適用し、より単純なユースケースにすることもできます。
+
+この次のセクションでは、い�= Vue.createApp({...})
+
+app.component('my-component-name', {
+  /* ... */
+})
+```
+
+`app.component` の第一引数がコン�ートレベルのリアクティブなプロパティを動的に追加することはできません。しかしながら、`V| --------------- | -------------------- | -------------------------------------------------------------------------------------��ったり、ひとつの要素に対して動的プロパティでバインディングを行ういずれの場合でも、複こからでも、そしていつでも、トレースを残すことなく変更できてしまうのです。
+
+```js
+const appption">リスト7-2: リスト7-1 のコードのモジュールツリー</span>
+
+<!--
+This tree shows how some of the modules nチームが新機能を構築したり、コードをリファクタリングしたり、バグを修正したりする能力�. Listing 10-17 shows the same code as Listing
+10-16 but with annotations showing the lifetimes of the variables.
 -->
 
-こ�ンに渡すことができ、クライアントとサーバの��ルツリー</span>
+Rustコ�ns/) と呼ばれるアニメーションのテクニックによって、transform を利用した要素の位置をスムーク後で説明します。
 
-<!--
-This tree shows how some of the mo�め、コンテキストにおけるあらゆるデータへとが、そのお互いの大きさが同じであり、水平方�
-<!--
-### The Borrow Checker
--->
+## コンポーネントプロパティへのアクセス
 
-### 借用精査機
-
-<!--
-The��ず、関数が実行中のある時点で使われていた�mple
-
-最後に、究極的には、プロップを受け付け�. By default, it will automatically detect the type that has a lWhen we try to compile this code, we get this error:
--->
-
-す。しかし、それらを回避しリアクティビティ�を設定する際に便利です。
-
-```html
-<script src="httpsriesMatchingSearchQuery = computed(() => {
-    return repositori�れを行うことはできませんが、あとでこの例にと、どちらのボールが硬く、どちらのボールが�ドを実行しているのか知る方法
-
-値が変化した�n this chapter, we’ll discuss common ways you might encounter
-ateEffect` が必要です。次のような実装になるで�クラスベースのアニメーションとトランジショ�ex コンテキスト内に要素を配置することとなり�<!--
-## Summary
--->
-
-## まとめ
-
-<!--
-Sharing code with Cargo tandard library               | 標準ライブラリ
-| string  イドラインを示します。
-
-#### Vue エコシステム�up` の中で便利と思われる他の値を公開しま�
-
-::: tip
-action によって、元の状態を保持するオ�は一般的な JavaScript オブジェクトです。すなわ�VNodes and templates in this way is that you need to provide a sings* to each other, meaning they’re defined in the same modul��、チームのリソースに対するリターンが減少�props のリアクティブを削除してしまうからです㦋ていきましょう！Vue の最大の特徴の 1 つは、�を宣言することで、そのすべての動きを簡単に�ドでCargoを拡張する
-
-<!--
-Cargo is designed so you can ex��
+`setup` が実行されるとき、以下�ラップします。プロキシは ES6 で導入されたもので、 Vue 3 では以前のバージョンの Vue にあった��します。ですが具体的な例を見る前に、コンポーネントについていくつかの重要なことを知っ一部です。
 
 ## 移行の戦略
 
-[移行ビルドのフラグ: `INSTANCE_take a look at the GitHub repositories for some other languages ..
-        }
-      }
-    }
-    return createElement('transition'
+[移行ビルドのフラグ: `INSTANCE_EVENT_EMITTER`](migration-build.html#compat-の設啰字の 3 を入力して SUM を要求すると、スプレッドシートは SUM の結果を返してくれます。なんあ�トのトランジション
 
-<!--
-Listing 7-2 shows the module tree for the structure in Li成できます。 私たちは可能な限り要素をハードutton>
-</transition>
-```
+ここまでで、私たちが管理しているトランジションは以下です:
 
-このようにも書き換えるこ�Notice that this will move the actual DOM nodes instead of beingT_FUNCTIONAL`](migration-build.html#compat-の設定)---
-title: ない）。そのため、エラーが発生した時に、最�がその名前をラベルから取得するかを確認でき�, let’s write a library crate that provides the functionality 次のことが行われます:
-
-1. Vue は、対象の要素がcause we don’t want the `longest` function to take
-ownership oyou have `v-for` inside it. When there are multiple conditional ng] section in Chapter 4 is
-that every reference in Rust has a */button>
-  <button @click="remove">Remove</button>
-  <transition自動的に浅いアンラップ](/guide/reactivity-fundamental��かを知る必要があるものは、この配列を確認�s code would know where to place the code to keep the program or��トでの使用
-
-`setup` がオブジェクトを返す場合�ng changes to code, make it clear which parts of the code change�。
-この章ではこれらの各規則の実例を�はこれについて気にする必要はありませんが、�"Learn how to use methods on Vue School">Learn how to work with ��が存在しないプロパティにアクセスしようと� start, you might want to check whether there was a community tr newValue`
-2. 配列の長さを変更する場合、例えば ` not a concept most other programming languages
-have, so this��。
-
-<!--
-Let’s look at how the lifetime annotations restricS2017 async/await](https://developer.mozilla.org/ja/docs/Web/Jav��ンタラクションを処理します。
-
-コンソールロ��に宣言するべきでしょう。この属性の値は、`a��、ブロックを条件に応じてレンダリングした�ブなコミュニティを持つことには、問題が発�！
-
-<!--
-When we’re defining this function, we don’t know t�は *src/lib.rs*、バイナリクレートでは *src/main.rs*とがわかりましたが、それは改善できないといングカーブを定義するために使用できます。
-
-3. ��。ただし、最初のセルの数字を更新すると、 Sisting 10-18 fixes the code so it doesn’t have a dangling refeuld start with `no-listing-` followed by a number that indicates��クに関する無料ビデオを視聴する</VideoLesson>
-
-㽹立ちます。どのテストが失敗しているかを伝がない場合、挿入、削除のいずれか、あるいは両�適切に破棄され、そして切り替えられるまでのations over and over in particular
-situations. These situations wing]節で議論しなかった詳細の一つに、Rustにお�
-
-<!--
-Now that you know where the lifetimes of references are ` を返すファクトリ関数を受けます。サーバーあ�トに追加された新しいプロパティは変更をト�10-16, which has an outer scope and an inner
-scope.
+- 個別�Commands
 -->
 
-ライ� and the reason it's not being formatted as the contents of thatフロントエンドのコードだけでなく、関連するョンについてのみ取り扱いますが、次の章では�ータとは異なる履歴を使います
-import { createMemorンのどこからでも、そしていつでも、トレース�ntil the end of the inner scope. Run this code, and you’ll seeンのように見える非常にシンプルな例です: returns a reference to `x` and the `else` block returns a
-refer�を実現できますが、JavaScript では複数のハンド、Node.js に加えてブラウザでもテストを実行でき開発者向けの情報
+## 独自のコマンドでCargoを拡張する
 
-もしあなたが React エコシス�and name why
-they’re related. Programmers using this code can vant because it’s possible that more
-deterministic patterns wi�しくは[こちら](single-file-component.html)で解説してr(el) {
+<!--
+Cargo is designed so you can extend it with new subcommands g-01-panic/src/main.rs}}
+```
+
+<!--
+When you run the program, you’ll see something like this:
+-->
+
+このプログラムを実�最高のエラーレポート
+
+テストが失敗した場合、単体テストフレームワークが有用なエラーを提
+このテクニックと前の実装を組み合わせることで、リストへの変更をアニメーションさせるこ�ップされた要素が挿入あるいは削除されるとき、次のことが行われます:
+
+1. Vue は、対象の要素�
+
+<!--
+As an example, let’s write a library crate that provides the functionality of a
+restaurant. We’ll define the signatur�。
+
+<!--
+### Generic Lifetimes in Functions
+-->
+
+### 関数のジェネリックなライフタイム
+
+<!--
+We’ll write a fu��できることです。この機能を利用するための概念として、要素が位置を変更するときに **`v-mov�`context` は一般的な JavaScript オブジェクトで、`setup` の中で便利と思われる他の値を公開します:�れはコンポーネントの状態に依存して、 JavaScript トランジションが異なる挙動する可能性があ�の振る舞いです - entering と leaving は同時に起きます。
+
+時には、これで問題なく、うまく動作す<!--
+Listing 10-18 fixes the code so it doesn’t have a dangling reference and
+compiles without any errors.
+-->
+
+リスト10-18�す。再利用可能なトランジションを作るためには、コンポーネントのルートに `<transition>` またgrammers adding new functionality
+to this code would know where to place the code to keep the program organized.
+-->
+モジれることが重要です。これはアサーションライブラリの仕事です。高品質のエラーメッセージをラリを使うことをおすすめします。まず、ルータを作るためのファイルを作成します。アプこの CodePen を例にとると、どちらのボールが硬く、どちらのボールが柔らかいと思いますか？
+
+< パッケージが提供する機能について説明します。このパッケージにはすでに紹介した `reactive` �アウトして、それが完了したら、新しい要素がトランジションインする。
+
+::: tip
+`out-in` がほと�d provide an example -->
+
+ほとんどの場合、 Vue は、自動的にトランジションが終了したことを見つけ�/vuejs/docs/issues/478) so that the rest of the community can find it.
+
+We also encourage you to update the root-level `README.m�を整理するかについての、クイックリファレンスを提供します。
+この章ではこれらの各規則の) をインストールして、より検査しやすいインターフェイスにするとよいです。
+
+最初の例をコなるタイプのインタラクションを処理します。
+
+コンソールログ以外にも、ここでは思い通りの�で、そのすべての動きを簡単に表現できます（他の JS ライブラリには他の種類のイージングの��、Vue に扱って欲しいタイプを `type` 属性で明示的に宣言するべきでしょう。この属性の値は、ook.title }}</div>
+</template>
+
+<script>
+  import { ref, reactive } from 'vue'
+
+  export default {
+    props: {
+      collection�ールバックは DOM が更新された後に呼ばれます。例えば:```html
+<div id="example">{{ message }}</div>
+```
+
+````rust
+{{#rustdoc_include ../listings/ch10-generic-types-traits-and-lifetimes/listing-10-21/src/main.rs:here}}
+```
+��
+
+## Vue がどのコードを実行しているのか知る方法
+
+値が変化したときにいつでも合計する�borrowing] section in Chapter 4 is
+that every reference in Rust has a *lifetime*, which is the scope for which
+that reference is�をオープンし、同じイベントループで起こる全てのデータ変更をバッファリングします。同じ�is chapter, we’ll discuss common ways you might encounter
+lifetime syntax so you can get comfortable with the concept.
+-->
+
+� Listings without a number should start with `no-listing-` followed by a number that indicates
+    its position in the chapter r
+<!--
+When we try to compile this code, we get this error:
+-->
+
+このコードのコンパイルを試みると、こんなエ�ng. Available values are `"transition"` and `"animation"`. By default, it will automatically detect the type that has a longer dークを評価する際に留意すべきガイドラインを示します。
+
+#### Vue エコシステムとの最適な互換��加します。どの作用が現在実行されているかを知る必要があるものは、この配列を確認でき�e longest
+string slice, we wouldn’t need to specify a lifetime on the `y` parameter. The
+following code will compile:
+-->
+
+何at they are only included in the build if they're used. They can also be imported explicitly if you need direct access to the co,
+  methods: {
+    beforeEnter(el) {
+      // ...
+    },
+    afterEnter(el) {
       // ...
     }
   }
 })
 ```
 
-そして[関数型コンn '$' + value
-  }
-}
-```
-
-それから、この `$filters` オブ would have been written like this:
--->
-
-この関数がライ�とも連携し、特別なセットアップなしで[タイム��了したことを把握するためのイベントリスナ�、何を受け取ったのかなどのコンテキストを提�のローカル登録](component-registration.html#ローカル� `reactive` や `watchEffect` といった関数が含まれるイルでは `createRouter` 関数をエクスポートしま�-post>
-```
-
-値はそのメソッドの第一引数として渡�put.txt}}
-```
+そして[関数型erm, ex: `is an
+  *associated function* of` rather than `is an ‘associated function’ of`.
+* When talking about a method in pit](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/async_function) 構文を用いて、同じこと�依存関係が使われているかを正確に追跡しておらず、関数が実行中のある時点で使われていた�表示において false の場合、何もしません。条件付きブロックは、条件が最初に true になるまで�構造体定義のライフタイム注釈
 
 <!--
-The problem is that `result` goes out ofr. This caveat doesn't apply if the nodes have different types,  のエイリアスなので、同じプロキシを経由しま��しながら、開発者が信頼性の高い方法でアプ�. The compiler will look
-for the module’s code in these places期間の設定
-
-<!-- TODO: validate and provide an example -->
-マッチングやデータのプリフェッチのロジック�を捨ててすべての DOM 要素を再生成したくない� Vue を実際に使って楽しいものを作ってみるこのときは `function` そのものが呼ばれます。
-いず�ostarch.sh`
-- Spot check the files that script created in the `n to allow memory-safe operations and disallow operations that
-wo   |
-| ----------------- | ------------------- |
-| `beforeCreateg the standards of acceptable behavior and are expected to take t} definition (optional)`
-
-- **返り値:**
-
-  - `definition` 弾す。再利用可能なトランジションを作るた�iated function* of` rather than `is an ‘associated function’とを確かめる一番の重要な方法は、ア�てオンザフライで HTML をコンパイルするのでは�、スクリーン拡大、スクリーンコントラストの�ting Library を使用することをおすすめしま�roject in that directory, either by using `cargo new` or copying�ンしてテストで何がうまくいかなかったかを判
-code. We’ll be going through examples of each of these rules に合わないかもしれません。いずれにしても、�いて説明しますが、`v-if`/`v-else` を使った通常�い注意点が発生します。プロキシ化されたオブ� also be imported explicitly if you need direct access to the coibute) は、ユーザが必要とする可能性のある追加れるプロセスです。コードがプロセスにはじめ� produce the result we want when we use it with the
-`main` functンは、それぞれ異なる */
-/* 間隔やタイミング関��。それ以外の場合は認識されません。
-
-### `v-el��かあります。
-
-簡単なプロジェクトはこの�t.html) もあります。---
-badges:
-  - breaking
----
-
-# 関数oot">This is a root element</div>
-</template>
-
-<script>
-  importows that Rust indeed does
-> not allow null values.
+So far, the structs we’ve defined all hold owned types. We can define structs��を作成すると、すべての受信リクエストの間で共有されることになり、リクエスト間での状�rameters that
+define the relationship between the references so the borrow checker can
+perform its analysis.
 -->
 
-> 注釈��、テストがソフトウェアの使用方法に類似しみンをクリックすると、それぞれが独自の `count` ��トは、ユーザには見えませんが、内部では Vue れたデータのように見えます。以下の例を見る�のダイアグラムです。これは今完全に理解する�ender` が再実行されて、新しい VNodes が生成され�か確認してください:
+この�生成されます。これらのプロパティは、 DOM に必要な変更を加えるために使われます。
 
-![aria-label からアクセス可 算出プロパティ
+<div class�トを置き換えてはいけないことに注意してください。なぜなら、状態変化が監視され続けるた�if you have `v-for` inside it. When there are multiple conditional children, as above, `<keep-alive>` requires that only one chien making changes to code, make it clear which parts of the code changed
+  and which stayed the same... not sure how to do this とがわかりましたが、それは改善できないという意味ではありません。将来的には改定される反列における次の変更は検知できません:
 
-<VideoLesson href="https://vueschool.io/が、
-その場合、構造体定義の全参照にライ�前の実装を組み合わせることで、リストへの変�oncept of
-smart pointers isn’t unique to Rust: smart pointers 最適化（SEO）が向上します。
+1. インデックスと一緒にアイテムを直接セットする場�w translation you may want to take a look at the GitHub repositories for some other languages to get a sense of how they handle  add a `rustfmt-ignore` file in the listing's
+  directory and the reason it's not being formatted as the contents of that file (�は、アクションのように見える非常にシンプルな例です:
 
-  現在のところ、��終了すると削除されます。このクラスは、ト�プラグインの統合など、Vue 固有の便利さが提供opy all of the output.
-  - Create a new `output.txt` file with textNum: 10
+```html
+<div id="demo">
+  <button @click="show = ��ルから直接エクスポートしてアプリケーション全体にインポートするのではなく、新しいリクed after an update, it will get applied a moving CSS class (auto generated from the `name` attribute or configured with the `mov�安っぽい表現に聞こえるかもしれませんが、限界はあなたの想像力次第です。# セットアップ
+
+�原則は、テストがソフトウェアの使用方法に類似しているほど、テストの信頼性が高くなると�クラスは、トランジションの名前が先頭に付きます。`<transition>` 要素に名前がない場合は、デ�よりも大幅に高速に実行できようにしてこの問題を解決しています。さらに、ローカルで開発�uter.js'
+import App from './App.vue'
+
+export default function () {
+  const app = createSSRApp(App)
+  const router = createRouternd that Rust programmers
+were entering the same lifetime annotations over and over in particular
+situations. These situations we�にたくさんロジックを入れすぎると、テンプレートが肥大化してメンテナンスしづらくなる可�ferences with Lifetimes
+-->
+
+## ライフタイムで参照を検証する
+
+<!--
+Lifetimes are another kind of generic that we� there’s a problem with the way a function is
+annotated or the way it is called, the compiler errors can point to the part of
+title="Learn how to use methods on Vue School">Learn how to work with data and methods with a free Vue School lesson</Video
+assignment of the value to the `result` variable inside the scope with
+`string2`. Then we’ll move the `println!` that uses `r�ルを生成します。利点はプリレンダリングの設定がよりシンプルで、フロントエンドを完全に�れをもっと簡単にすることを目指す優れたコミュニティプロジェクト [Nuxt.js](https://nuxtjs.org/) �neric type parameters, trait
+bounds, and lifetimes all in one function!
+-->
+
+ジェネリックな型引数、トレイト境界 over the number of threads used, you can send the `--test-threads` flag
+and the number of threads you want to use to the test bes in this way is that you need to provide a suitable `key` attribute. The VNode will be considered static, so any updates will ��数シグニチャにおけるライフタイム注釈
+
+<!--
+To use lifetime annotations in function signatures, we need to de��スを遅らせるという否定を受けてきましたが、最新の E2E ツールは、より信頼性の高い、イン�<!--
+## Summary
+-->
+
+## まとめ
+
+<!--
+We covered a lot in this chapter! Now that you know about generic type
+paramemeters depends on whether they’re related to the struct
+fields or the method parameters and return values.
+-->
+
+構造体にチ�ったと仮定してみます。
+
+## webpack によるコード構造
+
+サーバとクライアントの両方のアプ�s は、データを HTML ではなく、プレーンなテキストとして扱います。実際の HTML として出力するs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-describedby_attribute) は、ユーザが必要とする可能性のあて、また同じコードが異なる場所で実行すると異なる結果が得られるように注意してください（'s functionality, which means that its slot content will not be moved anywhere and instead be rendered where you specified the `of the struct so we can
+use the lifetime parameter in the body of the struct definition. This
+annotation means an instance of `I
+<!--
+Let’s look at how the lifetime annotations restrict the `longest` function by
+passing in references that have differcting an existing tag
+- Run `cargo run --bin release_listings`, which will generate `tmp/listings.tar.gz`
+- Upload `tmp/listingsn this example, `string1` is valid until the end of the outer scope, `string2`
+is valid until the end of the inner scope, and `r�して提供される、`<template>` 要素で `v-if` を使用できます。最終的にレンダリングされる結果は�ストを覚えているでしょうか？ここまでで Vue がこれらの重要なステップをどのように実装して��2 つの要素がお互いの間でトランジションしていますが、そのお互いの大きさが同じであり、�通常は、ライブラリクレートでは *src/lib.rs*、バイナリクレートでは *src/main.rs*）の中を探しま�同期がキーワードです。アプリケーションがローディングスピナーで始まり、API 呼び出しでコpanic.html#panicすべきかするまいか<!--
+# The Rust Programming Language
+-->
+# The Rust Programming Language 日本語版roject maintainers are responsible for clarifying the standards of acceptable behavior and are expected to take appropriate and �どですね。
+
+<!--
+For example, say each of your tests runs some code that creates a file on disk
+named *test-output.txt* an      user: 'John Doe'
     }
   },
-  methods: {
-    randomIndex() {
-      ret��ントリポイント名に `.js` を接尾へ追加したも�す。トラップにはいろいろな種類があり、そ�ge you to do the same. Some community translators use their own 、状態から中間フレームを生成するためのサー�に、プロパティの値が変わったら、作用を再度�ば、ページの他の部分の大きさはそのままで、d19f5e33a781" tab="html,result" :editable="false" />
-
-### カスle string slice. After
-we’ve implemented the `longest` functithe data in that file and asserts that the file contains a parti Old heading. Do not remove or links may break. -->
-<!--
-<a id="ラリや汎用ユーティリティメソッドのコレクシ�った高度なデバッギングヘルパーを実装でき�ameter in the body of the struct definition. This
-annotation mea��ませんでした。そのためには、 webpack で Vue ア�素を表示するための別のオプションは `v-show` �t` という関数が公開されています。この関数は�れた引数を受け取る関数が割り当てられ、イベ�tyle>
-
-<custom1>
-  This could be e.g. documentation for the compbe smoothly animated to its destination using the [FLIP techniqube generated by a script## Release a new version of the listings�トを覚えているでしょうか？ここまでで Vue が�hen the signature specifies a generic type parameter, functions ��。
-
-以下の検索フィールドを見�bj = reactive({
-  count: 0
-}) // オリジナルへの参照は�な HTML ページが表示されます。しかし、このコ�
-
-<!--
-As humans, we can look at this code and see that `string1す。必要なのは:
-
-```js
-// これを変更して
-import Myれを避けるため、代わりに副作用を引き起こすに対応するには、`splice` を使うことができます:�ンスが改善するほか、CSS のルールの誤ったト�<!--
-Here we create a binary crate named `backyard` that illustr�の他
-
-## name
-
-- **型:** `string`
-
-- **詳細:**
-
-  コンction is the same as the smaller of the lifetimes of the values
-��。
-
-時には、これで問題なく、うまく動作す�s we discussed in
-this chapter: Chapter 17 discusses trait objec�ドのみのコードでは、タイマーを設定して、 `b�ント内で `v-model` を実装するもう 1 つの方法は tion details
-not available for outside use. We can choose to makの戻り値の型はコンストラクタのような型です�pe, and anything we tried to do with `r`
-wouldn’t work correct to implement one method named
-`drop` that takes a mutable refer��シとは他のオブジェクトをラップして、その�t
-define the relationship between the references so the borrow c�ルに移動することができます:
-
-```vue
-<template>
-  <uration of transition. By default, Vue waits for the first `tranugh we didn’t call them as such at the time, we’ve already e�ンで説明しますが、ここではビルドのセッ㿅要になります。実際のレンダリング処理は決�u have to call the `std::mem::drop` function provided by the st�タを引数に取ります。まず、第 1 引数はイン�トを出力するようにあらかじめ設定され��トの構文解析の注意点](#dom-テンプレートハ�ication instance)** を作成するところから始まりまって提供される文字列の最初の文字を大文字にのでさらに単純です。代わりに、ただ [動的コン      complete: function() {
-            done()
-            if (�にとってコンテンツ表示までの時間がどれだけrustfmt` on all the listings, update the output when the
-compile�: src/main.rs</span>
-
-```rust
-{{#rus��よりも多くの要素と切り替えたい場合はどう�
-      this.message = 'updated'
-      console.log(this.$el.textCs called, the compiler errors can point to the part of
-our code ve({
-  message: 'Hello'
-})
-
-const appA = createApp({
-  dat�ィは、すべて `$` プレフィックスとなっ�w chapters or edits that we're
-currently working on. We would loent of the value to the `result` variable inside the scope with
-�は関係ないですが、 Vue の設計はその影響を受それだけです。終わりです！
-
-とりあえずスロ�す。`<transition>` 要素に名前がない場合は、デ〧には、これから定義されるキーワードを�う。リスト9-1は、
-ベクタに有効な添え字の範�Web/JavaScript/Reference/Functions/Arrow_functions)をオプ。
-
-## 2.x での構文
-
-`<dynamic-heading>` コ�ing a `String` instead of a string literal:
--->
-
-Rustは、異�スを指す `this` コンテキストとともに呼ばらせるという否定を受けてきましたが、最新の ,
-    template: `<div>Current user is: {{ user }}</div>`
-  })
-}
-��トが肥大化してメンテナンスしづらくなる可�ティ名やイベントハンドラのパラメータはそれ�me `'a` will get the concrete
-lifetime that is equal to the smは、第3章の[「データ型」][data-types]節で講義し�数シグニチャにおけるライフタイム注釈
-
-<!--
-To のポインタのおかげでデータに複数の所有者を�1.0 (file:///projects/hello)
-    Finished dev [unoptimized + debon for understanding
-the features that make Rust unique. In this trait allows you to customize the code that’s run when an in��タックに基づいて構築されていますが、多く�、Rustチームは、Rustプログラマが、
-特定の場面props: {
-    value: {
-      type: Number,
-      required: true
- <!--
-Lifetimes are another kind of generic that we �、代わりにコンポーネントが store に通知する�/instance-methods.html#emit)にイベントの名前を渡してspecifying that the borrow checker should reject any values tha係の一部が変更された場合にのみ再評価されfetime annotations don’t change how long any of the retation of the `longest` function that won’t
-compile:
--->
-
-�enting a project or community include using an official project  ensure that even though the types are generic, they’ll have t、明確でシンプルな文章などの恩恵を受けるこ�play` trait bound is necessary. Because
-lifetimes are a type of �が、異なるのは `v-enter-from` が要素が挿入さ�は、テスト全体の実行に長い時間がかかるこ�
-to a value created within this function. However, this would be��ドが異なる場所で実行すると異なる結果が得それではプラグインオブジェクトの設定を始めばを追加できます。このプラグインは、 Vue アプ�y` 文字列を受け取り、ユーザーから与えられた�くのが難しかった多くの効果を得られます。
-
-<cou must register them if you want to pass them by name. For examts because they do not have instances to be cached.
-  :::
-
-- **S, the Rust compiler
-made more inferences about what we intended m.$nextTick()` というインスタンスメソッドもあり�スナップショットを取る機能です。
-
-**リソースr than the longest
-string slice, we wouldn’t need to specifpassed in to the `longest` function and how the returned refereにマージするかを決定します。言い換えると、�
-and the number of threads you want to use to the test binary. T��発の制約。ブラウザ固有のコードは、特定の�
-```
-
-プロキシでリアクティビティの実装をする�はデフォルトでは getter 関数のみですが、必要�unctional` 属性は削除されました
-- **破壊的変更:***The `use` keyword**: Within a scope, the `use` keyword creates �
-
-<!-- manual-regeneration
-cd listings/ch09-error-handling/listにまとめることができる特別なファイル形式で�: src/lib.rs</span>
-
-```rust,panics,noplayground
-{{#rusowing rules at runtime instead of compile time
--->
-
-* ヒープ�れば `v-show` を選び、条件が実行時に変更するサイズを制御するためにテンプレート内で使用�and Rust’s ownership system, you
-don’t have to remember to c`; and so on.
--->
-
-最初の規則は、コンパイラは参照��リを走らせるのと全く同様に、
-`cargo test`はコ�ey shouldn’t be allowed to that is stored after
-the data strucapi/options-lifecycle-hooks.html#created) フックは、イン�eSSRApp } = require('vue')
-const { renderToString } = require('@�側のスコープが終わった後に移動します。
-リ�import App from './App.vue'
-
-const app = createSSRApp(App)
-
-consrsion number in `rust-toolchain`, which should change the versiolies to input
-lifetimes, and the second and third rules apply to��タマイズされた組み込み要素](https://html.spec.wha番よいのは、この依存関係を宣言的に作成して�て、開発中のテンプレートを確認することも検rver.get('*', async (req, res) => {
-  // ユーザごとにア�ィの形式](/guide/component-props.html#プロパティ� to an `i32` that also has the lifetime `'a`.
--->
-
-例を挙げ�ngs/ch03-common-programming-concepts/no-listing-16-functions/src行と、その処理を実行する条件を設定できてい�を渡すためには、`props` オプションを用いてこ�antExcerpt` that we defined in Listing 10-24.
--->
-
-`impl`ブロ�introduction.html) を読んでいることを前提に書かれpage content, which will be included in $slots.default.
-      </ion called the `Copy` trait that we can place on
-types that are ��すと、忌まわしい `undefined is not a function` エラランタイムのフィルタ API にのみ影響します）   て使用する場合は、最初にそちらをお読みくだ� which is not a reference to anything:
--->
-
-まず、唯一の�ders.</p>
-```
-
-### ボタン
-
-フォーム内でボタンを使�tests are running at the same time, you must make sure your test## Nuxt.js
-
-これまでに議論されたすべての側面を�
-<!--
-If we want to see printed values for passing tests as welで異なるイージングカーブの指定を可能にしまこのページを読み終えて十分に理解できたら、徥下の制限は、DOM で直接テンプレートを書いて�
-
-<!--
-* `Box<T>` for allocating values on the heap
-* `Rc<T>`, are 自身の中にあることに注目してください。こ�.
-    })
-  }
-}
-```
-
-## プラグインを使う
-
-Vue のアプ�dicates that it’s the second line,
-fifth character of our *sr�ら、
-コンパイラはエラーで停止します。
-これ成し、それを DOM にマウントします:
-
-```js
-import��、または驚いたりしたときにどう見えるかの侾�します。さらに、静的なサイトジェネレータ (��例外を除いて Vue 2 とまったく同じように動作ム](component-basics.html) について詳しくは、後で説惈を全て列挙するのではなく、
-ここに示したよ�hen we run this program, we’ll see the following output:
--->
-
-erlaps with the
-scope of `y`. In other words, the generic lifeti�トの値を比較するには、値だけのコピーを作�label>
-    <input
-      type="text"
-      name="name"
-      id="t` instance is valid.
--->
-
-ここの`main`関数は、変数`nov1-panic/src/main.rs}}
-```
-
-<!--
-When you run the program, you’��。
-`Drop`トレイトは、`self`への可変参照を取る`を介して自身のビルトイン API を公開する際に�or functions or structs that use references. However, in
-Chapter```
-
-また、活性化時と終了時の期間を、個別に�、VNode の対応する要素またはコンポーネントイ�行性について議論する時に、マルチスレッドプの式は、現在のアクティブなインスタンスのデ�hey don’t have any special capabilities other than referring tapp = Vue.createApp({})
-
-app.component('my-component-name', {
-  f` and `Drop` traits. The `Deref`
-trait allows an instance of th` to see where you can use them and where
-the ownership rules pr�は、特別な API は必要ありません。
-なぜなら�ンが異なる挙動する可能性があると�  <slot></slot>
-    </div>
-  `
+  template: `<div>Current user is: {{ user }}</div>`
 })
 ```
 
-上で見た通り、コ�in your code, and there’s nothing you can do about
-it. In thesonment variable, you can also have Rust display the call stack wて登録しているのは、非同期のエラー処理では�、理由を説明したり、覚えるのがより簡単にな�
-Examples of behavior that contributes to creating a positive enトを走らせる
-
-<!--
-We can pass the name of any test funcた JS での同じバウンスです:
+それでは、 `renderToString` ��与えるかをテストすることで、E2E テストは、アプリケーションが適切に機能しているかどう� メソッドでクライアントのエントリを更新しましょう:
 
 ```js
-gsap.from(element, we won’t see the `println!` output in the terminal; we’ll smpiler to find the other places that need to change.
-Checking th��。コンパイラの警告がすべて消えた場� Smart Pointers
+// entry-client.js
+import { createSSRApp } fro�た。 `data` で定義されたプロパティは、コンポーネントインスタンスを介して公開されのそれとは異なるものです)
+
+### トランジションクラス
+
+以下は、enter/leave トランジションのた�れ、
+        // 結果的にテンプレート参照は、まだ要素への参照を保持していません。
+      ットフォームの API の違いにより、異なる環境で実行したコードの動作は全く同じものにはなりdiscussed in
+this chapter: Chapter 17 discusses trait objects, which are another way to use
+traits. There are also more complex uter).
+
+## プラグインを書く
+
+独自の Vue.js プラグインの作り方をより理解しやすくするために、`i��ーは、スクリーンリーダー、スクリーン拡大、スクリーンコントラストの制御、または点字表��る場合は、視覚的なラベルを非表示にすることができます。
+
+以下の検索フィールドを見てみて分かるとおり、このメソッドは `Promise` を返すファクトリ関数を受けます。サーバーからコン�静的な HTML ページが表示されます。しかし、このコードは _Hydrate_ ではありません: Vue はまだむ� そのため、とても頻繁に何かを切り替える必要があれば `v-show` を選び、条件が実行時に変更�fe operations and disallow operations that
+would create dangling pointers or otherwise violate memory safety.
+-->
+
+究極的にん。
+
+<!--
+*Smart pointers*, on the other hand, are data structures that act like a
+pointer but also have additional metadata a�ンをマウントしているだけです:
+
+```js
+app.mount('#app')
+```
+
+サーバはすでにマークアップをレン�トをチェックし、オプションでそれらを[検証する](component-custom-events.html#発行されたイベン�d whether you want it to. Most of the time, an error message
+suggesting the `'static` lifetime results from attempting to create�合、
+そのコードに関わるテストのみを走らせたいかもしれません。`cargo test`に走らせたいテス�伝えられます。これによってわずかにパフォーマンスが改善するほか、CSS のルールの誤ったト��はこれで以上ですが、このページを読み終えて十分に理解できたら、後から戻ってきて[コン�の最も重要な部分の 1 つは、デザインがアクセシブルな実装をサポートできることを確認する�ost-demo')
+```
+
+プロパティ属性に値が渡されると、渡されたそのコンポーネントインスタンスのプ�別な処理が必要になるものもあります。
+
+- より複雑なビルドのセットアップとデプロイの要件�を表示する機能です。歴史的に、これらの統合を維持するのは面倒でした。
+
+### 推奨ツール
+
+�のオブジェクトのプロパティを読み込む試みを傍受しています。このようなハンドラ関数は、 *
+-->
+
+多くのRustコードを書いた後、Rustチームは、Rustプログラマが、
+特定の場面で何度も同じラㄟじなのか確かめてみましょう。リスト9-1は、
+ベクタに有効な添え字の範囲の外の添え字でア�# Smart Pointers
 -->
 
 # スマートポインタ
 
 <!--
-A *pointer�数の末端でスコープを抜け、片付けられてし� All
-string literals have the `'static` lifetime, which we can anents-fundamentals?friend=vuejs" title="Free Vue.js Components F)
-- [ルートの `<Transition>` は外部からトグルでき�| クオート
-| trait                          | トレイト
-| happens when a value is about to go out of scope. You can
-provi <body>
-      <h1>My First Heading</h1>
-      <div id="app">${ap�、自分のソースコードに起因する警告の修正に際には考慮すべきいくつかのトレードオフがあを持たせることで実現しています:
-
-```html
-<!-- コ�とを思い出してください。
-:::
-
-## キー修飾子
-
-�ue` ファイルは、3 種類のトップレベル言語ブロ�es in a filesystem,
-you use modules to organize your code. And jor the `drop` method that calls `println!`. The body of the
-`dro��として何を受け取ることを期待して� 10-20:
+A *pointer* is a general concept for a variable that contains an address om the cause of the problem.
 -->
 
-別の例に目を向けましょう。今回は、ow と共に使うときだけ leaveCancelled は有効です
-  ��用があってはなりません。もしそのようなこした状態が必要となることがあります。Vue では�それゆえに、複数のインスタンスで共有され�ィまた ref が依存関係として追跡する時に呼び�す。
-`$PATH`にあるバイナリが`cargo-something`とい�
-<!--
-Rust doesn’t let us call `drop` explicitly because Rust  we need a data type that is more complex
-than those we covered �    | すべての場合において、`data` は関数であ�メタデータと能力があるデータ構造です。
-ス�わせたいときに特に便利です。
-
-こちらが例とでンを構築するためのフレームワークです。デフtion>` only applies the transition behavior to the wrapped conte curly brackets containing `x` was
-in the format string.
+関数にライフタイムを注釈するときは、注釈は関数の本体ではなくシ�es. Let’s look at some examples using the
+struct named `ImportantExcerpt` that we defined in Listing 10-24.
 -->
 
-`ae`節で指定されているように、
-`Display`トレイト�ate these two types of arguments, you list the arguments that
-gon that prints the value of its
-parameter and returns 10, as wel��てそれはフォーム内の全ての入力欄に適用さ�とを `v-bind` ディレクティブへ伝える引数です�riable to get a backtrace of exactly what happened to cause the
- details of specific enforcement policies may be posted separatef the current *scope*. Listing 4-1 shows a
-program with commene.log(vm.count)       // => 4
-
-// vm.count に値を代入する�クな型引数により、
-コードを異なる型に適eturn { count: 4 }
-  }
-})
-
-const vm = app.mount('#app')
-
-consol
-  install: (app, options) => {
-    app.config.globalProperties./vuejs/vue-next/blob/master/packages/shared/src/globalsWhitelist��ベースに保存する前に、常にバックエンドで�;
-another solution is to run the tests one at a time.
--->
-
-例�: ch07-03-paths-for-referring-to-an-item-in-the-module-tree.html�ィを使うのがベターです。次の例を考えてみ㯾します。短期的にはもっとも単純な解決策でぁ�のプロパティを特定の型の値にしたいと思うぃドを呼び出せば同じことができると気づいたか��の後につなげます。
-
-例えば:
+`impl`ブロ�
+correspond to that element in the data structure, even though the memory
+doesn’t belong to that structure. This is called a *�す。Rustでは、
+値がスコープを抜ける度に特定のコードが走るよう指定でき、コンパイラはこンスを作成する、繰り返し実行可能なファクトリ関数を書く必要があります:
 
 ```js
-render() {
-  re-
-This command ran all tests with `add` in the name and filteredn a struct with lifetimes, we use the same syntax as
-that of gent-custom-events.html#発行されたイベントを検証すある、またはエラーになる可能性が高い
+// server.js
+consグ
+| specialized                    | 特殊化された
+| standard library               | 標準ライブラリ
+| string    u can use
+with `cargo test`, and running `cargo test -- --help` displays the options you
+can use after the separator.
+-->
 
-| ID     gesting the `'static` lifetime results from attempting to create「`match`制御フロー演算子」節で、
-`match`アーム�という文脈で、その目標を達成する助けにはなs for struct fields always need to be declared after the `impl`
-��。
-
-- サーバコードを webpack で処理する�は、要素がコンポーネントであるかどうかのチッドは、同じインスタンスを返すので、チェーッ�チされている関数は、それが無効化された時�l
-  <span v-pre>{{ this will not be compiled }}</span>
+コ� require(appPath).default
   ```
 
-##��はハック的なもので、他のライブラリの環境�title="bookTitle"></my-component>
+- すべてのアセットへ正しいパスを定義しなければなりません:
+
+  ```js
+ ��そのままで、ブログ記事のテキストを拡大するアクセシビリティ機能を実装することを決める�過ごされがちです。それゆえに、複数のインスタンスで共有されるべき状態がある場合、オブ� つのユニークな機能は、Node.js に加えてブラウザでもテストを実行できることです。
+
+**リソー�}).mount('#app-b')
 ```
 
-この場合、子コン�ィの方が適切ですが、カスタムウォッチャが必��。
+![State Management](/images/state.png)
 
-[API リファレンス](../api/global-api.html#引数-4)<!--
-We’ve specified a lifetime parameter `'a` for the parar will give you an error
-that you can resolve by adding the liに重要な点は二つあります:
-
-<!--
-* When `s` comes *ind any other crates for this project, but we will in the
-first prsily accomplished! And easy to update on the fly.</p>
-
-他のアte can take a long time. If you’re working on
-code in a particn.html#explanation-of-different-builds) の利用につ�ムを入力するために必要とするすべての情報を�ウェブサイトを作ることを指します。たとえば�シナリオでは、`v-bind="object"` 構文と、同じ要素tps://doc.rust-lang.org/reference/<!--
-## Controlling How Tests��する際のパフォーマンスコストを無視でき�す</span>
-
-<!--
-Running this code will print the following:
---l get a compile-time error. To learn about how to add the `��が何らかの障害を持っており、そのうち 2～4�l Vue CLI Nightwatch Plugin](https://cli.vuejs.org/core-plugins/  <li v-for="item in items" :key="item">
-    {{ item }}
-  </li>
-, the values passed into the function
-> (including, potentially,縛
-| reference                      | 参照
-| reference count e suggestions to use the `'static` lifetime in error messages. Bt` will be used. But there is a way to run multiple tests.
--->
-  },
-  computed: {
-    // 算出 getter 関数
-    publishedBook�ィ
-
-これらはすべて、生の数値として保持され㏂照カウント)の省略形です。
-`Rc<T>`型は、値が�e` の利用
-
-まず、タブインタフェースにおいて�ut lifetime                 | 入力ライフタイム
-| interioを推奨します。
-- `@vue/server-renderer` と `vue` のバ�を追加する
-
-5. 自身の API を提供すると同時に�
-
-<!--
-Remember, when we specify the lifetime parameters in thifetime/src/main.rs:here}}
-```
-
-<!--
-Here, even though we’ve--
-The `Cons` variants own the data they hold, so when we cre�のワークフロー
-
-以下のワークフローは、実際�ンの他の部分に影響を与えずに Vue 3 の API に移 our
-program. String literals are convenient, but they aren’t 
-`onTrack` および `onTrigger` は、開発モードでのみ�ity of the `Drop` trait is almost always used when implementing ;
-  opacity: 0;
-}
-.skipLink:focus {
-  opacity: 1;
-  background-c�ドを返す機能も追加されました。
-
-その結果、� `<template v-for>` のキーは、`<template>` に置くこと�w DOM に見られるスタイルのカプセル化に似てい�, just as we did with generic *type* parameters.
--->
-
-関数シ�ラはそれでも、`main`の終端で値に対して自動�t('update:modelValue', $event.target.value)">
-  `,
-  created() {�数で書く](render-function.html)ことも可能で、オプ�nc` なので、
-    // 暗黙的に Promise でラップされ�class="style-example style-example-bad">
-<h4>悪い例</h4>
-
-```s we have too many h3 elements on this page, set the anchor to bsts, we can use `cargo test -- --ignored`:
--->
-
-`expensive_test`時に使われるからです。
-例えば`Box<T>`はドロッ�して特別な [`is` 属性](/api/special-attributes.html#is) ��トツリー内のどの深さにあってもよく、`<suspennder is determined by the `is` prop. An `is` prop as a string cond if your code
-fits these cases, you don’t need to write the method on the `Option` to move the value out of the `Some` varia = 0
+::: tip
+action によって、元の状態を保持するオブ�を独自のリアクティブプロキシでラップする
+      return reactive(value)
+    } else {
+      return value
+    }stions usually contain a question mark. ;-)'
+      }
     },
-    enter(el, done) {
-      gsap.to(el, {
-        op�ンの各セクションに説明的な見出しをつけると [Number, String],
-    success: { type: String },
-    callback: ー
+    watch: {
+      // question が変わるたびに、この関数�rds
 
-<!--
-There’s another wrinkle we haven’t talked about ye Rust to be able to infer the type.
--->
+Examples of behavior that contributes to creating a positive environment include:- Using welcoming and inclusive language
+-�: src/lib.rs</span>
 
-1行目が関数定義�るエラーメッセージは、ダングリング参照を生should not use `panic!` to
-handle error conditions in the [“Toput() {
-      this.$refs.input.focus()
-    }
-  },
-  mounted() {
-/ count.value を変更される場合にトリガーする
-    h other. Let’s examine how the lifetime annotations
-relate to ns that enumerates the differences between editions and explains�トに分割して構成する方がはるかに理にかなっ受け入れず、`function` 宣言を期待します。
+```rust,panics,noplayground
+{{#rustdoc_include ../listings/ch11-writing-automated-tests/listing-11-10/src/e what happens when a value is about to go out of scope. You can
+provide an implementation for the `Drop` trait on any type, andわせたいときに特に便利です。
 
-- **砨がない時はどうでしょうか？もしくは、どんなt will compile and print `The longest string
-is long string is l�点は主に次の点です:
-
-- 検索エンジンのクロー�/runtime-dom'
-   }
-   ```
-
-5. この時点で、あなたのアトのファイル名とマッチさせるための正規表現
- ��トサイドでのハイドレーション
-
-ハイドレー�す。親は、ネイティブ DOM イベントでの場合と�すときに、単純にジェネリック引数を渡クトとしての現在のノードの子として定義�Using Trait Objects that
-Allow for Values of Different Types”�� Debounce 関数を共有するため、問題が起きる可�り詳細を知るためには、[TypeScript compiler options do--
-We need to add a `use` statement to bring `Rc<T>` into scope s after the `&` of a
-reference, using a space to separate the anstr {
-```
-
-<!--
-You can see that the second rule doesn’t applyrules that govern how a Rust program manages memory.
--->
-
-*所�="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.4/gsap.min.js"��トも_ 返却される前にプロキシに変換され``vue
-<script setup>
-import * as Form from './form-components'
-< the cause of the test failure.
--->
-
-この出力のどこにも�的なアプローチです。
-
-サードパーティのライ�ement that Rust could
-return here that would be correct.
--->
-
---
-Now let’s look at the `String` version:
--->
-
-では、`St the `RefCell<T>`
-type that you can use in conjunction with an `出し、`Some`列挙子から値をムーブし、ト
-
-`createApp(/* オプション */)` で初期化した後、�より明確となります。
-
-![Transition Diagram](/images/t�タ
-| variable                       | 変数
-| variable bindin��イプのボタンとして機能します
-
-  ```html
-  <form ��せます。## Vite SSR
-
-[Vite](https://vitejs.dev/) は、フponent instances without destroying them. Similar to `<transnsitionGroup>` はデフォルトでラッパー要素をレン�ics in the future, you’ll need to figure out what action the ce の解決前にクリーンアップする関数を登録
-  da this in more detail. There are two important bits:
-first, the lction, like so:
--->
-
-既に文字列リテラルは見かけま�on are similar to those when
-assigning a value to a variable. Paたはその他のプレースホルダーの値を使ってく�その評価結果が引数の最終的な値として使わ�ると指定します。
-それを通常通り`'a`と呼ぶの�nter` struct that
-implements the `Drop` trait where we would put��。このため、プラグインを含むテストは特に�copy kinds of clones and the kinds of clones that
-increase the rlt the “Hello, world!” project with Cargo, it would
-only usenction increment() {
-      state.count++
-    }
-
-    // render � removing the semicolon, which
-would fix the error.
--->
-
-メイ�t when using `cargo build` or `cargo run` without the `--releaseop`
-trait. We call it by passing as an argument the value we wan& 非同期コンポーネント](./component-dynamic-async.html
-
-### Event Bus
-
-Event Bus (イベントバス) パターンは�to use any
-parallelism. Running the tests using one thread will ��をインラインで書く利便性を保ちながらデーて、走らせてください。
-以下のような出力が得�トは重要です。
-次の節では、イテレータにつ�普通の HTML とはちょっと違うように見えるかも��めたいけど、どこを参照すれば良いかわかうのも、スペースや引用符のような一部の文�ngs/ch11-writing-automated-tests/listing-11-11/src/lに配置します。
+こちらが例となります:
 
 ```html
-<form action="/dataCollectionLoca the `panic!` macro is
-called, not the line of our code that nction from Listing 15-14, as shown in Listing 15-15, we’ll ge��。残念なことに、デザイナーがアイコン、ロ�ance
-}
-```
-
-:::warning
-[fragments](/guide/migration/fragments.ht�そうでないかに関わらず、最終成果物の中に含
-
-3.x では、ステートフルコンポーネントと関数�ng 10-24: A struct that holds a reference, requiring
-a lifetacing with modules in [“Paths for Referring to an Item in the
-�その代わりに多くの利点があります:
-
-- 使い慣�. This is why we got an error trying to compile the code in
-Liste first and last name.</p>
-  </div>
-  <button type="submit">Subm'',
-        answer: 'Questions usually contain a question mark. �ント](component-custom-events.md)の完全なガイドを読ん。
-:::
-
-### 属性
-
-Mustache は、HTML 属性の内部で�props, context) => {
-  return h(`h${props.level}`, context.attrs<!--
-Note that `Rc<T>` is only for use in single-threaded scenar�は、
-ジェネリクスで関数、構造体、enum、メソ�ール
-  - [MAGic](https://www.freedomscientific.com/products/sub.com/rust-lang/book/issues?q=is%3Aopen+is%3Aissue+label%3AE-he`
-
-SFC 内の `<style>` タグは、ホットアップデート�mentals.html#独立したリアクティブな値を-ref-と�s`変数がスコープを抜ける時です。
-変数がスコ�lue in the second table. The second table contains the represent予測しやすくなります。見出しに関しては、いスできる有効な HTML です。
-
-内部では、Vue はテヾ�します(ただし、`v-for` と `v-on` は例外で、こ�l registration name (the key in the parent's `components` option
-
-<!--
-Because the third rule really only applies in method signut being able to mutate data is very useful! In the next
-section��できません。参照するとコンパイルエラ�tely, we can’t put a blob of memory into the
-binary for each p
-Vue は、 `methods` の `this` を自動的に束縛して、�` 修飾子の処理
-
-フォーム入力バインディングに!-- これはコンパイラ警告を引き起こします -->
-<��3.2 のリリースラインと並行して引き続き公開�ば `src/main.js`）でベースコンポーネントをグロ�', {
-  props: {
-    firstName: String,
-    lastName: String
-  },同じ関数内で監視しているソースの両方を同時�変
-| immutability                   | 不変性
-| implement   on’t require you to think about the stack and the
-> heap very ��。
-
-<!--
-The reason is that types such as integers that have  the Secret
-Number”][comparing-the-guess-to-the-secret-number]に置き換える必要があります:
-
-  ```js
-  // server.js<ruby>詳<rp>(</rp><rt>つまび</rt><rp>)</rp></ruby>らかに聯、ウォッチャの振る舞いのデバッグに利用〧を向上させたいなら、
-変数に型注釈を加える�トの [setup()](composition-api-setup.html) 関数または [はある程度の利便性をもたらしましたが、ルー�リビュータがすべてを投げ出して取り組みます�ues to cause the panic and what the code should do instead.
--->
-がコンポーネント自体であるべきことが多いで�、Rustのようなシステムプログラミング言語に�f the `clone` method in action:
+<link
+  href="https://cdnjs.cloudflare.com/�の数値として保持されているか、あるいは数値に変換することが可能です。一度それをすれば�
+of the `longest` function. We’re also trying to return a reference to `result`
+from the function. There is no way we can spec<!--
+Here we create a binary crate named `backyard` that illustrates these rules. The
+crate’s directory, also named `backyard`ameter annotations after the `&` of a
+reference, using a space to separate the annotation from the reference’s type.
 -->
 
-これは、`clone`メソ�l="name" />
-</label>
-```
+ラ�ィにバインドする
+- `input` では、 `update:modelValue` イベントを新しい値と共に発行する
 
-一致する id で明示的にラベこれができるのは、検索ボタンが視覚的にユー� が `currentTabComponent` の新しいインスタンスを作�brary code, or crates that you’re using. Let’s try getting ats called only once when
-the value is no longer being used.
--->
-reventing-ref-cycles] section.
+以下のよ� a mutable
+reference to an `i32` that also has the lifetime `'a`.
 -->
 
-プログラム内で参照�
-  props: ['title'],
-  template: `<h4>{{ title }}</h4>`
-})
-
-app動くのかについて少し知っておくことが重要で�
-
-## NPM パッケージ内の公式型宣言
-
-静的型シス�thout any lifetimes associated with the
-references:
+例を挙げましょう: ライフタイム引数なし�fetimes, and the second and third rules apply to output lifetimes. If the
+compiler gets to the end of the three rules and there <!--
+Note that `Rc<T>` is only for use in single-threaded scenarios. When we discuss
+concurrency in Chapter 16, we’ll cover ho when the moving class is applied, the element will be smoothly animated to its destination using the [FLIP technique](https://a��などの副作用があってはなりません。もしそのようなことをしたくなったら、代わりに [ライ㳨釈が必要なくなることがよくあります。
+リスト10-24で定義した`ImportantExcerpt`という構造体を使 borrowing rules at runtime instead of compile time
 -->
 
-コ�
-> certain amount of space. The memory allocator finds an empty --
-is a block that, in this case, evaluates to `4`. That value griable will have a value that probably isn’t what you were exp��ーンな HTML として解釈されます。Vue は、文字�buginfo] target(s) in 1.0 secs
-     Running `target/debug/hello`��力しています。
+* ヒープに値を確保する`Box<T>`
+* 複数の所有権を可� new chapters or edits that we're
+currently working on. We would love if you would read through those and make
+comments for any ��なデータを含む複雑なロジックには**算出プロパティ**を使うべきです。
 
-<!--
-In `main`, we create two instan. This example’s purpose is to
-give you a visual guide to how 
-<!--
-However, the second part is different. In languages with a�を注釈する必要はありません。
+### 基本的な例
 
-<!--
-Here is an exa!--
-#### Filtering to Run Multiple Tests
--->
-
-#### 複数のテ�う方法と、明示的に`panic!`マクロを呼び出す方�xample of ownership, we’ll look at the *scope* of some variab的にインポートしなければいけません:
-
-```j
-
-上の HTML の DOM ノードツリーはこんな感じにな�
-
-- **使用方法:**
-
-  ```js
-  app.component('base-input', {
-覧です。Rustのバックトレースも、
-他の言語同�uct which could reasonably be considered inappropriate in a profe; this encompasses where the hosts seat customers, servers take��す）。
-
-- [watchEffect](#watcheffect) と比較して、 `wto be cleaned
-> up by the operating system. If in your project yg enough space
-> to hold the data and then perform bookkeeping tを求めます。
-> メモリアロケータはヒープ上に�ion in Rust will be familiar to you if you’ve used RAII
-> patthe way we want it to yet. The key
-is the logic in the closures rd to adjust the channel to use values of type `Message` ratheorg/resources/linkcontrastchecker)
-- その他の便利なツーion/custom-elements-interop.html#customized-built-in-elements)
-
-ーが起こります: Property 'filter' does not exist on type ��除する代わりに `false` を `'false'` に強制する
-
-3vue
-<style scoped>
-:slotted(div) {
-  color: red;
-}
-</style>
-```
-`html
-<input
-  v-bind:value="newTodoText"
-  v-bind:placeholder="ngs/ch15-smart-pointers/listing-15-15/src/ma�に、`Box<T>`の箇所に`Rc<T>`を使うように変�2` type. This type declaration indicates that the
-value it’s aトを入れ子にしたツリー状に構成さか議論してください。参照用のリンクは必須で�s when you try to use `s1` after `s2` is
-created; it won�ethod is defined in the `Iterator` trait and limits the iterat=> {
-  const { app } = createApp()
-
-  const appContent = await r�が、中にはまだベータ版やリリース候補版のも> Keeping track of what parts of code are using what data on the�は、引数としてデフォルト関数に渡さ�ルタを使用して、一度に 1 つの項目を修正する--
-You’ll get an error like this because Rust prevents you fro��です:
-
-```rust
-let x = 5;
-```
-
-<!--
-Second, the `five` funct��てしまいました。ユーザーは元のグローバル訿ンス化する際にコピーされます:
-
-```js
-// before - -method">
-  <!-- `greet` は、あらかじめ定義したメソone of them is `&self` or `&mut self` because this is a method,  a package. As we add more information to
-this file, we’ll add
-レガシーな [HTML5 のセマンティック要素をサポ�して、コンポーネントで定義することが出来ま��のを見ましたね。
-この付録ではその意味につection of Chapter 1][install]
-to install or update Rust.
--->
-こcan be used to
-access the heap data." src="img/trpl04-04.svg" cl`
-lists will then continue on to the first `a` list containing 5ngs/ch05-using-structs-to-structure-related-data/listing-05-08/spen and welcoming environment, we as contributors and maintainerdata stored on the stack must have a known, fixed size. Data wit
-<!--
-At the time of this writing, three Rust editions are availter* the `main` function in the source code; we could have defin��
-
-Vue 2 では、以下のフックを使用して要素のラ��とそのミックスインや継承元の `data()` がマー�k="count++">
-      Clicked {{ count }} times.
-    </button>
-  `
-前に、なにか非同期のリクエストを実行する�ent.stopPropagation()`  の呼び出しは、様々な場面で�n value. However, there are cases when a single value might havereturn () =>
-      h('div', {
-        ref: root
+```ht�グの後に ref に代入されます
+        console.log(root.value) // <div>This is a root element</div>
       })
 
-    //
-複数の同期的な変更は、ウォッチャを一度しか的なユースケースでも、ユーザーが手動でブー�トの使い方のさらなる情報は、以下を見てく�ます！ -->
-<keep-alive>
-  <component :is="current-
-We could change the definition of `Cons` to hold references inof the function `plus_one` says that it will return an
-`i32`, bus of different
-types, we can define and use an enum!
--->
+      �を返します。
 
-ベク��トに含めたい場合、問題はさらに悪化しま�は、読み込みの状態は `<Suspense>` から制御さコトがトリガされた際 `event.preventDefault()` を呼ぶ�トとスクリプトの相互分析によるコンパイル時e 3 の動作にして、特定の compat 機能だけを有効。ここに`Copy`を実装する型の一部を並べておきけると、データの所有権が別の変数にムーブされe parts of our program to read and we can’t determine at compitions can contain incompatible changes, such as including a new �たが書くRustコードの多くを構成します。
-数学�--
-The first command creates a new directory and project called�照が有効であると見なせません。`longest`関数�で、
-この関数は`count`ではなく`strong_count`と命名 then we call `join` on that worker’s
-thread. If the call tts. There’s a place for everything, and
-everything is in its priable name and parentheses as
-if the variable name were a func��ジで繰り返されるコンテンツをスキップでき�入れる値を持つ、`onclick`、`onfocus`、`onmouseenter` �ある API を作成しました。Vue 2 では、似たよう�ード内のハンドラ関数を探すことを容易にし�olveDynamicComponent` をつかって `is` 属性を実装してthe
-end of a vector, which will cause a call to `panic!`</span>atements and Expressions
--->
+厳密には [MVVM パターン](https://en.wikipedia.org/wiki/Model_View_ViewModel) とは関係ないで� we didn’t call them as such at the time, we’ve already encountered a few
+smart pointers in this book, including `String` anス可能な名前が変更されたか確認してください:
 
-### 文と式
+![aria-label からアクセス可能な入力欄の名前を�と、
+コンパイラに教えています。
+実際には、`longest`関数が返す参照のライフタイムは、関数倂
+これは概念的には図15-3のような見た目になります:
 
 <!--
-Function bodievariant that will cause the
-thread to exit its loop and stop.
---��ツとして分離され、意味のあるものにな�（XSSI）などの HTTP セキュリティの脆弱性は、主�で、戻り値型は`&self`のライフタイムを得て、
-�n manually. As a result, our examples will be a
-bit more conciseを強制します。しかし、これは非効率的であっ�']
+<img alt="Two lists that share ownership of a thir�しくない環境にいる人など、誰もが利用できるウェブサイトを作ることを指します。たとえばイアグラム
+
+以下はインスタンスライフサイクルのダイアグラムです。これは今完全に理解する�ible: false` を指定することで、 `Suspense` の制御から外すことができ、常にコンポーネントが自身㕰は `this` を持たないため、`this` は他の変数のように親のスコープ内を辞書探索され、しばしば�はネイティブの [カスタマイズされた組み込み要素](https://html.spec.whatwg.org/multipage/custom-elements.ht
+<!-- Old heading. Do not remove or links may break. -->
+<!--
+<a id="ways-variables-and-data-interact-move"></a>
+-->
+
+<!--
+#### , where the value of the string is
+hardcoded into the text of our program. The variable is valid from the point at
+which it’s er. Because the
+tests are running at the same time, you must make sure your tests don’t depend
+on each other or on any shared �ンは、CSS トランジションと同じように適用されますが、異なるのは `v-enter-from` が要素�"></my-component>
+```
+
+[プロパティの形式](/guide/component-props.html#プロパティの形式-キャメルケー�トの基本](component-basics.md) を読んでいる事を前提としています。コンポーネントをよく知らなングが起こるたびに**常に**関数を実行します。
+
+どうしてキャッシングが必要なのでし�,
+  computed: {
+    value: {
+      get() {
+        return this.modelValue
+      },
+      set(value) {
+        this.$emit('update�トを修正するとプレースホルダが入力欄に事前入力されたデータのように見えます。以下の例�う。
+その調子でいきましょう！
+
+<!--
+When you understand ownership, you’ll have a solid foundation for understandses, Rust’s test library captures anything printed to
+standard output. For example, if we call `println!` in a test and the te��のが一般的なアプローチです。
+
+サードパーティのライブラリが Universal での利用を考慮して `number | { enter: number, leave: number }`. Specifies the duration of transition. By default, Vue waits for the first `transitるのを好む場合、テンプレートの代わりに[直接 render 関数で書く](render-function.html)ことも可能�ンが動作しなかったとしても、そのようなケースへの対応として移行ビルドを調整する�経由して登録しているのは、非同期のエラー処理では、返り値が非常に重要だからです。デー�のは難しいかもしれないことに注意してください。グローバル変数の一部をモックして動かす�
+
+<!--
+You can see that the second rule doesn’t apply because there is more than one
+input lifetime. The third rule doesn�
+
+<VideoLesson href="https://vueschool.io/courses/vue-js-3-components-fundamentals?friend=vuejs" title="Free Vue.js Components ��トは重要です。
+次の節では、イテレータについて議論します。多くのイテレータメソ�
+  - `{string} name`
+  - `{Function | Object} definition (optional)`
+
+- **返り値:**
+
+  - `definition` 引数が渡��ァレンス](../api/application-api.html) で閲覧できます。
+
+## ルートコンポーネント
+
+`createApp` に渡さ�t {
+  props: ['level']
 }
 </script>
 ```
 
 ## 3.x での構文
 
-### 関数で作られ�ue-prototype-は-config-globalproperties-と置換) |
-| GLOBAL_Scintosh キーボードの場合、meta はコマンドキー（��ムがあり、参照を使用する関数や構造体には�ラムを先ほどの例と置き換えて、
-`cargo run`で走�。
+### 関数で作られるコンポーネント
 
-```console
-$ cargo --version
+Vue 3 では、す�hout lifetime annotations.
+-->
+
+全参照にはライフタイムがあり、参照を使用する関数や構造体にはライ the remaining
+references should be. Instead of guessing, the compiler will give you an error
+that you can resolve by adding the    | 再束縛
+| reference                      | 参照
+| reference count                | 参照カウント
+| regression   の注意点は、 `beforeCreate` と `created` でグローバルな副作用を引き起こすコードは避けるべきと�h as
+accessing an array past the end) or by explicitly calling the `panic!` macro.
+In both cases, we cause a panic in our progra }
+      ...
+    })
+
+    app.mixin({
+      created() {
+        // 何らかのロジック ...
+      }
+      ...
+    })
+  }
+}
+��行けば、`panic!`マクロ呼び出しがあるわけです。
+それ以外では、`panic!`呼び出しが、自分のコ�rned does *not* refer to one of the parameters, it must refer
+to a value created within this function. However, this would be a ��テートフルコンポーネントに複数のルートノードを返す機能も追加されました。
+
+その結果、郈では、通常 SFC コンパイラを [Vite](https://vitejs.dev/) や（[webpack](https://webpack.js.org/) をベースとしo lifetime parameters when we started working with it in Listing 10-20:
+-->
+
+別の例に目を向けましょう。今回は、e. If you’re working on
+code in a particular area, you might want to run only the tests pertaining to
+that code. You can choos��ーティリティメソッドのコレクションなどの      -->
+<!-- 豊富なエコシステムがすでに存在する!--
+We need to add a `use` statement to bring `Rc<T>` into scope because it’s not
+in the prelude. In `main`, we create the l" tab="js,result" theme="light" :preview="false" :editable="false" />
+
+chrome デベロッパツールでこの要素を検証ため、高いトラフィックが予想される場合は、対応するサーバ負荷に備えて、キャッシュ戦略を�
+
+<!--
+Using `cargo run` is more convenient than having to remember to run `cargo
+build` and then use the whole path to the bina�に役に立ちます。テンプレートが JavaScript の式をサポートしていれば、どこでもメソッドを呼は、そのプラグインが 2 番目のパラメータとして何を受け取ることを期待しているのか、必ずド�カスされていない時にリンクを非表示にするには、以下のスタイルを追加します:
+
+```css
+.skipLink�列スライス
+[reference]: https://doc.rust-lang.org/reference/<!--
+## Controlling How Tests Are Run
+-->
+
+## テストの実�lar to that in other programming languages. Now we’ll build on top of this
+understanding by introducing the `String` type.
+0.1"` リスナによって、親コンポーネントはこのイベントを受け取り `postFontSize` の値を更新する�、他のユーザから視覚的に利用可能になります。フォーカス可能な要素や、純粋に装飾的なコム、実用的な環境設定、そして開発者の拡張性を活用して、あなたのアイデアを設計し構築する㸀部として渡されなくなりました。
+
+## 2.x での構文
+
+Vue 2 では、以下のフックを使用して要素の�ll demonstrate how these closure features allow for code reuse and behavior
+customization.
+-->
+
+Rustのクロージャは、変�で、
+リスト15-15の`main`を変更して`drop`関数を呼び出せます。リスト15-16のようにですね:
+
+<!--
+��ダとして `<slot>` を使います。それだけです。終わりです！
+
+とりあえずスロットに�れる関数の実行をします。
+
+例えば [created](../api/options-lifecycle-hooks.html#created) フックは、イ�素上に含むことができるかに注目してください。そしてそれはフォーム内の全ての入力欄に適�     | 所有権を持った
+| owner                          | 所有者
+| ownership                      | 所有権
+| panic  �構造体とは異なり、
+スマートポインタが`Deref`と`Drop`トレイトを実装します。`Deref`トレイトに�d investigated and will result in a response that is deemed necessary and appropriate to the circumstances. The project team is �です:
+
+```text
+$ cargo run
+   Compiling hello v0.1.0 (file:///projects/hello)
+    Finished dev [unoptimized + debuginfoexperiments that vary the values and lifetimes of the
+references passed in to the `longest` function and how the returned refereeed to be cleaned
+> up by the operating system. If in your project you need to make the resulting
+> binary as small as possible,��トの推論をオーバーライドするために ref を呼び出すときに、単純にジェネリック引数を渡� 3.2.0 では、`watchPostEffect` と `watchSyncEffect` のエイリアスを使って、コードの意図をより明確にす�ゴは生き物に似ていますが、本当に生きているようには見えません。
+
+Vue はそれを手助けでき、`defineComponent` の戻り値の型はコンストラクタのような型ですが、これは TSX の推論にのみ使用�書かれている理由です。このことは、あなたが Vue 3 とともに TypeScript を使うために追加のツー�
+
+Vue のテンプレートを DOM に直接書いている場合、Vue は DOM からテンプレート文字列を取得するe for the entire duration of the program. All
+string literals have the `'static` lifetime, which we can annotate as follows:
+-->��体がなんらかの型`T`に関して、
+ジェネリックであると述べていて、その型がなんであれ、`x`�tation for the component.
+</custom1>
+```
+
+## 言語ブロック
+
+### `<template>`
+
+- 各 `*.vue` ファイルは一度に最大 使う場合と同様に、状態のトランジションの背後にあるデータはリタルタイムに更新でき、これたら、第4章で議論した借用ルールの1つを侵害する<ruby>虞<rp>(</rp><rt>おそれ</rt><rp>)</rp></ruby>が�ツに対しては**決して**使用してはいけません。
+:::
+
+### 属性
+
+Mustache は、HTML 属性の内部で使用�he
+instance goes out of scope, to show when Rust runs the `drop` function.
+-->
+
+リスト15-14では、コンパイラがいつ`�
+
+- コンポーネントが受け取った生のプロパティは、引数としてデフォルト関数に渡�"Component basics: reusing components" slug="rNVqYvM" tab="result" :preview="false" />
+
+ボタンをクリックすると、そ�て、リアクティブな配列やオブジェクトの値を比較するには、値だけのコピーを作っておく必胫にまとめることができる特別なファイル形式です。これが SFC の例です:
+
+```vue
+<script>
+export�した！ `updated` と似たようなものが多すぎて冗長です。代わりに `updated` を使ってください。
+- >` does not work with functional components because they do not have instances to be cached.
+  :::
+
+- **See also:** [Dynamic Comr 17 in the “Using Trait Objects that
+Allow for Values of Different Types” section, we mentioned that to use traits
+as trait��たテストがあったことを知らせてくれています。
+
+<!--
+We can’t specify the names of multiple tests in th`$emit` 呼び出しに渡された引数を受け取る関数が割り当てられ、イベントが有効かどうかを示す��フタイム
+| lifetime elision               | ライフタイムの省略
+| lifetime parameter             | ライフタイか。
+
+<!--
+Here’s an example of the `clone` method in action:
+-->
+
+これは、`clone`メソッドの動作例です:
+
+```ru```
+
+また、別の `ref` をコンポーネント自体に追加し、それを使用して親コンポーネントからの `��クで構成されています: `<template>` と `<script>` と `<style>` です:- `<script>` セクションは、標準的�e’ll apply these rules to figure out the
+lifetimes of the references in the signature of the `first_word` function in
+Listinngs/ch15-smart-pointers/listing-15-14/output.txt}}
 ```
 
 <!--
-If you see a versioじノードのあらゆる他のバインディングが影響�4 にアップグレード](https://next.router.vuejs.org/guide/て実装されているため、[Language Service Protocol](htt be able to use that dependency. The
-opposite situation, where lare
-the type of an integer value.
--->
+Rust automatically called `drop` for us when our instances went outn
+expression. Calling a macro is an expression. A new scope block created with
+curly brackets is an expression, for example:
+-->�の宣言されている順番がそれらをどのようにマージするかを決定します。言い換えると、開発�html
+<transition-group tag="ul">
+  <li v-for="item in items" :key="item">
+    {{ item }}
+  </li>
+</transition-group>
+```
 
-*整数*とは、小数�は、1 つしか存在しえないことを示すために `The��のか
--->
+�に、関数を使って ref に独自処理を行うようにします。
 
-<!--
-By controlling which tests run, you can make an index that doesn’t exist, Rust will stop execution and ref��ついたもののことです。
-Rustの浮動小数点型は of a tuple, we can
-use pattern matching to destructure a tuple or those parameters. Technically, the concrete
-values are called�があると、仮引数に対して具体的な値を与える�合、 `v-model` は代わりにこれを行いま�dge/) を試してみてください。複雑なプロダクシ�l-api-treeshaking.html) にあるように、名前付きエク�pected in more
-complicated situations when we want to have multadata to your
-*Cargo.toml* file about an edition. This appendix install -g @vue/cli # OR yarn global add @vue/cli
-  vue create ��本質的に `resolve` と `reject` を引数にとらず、� dereferencing                  | 参照外し
-| destructor     To demonstrate how to run a subset of tests, we’ll first creat�縛された`"hello"`という値を保持する`String`のメ�ship
-of the data has been moved to another variable.
--->
-
-変数�ョン API ドキュメント](/api/application-api.html) を�FIG_IGNORED_ELEMENTS  | ◐    | `config.ignoredElements` は `c�り、特に指定しない限り、アイコンが一貫してく、データの一貫性を確保するのにも役立�u know that some arbitrary code is being
-executed and that code ��せて使う時、
-  // done コールバックはオプ㱺策はたくさんあります。
-
-## ハイブリッドアプ��。リアクティブなデータは、親コンn a program that an instance of a particular
-type is finished we>
-<script>
-  export default {
-    inheritAttrs: false
+```html
+<template>
+  <div v-for="(item, i) in list"��グごとに繰り返し呼び出される関数を default でエクスポートします。いまのところは、�return '$' + value
   }
-</scr�。一般的に、XSS を許してしまう 2 つのシナ�class="hide-from-sidebar">(エラー防止)</span>
+}
+```
 
-### 複数�s" slug="JjEyrYZ" :height="467" tab="js,result" theme="light" :p��゚ーネントへのデータの受け渡し) と [イベ�on/array-refs.html)
+それから、この `$filters` オブジェクトを使って、次のようにすべてのテの返り値に対して、イミュータブルでリアクティブな [ref](./reactivity-fundamentals.html#独立したリアの string 以外の値は、警告を発生させます。
 
-### コンポーネント
+#### 動的引数の式の制約
 
-- [関数コン�stには、
-2種類目の文字列型、`String`型があ�ctions return the last expression implicitly. Here’s an exr than a concrete type. We could
-have chosen a different name fo��部になりました。
-
-```js
-{
-  text: 'this is an attribuに警告を表示していました。その結果、このエ�を導入しました。
-
-## 新しいグローバル API: `crea�数が妥当かどうかを示すブール値を返す必�s has a special name, *unit*. This value and its
-corresponding ttions, structs, enums, and methods using
-generics. Then we’lhow component props work with a free lesson on Vue School</Videon that case.
+動的引数の式には構文上�en
+the value is no longer being used.
 -->
 
-第17章で議論したように、`Option`の正当な理由を持ち続ける限り、独自のコ�ropped before the end of main.`テキストの間に出力され we only need to consider the deep-copy clones and can disregardなんらかの作業を行う。
-* *https://crates.io* でス�orks the same way with `Vec<T>` and `String` is the `new`
-functi�長ですね。算出プロパティで書き換えたものとmponent basics: passing props" slug="PoqyOaX" tab="result" :prev��、まだ要素への参照を保持していません。
-    Advanced Types
--->
-
-## 高度な型
+まだ使用中の値を間違って片付けてしまうことに起因する問題�ープ
 
 <!--
-The Rust type system hngs/ch06-enums-and-pattern-matching/no-listing-01-defining-enums��ムによるアクセスができます。支援技術に依僬クタを使ってテンプレートをターゲットにし�, so we might assume that the way it works would be the
-same: thl-c</span> method to halt the main thread, all other
-threads aref any type.
+Returning values can also transfer ownership. Listing 4-4 shows an example of a
+function that returns some value, w<T>`を`Weak<T>`に変換する」][preventing-ref-cycles]節で確かめます。
+
+<!--
+This code prints the following:
 -->
 
-構造体を定義して`<>`記法で1つ以上
-| assignment                     | 代入
-| associated -       o call `join` on each of the threads in
-the pool so they can finpath.join(__dirname, '/dist/client/index.html'),
+��現れません。省略記法の構文の利用は完全に任意ですが、後でその使用方法について詳しく学��るはずです。
+
+   コマンドラインとブラウザのコンソールの両方に、たくさんの警告が表�ch: </label>
+    <input type="text" name="search" id="search" v-model="search" />
+    <input
+      type="image"
+      class="btnrace by setting the `RUST_BACKTRACE` environment variable to any value
+except 0. Listing 9-2 shows output similar to what you’ト9-2のような出力が得られるでしょう。
+
+<!-- manual-regeneration
+cd listings/ch09-error-handling/listing-09-01
+Rう。
+> しかし、Rustのようなシステムプログラミング言語においては、値がスタックに積まれる-
+Rust won’t let us annotate a type with `Copy` if the type, or any of its parts,
+has implemented the `Drop` trait. If the tymethod on the `Option` to move the value out of the `Some` variant and
+leave a `None` variant in its place. In other words, a `Wing 可能ではなく、実際にどこで使われているかそうでないかに関わらず、最終成果物の中に含� ></blog-post>
+</div>
+```
+
+上記では、 `v-bind` を用いて動的にプロパティを渡すことができると分かり�ust have a known, fixed size. Data with an unknown
+> size at compile time or a size that might change must be stored on the heaptation called the `Copy` trait that we can place on
+types that are stored on the stack, as integers are (we’ll talk more aboute, if you’re using Rust 2015 and one of your dependencies uses
+Rust 2018, your project will compile and be able to use that de��なくても、自身の状態（選択された投稿）を保持するようになります。
+
+`<keep-alive>` の詳細な�change the definition of `Cons` to hold references instead, but then
+we would have to specify lifetime parameters. By specifyinghave to call the `std::mem::drop` function provided by the standard library
+if you want to force a value to be dropped before th��します。他のデータに基づいて変更しなければならないデータがある場合（AngularJS をやって�rates*. We won’t need any other crates for this project, but we will in the
+first project in Chapter 2, so we’ll use this de��ャで環境をキャプチャする
+
+<!--
+We’ll first examine how we can use closures to capture values from the
+environ`html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.4/gsap.min.js"></script>
+
+<div id="app">
+  <input v-model.numcan create a `String` from a string
+literal using the `from` function, like so:
+-->
+
+既に文字列リテラルは見かけま�
+parameter that’s a reference. In other words, a function with one parameter gets
+one lifetime parameter: `fn foo<'a>(x: &'a iual values out of a tuple, we can
+use pattern matching to destructure a tuple value, like this:
+-->
+
+変数`tup`は、タプル�sage states that we’re not allowed to explicitly call `drop`. The
+error message uses the term *destructor*, which is the generって提供される文字列の最初の文字を大文字にするカスタム修飾子の例、`capitalize` を作成して�# name
+
+- **型:** `string`
+
+- **詳細:**
+
+  コンポーネントがテンプレートの中で自分自身を再帰的に呼�ro), but the vector has only 3 elements.
+In this situation, Rust will panic. Using `[]` is supposed to return an
+element, but ifータ型にも適用されます。
+`String`型については、[第8章][ch8]でより深く議論します。
+
+<!--
+We’ve ngs/ch03-common-programming-concepts/no-listing-16-functions/src/main.rs}}
+```
+
+<!--
+We define a function in Rust by entering `f�実行
+})
+```
+
+`Vue.nextTick()` を直接呼び出すと、忌まわしい `undefined is not a function` エラーになるで�join(__dirname, '/dist/client/index.html'),
     'utf-8'
-  )実行可能なオプションではない場合に役に立ち�信にも使えます。プロパティを必要としないコ�ント定義を提供できないことを正確に伝えるた�n: requiring type annotations in function
-definitions means the tandard
-library provides, which we used in Chapter 6:
+  )
+
+  server.get('*', async (req, res) => {
+    const { app } = createAの移行方法は、この属性を削除して、 `props` を `$props` に、 `attrs` を `$attrs` にすべての参照を変t on the way Rust code is written. It may seem
+simple right now, but the behavior of code can be unexpected in more
+complicated tadata to your
+*Cargo.toml* file about an edition. This appendix talks about what that means!
+-->
+第1章で、`cargo new`が �--
+Given that the smart pointer pattern is a general design pattern used
+frequently in Rust, this chapter won’t cover every ex's Official Website](https://devexpress.github.io/testcafe/)# セマンティクス
+
+## フォーム
+
+フォームを作成す� {
+    // ...
+  },
+  // v-show と共に使うときだけ leaveCancelled は有効です
+  leaveCancelled(el) {
+    // ...
+  }
+5), and a pointer to the first
+value in the second table. The second table contains the representation of the
+string data on the--
+The code in Listing 20-21 is responding to requests asynchronously through the
+use of a thread pool, as we intended. We get sがどんなものであれ、フレームワークのサイズによる懸念はずっと小さくなります。
+
+::: warning in the `drop` method, printing our final message. Note that we didn’t need to
+call the `drop` method explicitly.
 -->
 
-ample, that when we pass `3` to the
-`add_two` function, the re�は、配列構文ではなくオブジェクト構文で定�保つために、値が空文字である場合も含まれま�       compilerOptions: {
-               compatConfig: {
-   �ずっと小さくなります。
+`main`�```
 
-::: warning 重要
-上記は�、 ["Treating vue as external dependency"](https://rollupjs.oror passed 'el' that DOM element as the argument, something ...
- 、2番目の規則を適用します。2番目の規則は、1トリに格納する
+リスト内のクラスを条件に応じて切り替えたい場合は、三項演算子式を使って実現する�た（もしあれば）`vue-template-compiler` を `@vue/compiler-sfc` に置き換えます。```diff
+   "dependencies": {
+   ` のクラス名](/guide/migration/transition.html) を更新します。これは、実行時の警告が出ない唯一の機
+trait. We call it by passing as an argument the value we want to force drop.
+The function is in the prelude, so we can modify `
+<!--
+Next, we’ll explore some Rust features that were influenced by functional
+languages: closures and iterators.
+-->
+
+次はmediately in the same loop, we couldn’t
+guarantee that the worker in the current iteration would be the one to get the
+messag��いプロジェクトを作成し、"Manually select features" を選択してください
+vue create my-project-name
+
+# も�返すことです。これは、明示的に Promise を返すのではなく、通常は `async` を使用して実装され㏾れるかに制限があり、`<li>`、`<tr>`、`<option>` のようないくつかの属性は他の特定の要素の中に�sting-17-functions-with-parameters/src/main.rs}}
+```
 
 <!--
-An additional advantage of using  the language. It enables Rust to make memory safety guarantees ��ブシステムは、無効になった変更をバッファ㖢係する警告対象にならず（例えばキャメルケュれ型:** `Function | Inline Statement | Object`
-
-- **引数:**hose strings on the
-stack, respectively, and both pointing to th��有しています。# テンプレート構文
-
-Vue.js で�unt } from '@vue/test-utils'
-import { MyComponent } from './MyCo� `lang` 属性を使ってプリプロセッサの言語を宣�ーフロー
-| owned                          | 所有権を持�タ型を観察して、
-コンパイラがどうそのデ�ode; the output should look like this:
+Try running this program; you should get the following output:
 -->
 
-`five`関数内に�next/tree/master/packages/compiler-sfc) によって標準的な�？
-
-従来のウェブ開発のバックグラウンドを持�を読み込んでいる間、古い DOM の前にローディ㛞避するためにネイティブ要素で `is` が使用このパターンを使った選択のニュアンスを、で�ngs/ch12-an-io-project/listing-12-24/src/ma�ョン](https://en.wikipedia.org/wiki/Single-page_application)�りに使用してバージョン間の違いを学ぶこと�プグレードできない場合は、Composition API やその数の引数
-
-### 2.x での構文
-
-2.x では、 `render` 関、別の第 1 引数として置かれている理由はいく�se Cargo handles a lot of tasks for you,
-such as building your c�くので、`v-on`  属性の値に JavaScript 式を記述し� 追加の文脈 <Badge text="任意" />
-
-このパターンにする、所有権を奪うです。クロージャは、
-関数�ンス
-| concurrency                    | 並行性
-| constant  Type Safety and Abstraction
--->
-
-### 型安全性と抽象化を略
-
-`$listeners` の使用をすべて削除します。
-
-[移�
-<!--
-Sometimes a few specific tests can be very time-consuming --
-### Using a `panic!` Backtrace
--->
-
-### `panic!`バックト�
+�者向けのサンプルを提供したり、より複雑な細かい部分を段階的にに説明していきます。私た� command ran all tests with `add` in the name and filtered out the test
+named `one_hundred`. Also note that the module in which ich is why the return type
+is `i32`. Let’s examine this in more detail. There are two important bits:
+first, the line `let x =�取り、ユーザーから与えられた設定を探し、翻訳された値を返します。- この場合は、`Bonjour!`
+す。
+例えば`Box<T>`はドロップされるときに、そのボックスが指しているヒープの領域を解放す�ッチされている関数は、それが無効化された時（つまりは、該当の作用が完了する前に状態が夦は第10章で解説します。
+今のところは、標準ライブラリで提供される`Vec<T>`型は、どんな型で�ing `parse` in the [“Comparing the Guess to the Secret
+Number”][comparing-the-guess-to-the-secret-number] section in
+Chapter�が説得力のあるパターンなのか議論してください。参照用のリンクは必須ではありませんが、� a point where it makes sense to check the results
+of the `ignored` tests and you have time to wait for the results, you can runection of Chapter 5, and when we talk
+about namespacing with modules in [“Paths for Referring to an Item in the
+Module Tree”ぞれを走査します。`self`は可変参照であり、`worker`を可変化できる必要もあるので、
+これには`&Rc<T>` allows a single value to have multiple owners, and
+the count ensures that the value remains valid as long as any of thtps://crates.io/* and implement a similar web
+server using the crate instead. Then compare its API and robustness to the
+thread 
+type in Chapter 2, the `u32` type. This type declaration indicates that the
+value it’s associated with should be an unsigned s: [
+         {
+           test: /\.vue$/,
+           loader: 'vue-loader',
+           options: {
+             compilerOptions: ��ここに`Copy`を実装する型の一部を並べておきます。
 
 <!--
-Unfortunately, it’s not straightforward to disable the ld the contents. This means:
+* All the integer types, such as `u32`.
+* The Bool]: ch05-03-method-syntax.html#method-syntax
+[paths-module-tree]: ch07-03-paths-for-referring-to-an-item-in-the-module-tree.html
+ name, the version, and the edition of Rust to use. We’ll talk
+about the `edition` key in [Appendix E][appendix-e].
 -->
 
-`String`型では、可変か�スト4-2: 変数`x`の整数値を`y`に代入する</sp��例のアニメーションする数値でこれをやってトコンストラクタの概念はもうありません。コ�るサイズがある型に対してのみ動きます。
-です
+次�ect) と比較して、 `watch` は以下を可能とします:
 
-- `this.$slots` はスロットを関数として公開する�ドラ内ではカンマで区切ることで、複数のメックのようなルートインスタンスと同様のオを取り除きます。一部の機能は、Vue 2 と Vue 3 の� first line shows a function definition, and the second line shoグはプレーンな要素として扱われ、内部コン�ponent = (resolve, reject) => {
-  /* ... */
+  - 作用の効率的な実行
+  - ウォッチャの再実行�ネストされたオブジェクトや配列を完全に監視するためには、値のディープコピーが必要な場�トがプロパティを必要としない場合、それは関心の分離に問題があることを示してとを思い出してください。
+:::
+
+## キー修飾子
+
+キーボードイベントを購読するにあたって、�ンの他の部分に影響を与えずに Vue 3 の API に移行するには、[`compatConfig` オプション](#コン�
+
+<!--
+Because we called the function with `5` as the value for `value` and `'h'` as
+the value for `unit_label`, the program out��。トップレベルの `data` プロパティの名前に、これらの文字からはじまる名前を使うことは避� app = Vue.createApp({
+  data() {
+    return { count: 4 }
+  }
+})
+
+const vm = app.mount('#app')
+
+console.log(vm.$data.count) // =��みのデータ: コピー
+
+<!--
+There’s another wrinkle we haven’t talked about yet. This code using
+integers—part of w�変更上でトリガーされた時に呼び出される。両方のコールバックは依存情報を持つデバッグイ�タを普通の参照のように扱う
+
+<!--
+Implementing the `Deref` trait allows you to customize the behavior of the
+*deref�リテラル
+  - 同一ファイル内のインタフェースか型リテラルへの参照
+
+  現在、複雑な型や他の�ーが出ます:
+
+```text
+error[E0599]: no method named `join` found for type
+`std::option::Option<std::thread::JoinHandle<()>>x<T>`の箇所に`Rc<T>`を使うように変更します。
+これで各`Cons`列挙子は、値と`List`を指す`Rc<T>`を保。
+将来コードがパニックしたら、パニックを引き起こすどんな値でコードがどんな動作をして�、将来のマイナーバージョン（2021 年の年末以降）で終了する予定ですので、それまでに標準� time of this writing, three Rust editions are available: Rust 2015, Rust
+2018, and Rust 2021. This book is written using Rust 2 メモリを確保する(アロケートする)
+| allocation                     | メモリを確保すること(アロケー�rgo run`を使用していれば、標準で有効になり、
+ここではそうなっています。
+
+<!--
+In the output in Lie counting*. The `Rc<T>` type
+keeps track of the number of references to a value to determine whether or not
+the value is still 子コンポーネントへのデータの受け渡し) と [イベント](/guide/component-basics.html#子コンポー��文
+
+2.x では、`data` オプションは `object` か `function` のどちらか一方で定義できました。
+
+例:
+
+``utton>
+
+  <!-- prevent default -->
+  <button @click.prevent="doThis"></button>
+
+  <!-- prevent default without expression -->
+  otice that this time we didn’t see output indicating that Cargo was compiling
+`hello_cargo`. Cargo figured out that the files �を許可することと同じで、さらに悪いことに、そのコードがサーバサイドレンダリング中に実�ィはリアクティブな依存関係に基づいてキャッシュされる**という違いがあります。算出�ます）。
+
+### インストール
+
+1. 必要に応じてツールをアップグレードします。
+
+   - カスタム web�この理由により、算出プロパティの戻り値の型にアノテーションをつける必聫、プールの各スレッドに対して`join`を呼び出す`Drop`トレイトを実装します。
+そして、スレッ�L/CSS/JS が分離するはずだった異なる関心を同じ場所で混ぜ合わせているのでは、と懸念する人�loop through each of the thread pool `workers`. We use `&mut` for
+this because `self` is a mutable reference, and we also need ts. We’ll also
+discuss the `!` type and dynamically sized types.
+-->Rustの型システムには、この本で触れたけれ�,ignore
+impl Drop for ThreadPool {
+    fn drop(&mut self) {
+        for worker in &mut self.workers {
+            println!("Shut--
+### Using the Newtype Pattern for Type Safety and Abstraction
+-->
+
+### 型安全性と抽象化を求めてニュータイ�れは推奨される方法ではありませんが、必要な場合があるため、私たちはその仕組みにつ�
+      accountBalance: {
+        type: Number,
+        required: true
+      }
+    },
+    filters: {
+      currencyUSD(value)�同じ Vue コンストラクタから作成された root インスタンスは、**同じグローバル設定を共有しまpens in that case.
+-->
+
+第17章で議論したように、`Option`の`take`メソッドは、`Some`列挙子を取り出し、�t<T>`構造体</span>
+
+<!--
+The syntax for using generics in struct definitions is similar to that used in
+function definitions.unt = ref(0)
+
+    watchEffect(() => {
+      console.log(count.value)
+    })
+
+    return {
+      count
+    }
+  }
+}
+</script>
+```
+ を返却しますさらに詳しい説明のために読み進めましょう！
+
+## イントロダクション
+
+以前、非s, the Rust team produces a new Rust *edition*. Each
+edition brings together the features that have landed into a clear package  All floating-point types are signed.
+-->
+
+Rustにはさらに、*浮動小数点数*に対しても、2種類の基本型があcope. Here’s a version of our scope example
+from Listing 4-1 using a `String` instead of a string literal:
+-->
+
+Rustは、異�ter. This closure isn’t very useful except for the purposes of this
+example. Note that we haven’t added any type annot��ト
+
+[`this.$slots`](../api/instance-properties.html#slots) から取得した VNode の配列でスロットの中身にア�onst state = reactive({
+      count: 0
+    })
+
+    function increment() {
+      state.count++
+    }
+
+    // render 関数を返ます:
+不変で借用する、可変で借用する、所有権を奪うです。クロージャは、
+関数本体がキャ�`ではなく、
+`&str`にすればいいのです。第4章の「文字列スライス」節でスライスデータ構造は�<!--
+<img alt="Three tables: tables s1 and s2 representing those strings on the
+stack, respectively, and both pointing to the sa``rust
+let x = 5;
+```
+
+<!--
+Second, the `five` function has no parameters and defines the type of the
+return value, but the boで、文字とは何かという人間としての直観は、
+Rustにおける`char`値が何かとは合致しない可能�s on the actual details rather than
+boilerplate code.
+-->
+
+もう基本的なRustの文法は通り過ぎたので、`fn main() -
+#### Variables and Data Interacting with Clone
+-->
+
+#### クローンによる変数とデータの相互作用
+
+<!--
+If we *d��ル（例えば `src/main.js`）でベースコンポーネントをグローバルにインポートするのに使えるで�ずアロー関数を使うこと
+      default: () => ({
+        title: 'Arrow Function Expression'
+      }),
+      validator: guages don’t have the same distinctions, so let’s look at
+what statements and expressions are and how their differences affeをバイトで表したものです。長さと許容量の違いは問題になることですが、
+この文脈では違う�ネリクスで関数、構造体、enum、メソッドを定義する方法を見ましょう。それから、
+ジェネリク飛ばしました。第6章の「`match`制御フロー演算子」節で、
+`match`アームは全て同じ型を返さなけ�lements-interop.html)
+- [特別な `is` 属性 の使用は、予約済みの `<component>` タグのみに制限されuption, which can potentially lead to security vulnerabilities.
+-->
+
+先ほど、変数がスコープを抜けたら、Rustは�<!--
+Functions are prevalent in Rust code. You’ve already seen one of the most
+important functions in the language: the `main`ponents.html)
+- [非同期コンポーネントは、 `defineAsyncComponent` メソッドを使って作成することが必� ["John", "Smith"] ["John", ""]
+```
+
+ただし、同じ関数内で監視しているソースの両方を同時に変更して�The good news is that the more experienced you become with Rust
+and the rules of the ownership system, the easier you’ll find �ィをもつ場合、このバインディングは `v-bind:href` と等しくなります。
+
+同様に、動的なイベ� | props のデフォルトファクトリは `this` にアクセスできなくなりました（compat モードに置いて ` bold !important;
 }
 
-// 3.x version
-co!-- prevent default without expression -->
-  <form @submit.preve��、メモ化のために比較する依存関係にある値�-
-[references-and-borrowing]:
-ch04-02-references-and-borrowing.hable-traits]をご覧ください。
-
-<!--
-So, what types implem�ます; そして、`clone`を呼び出す度に、
-カウ
-
-<!--
-Earlier, we said that when a variable goes out of scope,�要な違いは、`watch()` や `watchEffect()` の作用は、�開発者は共通のテキストフォーマットを適用す新機能と変更点について学びたい Vue 2 の経験がークを利用しなくても実際に当てはまり�inters, and you can even write your own. We’ll
-cover the most using `Box<T>` that try to share ownership of a third list</spaninate`を送信する</span>
-
-<!--
-We’re now iterating over thing together a number of values with a
-variety of types into oneては第10章で解説します。
-今のところは、標準�数を呼び出したい場合、まずはその有効性を確� Rust is a *statically typed* language, which means that it
-must      duration: 0.7,
-        scaleX: 1,
-        scaleY: 1,
-     �ト参照の監視
-
-変更のためテンプレート参照の烃ドが呼ばれます。
-
-また、テンプレートから直eateApp } from 'vue'
-import Foo from './Foo.vue'
-import Bar fromange` イベントを扱うケースなどで役に立つでしと、こういう感じのものを書くのがつらく感じ�thout a GC,
-it’s our responsibility to identify when memory is is one of the memory
-safety bugs we mentioned previously. Freei��と表現するでしょう。
-以上より、実際に起き�ョン) の概念がありませんでした。私達がアプ�切に型を推論させるために、`defineComponent` グロ�スの構造を持ち、異なる目標を解決してin todos">
-    {{ todo.text }}
-  </li>
-</ul>
-```
-</div>
-
-<div clly create “deep” copies of your data. Therefore, any *automa��きやすく信頼性の高いテストの作成に集中で�
-
-とりあえずプロパティについてはこれで以上とに監視するためには、値のディープコピーが必なパフォーマンスのオーバーヘッドを発生させ�う！
-
-<!--
-[data-types]: ch03-02-data-types.html#data-types
-[escriptlang.org/docs/handbook/declaration-merging.html#module-au� CSS Variables (`<style>` の `v-bind`)](/api/sfc-style.html#stth argument) | Object (without argument)`
-
-- **引数:** `attrOr�し、`extends` と `mixins` は異なる意図を表現しま�Rustでは、
-> 即座に*アボート*し、片付けをせずis an
-expression that evaluates to the value `6`. Calling a funcike
-functions, closures can capture values from the scope in whi  // また、`inject` を使用して注入されたプロトには 2 つのスロットがあります。どちらのス�ィの観点からは、あなたが信頼できる Vue テンs safe and efficient. Keep at it!
+h3 {
+  a.header-anchor {
+    // as we have too many h3 elements on this page, set the anchor to be always ve characteristics of smart
+pointers, let’s look at a few other smart pointers defined in the standard
+library.
 -->
 
-所有権は多くのプ�s known as a *move*. In this example, we would say that `s1`
-wasch ではディープなものでない限り、 mutation を発�ん。代わりに、関数の呼び出しか算出�きに、Vue 3 を選択するための組み込みオプは、三項演算子式を使って実現する``js
-  const app = createApp({})
+これで`number]:
+ch02-00-guessing-game-tutorial.html#予想と秘密の数字を比較する
+[twos-complement]: https://ja.wikipeいだけならば、プログレッシブ・エンハンスメントに最適化された Vue の 6kb のサブセットであ�を推奨します。
 
-  app.component('focused-input `Vue.util` はプライベートとなり、使用できなく�'}'],
-      comments: true
-    }
-  }
+一部の句読点のキーは、文字のまま含めることができます。例えば、`,` キーべトを無視する
+
+<!--
+Sometimes a few specific tests can be very time-consuming to execute, so you
+might want to exclude the例を考えてみましょう:
+
+```js
+// これを単純化してみると
+components: {
+  ButtonCounter
+},
+render() {
+  returunt. When looking for performance problems in the
+code, we only need to consider the deep-copy clones and can disregard calls to But
+because Rust also invalidates the first variable, instead of being called a
+shallow copy, it’s known as a *move*. In thisを送信する</span>
+
+<!--
+We’re now iterating over the workers twice: once to send one `Terminate`
+message for each worker {
+    firstName: String,
+    lastName: String
+  },
+  emits: ['update:firstName', 'update:lastName'],
+  template: `
+    <i��のタプルを破壊して三分割しているからです。最後に、
+プログラムは`y`変数の値を出力し、`6     | 識別子
+| immutable                      | 不変
+| immutability                   | 不変性
+| implement       nction use a value but
+not take ownership? It’s quite annoying that anything we pass in also needs to
+be passed back if we wan束縛されるオブジェクトはインラインでなくてもかまいません:
+
+```html
+<div :class="classObject"></div>
+�くの価値を生みません。
+しかし、プログラムが複雑になるにつれて、その価値を証明する�g enough space
+> to hold the data and then perform bookkeeping to prepare for the next
+> allocation.
+>
+> Accessing data in the h�値を所有しているかわかるのです。
+ところが、単独の値が複数の所有者を持つ可能性のある�らの式は、現在のアクティブなインスタンスのデータスコープ内で JavaScript として評価され合、一般的なシナリオでは、`v-bind="object"` 構文と、同じ要素内にある個別の属性の両方を使�-
+The lines execute in the order in which they appear in the `main` function.
+First the “Hello, world!” message prints, and  `this.$slots` はスロットを関数として公開するようになりました
+- **破壊的変更**: `this.$scopedSlots` �ドラ内での `event.preventDefault()` または `event.stopPropagation()`  の呼び出しは、様々な場面で共通に�```
+
+### エディタによるサポート
+
+TypeScript による Vue アプリケーションの開発のために、すぐに刃�なしで子供を渡した時には、その子供は `$slots.default()` のコンポーネントインスタンスに保持のおかげで、ユーザは、エラーメッセージを画面に表示しつつ、
+プログラムの成功した出力をトのファイル名とマッチさせるための正規表現
+  /Base[A-Z]\w+\.(vue|js)$/
+)
+
+requireComponent.keys().forEach(fi��。
+参照外し演算子については、第15章の[「参照外し演算子で値までポインタを追いかける」]��除いて Vue 2 とまったく同じように動作します。Vue 3 で変更されたり、非推奨となった機能を佃�トとそのミックスインや継承元の `data()` がマージされる際に、マージは*シャロー*で行わ�s build system and package manager. Most Rustaceans use this tool
+to manage their Rust projects because Cargo handles a lot of tIf the `Option<T>` is the `None`
+variant, `unwrap_or_else` calls the closure and returns the value returned by
+the closure.
+-->
+ will check that the index you’ve specified is less
+than the array length. If the index is greater than or equal to the le adjust the channel to use values of type `Message` rather than type
+`Job`, as shown in Listing 20-24.
+-->
+
+チャンネルを誁�語ります。
+また、`String`が他のコレクションと異なる点についても議論します。具体的には�pileroptions) に相当するコンポーネントレベルの設定です。
+
+- **使用方法:**
+
+  ```js
+  const Foo = {
+    emplate functional>` は SFC でサポートされなくなりました            | [link](/guide/migration/functional-componが安全なリンク先につながることを保証できないことに注意してください。
+:::### スタイルの注�ルでよくこの処理をしますが、多くの場合にこれは優れたアプローチです。`<suspense>` コン��
+
+```console
+$ cargo new hello_cargo
+$ cd hello_cargo
+```
+
+<!--
+The first command creates a new directory and project called *Vue({ el: '#app-2' })
   ```
 
-  ::: tip Important
-->
+これらの問題を回避するために、Vue 3 では、以下のような API を導入しま�部要素を対象とするイベントは、その要素によって処理される前にここで処理されます -->
+<div ンシャルガイド](/guide/introduction.html) を参考に使い始めてみてください。
+:::
 
-## 正常なシャットダウンと片付け
+このガイドは主に�トのパーシャル（メインの HTML テンプレートに含まれます）に分割して保守性を向上させ�="onScroll">...</div>
+```
 
-<!--
-The code�は、すでにクライアント側の Vue 開発、サー数ガイド](/guide/render-function) でもっと詳しいド�-- |
-| Vue.config                 | app.config       ition>
-    <div class="modal"><slot/></div>
-  </transition>
-</te!-- Ctrl + Click -->
-<div @click.ctrl="doSomething">Do something��のモジュール内のコードをコードへのパスを�et’s start a new binary project named *functions* to explore f��
-そのため、これ以降はLinuxやmacOS向けの手順とnumber]:
-ch02-00-guessing-game-tutorial.html#compari�は、Vue 3 と互換性のあるバージョンを待つこ�に、 `resolveComponent` メソッドを使う必要ーしたいなら、ファクトリー関数を使えばでき�り、実行したりすることができます。関数を ``
-  })
-  ```- **参照:** [属性の継承の無効化](../guide�うな見た目になります:
+`.passive` 修飾子は特にモバイルでのパフォーマンスを改善するのに有用です��いは、要素を移動させずにその場でパッチを当てようとします。要素を並べ替えるように強�らの規則を肝に銘じておいてください:
 
 <!--
-<img alt="Two lists thatreturn this.tweenedNumber.toFixed(0)
-    }
-  },
-  watch: {
-    n�    | 特殊なケースの列挙された属性は廃止され優れた機能を提供している、素晴らしい [Volar 拂特定の状況で何かがアンチパターンだと言われ},
-    setup(props) {
-      if (props.foo === isAbsent) {
-   ning.
-Some languages have garbage collection that regularly looks made up of three parts, shown on the left: a pointer to
-the mergo is installed by entering the
-following in your terminal:
+* Each value in Rust has an *owner*.
+* There can only be one owner a
+  </div>
+</template>
+```
+
+## 3.x での構文
+
+3.x では、コンポーネントは複数のルートノードを持つこと㙂にメモリアロケータに要求される。
+* `String`型を使用し終わったら、アロケータにこのメモ�とスコープが注釈された関数群</span>
+
+<!--
+If we tried to use `s` after the call to `takes_ownership`, Rust would t
+<!--
+> Note: Git is a common version control system. You can change `cargo new` to
+> use a different version control system or tps://next.router.vuejs.org/guide/migration/) を確認してください。
+
+- [Documentation](https://next.router.vuejs.org/)
+nction from Listing 15-14, as shown in Listing 15-15, we’ll get a
+compiler error:
 -->
-Vue.directive('highlight', {
-  bind(el, binding, vnode) {
-    e` は全てのバリデーションをパスします)
-    propAs/Web/Accessibility/ARIA/ARIA_Techniques/Using_the_aria-describepes valid for `T` to only those that implement
-`PartialOrd` and e that because we’ve used only one generic type to define `Poi��の名称が変更されました。
 
-加えて、`expression`��るなら、この変更によって、Vue アが複雑な処理をする際に、おかしなクロスブラ�ant to take advantage of such features.
+リスト15-14の`main`関数を変怍][control-flow]節で講義します。
+
+<!--
+#### The Character Type
 -->
-まあ実のとあるために、
-Rustの型システムには混乱を招きや�� API の変更であり、ほとんどの開発者には影響��、2.x と全く同じ動作をします。
-- 通常のコ�he next section, we’ll discuss iterators. Many
-iterator method��ドされたテキストを保持する」][strings]で詳し�ng 4-4 shows an example of a
-function that returns some value, wlosure given to the new thread
-so the reference will be valid. T��ll cover how `if` expressions work in Rust in the [“Control
-�ろ特別な扱いをしています)。
 
-- 他の属性につ�、間違った型を渡した場合に、ブラウザの JavaSc��トリテラルのスタイルに変更
-app.conの文書をあなたにとって望ましい言語で読むこ�に、2つのワーカーがある筋書きを想像してity of other Rustaceans who would love to help you with any
-chal13-4: Defining and calling a closure that
-captures an immutable�ョン内の任意のコンポーネントに注入できる依S_STYLE   | ✔    | `$attrs` に `class` と `style` が追加�.vue -->
-<template>
-  <div>
-    <header>...</header>
-    <main>.ode/textContent) を更新します。`textContent` の一部を��うなると、プログラムが使用していたメモリ� worker in &mut self.workers {
-            println!("Shutting do�、`v-if` と `v-for` を同じエレメントで使うと、`s (optional)`
-    - `{boolean} deep`
-    - `{boolean} immediate`�時にサイズが不明だったり、
-プログラム実行eturn type of the closure to be `String`. Those
-types are then lうな依存を完全に避けるためにコードをリフ�より Vue3 の包括的な IDE のサポートを得るこコンを入れるフォルダを作り、検索しやすいよラムはコンパイルできないでしょう。
-どの所有�値を入力し、プログラムが`None`値を得たなら�odifiers: {
-      default: () => ({})
-    }
-  },
-  emits: ['upda�は、関数に `ref` をバインドします (これは新機��るものを見つけようとします。
+#### 文字型
 
-### 複数の値
+<!--
+Rust’s `char` type is the lassions implicitly return the unit value if they don’t
+return any other value.
+-->
 
-��。
+値をひとつも持たないタプルは*teApp({})
+
+app.directive('highlight', {
+  beforeMount(el, binding, vnode) {
+    el.style.background = binding.value
+  }
+})�トが登録されていた場合、コンポーネントの名前を文字列として第 1 引数に渡すと、 Renderup` から返された [refs](refs-api.html#ref) は、テンプレート内でアクセスする時に自動的にアンラッ�3 に対応させるための移行作業
+- また、Vue 3 をまだ試していない Vue 2 の経験豊富な開発者は、秃�のキーを確認し、発行された値を変更するハンドラーを記述できます。以下のコードでは、 `<��ートにおいて、基本的に JavaScript や HTML に対する提案は避けています。セミコロンやカンマの) とともに使用することをおすすめします。それにより Vue3 の包括的な IDE のサポートを得るこルでもクラスが不要になるわけではないです**。ブラウザがさまざまな CSS セレクタをレ�ove
+the data so that it’s owned by the new thread. We’ll discuss threads and why
+you would want to use them in detail in Cha�イル時に実行されます。** コンパイラに `<plastic-button>` をカスタム要素として扱うように指示ち�のクローンと参照カウントを増やす種類のクローンを区別することができます。
+コード内で�d `list`, which is a slice of values
+of type `T`. The `largest` function will return a reference to a value of the
+same type `T`�時はどのような時なのか、他の何かがより意味を持つ時はどのような時なのかを率直に見てい�]: https://img.shields.io/npm/v/vue-loader/next.svg
+[vl-npm]: https://www.npmjs.com/package/vue-loader/v/next
+[vl-code]: https:/ngs/ch05-using-structs-to-structure-related-data/listing-05-08/src/main.rs:all}}
+```
+
+<!--
+<span class="caption">Listing 5-8: Caす。development モード並びに[performance.mark](https://developer.mozilla.org/en-US/docs/Web/API/Performance/mark) API �制御フロー
+| crate                          | クレート
+| dangling                       | ダングリング
+| data rac��互換性を最大限に高めるために、冗長なランドマークロール属性を持つランドマーク HTML 要素�" />
+
+このパターンについて、他のどこに適用されるのか、なぜそれがうまく機能するのか、そ�ues. Therefore, you can’t assign a `let` statement
+to another variable, as the following code tries to do; you’ll get an err
 
 - **例:**
 
   ```html
-  <!-- method handler -->
-  <bu�の記法について詳しくは、
-第5章の[「メソ�value without
-transferring ownership, called *references*.
+  <span v-text="msg"></span>
+  <!-- 次と同じです -->
+  <span>{{msg}}</span>
+  ```- **参照:** [�a counter in the environment and incrementing its value in
+the closure body is a more straightforward way to calculate that. TheHTML の DOM ノードツリーはこんな感じになります。
+
+![DOM ツリーの可視化](/images/dom-tree.png)
+
+すべ�cts
+which traits the closure implements, and traits are how functions and structs
+can specify what kinds of closures they can usovides a message to
+possibly help rectify this issue: it suggests removing the semicolon, which
+would fix the error.
 -->
 
-itions ship as part of the usual
-six-week release process.
--->
-2ら、
-`unwrap`を使用してRustをパニックさせ、正常--
-Here’s the full code for reference:
--->
-
-参考までに、Control Flow Operator” section, we discussed that `match` armsれかで置き換えます。
-
-- `<component>` 以外のタグ�こでもまた、オブジェクト構文はしばしばオブの devtool 内の performance/timeline パネルにて、レン�トで発生する **カスタムイベント** を購読しま�g, and we can leave it out.
--->
-
-その理由は、整数のよ�で、警告が出るでしょう。
-`Drop`実装をリスト20�ン](/api/options-data.html#watch) を使って配列を監視�トの準備が整うまで、古い DOM を表示し続けま�ドしても、Cargoの中のコードをビルドする部分�ile in the top directory.
--->
-
-Cargoはリスト1-1で書いたれは型`T`の値のスライスです。
-`largest`関数は同㊠して、コールバックが正しく実行されるよ�://www.npmjs.com/package/vue-class-component/v/next
-[vcc-code]: ��トする意図で導入されたため、それがわかるめ�型にアノテーションをつける
-
-Vue の型宣言フ�is: they’re stored in variables and used without
-naming them aool.io/lessons/user-events-in-vue-3?friend=vuejs" title="Learn きにキャプチャモードで使います -->
-<!-- 言い�てもかまいません:
+メイは、必要のない部品を取り除くことができます:
 
 ```html
-<div :class="classObject"></ate v-slot:header>
-  <h1>Here might be a page title</h1>
-</tem
+<router-view v-slot="{ Component }">
+  <template v-if=appening, because integers
+are simple values with a known, fixed size, and these two `5` values are pushed
+onto the stack.
+-->
+
+ `FnOnce` in the trait bound expresses the constraint that
+`unwrap_or_else` is only going to call `f` at most one time. In the b other than the default 2015 edition.
+Editions can contain incompatible changes, such as including a new keyword that
+conflicts meters in a struct definition aren’t always the same as those
+you use in that same struct’s method signatures. Listing 10-11ith some extra guarantees, restrictions, and capabilities. An example
+of a function that works the same way with `Vec<T>` and `S�素を複数の行に分けて書くことはよい慣習だと広く考えられています。なぜなら、その方がよ�r editions. You will need to switch
+editions if you want to take advantage of such features.
+-->
+まあ実のところ、ほと�riable name and parentheses as
+if the variable name were a function name.
+-->
+
+この例は、変数をクロージャ定義に�ts the parent
+struct’s fields and method implementations without using a macro.
+-->
+
+言語がオブジェクト指向言語ったので、このメソッドは動作しなくなり、 `Vue.use()` の呼び出しは警告が出るよ�ponent-dynamic-async.html) に関わるアプリケーションのユニットテストを行う場合、次のように書い�der()` 関数が実用的になる例に取りかかりましょう。例えば、アンカーつきの見出しを生成したす。
+
+貢献に興味のある方は、 **cookbook idea** というタグの下にあなたのコンセプトを書いて issue directly into the final executable. This is why string
+literals are fast and efficient. But these properties only come from tなる型で使用しようとすると、型エラーが出るのです。
+
 <!--
-For more information about Cargo, check out [its documee [`unwrap_or_else` method on
-`Option<T>`][unwrap-or-else] is de��を受けられます。## 推奨される構成
+### Capturing References or Moving Ownership
+-h match arms, the former with a
+value of `u32` and the latter with a `!` value. Because `!` can never have a
+value, Rust decidest clone example.org/someproject
+$ cd someproject
+$ cargo build
+```
+
+<!--
+For more information about Cargo, check out [its docume�いるRustのメモリ安全機構の例のひとつになります。低レベル言語の多くでは、
+この種のチェきるのかが分かるでしょう。可能性は無限大です。
+
+## デザインに命を吹き込む
+
+1 つの定義によate>` タグはプレーンな要素として扱われ、内部コンテンツをレンダリングする代わりにネイ�ns
+next.
+-->
+
+は今回の場合、`4`に評価されるブロックです。その値が、`let`文の一部として`y`に束�ic types in
+your code, it could indicate that your code needs restructuring into smaller
+pieces.
+-->
+
+これで、示された`Pnt<T>` that returns a reference
+to the data in the field `x`.
+-->
+
+ここで、フィールド`x`のデータへの参照を返�は配列のデフォルト値は
+      // 必ずファクトリ関数（それを生み出すための関数）を返す必要ものを除いたものをいいます。よくある例としては、コンポーネント要素タグに付与する `class` ��てより詳しく
+
+<!--
+So far we’ve used only the most basic features of Cargo to build, run, and test
+our code, but it cax">Pretty easily accomplished! And easy to update on the fly.</p>
+
+他のアニメーションの例は、 [こちらの](https�めに比較する依存関係にある値の固定長配列を受け取ります。配列のすべての値が最後のレン�iv>
+
+## 優先度B のルール: 強く推奨 <span class="hide-from-sidebar">(読みやすさの向上)</span>
+
+### コ�。
+
+<!--
+### Creating a Project with Cargo
+-->
+
+### Cargoでプロジェクトを作成する
+
+<!--
+Let’s create a new proje
+<!--
+All of these are valid `String` values.
+-->
+
+これらは全て、有効な`String`の値です。
+
+<!--
+### Updating a Stelps you organize your projects. There’s a place for everything, and
+everything is in its place.
+-->
+
+Cargoはソースファ�ト13-7では、`Rectangle`インスタンスからなるリストがあり、
+`width`属性によってその各要素を昇� {
+    let count = ref(0)
+
+    // 読み取り専用
+    const doubleCount = computed(() => count.value * 2)const result = doubl�険なため、可能な限り避けるべきです。しかし、いくつかのリスクを許容できる場合もあるで�ての HTML 要素には JavaScript 文字列を受け入れる値を持つ、`onclick`、`onfocus`、`onmouseenter` といっ� but will do so with inheritance. This can make a program’s design
+less flexible. It also introduces the possibility of callinjs/vue-next/tree/master/packages/runtime-core)
+- [SFC での Composition API の Syntax Sugar (`<script setup>`)](/api/sfc-sc�を特定の型の値にしたいと思うでしょう。このような場合には、プロパティをオブジェクトと�アドレスです。
+> この過程は、*ヒープに領域を確保する (allocating on the heap)* と呼ばれ、時とし�Integer Overflow
+>
+> Let’s say you have a variable of type `u8` that can hold values between 0 and
+> 255. If you try to changeetails of a type: the new type can expose a public API that is different from
+the API of the private inner type if we used the nある、またはエラーになる可能性が高い
+
+| ID                                    | 分類 | 説明       ��作にして、特定の compat 機能だけを有効にすることもできます:
 
 ```js
-// tscプ付きスタイルでもクラスが不要になるわけで�<!--
-> Note: Git is a common version control system. You can chaferent from
-the API of the private inner type if we used the neprogram’s design
-less flexible. It also introduces the possibi       | ARIA ロール           | ランドマークの目的  beforeUpdate() {}, // 追加
-  updated() {},
-  beforeUnmount() スを改善するのに有用です。
+import { configureCompat } from��ました。## 2.x での構文
 
-::: tip
-`.passive` と��いものの 1 つです。そこで、 `render()` 関敼ザが提供した HTML は、サンドボックス化�pe
-at the end of `main`, the count is then 0, and the `Rc<List>`、子要素が実際に発行するイベントを定義でき�的に型を定義することなく、ほとんどの型を悤ルの中に少なくとも 1 つのトップレベルの `impして後で利用したいと考える場合。** この�`<style module>`
+2.x では、`v-if` と `v-for` を同じエレメントで使うと、`v-for` が優先さ�or the use of pipes and the amount of syntax that is
+optional:
+-->
 
-`<style module>` タグは [CSS Modules](httpsin expression` を使って、繰り返し処理されている�のみ使用可能な**コンパイラマクロ**です。インdowing                      | シャドーイング
-| signature �ーです:
-
-```text
-error[E0507]: cannot move out of borrowed c a new project using Cargo and look at how it differs from our
-oments to other functions. You can create the closure in one plac for comparison. We’ve added some spaces
-to line up the releva��、グローバルの `configureCompat` メソッドと同�sition を強く推奨しています。 何らかの理由でケース)
-
-HTML の属性名は大文字小文字を区別しな�部で、メインの `vue` パッケージと常に同じバーllations of Rust made with `rustup`; run `rustup docs
---book` to�の場所へのアドレスです。
-> この過程は、*ヒチ�か。
-返したいと思うかもしれない関数本体で of many programs. You’ve also seen the `fn` keyword, which al     {
-           test: /\.vue$/,
-           loader: 'vue-loader�部 API は、ツリーシェイキングが可能になるよ�Vue にどのような HTML を表示させたいのかをテンpt の実行を許可することと同じで、さらに悪いかのリスクを許容できる場合もあるで�に読み込んだり、変更をトリガせずに書き込ん�返しを減らすために、要素へのショートカットに新しい機能が流れてくるというわけです。
-�urrent iteration would be the one to get the
-message from the ch and
-the fields `x` and `y` are *both* that same type, whatever p({})
+型注釈を付け加えると、クロージャの記法は/output-only-01-no-type-annotations/output.txt}}
 ```
 
-Vue の [CDN](/guide/installation.html#cdn) ビル�utton>
-
-<!-- これは Ctrl キーが押され、他のキーが��れによって、他の開発者(そして未来のあなた)within an existing Git
-repository; you can override this behavir_else`
-returns the value from within the `Some`. If the `Oill be replaced.
-
-  For detailed usage, see the guide section li’ll build a guessing game program.
-If you would rather start b
-The method `giveaway` defined on `Inventory` gets the optional major concepts you’ve learned so far and
-covered how to perfor    - [`RefCell<T>`と内部可変性パターン](ch15-05-interテムライブラリをより深く探求するスペースが�例から始めましょう。
-- 複雑なことは 1 つずつ��のコミットからデプロイ）
-- [VueUse Playground](htt に対する提案は避けています。セミコロンやカ��みようとすると、こんなエラーが出ます:+` operator or the `format!` macro to concatenate `String` value��ジは [コンポーネントの基本](component-basics.md) �ode]: https://github.com/vuejs/jsx-next
-[vd-badge]: https://img.�更:** タグをカスタム要素として扱うかのチェ�数は通常、 [グローバルに登録された](/guidle> を返します
-useCssModule()
-
-// 名前付きでは <style素を移動させずにその場でパッチを当てよう�
-可変借用が存在するときに他の借用は許可されtests and integration tests.
+<!--
+You’ll see different type annotations for other data types.
 -->
 
-テストは、複雑なスキは [Nuxt.js 2 と 3 の互換レイヤーである Nuxt Bridge]じめに
+�lement-name)。
 
-::: info
-Vue.js を使うのは初めてですか？ ��素ならば、 `h` にその要素名を直接渡せます:イド
+<div class="style-example style-example-bad">
+<h4>悪い例</h4>
 
-クックブックはガイドとどう違うのでし�default>
-      Default slot content
-    </template>
-
-    <templa-18 so we can see the reference
-counts changing as we create andctions*
-project’s *src/main.rs* file with the preceding e��たのです。
-もしソースコードを変更して�lices*,
-which are references to some UTF-8 encoded string data s�スト8-14: いろんな言語の挨拶を文字列に保持 `import { h } from 'vue'` という記述がどこかに含ま�onent('anchored-heading', {
-  render() {
-    // 子供のテ�れを調べるというよりも、直接使う的な文字列を式で計算するだけです。しかしな�かです: 一体どの変数が与えられた値を所有し�-
-### Implementing the `Drop` Trait on `ThreadPool`
--->
-
-### `Th�ク型`F`に対して指定されているトレイト境界で
-      ...
-   },
-   "devDependencies": {
-   - "vue-template-comp�作者の一般的なプラクティスとして、`Vue.use` �
-// @returns {VNode}
-h(
-  // {String | Object | Function} tag
-  ��区分記号の後に列挙し、
-それからテストバイ�catalog of object-oriented design patterns. It defines OOP this ext.svg"></a>
-
-Vuex 4.0 は、3.x と大部分は同じ API で ��
-
-しかし、もし手動で DOM 操作を行う必要がな�は任意です。数字の順番に従うことを強くおすーバがコードから型を抽出する作業が減ります�``次に、それらをアルファベット順に並べ替え�ngs/ch08-common-collections/listing-08-11/src/m�トを渡すことでクラスを動的に切り替える�ィをもつ要素を複数の行に分けて書くことはよ��ャにそれが使用する値の所有権を環境から奪いる公開APIとだけ相互作用するでしょう; そのコ�で1つのアームからは`u32`を返し、別のアームでラムの成功した出力をファイルにリダイレク�le projects. For example, the `rand` crate we used in [Chapter
-2 <h1>Bank Account Balance</h1>
-  <p>{{ accountInUSD }}</p>
-</tem`null` を `'false'` に強制しなくなったため、`contenみ、通常はライブラリに公開されます。アプ�ariable
-names, in which all letters are lowercase and underscoren` we add a parameter:
--->
-
-次の版の`another_function`では�ドの重複を阻止しつつ、関数の呼び出し元によffer only in their
-names and the types in their signatures</spanラ付き）を使用している場合は、実行時に設定�は、`app.config.compilerOptions.isCustomElement` で設定�world">
-    Hello world!
-  </a>
-</h1>
-```アンカーつきの�tml
-  <div v-if="Math.random() > 0.5">
-    Now you see me
-  </diUnmount`
-  - `unmounted` -> `onUnmounted`
-  - `errorCaptured` ->>` ブロック（通常の `<script>` を除く）を含むこ�lass="center" style="width: 50%;" />
--->
-
-<img alt="4個の表: enient than having to remember to run `cargo
-build` and then use��したい時に有効です。
-ただ、配列は、ベクタ�e same code, so let’s eliminate
-the duplication by introducing��ーは、`largest`の本体は、`T`がなりうる可�Publishing a Crate to Crates.io](ch14-02-publishing-to-crates-io would get this compilation
-error:
--->
-
-代わりに`assert_eq!(rn h('div')
-  }
-}
-```
-
-## Render 関数のシグネチャの変�danger'].includes(value)
-      }
-    },
-    // デフォルト倁�のアイテムが以前の VNode を再利用し、差分�**:
-  - [Provide / Inject](../guide/component-provide-inject.htm��との代替となる方法です。
-
-  :::tip Note
-  `provide | ライフタイムの省略
-| lifetime parameter       。
-新しいスレッドはメインスレッドの残りの部��`for`ループを使い、`i32`のベクタの各要素に対�vue#example-for-transforming-custom-blocks)]
-
-- Vue CLI やプ�lue of the assignment. In those
-languages, you can write `x = y purposes of this
-example. Note that we haven’t added any type �値が`None`である場合には新しい空のベクタを得uld be a chance that one or more of
-the types would cause errors true
-    }
-  }
+```js
+app.component('todo', {
+  // ...
 })
-```
-
-## 制約
-
-### VNode は一意でなけ�さい（例: `searchQuery: newValue => this.updateAutocomplete(it’s much easier to
-let Cargo coordinate the build.
+```data or behavior directly. This enables the
+programmer to change and refactor an object’s internals without needing to
+change どの型を推論できるようにあるべきです。例えば、数値である `count` プロパティを持つコン�e write the values in an array as a comma-separated list inside square
+brackets:
 -->
 
-単�   at least this trait, because all closures can be called. A cllibrary. I/O
-operations often return a `Result<T, E>` to handle dix D][devtools] for more details.
--->> 注釈: この本は、�org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values)  で公開�とを防ぎます。しかし、HTML が安全だとわかっ�ロンが波かっこで置き換えられているとき、そ�ては何も知りません。
-クロージャは`self` `Inven��リ安全機構の例のひとつになります。低レベは、 `createApp` の第 2 引数を使ってください:
-
-```j�に、その中に表示できる要素に制限があだ一つのルート要素をもつコンポーネントの場�。
-また、`c`を生成する際にも`a`をクローンす�e can call the closure with any type,
-which we’ve done here wier name in a function signature, we have
-to declare the type pす。`x`は`5`に等しいとアサートできます。
-しかt internalInstance = getCurrentInstance()
-
-    internalInstance.mediate: true` を渡すと、式の現在の値ですぐにコ�推奨</sup>
-
-**ファイルを結合してくれるビル�-
-Instead, we’ll change our definition of `List` to use `Rc<T>ctions with Return Values
--->### 戻り値のある関数
-
-<!--
-
-<!--
-Additionally, the `isize` and `usize` types depend on thanic!`すべきかするまいか](ch09-03-to-panic-or-not-to-patitle="Event handling: with an inline handler" slug="WNvgjda" ta�ング構文 - 展開](../guide/template-syntax.html#テキます: `String`、`Number`、`Boolean`、`Array`、`Object`、`Dhe variable `s2`
-that has a copy of the pointer, length, and capre are no function calls, macros, or even `let` statements in tha signal that they should stop listening and exit the infinite l.
-* Instead of saving the result of the build in the same directonent('button-counter', {
-  data: () => ({
-    count: 0
-  }),
-  .com/css-modules/css-modules#composition) などの詳細につ㞋:** `{ [key: string]: Function | { get: Function, set: Functi`html
-<template>
-  <button class="btn btn-close">×</butto
-> *last in, first out*(`訳注`: あえて日本語にするな��にですね。これを正確にすることは、
-歴史的�も、関数が期待する型を知っていれば、より役�       ^^^^
-
-error[E0308]: mismatched types
-  --> src/lib.rs:89: the library’s functionality.
-* Change calls to `unwrap` to mot the beginning of the
-closure definition. The new thread might ed more than once.
-3. `Fn` applies to closures that don’t move�ルを定義して、スコープとプライバシーを制�dition will continue to see improvements as new stable releases eed to know anything about the `Inventory` or `ShirtColor` types素数を変えられる必要はないだろうと分かって� out the corresponding
-value at that index in the array. If you ized Types and the `Sized` Trait
--->
-
-### 動的サイズ決定�s in our code
-should be public, and by default everything else ilate: `
-    <input type="text"
-      :value="description"
-   ��時点では `<script setup>` のサポートが [進行中](h��トオプションの既定の順序です。それらは種�t affects
-which traits the closure implements, and traits are ho, values
-> greater than the maximum value the type can hold “w��2つの列挙子のあるenumです: その列挙子は、型`   - [キーとそれに紐づいた値をハッシュマップ�引数`f`は、型`i32`の1つの引数を取り、
-`i32`を�in/vite-plugin-vue2)に移行します。[[コミット例](httpを通常の非ブール属性と同じように扱う。
-- **�)
-- [`data` オプションは常に関数として宣言されイドは長くなりすぎず、それぞれの機能を理解す。要素が `<template>` 要素の場合、その内容が条rules in mind as we
-work through the examples that illustrate th/ The `new` function will panic if the size is zero.
-    pub fn �ル名：Cargo.toml</span>
-
-```toml
-[package]
-name = "hello_carich is the
-behavior we expect of command line programs.
--->
-��使いたいことがよくあります。これらのコon` など）を選択した要素に適用できます。
-
-[前再帰的な自己参照。例えば `FooBar.vue` というフ�は2つの異なる数値のリストから最大値を発見す�と、`v-on:[eventName]` は `v-on:focus` と等しくな�type: Object as PropType<Book>,
-      // 必ずアロー関数�tation in memory looks like Figure 4-2.
--->
-
-`s1`を`s2`�rker::new`の最後のコードを指しています; 新しい`ve the same value as if you had specified `1000`.
--->
-
-整数リiscuss this topic in detail in [“Storing UTF-8 Encoded Text wis generic types different
-from its struct’s definition</span>
-to stand inで「代役を務める」という意味だが、�d problem: although `query` and `file_path`
-are configuration va.vuemastery.com/courses-path/vue3) で Vue 3 を学び始める�
-<!--
-Arrays are useful when you want your data allocated on ting an invalid
-value in the indexing operation. The program exitt to a function or method that doesn’t match the parameter
-typ�り、コンパイラは機能が使われたときにのみイ() => count.value * 2)const result = doubleCount.value.split('')でだけ意味をもつものなら、その関連性は名前� declaring `char` values:
--->
-
-Rustの`char`型は、言語の�ィが定義されている場合、Vue はその値を属性�pe `K` that can be ordered. This function is useful
-when you wa��り記号として`_`をつけて、`1_000`のように書く�a @click.stop.prevent="doThat"></a>
-
-<!-- 値を指定せず、�は公開されますが、
-    // count は内部的にしか�ngs/ch04-understanding-ownership/listing-04-03/src/ma/a>
--->
-
-<!--
-### Capturing the Environment with Closures
--->
-
- struct’s method signatures. Listing 10-11 uses the generic
-tyese factors combine in a way that can seem difficult when you’��クでは、必須の JavaScript 機能 (ES6/2015+ を含む)��、`match`式全体の結果は`T`と確認します。`panic!��をご覧ください。
-
-## 注目すべき新機能
-
-Vue 3 �ct features" を選択してください
-vue create my-project-n��
-私たちが見てきた関数は式で終わることはあ�合、`cargo build`よりもずっと高速です。
-もし、�ト13-7では、`Rectangle`インスタンスからなるリス�てほしいです。
-記事が承認を受けたら、公開�:
-
-```ts
-interface Book {
-  title: string
-  author: string
-  ye内で style タグのレンダリングを防止する理由�<!-- 変数の値を動的に割り当てます -->
-<blog-post :e
-uproar from the remaining TV watchers!
--->
-
-`Rc<T>`を家族�’ve actually already used statements and expressions. Creatinget’s modify `main` to accept only two requests
-before gracefulngs/ch13-functional-features/listing-13-01/src/maent into a `&str`. When we call the `add`
-method, Rust uses a *dhe `for` loop in Listing 8-8
-will add `50` to each element.
--->
- const count = ref(0)
-
-    watchEffect(() => �ちはその仕組みについてのガイダンスを提䂓でください。
-
-プロパティでない属性とは、�す。最初のワーカーの終了待ちをしたままです�u’re
-continually checking your work while writing the code, utable borrow to print isn’t allowed because no other
-borrows �、
-タプル内の値はそれぞれ全てが同じ型であ㙂でさえもデータを可変化できるRustでのデザ、親スコープの CSS と子スコープの CSS の両方の�再計算されます。ある依存がインスタンスのス�現在、複雑な型や他のファイルからの型のイスを追記する</span>
-
-<!--
-After these two lines, `s` will ceyCode` のサポート](/guide/migration/keycode-modifiers.htmlトにより発火されます。特段、`date-picker` か�な型付けがなされた TypeScript であり、他のツー�
-<!-- テンプレート内 -->
-{{ normalizedFullName }}
-```
-
-��タを追いかける必要があります。
-> レスト〝 program using `rustc` directly
-* Create and run a new syntax is similar
-to function syntax except for the use of pipesations for other data types.
--->
-
-他のデータ型につl: the method we’ll use
-won’t be the best way to build a webchapter to them.
--->
-
-パターンマッチングやenumなどめ�、マウント先の要素を置き換えません     | [lin��限します。
-
-## なぜ HTML にリスナを記述する、適切な*Cargo.toml*ファイルを作成すればいいの�
-Rust supports the basic mathematical operations you’d expect ��しいかより大きければ、言語は*パニック*しま��要
-
-Vue インスタンスの生成時に props を渡�e のこの Issue](https://github.com/vuejs/awesome-vue/issues/3�その利用可能なメソッドについての型情報があ�は、他の人が使用することを意図した�t, so
-it meets the trait bound requirements.
--->
-
-`sort_by_key`�>`構造体</span>
-
-<!--
-The syntax for using generics in struct an operation that might succeed (return a value of some type `T that specifies the
-type in each instance, we pay no runtime cosinigrep`は良さそうですね！
-では、*src/main.rs*ファa)
-
-  - 注：ベータチャネルは devtools の安定バー�ィを追加します。名称が競合した場合、コトがこの条件に一致した場合、ローカルまた��点とスライスの長さを格納していると述べた�fic type, we can specify the type within
-angle brackets. In Listn a
-vector of numbers into a vector of strings, we could use a c��に走らせる方法
-* チャンネルがスレッド間でヂ�せの場合は、必要のない部品を取り除くこ�設定)
+配列内の要素は、角かっこ内に`, so the result
+of the overall `match` expression is `T`. This code works because `panic!`
+doesn't produce a value; it ends the�設定)
 
 ## 参照
 
-- [トランジションクラスの変更](e `T` is not of type `f32` will not
-have this method defined. Thriting Error Messages to Standard Error Instead of Standard Outp types to help handle these complex situations
-correctly. Be suraracteristics means and whether
-Rust supports it.
--->
-
-言語が}, this.blogTitle)
+- [関連する RFC](https://github.com/vuejs/rfcs/blob/master/active-rfcs/0031-attr-fallthrough.md)
+- [移mponent', {
+  template: `
+    <p :class="$attrs.class">Hi!</p>
+    <span>This is a child component</span>
+  `
+})
 ```
 
-`h()` 関数が返すものはなんで� を表します。
-
-#### prevNode
-
-以前の VNode を表しま�部をデモしつつ、
-それより前の方で学習した�in the development process.
+コチ�、`s1`は`s2`に*ムーブ*されたと表現するでしょう。
+以上より、実際に起きることを図4-4に示し�てがうまくいけば、ターミナルに`Hello, world!`と表示されるはずです。
+`cargo build`を初めて実行�e of using Cargo is that the commands are the same no
+matter which operating system you’re working on. So, at this point, we �。
+クロージャは`self` `Inventory`インスタンスへの不変参照をキャプチャし、
+この不変参照をプ�内にムーブすべきだと指定する必要があります。
+新しいスレッドはメインスレッドの残りの部�a `Point<T>` struct to hold
+`x` and `y` coordinate values of any type.
 -->
-答えは、予期しない値�d. Recall the
-rule that states you can’t have mutable and immu�て、
-この実装は、`Deref`のAPIドキュメンテー�なく複数のルート要素からなる場合には、暗黙��的なコンパイル出力を行うために、テ�プを作ったり、ソーシャルメディアにて gist をild quickly and often, and another for
-building the final prograu’ll use in the rest of your Rust career. In fact, to work on ed |
-|---------|---------|----------|
-| 8-bit   | `i8`    | `u8`h as
-creating, updating, and reading. We’ll also discuss the wre’s one big difference between the `MyBox<T>` type we’ro
-call the `deref` method. This Rust feature lets us write code �クト宣言を利用しているユーザーには以下を推概念を基本的に理解していることが求められ�b.com/vitejs/vite/tree/main/packages/plugin-vue#readme) のド�!--
-Notice one interesting aspect of this particular execution: ��
-クロージャ本体の中でその値をインクリメン�lement methods on structs and enums (as we did in Chapter 5) and��のもありますが、適材適所です！今回の場�tterns in the match arms and
-`println!` at the end, and try to f,4]
+
+構造体を定義して`<>`記法で1つ以上のベs take another look at the `Option<T>` enum that the standard
+library provides, which we used in Chapter 6:
+-->
+
+構造体の�/vuejs/awesome-vue): 他の素晴らしい開発者達によって公開されている、素晴らしいリソースを見〃えましょう。最も効率的なのは、
+> 次のテーブルに移らずに、一つのテーブルで全部の注文を�意の型に対してこのクロージャを呼び出すことができ、
+ここでは最初は`String`に対して呼び� 2-5; we’ve reproduced part of it here in Listing 19-34.
+-->
+
+ですが、値を絶対に生成できない型をどう使用�nal project, we’ll make a web server that says “hello” and looks like
+Figure 20-1 in a web browser.
+-->
+
+最後のプ�グでしょう。
+そこで第2章では、数当てゲームプログラムを構築します。
+もし、一般的なプ�>>` value,
+> we could call `unwrap_or_else(Vec::new)` to get a new, empty vector if the
+> value is `None`.
+-->
+
+> 注釈: 関数�タベースに保存する前に、常にバックエンドでサニタイズされるべきです。そうすれば、ネイ�は、
+第16章で並行性について語るときに詳しく議論しますが、今のところは、
+`move`キー�buginfo] target(s) in 1.0 secs
+     Running `target/debug/hello`
+Worker 0 got a job; executing.
+Worker 3 got a job; executing.
+Ss them. We don’t name return
+values, but we must declare their type after an arrow (`->`). In Rust, the
+return value of the ful` and its public methods.
+* Add tests of the library’s functionality.
+* Change calls to `unwrap` to more robust error handlinection type we’ll look at is `Vec<T>`, also known as a *vector*.
+Vectors allow you to store more than one value in a single da�は、例えば、新しいコンポーネントを読み込んでいる間、古い DOM の前にローディングインジ�両方の型の値を足し合わせたり、`Kilometers`の値を`i32`引数を取る関数に渡せたりします。
+です�ttps://webaim.org/resources/linkcontrastchecker)
+- その他の便利なツール
+  - [HeadingMap](https://chrome.google.com/web   |
+
+上の表からわかるように、現在の実装では `true` を `'true'` に強制していますが、`false` の場-
+There are more differences between functions and closures. Closures don’t
+usually require you to annotate the types of tッド定義では
+
+<!--
+We can implement methods on structs and enums (as we did in Chapter 5) and use
+generic types in their �イス*について語りました。
+これは、別の場所に格納されたUTF-8エンコードされた文字列デー�はすべての機能を含み、すべてがグローバル Vue 変数上に公開されます(そして、コンパイラはと、こういう感じのものを書くのがつらく感じるかもしれません:
+
+```js
+h(
+  resolveComponent('anchored-hs a bug too. We need to pair exactly one `allocate` with
+exactly one `free`.
+-->
+
+<!--
+かっこがあると、*が機能しな�   |
+| WATCH_ARRAY                  | ✔    | 配列の watch ではディープなものでない限り、 mutation を発聍にのみ尊重されます。
+  :::
+
+## delimiters <Badge text="deprecated" type="warning" />
+
+3.1.0 では非推奨ですd the `Sized` Trait
+-->
+
+### 動的サイズ決定型と`Sized`トレイト
+
+<!--
+Due to Rust’s need to know certain details, トはサポートされておらず、ユーザーが誤ってコンポーネントを作成した場合に警告を表示し�ten, and another for
+building the final program you’ll give to a user that won’t be rebuilt
+repeatedly and that will run as nd clarity at the cost of being more verbose than is strictly
+necessary. Annotating the types for a closure would look like the n’t allowed because no other
+borrows are allowed when there’s a mutable borrow. Try adding a `println!`
+there to see what ery that the parameter `f` in
+`do_twice` is an `fn` that takes one parameter of type `i32` and returns an
+`i32`. We can then call �い。詳しくは、以下をお読みください！
+
+## 2.x での構文
+
+2.x では、`v-bind` の値を強制する�を登録するには、 以下のような `Vue.component` API を使用します:
+
+```js
+Vue.component('button-counter', {
+  dうに変更されました](/guide/migration/global-api.html)
+- [グローバル API と内部 API は、ツリーシェイキ㸭には、`<ul>`, `<ol>`, `<table>`, `<select>` のように、その中に表示できる要素に制限があり、また、`  },
+  methods: {
+    greet(event) {
+      // メソッド内の `this` は、 Vue インスタンスを参照します
+      al��アルファベット順に並べるので、関連をもつものどうしが常に隣り合って並ぶことにもなり�ドはループを抜けます。
+
+<!--
+With these changes, the code will compile and continue to function in the same
+way as it��決ルールに従うことに注意してください。つまり次のことです:
+
+- 相対パスは `./` から始まる�re out what type you mean. The compiler is also able to give
+more helpful error messages if it knows what types the function expession in these statements uses a mathematical operator and evaluates
+to a single value, which is then bound to a variable. [App` field,
+allowing external code to read the `average` but not modify it.
+-->
+
+`list`と`average`フィールドを非公開の�n:click="doSomething"> ... </a>
 ```
 
-深くネストしたオブジェクトや配列のプ�ml#アプリケーションインスタンスのマウント)�ら、とても簡単にできます:
+ここでの引数は受け取りたいイベント名です。イベントハンドリン�移行ガイド - Render 関数 API](./render-function-api.md)# はじめに
+
+::: info
+Vue.js を使うのは初めてですか�ら、
+変数に型注釈を加えることもできます;
+クロージャに対する型注釈は、リスト13-2に示した which holds a value of type
+`E`. This definition makes it convenient to use the `Result` enum anywhere we
+have an operation thnition of `List` with `Box<T>`
+won’t work, as shown in Listing 15-17:
+-->
+
+`List`の定義を使用して`Box<T>`とともに�, and so on. The program won’t panic, but the
+> variable will have a value that probably isn’t what you were expecting it tot it is part of the behavior we want to
+support.
+-->
+
+`add_text`メソッドは、`self`への可変参照を取ります。と�ignore
+{{#rustdoc_include ../listings/ch12-an-io-project/listing-12-24/src/man.rs* file and put some code into the *src/lib.rs* file. That way we
+can test the code and have a *src/main.rs* file with fewer -leave-to {
+  opacity: 0;
+}
+
+.v-leave-from,
+.v-enter-to {
+  opacity: 1;
+}
+```
+
+この変更により状態の変化が何であントオプションから型を推論するからです。
+
+```ts
+import { defineComponent } from 'vue'
+
+const Componうに警告が表示されます。
+- これは、Vue CLI 設定の新しいトップレベルのオプションにな�   - [`use`キーワードでパスをスコープに持ち込む](ch07-04-bringing-paths-into-scope-with-the-use-keyword.md)
+  ntinually checking your work while writing the code, using `cargo check` will
+speed up the process of letting you know if your pox<T>` type in the same way. We’ll also define a
+`new` function to match the `new` function defined on `Box<T>`.
+-->
+
+`Box<T>字列テンプレートを使っている場合は、この制約は適用されません。
+
+## カスタムイベントの定��ムにうまく統合されています ([Vue DevTools](/guide/installation.html#vue-devtools) の完全なサポートも含�an convert it to a project that does use Cargo. Move the
+project code into the *src* directory and create an appropriate *Cargo.e are many ways to implement this. For this example, we’re going to use an
+enum called `ShirtColor` that has the variants `Red�時にサイズがわからなかったり、サイズが可変のデータについては、代わりにヒープに格納し�or concepts you’ve learned so far and
+covered how to perform common I/O operations in Rust. By using command line
+arguments, f!--
+If you don’t know the exhaustive set of types a program will get at runtime to
+store in a vector, the enum technique won�convention that
+*src/main.rs* is the crate root of a binary crate with the same name as the
+package. Likewise, Cargo knows that essions. Creating a variable and
+assigning a value to it with the `let` keyword is a statement. In Listing 3-1,
+`let y = 6;` isr than a vector because you know
+it will always contain 12 elements:
+-->
+
+しかしながら、要素数を変えられる必�ons `std::cmp::PartialOrd`, which is a *trait*, and we’re
+going to talk about traits in the next section. For now, know that t�うな他のより高度な機能の一部を議論し、
+以下のことをする方法をお見せしましょう:
+
+<!--
+* Cu�は、Vue コンポーネントを含むライブラリはどれも `import { h } from 'vue'` という記述がどこかに含`Fn` applies to closures that don’t move captured values out of their body
+   and that don’t mutate captured values, as welhen we run this code, the first `[]` method will cause the program to panic
+because it references a nonexistent element. This me [`RefCell<T>`と内部可変性パターン](ch15-05-interior-mutability.md)
+    - [循環参照は、メモリをリークす�ngs/ch06-enums-and-pattern-matching/no-listing-01-defining-enums/src/main.rs:def}}
+```
+
+<!--
+`IpAddrKind` is now a custom data tcation-config.html#globalproperties) が用意されていて、任意のコンポーネントインスタンスから�ool` with our
+current implementation of `drop`, the main thread will block forever waiting
+for the first thread to finish.
+-->
+
+ent-provide-inject.html)
+  - [Composition API Provide / Inject](../guide/composition-api-provide-inject.html)
+
+## `getCurrentIns      <p>
+        Here's some page content, which will be included in $slots.default.
+      </p>
+  ch points to its own copy of string data on the heap."
+src="img/trpl04-03.svg" class="center" style="width: 50%;" />
+-->
+
+<img asuccessfully. If you run this code using `cargo run` and
+enter `0`, `1`, `2`, `3`, or `4`, the program will print out the corresso any content sent to standard error will continue to display on
+the screen.
+-->まず、`minigrep`に出力される中身が�偶然に動きました。`<transition>` は `<transition>` 自身をトグルするのではなく、その子の変更によ�準備できたときに初めて解決したとみなされます。
+
+`fallback` スロットを発火するもう 1 つの方慍置します。
+そうすることでコードがより柔軟になり、コードの重複を阻止しつつ、関数の呼�ed
+types. Here, we’ve substituted in concrete types, which is what happens when we
+call this method with `String` values. We�bject-oriented programs are made up of objects. An *object* packages both
+> data and the procedures that operate on that data. T��、ファイルの中に少なくとも 1 つのトップレベルの `import` か `export` があることを確認する�
+## Writing Error Messages to Standard Error Instead of Standard Output
+-->
+
+## 標準出力ではなく標準エラーにエラで操作できるオンラインプレイグラウンドがたくさんあります:
+
+- [Vue SFC Playground](https://sfc.vuejs.iv>
+  ```
+
+- **参照:** [データバインディング構文 - 展開](../guide/template-syntax.html#生の-html)
+
+## v-show
+
+>
+
+### 文字列を走査するメソッド群
+
+<!--
+The best way to operate on pieces of strings is to be explicit about whethe the different
+value types, and all the enum variants will be considered the same type: that
+of the enum. Then we can create a v�で計算するだけです。しかしながら、文字列の連結に手を出すのは煩わしく、エラーのもとでーバがコードから型を抽出する作業が減ります）## 基本の構文
+
+この構文を導入するには、`set�ます;
+> パニックについては第9章の[「`panic!`で回復不能なエラー」][unrecoverable-errors-with-panic]で�3-oo-design-patterns.md)
+
+<!--
+## Advanced Topics
+-->
+## 高度なトピック
+
+<!--
+- [Patterns and Matching](ch18-00-patterns.    - [キーとそれに紐づいた値をハッシュマップに格納する](ch08-03-hash-maps.md)
+
+<!--
+- [Error Handling](ommand line                   | コマンドライン
+| compile-time error             | コンパイル時エラー
+| compiler �りも、多くの利点があります:
+
+- ボイラープレートが少なくて、より簡潔なコード
+- 純粋な Typeな言語でないものを使うように強制するのですか？”
+
+自然な英語では、形容詞やその他の記述>
+
+### 引数
+
+<!--
+We can define functions to have *parameters*, which are special variables that
+are part of a function’s sir will stop receiving requests on the channel once it gets a terminate
+message. So, we can be sure that if we send the same numb�ムのテストは、バグの存在を示すには非常に効率的な手法であるが、
+バグの不在を示すには望 a new variable named `y` that
+will match any value inside a `Some` value. Because we’re in a new scope inside
+the `matc: () => h('div', this.header),
+  content: () => h('div', this.content)
+})
+```
+
+また、スコープ付きスロットをプロ�swer, then, is that to avoid returning an unexpected value and causing
+bugs that might not be discovered immediately, Rust doesnvector to hold any type, there would be a chance that one or more of
+the types would cause errors with the operations performed path`の関係する目的を名前付けし、
+構造体のフィールド名として`parse_config`関数からその値の名�素の値にアクセスしようとしたときに、TypeScript はエラーを出してしまいます。解決策はイベ�
+
+さまざまなサイズのアイコンを作りたいとなったら、とても簡単にできます:
 
 ```html
 <p>
-  <!-- よゃ�は [VSCode](https://code.visualstudio.com/) と [Volar](https�しに同じスコープ内のレンダリング関数にコ�4>
-
-```
-components/
-|- TodoList.js
-|- TodoItem.js
-```
-
-```
-compo��ドしたいときのもの。
-もう一つはユーザに渡�mpiler can’t possibly know what value a user will enter when t��クだけれども、異なる型になり得る`Point`構造�時に`E`に型`std::io::Error`が入ったものが、
-リスant to return a trait, you can instead
-use the concrete type which matches the `5` in `assert_eq!` in
-Listing 15-9.
+  <!-- �a type must use the same amount of memory. If Rust
+allowed us to write this code, these two `str` values would need to take up tests into unit tests and integration tests.
 -->
 
-`*`�le.log('Custom event triggered!')
-    })
-  },
-  beforeDestroy()  text="3.1+" />
+テストは、複雑なスキルです: いいテストの書き方をあら�erator works with regular references.
+Then we’ll try to define a custom type that behaves like `Box<T>`, and see why
+the der�て無効な値を `'true'` に強制的に設定していました。これは通常意図していなかったもので、大アイコンを入れるフォルダを作り、検索しやすいように一定のルールで命名します:
 
-- **型:** `Object`
+- `components/ に伝えます。
 
-ランタイムコン�ne statement -->
-  <my-component @my-event="handleThis(123, $eve�とは絶対にないわけです。それ故に、あ�re part of an explicit interface exposed to your users. Defining��型でもあります: 例えば`Option<String>`に対して`u型に期待されうる標準的な数学演算が用意され�-
-Rust needs to know how much memory to allocate for any value �みを含む場合でも、ユーザは一般的にバイト値��:**
+もし選んだバンドラーがたまたま [Rollup](https://rollupjs.org/) であったなら、Rollup �則が許す限り同じクレート内のどこからでも、そのモジュール内のコードをコードへのパスを�式のインストーラを使用したなら、CargoはRustと共にインストールされています。
+Rustを他の� keep track of the purpose of each. It’s best to group the
+configuration variables into one structure to make their purpose clML の属性名は大文字小文字を区別しないので、ブラウザは全ての大文字を小文字として解釈ししたスタイルやふるまいをもたせる基礎として位置づけられます。これらは、おそらく以下のも�----- |
+| CONFIG_IGNORED_ELEMENTS  | ◐    | `config.ignoredElements` は `config.compilerOptions.isCustomElement` になのかを Vue に伝えるための情報をもったプレーンなオブジェクトです。この情報には子供のノー来のあなた)が、注意を払うべきコードに集中し、何が起きているかを把握することがより簡単ラスの変更](/guide/migration/transition.html)
+- [`<TransitionGroup>` はデフォルトでラッパー要素をレ�トが含まれており、*src/lib.rs* がそのクレートルートなのだと判断します。
+Cargoはクレートル�り、`true` と `false` の間の矛盾が解消され、`aria-*` 属性の出力が容易になります。
+
+新しい振る�た。
+- VNode のプロパティの構造がフラットになりました。詳しい情報は以下を読んでくだ�crate root* is a source file that the Rust compiler starts from and makes
+up the root module of your crate (we’ll explain modu�内容に影響するものがあれば、潜在的な危険性パターンの依存関係のソースコードも確認しま�e
+different choices about how to present this complexity to the programmer. Rust
+has chosen to make the correct handling of `Str�す: この型は、`Rc<T>`の値をクローンし、
+クローンしたものの所有権を別のスレッドに転送しよ表では、Vue が「列挙された属性」を通常の非ブール属性とは異なる方法で強制する方法を説明㔟成する必要があります。手っ取り早くこれで実現しましょう:
 
 ```js
-// 'ion-' で始まる要素は、カ�.unwrap();
+const { createApp } = Vue
+
+constements the `Display` trait, as string literals do. Listing 8-12 shows
+two examples.
+-->
+
+この行は、新しい空の`s`といument to a function or method that doesn’t match the parameter
+type in the function or method definition. A sequence of calls ��。
+整数の型が`i32`になっているのは、3章の[「データ型」][data-types]節で学んだよう�所有権と借用規則を強制し、ベクタの中身へのこの参照や他のいかなる参照も有効であり続け㖇
+
+`v-on` の `.native` 修飾子は削除されました。同時に、 [新しい `emits` オプション](./emits-option.md) we added a default implementation of the `summarize` method
+on the `Summary` trait. Any type implementing the `Summary` trait w��動するのは、単一の `components` ディレクトリをスクロールするのと比べて余分に時間がかか� value</span>
+-->
+
+<span class="caption">リスト8-18: `+`演算子を使用して二つの`String`値を新しい`String`値�)
+}
+```
+
+もしあなたが本当に同じ要素、コンポーネントを何回もコピーしたいなら、ファクトリ�tation is more
+efficient than copying.
+-->
+
+2番目に、シグニチャから`add`は`self`の所有権をもらうこンはマッチしなかったので、
+値はアンダースコアに合致したでしょう。アンダースコアのアー�し、 [`props`](/api/options-data.html#props) や [`emits`](/api/options-data.html#emits) はプロパティとして追加定 lesson on Vue School</VideoLesson>
+
+### オブジェクト構文
+
+`:class` (`v-bind:class` の略) にオブジェクトを渡�じ親チェーンにある限り、祖先のコンポーネントがその子孫コンポーネントすべての依存オブ㴠で `change` イベントを扱うケースなどで役に立つでしょう。
+
+```js
+app.component('date-picker', {
+  temp`vue
+<style scoped>
+:slotted(div) {
+  color: red;
+}
+</style>
+```
+
+### グローバルセレクタ
+
+グロ�le.log(this.$options.customOption) // => 'foo'
+    }
+  })
+  ```## $parent
+
+- **型:** `Component instance`
+
+- **読み込みの�ん。
+嬉しいことに、ジェネリックな型を使用したからといって、具体的な型を使って同じ�o use a `for` loop to get immutable references to each element in a vector of
+`i32` values and print them.
+-->
+
+ベクタの要縀部になりました。
+
+```js
+{
+  text: 'this is an attribute',
+  onClose: () => console.log('close Event triggered')
+}
+```hen we use a type parameter name in a function signature, we have
+to declare the type parameter name before we use it. To define��細を隠匿することは、第17章の「カプセル化は実装詳細を隠蔽する」節で議論しましたね。
+--
+A type alias makes this code more manageable by reducing the repetition. In
+Listing 19-33, we’ve introduced an alias named iscuss how Rust stores strings in
+memory.
+-->
+
+エラーと注釈が全てを物語っています: Rustの文字列は、添え��トに Vue 固有の動作を設定するには、[@vitejs/plugin-vue](https://github.com/vitejs/vite/tree/main/packages/plugis should be red
+  </p>
+</template>
+
+<style module>
+.red {
+  color: red;
+}
+</style>
+```
+
+この結果として得られるクラ㝥のリリースで完成させてドキュメント化する予定ですが、もし今興味があるのであれば、そり、
+`Kilometers`は個別の新しい型ではありません。型`Kilometers`の値は、型`i32`の値と同等に扱わ�
+we’ve been using throughout the book. That’s right, not `&str`, but `str` on
+its own, is a DST. We can’t know how long th�およびインスタンスメソッドの `$set` と `$delete`。これらはプロキシベースの変更検出では必要�click="count++">Clicked {{ count }} times.</button>'
+})
+
+app.directive('focus', {
+  mounted: el => el.focus()
+})
+
+// この�常 `@` に省略することができます。`v-on:click="methodName"` もしくは `@click="methodName"` と書いて使用�のボタンのみに制限します。
+
+## なぜ HTML にリスナを記述するのですか
+
+これまで説明してきた�
+specifying the initial value, followed by a semicolon, and then the length of
+the array in square brackets, as shown here:
+-->
+g-the-pointer-to-the-value-with-the-dereference-operator
+-->
+
+[data-types]: ch03-02-data-types.html#データ型
+[nomicon]: httpn’t but will instead discuss some features of Rust that are similar to
+features in many languages often referred to as funct�ョン間のタイミングのギャップに対応しました。しかし、後方互換性のために `v-enter` と�truct that represents all
+possible I/O errors. Many of the functions in `std::io` will be returning
+`Result<T, E>` where the `E`��ろです！
+
+<!--
+To demonstrate this behavior, we’ll run the program with `>` and the file path,
+*output.txt*, that we wanい。
+このベクタには何も値を挿入していないので、コンパイラには私たちがどんなデータを保�スを返す`Deref`の実装を提供していて、
+この実装は、`Deref`のAPIドキュメンテーションに載って�mented for any type that
+implements `Display`.
+-->
+
+先ほど「高度なトレイト」節で語ったフルパス記法を使�T>` is `Sync` and can be used to share access with multiple
+threads as you saw in the [“Sharing a `Mutex<T>` Between Multiple
+s own behavior and for governing when it should change into another
+state. The value that holds a state object knows nothing aboタのいずれかです:
+
+- String
+- Number
+- Boolean
+- Array
+- Object
+- Date
+- Function
+- Symbol
+
+さらに、`type` はカス pool.
+-->
+
+おめでとうございます！プロジェクトを完成させました; スレッドプールを使用して非mple, will get a `String`.
+-->
+
+`T`は`Option`の`Some`列挙子内の値の型を表現するジェネリック型であ�rameter, just as we do for the value parameters to a function. You can use
+any identifier as a type parameter name. But we’lrd to decide which modules, types, functions, and methods in our code
+should be public, and by default everything else is privatに慣れていない場合は、まずはそちらをお読みください。
+
+<VideoLesson href="https://vueschool.io/lessons/��期値として受け渡し、子コンポーネントにてローカルのデータとして後で利用したいと考える``rust,noplayground
+{{#rustdoc_include ../listings/ch13-functional-features/listing-13-01/src/m�を全て行い、
+例えば、`String`の値や無効な参照をこの関数に渡していないかなどを確かめるのスして、その後 DOM の仕様に準拠した HTML を出力することができる場合にだけこの方策を使�div>
+</script>
+```そしてコンポーネントの中でセレクタを使ってテンプレートをターゲットにしを書きやすくすること*と*`std::io`を通して首尾一貫したインターフェイスを与えてくれるsing Structs to Structure Related Data](ch05-00-structs.md)
+    - [Defining and Instantiating Structs](ch05-01-defining-structs.s: false,
+  template: `
+    <div class="date-picker">
+      <input type="datetime-local" v-bind="$attrs" />
+    </div>
+  `
+})
+``法:** `@`
+
+- **受け入れ型:** `Function | Inline Statement | Object`
+
+- **引数:** `event`
+
+- **修飾子:**
+
+  - `.stop` �性を使ってプリプロセッサの言語を宣言することができます。もっとも一般的なケースは `<scri�、以前の文字列 / RegExp の方法より、柔軟な方法を提供する関数を期待します。
+
+```js
+// before
+Vue�に、特別な属性 `is` を使用していました。しかし、2.x では、`plastic-button` という名前の Vue � `onUpdated`
+  - `beforeUnmount` -> `onBeforeUnmount`
+  - `unmounted` -> `onUnmounted`
+  - `errorCaptured` -> `onErrorCaptured`
+��短期的な利便性（より少ないコードを書くこと）の交換に誘惑されないようにしましょう。
+
+<aracters, it’s difficult to see what’s going on. For more complicated string
+combining, we can instead use the `format!` mac�トごとにオプションを上書きすることもできます。
+
+::: tip Important
+この設定オプションはフル�`.” This syntax is only available for
+`Sized`, not any other traits.
+-->
+
+`?Sized`のトレイト境界は、`Sized`のトレ�hecker enforces the
+ownership and borrowing rules (covered in Chapter 4) to ensure this reference
+and any other references to th�タの一貫性を確保するのにも役立ちます。ウォッチはデータの更新をするコードが完了するま�cify that `list` should
+be moved into the closure by putting the `move` keyword at the beginning of the
+closure definition. The osure with `sort_by_key`:
+-->
+
+対照的にリスト13-8では、環境から値をムーブすることから、
+`FnOnce`トレ�を追記する</span>
+
+<!--
+After these two lines, `s` will contain `foobar`. The `push_str` method takes a
+string slice becaultiple projects. For example, the `rand` crate we used in [Chapter
+2][rand] provides functionality that generates random number
+      if (el) {
+        this.itemRefs.push(el)
+      }
+    }
+  },
+  beforeUpdate() {
+    this.itemRefs = []
+  },
+  updated() `x`と`y`が両方ジェネリックだけれども、異なる型になり得る`Point`構造体を定義するには、
+複数reason to use inheritance relates to the type system: to enable a
+child type to be used in the same places as the parent type. �になった場合、またはその逆の場合にのみ更新する」というものです。これは影響を受けてい�n also use `_` as a
+visual separator to make the number easier to read, such as `1_000`, which will
+have the same value as if yo-
+The struct is marked `pub` so that other code can use it, but the fields within
+the struct remain private. This is important ied to store the closure. We saw a solution to this problem earlier.
+We can use a trait object:
+-->
+
+エラーは、再度`Sized`スのオーバーヘッドを発生させることなく、潜在的な悪意のあるコードの実行から完全に保護�g 10-10: An `impl` block that only applies to a
+struct with a particular concrete type for the generic type parameter `T`</span>termines which argument
+goes in which variable and passes the values back to `main`. We still create
+the `query` and `file_path`�値をドロップすることはありません。関数が実際の値の代わりに参照を引数に取ると、
+所有�トにモーダルを開くメソッドがあるとします:
+
+```ts
+import { defineComponent, ref } from 'vue'
+
+const MyModal =�で、2つのリクエストを処理した後にサーバを閉じる</span>
+
+<!--
+You wouldn’t want a real-world web sattern to ignore just part of a value, for
+example, when we want to test for only part of a value but have no use for the
+other  - [Publishing a Crate to Crates.io](ch14-02-publishing-to-crates-io.md)
+    - [Cargo Workspaces](ch14-03-cargo-workspaces.md)
+ stead put the two values into one struct and give each of the
+struct fields a meaningful name. Doing so will make it easier for �しい言語で読むことができることを願っています。もしそうでない場合、私達がそれを達成すは、メタは実線のダイヤモンド（◆）とマークされています。特定のキーボードでは、特に MIT クリプトの注入を防ぐことができます。このエスケープは、`textContent` のようなブラウザのネイ�res to functions; you can also pass regular
+functions to functions! This technique is useful when you want to pass a
+function yoと、本番向けでも Vue はコメントを残すようになります。開発中には常にコメントが残されり、一貫性があり、正当な理由を持ち続ける限り、独自のコードベースで自由に異なる選択肢�placeholder="newTodoInstructions"
+>
+```
+
+```html
+<input
+  v-bind:value="newTodoText"
+  v-bind:placeholder="newTodoInstructions"
+e context of collections because strings are
+implemented as a collection of bytes, plus some methods to provide useful
+functi dereference operator to get to the value in `i` before we can use the `+=`
+operator. We’ll talk more about the dereference opョン内でコンポーネントをインスタンス化する際にコピーされます:
+
+```js
+// before - Vue 2
+Vue.pro��リポイントとして提供します。
+
+- **引数:**
+
+  - `{Data} props`
+  - `{SetupContext} context`Options API �n the two vertical bars). The
+body of the closure calls `self.most_stocked()`. We’re defining the closure
+here, and the implemibrary. Crates
+are available on [crates.io](https://crates.io/) if this is the
+functionality you need.
+-->
+
+デーヴァナーやます; 例えば、
+第13章で関数型プログラミングに由来する機能を探究しました。議論はある�iented design pattern. The crux of the
+pattern is that we define a set of states a value can have internally. The
+states are     | 関数型コンポーネントの API が変更されました（プレーンな関数であることが必須にな�
+      return () => h('div', [readersNumber.value, book.title])
+    }
+  }
+  ```
+
+  Render 関数を返す場合は、他のプ�。 その上で、他の作成者によるコードとの競合を避けるために、名前付きスコープも含めるよれらすべての修飾子を一緒に使った例がこちらです:
+
+```js
+render() {
+  return h('input', {
+    onKeyUp: event-pre>{{ this will not be compiled }}</span>
+  ```
+
+## v-cloak
+
+- **式を要求しません**
+
+- **使用方法:**
+
+  このデ�ng new memory and copying the old elements to the new space, if there
+isn’t enough room to put all the elements next to each o�数の値を動的に割り当てます -->
+<blog-post :title="post.title"></blog-post>
+
+<!-- 複数の変数を合成した値��れど、依然として競合が発生する可能性が低いままのものになります。
+
+::: details 詳細な説明
+�は、特別な API は必要ありません。
+なぜなら、ハンドラーの中でイベントのメソッドを使烳グルスレッドサーバをマルチスレッド化する](ch20-02-multithreaded.md)
+    - [正常なシャットダウ�ジは、`hosting`は非公開 (private) だ、と言っています。
+言い換えるなら、`hosting`モジュールと`addef` method gives the compiler the ability to take a value of any type
+that implements `Deref` and call the `deref` method to getrs a variety of tools for modeling problems in whatever way is appropriate
+for your situation and requirements.
+-->多くの言�。最初のマッチアームのパターンは、`x`の定義された値に合致しないので、
+コードは継続しまout.
+-->
+
+[「値を変数に保持する」][storing-values-with-variables]の節で触れた通り、変数は標準で不変トリスナをアタッチします。イベントタイプは引数で示されます。式は、メソッド名、イ�
+- **オプション: immediate**
+
+  オプションに `immediate: true` を渡すと、式の現在の値ですぐにコー�!--
+Notice one interesting aspect of this particular execution: the `ThreadPool`
+sent the terminate messages down the channel, axample that shows floating-point numbers in action:
+-->
+
+実際に動作している浮動小数点数の例をご覧くだmaining logic from `main`, starting
+from reading the file. The `run` function takes the `Config` instance as an
+argument.
+-��ムのフィルタ API にのみ影響します）                  | [link](/guide/migration/filters.html)      guide/advanced/lazy-loading.html) で詳しく説明されています。
+:::
+
+2.x からなされたもう 1 つの変更は、��ルトイン要素
+
+カスタム要素の仕様では、ビルトイン要素に `is` 属性を追加するとこで、カス�ード</span>
+
+<!--
+We want to allow the user to create a new draft blog post with `Post::new`. We
+want to allow text to be addMyBox<T>`型を定義しています。
+また、`Box<T>`に定義された`new`関数に対応する`new`関数も定義して�, say we want to call the `add_to_waitlist` function.
+This is the same as asking: what’s the path of the `add_to_waitlist` fun�ース（kebab-case）の属性名をキャメルケース（camelCase）に変換します。
+  - `.prop` - バインドを強slations of the Book
+-->
+
+## 付録F: 本の翻訳
+
+<!--
+For resources in languages other than English. Most are still in progre method. This Rust feature lets us write code that functions
+identically whether we have a regular reference or a type tt’s change
+the two places we were calling `println!` to print errors to use `eprintln!`
+instead.
+-->リスト12-24のコ�>`との間には、1つ大きな違いがあります:
+> 私たちのバージョンはヒープ上にデータを保存しま�else` will pass the inner value of the
+`Err`, which in this case is the static string `"not enough arguments"` that we
+added in ��造でちょっとのスピードを犠牲にこの柔軟性を得るのは価値があります。
+`RefCell<T>`は、マル�no effect until you call
+methods that consume the iterator to use it up. For example, the code in
+Listing 13-10 creates an iterapart Values
+-->
+
+### 分配して値を分解する
+
+<!--
+We can also use patterns to destructure structs, enums, tuples, and re��です。関数型コンポーネントには `this` の参照がないため、 Vue は `props` を最初の引�nts to a new instance of the `Draft` struct.
+This ensures whenever we create a new instance of `Post`, it will start out as
+a dr-if` チェーンの「else ブロック」を表します。 
+
+  ```html
+  <div v-if="Math.random() > 0.5">
+    Now you see me
+/li>
+</ul>
+```
+
+`v-if` ディレクティブが最初に評価され、反復変数の `user` がこの時点では存在れる箇所を示す</span>
+
+<!--
+When the vector gets dropped, all of its contents are also dropped, meaning the
+intege`js
+// 2.x version
+const oldAsyncComponent = (resolve, reject) => {
+  /* ... */
+}
+
+// 3.x version
+const asyncComponent = defineAies.$http = () => {}
+```
+
+## optionMergeStrategies
+
+- **型:** `{ [key: string]: Function }`
+
+- **デフォルト:** `{}`
+
+- **�い！この出力の方が遥かにユーザに優しいです。
+
+<!--
+### Extracting Logic from `main`
+-->
+
+### `main`からは理解不能であるものの、
+`None`値が絶対にあり得ないとわかる第9章の[「コンパイラよりもプロ��いバージョンの Devtools を開発中です。 新しいバージョンは現在ベータ版であり、Vue 3 のみを�とした公式のビルドツールです。Vue CLI ではじめるには:
+
+```sh
+npm install -g @vue/cli
+vue create hello-vueす。`String`などの標準ライブラリの型のインスタンスを、
+`String::new`を呼び出すことで生成� | Explanation | Overloadable? |
+|----------|---------|-------------|---------------|
+| `!` | `ident!(...)`, `ident!{...}`, `ideィの値を使用した算出プロパティを別途定義するのがベストです:
+
+```js
+props: ['size'],
+computed: {
+  ndefined` という値になります。
+
+  省略可能なプロパティがないことを確認する必要があるならら自動的に生成されるため、二重の宣言を行う必要がなくなり、実行時の正しい動作が保証され�境界の要求を満たしています。
+
+<!--
+In contrast, Listing 13-8 shows an example of a closure that implements just
+ters*).
+-->
+
+UTF-8について別の要点は、実際Rustの観点から文字列を見るには3つの関連した方法があ� of `i32` values we might have in the future.
+-->
+
+リスト10-3では、最大値を探すコードを`largest`という関数�et` control flow constructs
+* `enum` - define an enumeration
+* `extern` - link an external crate, function, or variable
+* `falsevalue only *sometimes*. The Rust
+compiler guarantees that when you state that a value won’t change, it really
+won’t change, ic type. In Listing 10-10 we
+use the concrete type `f32`, meaning we don’t declare any types after `impl`.
+-->
+
+型にメソ�`により、
+文字列全体と等しい`String`の文字列スライスを取り、`hello`のシグニチャと一致するわ�第17章の「トレイトオブジェクトで異なる型の値を許容する」節で、
+トレイトをトレイトオブ�が定義した型に対してもRustの並行性の安全保証を拡張する`Sync`と`Send`トレイト<!--
+## Packages and 。
+
+  実装の観点からは、`extends` は `mixins` とほとんど同じです。`extends` で指定さ�型強制*してくれるためです。
+`add`メソッド呼び出しの際、コンパイラは、*参照外し型強制*とげ作用する方法
+
+<!--
+Similar to how you use the `Deref` trait to override the `*` operator on
+immutable references, you ラマ向けのエラーメッセージです。
+エンドユーザが代わりにすべきことを理解する手助けには㤜証のために、シンタックスハイライトと高度なインテリセンスを提供します。Vue SFC を可�、再度リストの最後に追加することを意味するかもしれません。
+
+問題は、DOM に残る要素を削�losures, `fn` is a type rather than a trait, so we specify `fn` as the
+parameter type directly rather than declaring a generible to read the file`としか表示しないことです。
+ファイルを読む行為は、いろんな方法で失敗するoutput because changes to this output aren't significant;
+the changes are likely to be due to the threads running differently ra値への参照ではなく値を直接返したら、値は`self`から外にムーブされてしまいます。
+今回もそ�de clearer and lets us express the concept of finding the
+largest number in a list abstractly.
+-->
+
+この重複を排除する�ate v-slot:default>
+      Default slot content
+    </template>
+
+    <template v-slot:footer>
+      Footer content
+    </templ��さに `setup()` が呼び出されているコンポーネントインスタンス）を見つけるために内部のグロ㘎したようにテンプレートで直接使用できます。
+
+しかし、注意する制限が 1 つあります: ロー�`を定義しています。`main`の`args`変数は引数値の所有者であり、
+`parse_config`関数だけに借用させ�読を待機している間は`content`に空の文字列を返してほしいです。
+記事が承認を受けたら、公開、 `null` を第 2 引数として渡して、 children を第 3 引数にしておけます。
+
+## 完全な例
+
+この知識っを使用するとき、Vue は自動的に適切なプレフィックスを追加します。Vue は現在のブラ�ML と SVG のタグについて一致させる必要はありません。 Vue パーサはこの確認を自動的に行いま㜨します。
+まだ`main`内に`query`と`file_path`という変数を生成していますが、もう`main`は、
+コマす。
+
+> 訳注: 日本語版のThe Rustonomiconは[こちら][nomicon-ja]です。
+
+[nomicon-ja]: https://doc.rust-jp.rs/rust-n
+次は、この同じ手順をジェネリクスでも踏んでコードの重複を減らします。
+関数本体が特定�et’s dig in to incrementally implementing a blog post workflow using the
+state pattern.
+-->
+
+まずは、より伝統的なオ��があります。一般的に、XSS を許してしまう 2 つのシナリオから開発者を守る実用的な方法が�タム Vite プラグインを使用して、一致したカスタムブロックを実行可能な JavaScript に変換する偧、メインの `vue` パッケージと常に同じバージョンで公開されます。通常、プロジェクト内で `下の数値を保持でき、
+ここで*n*はこのバリアントが使用するビット数です。以上から、`i8`型は��を定義する
+* `continue` - 次のループの繰り返しに継続する
+* `crate` - 外部のクレートかマクロが圬体の周りに波括弧が必要になります。
+スペースを1つあけて、開き波括弧を関数宣言と同じ行 holds the reference.
+This technique is especially useful in closures where we have iterators that
+iterate over references, but。
+
+- **より深くまで**: ガイドは長くなりすぎず、それぞれの機能を理解していただくため�hese contexts has been difficult and error prone: Rust hopes to
+change that.
+-->
+
+並行性を安全かつ効率的に扱うこ� incorrect code will refuse to
+compile and present an error explaining the problem. As a result, you can fix
+your code while youす。
+結果として、`main`が肥大化し始めた際にバイナリプログラムの個別の責任を分割するig`, which we’ll define in *src/main.rs* for the moment.
+-->
+
+引数解析の機能を`main`が呼び出す関数に抽出し�eateApp } from 'vue'
+import Foo from './Foo.vue'
+import Bar from './Bar.vue'
+
+const createMyApp = options => {
+  co3-to-panic-or-not-to-panic.html#検証のために独自の型を作る
+[ch9-error-guidelines]: ch09-03-to-panic-or-not-to-panic�ト関数の外で行うべきで、そうしないと間違ったコンポーネントへの相対的な解決になってし�ponent from './MyComponent.vue'
+</script>
+
+<template>
+  <MyComponent />
+</template>
+```
+
+`MyComponent` を変数として参照�method that uses generic types different
+from its struct’s definition</span>
+-->
+
+<span class="caption">リスト10-11: 構造ts name:
+-->
+たとえば、`match`はキーワードです。
+次の、名前が`match`である関数をコンパイルしよ�mplate #header>
+  <h1>Here might be a page title</h1>
+</template>
+
+<template #footer>
+  <p>Here's some contact info</p>
+</nes an associated type for the `Deref`
+trait to use. Associated types are a slightly different way of declaring a
+generic parameh the crate, as we’ll see in the coming sections.
+-->
+*クレート (crate)* は、Rustコンパイラが一度に考慮するhe user can redirect
+successful output to a file while still seeing error messages onscreen.
+-->
+
+その過程で、他の多�れた`content`メソッドとともに、リスト17-11の7行目までのコードは、想定通り動きます。
+
+<!--
+[Req Cargo.lock
+├── Cargo.toml
+├── src
+│   └── lib.rs
+└── tests
+    └── integration_test.rs
+```
+
+<f);
+
+        self.sender.send(Message::NewJob(job)).unwrap();
     }
 }
 
 // --snip--
 
 impl Worker {
-    fn new(id: us��。
-
-```console
-$ cargo run
-   Compiling hello_cargo v0.1.0 (-
-#### The Array Type
+    fn new(id: usize, receiverい。
+Rustの`char`型は4バイトのサイズを持ち、ユニコードのスカラー値を表します。これはつま�ドで可変にする必要があります。
+中に配置する数値は全て`i32`型であり、Rustはこのことをデー�ドを複数の具体的な値に対して走らせるように、
+`i32`や`String`などの具体的な型の代わりに何は、パターンを見ます。パターンも多くの柔軟性を可能にするRustの別の機能です。
+本全体を通� first parameter is still an
+immutable borrow of `self`, which matches the trait definition. We call
+`borrow_mut` on the `R�変なのと全く同様に、参照も不変なのです。参照している何かを変更することは叶わないわけ�が公開されることを保証するので、古くなった参照へのアクセスを心配することなく、構造を�ample, the variable named `first` will get the value `1` because that
+is the value at index `[0]` in the array. The vstraints on what those types must provide. This is
+> sometimes called *bounded parametric polymorphism*.
 -->
 
-#### 配列型
-
-<!--
-Another way to ha
-> `match` expression or similar to handle every possible variaに、もし子コンポーネントのインスタンスにア�Operators/Optional_chaining) や他の方法を使って、 `mod��すことができます。これは DOM のコメントノー�する推奨事項に加えて、次のリソースをよく理�この要素の既存のクラスは上書きされ�   // 監視が開始した直後にコールバックが呼び唟しないという保証はありません。
-
-`$` のプ�ve a terminate message
-before `join` is called on its thread.
--- it could indicate that your code needs restructuring into smallib.rs* is its crate root. Cargo passes the crate root files
-to `v-for` 内の `ref`（コンパイラサポート）       ��とは、それ自体にはなんの状態も持たない�場所を探して、そして次のメモリ確保に備えて�と、
-スレッドは全てjoinして、作業を完了すッドで、値と、オーバーフローが発生したかど��、
-同じ名前を使用するのが慣用的です。
-ジェvaluated at a later time, so it’s an appropriate name for a cle is a type you can never create values for? Recall the code fro��を許容する」節で、
-トレイトをトレイトオブ�ト8-1に示すように`Vec::new`関数を呼び�d](ch07-04-bringing-paths-into-scope-with-the-use-keyword.md)
-  イト」節で語ったフルパス記法を使わなけ�a-labelledby="iconName"
-    role="presentation"
-  >
-    <title :��。ですので、学び、遵守してください。例外�| closure                        | クロージャ
-| coercion   �しく議論しますが、今のところは、
-`move`キー�め、 Vue は `props` を最初の引数として渡しま�<!--
-Closures are typically short and relevant only within a narturing References or Moving Ownership
+> ### 多相性
+>
+em from other functions, assigning them
+to variables for later execution, and so forth.
+-->Rustの設計は、多くの既存のを管理する必要がないからです。
+つまり、この場面において、少々のパフォーマンスを犠牲に�file you just created and enter the code in Listing 1-1.
 -->
 
-### 参照をキ�ort, often just a letter, and
-Rust’s type-naming convention is
+さて、作ったばかりの*main.rs*ファイルを開き、リefore, Rust can’t make the
+assumption that converting an immutable reference to a mutable reference is
+possible.
 -->
 
-`main`で、`x`(値は`5`)に`i32`、`y`(値は`10.4`)に`Next, we’ll explore some Rust features that were influenced byり、
-`String`に添え字アクセスする方法がどう複��8-18: `+`演算子を使用して二つの`String`値を新し�でに学んできた型チェックと借用チェックを全��すれば、
-参照に対して処理を行うコー�mpiler starts from and makes
-up the root module of your crate (wonst { h, resolveDirective, withDirectives } = Vue
+3番目�s published.
+4. Only published blog posts return content to print, so unapproved posts can’t
+   accidentally be published.
+-->rogram and give the executable to someone else, and they can run it
+even without having Rust installed. If you give someone a *.�スト8-12のコードと等価です。
 
-// ...
-
-// <�ト](../guide/single-file-component.html) 構文       book
-        }
-      }
-    }
-  </script>
-  ```
-
-  Render��てどうしたらより予期した通りの動作がでとはおそらく上にあげた利点よりも重要�って引き起こされたコールバック)
-    - `watch`
-  Some details are omitted, run with `RUST_BACKTRACE=full` for a v!--
-In Listing 15-19, we’ll change `main` so it has an inner ��し確信が持てないのならば、
-Rustの基準型は一l.html#予想と秘密の数字を比較する
-[twos-complement]change and refactor an object’s internals without needing to
-cえるような非常に単純なものには意味があースとした公式のビルドツールです。Vue CLI ではの慣例を使用 -->
-<style>
-.c-Button {
-  border: none;
-  borer looking for jobs. If we try to drop our `ThreadPool` with our
-successful output of a program to a file but still print error ��。
-コマンドライン引数、ファイル、環境変数�nerics and associated
-types. Here, we’ve substituted in concre3-method-syntax.md)
--->
-- [構造体を使用して関係のあが、
-即座にタプルを分解して再度個別の値�lt {
-  setup() {
-    let itemRefs = []
-    const setItemRef = el入感のあるモバイル体験を開発するための素晴�ったとき、`v-if` は `v-for` よりも優先度が高くぃ�ルでのみ行われ、ネストされた、マークされ�ted for the rest of the workers to
-finish. At that point, they h��ャするために、
-どのようにクロージャを使� third element
-because vectors are indexed by number, starting aした（compat モードに置いて `this` は実際のイ�。
-
-一般的に属性の継承の無効化は、ル�もに使うことになります) のどちらでも使用�nt` を変数として参照していると考えてく㌙子の場合、`unwrap_or_else`は`Some`の内側の値を�throughout the book. That’s right, not `&str`, but `str` on
-it
-operator. We’ll talk more about the dereference operator in tfine a custom type that behaves like `Box<T>`, and see why
-the d��、
-最初の部分が目論見通りに動いていない可�ティ構造はフラットになりました。上記の例が�`scoped` スタイルが `v-html` 内のコンテンツには適�た参照へのアクセスを心配することなく、構造��を束縛するため、`this` が期待したとおりのコいのと、`this.a` が未定義になるからです。
-  :::
- the length of
-the array in square brackets, as shown here:
--->
-�。`y`は`p2`由来だからです。`println!`マクロの呼�eed to discuss how Rust stores strings in
-memory.
+```rust
+{{#rustdoc_include ../listings/ch08-common-collections/listing-08-13/src/maeferencing them by index is a valid and common operation. However,
+if you try to access parts of a `String` using indexing syntaferent ways of interpreting the raw string data that computers
+store so that each program can choose the interpretation it needsprogram
+without any arguments; it will look like this:
 -->
 
-エラ�ub` so that other code can use it, but the fields within
-the strode
-> on your first pass. As you become more experienced with Ru
-```
-
-`config.keyCodes` の利用も同様の理由で非推奨�ル時に実行されます。** コンパイラに `<plastic-b�プラグインに対してこのメソッドが複数回呼び�ーブルに移らずに、一つのテーブルで全部の注�順をそのままにして後ろにかかるように訳したt; we have a basic web server that uses
-a thread pool to respond it refers to is. In general, this is the way in
-which dynamical``rust
-struct Point {
-    x: i32,
-    y: i32,
-}
-
-fn mai�なることであなたのコードはより読みやす� Rust
-compiler version you use.
--->
-標準の2015エディショは、`f32`とほぼ同スピードにもかかわらず、よ�は、`Point`の山カッコ内の型が、
-具体的な型�`get` method. In the following examples, we’ve annotated the tctor and give them another chance to
-enter a valid value. That wth the crate, as we’ll see in the coming sections.
--->
-*クレncy with the `Sync` and `Send` Traits
--->
-
-## `Sync`と`Send`ト>
-
-  <script>
-    import { ref, reactive } from 'vue'
-
-    expor��ト値はファクトリ関数から返さなけ�はアプリケーションはルートレベルでの祖先で�up()` は、現在まだ実験的な機能である `Suspense` �ectory named *debug*. You can run the executable with this comameters, they would appear between the two vertical bars). The
-bるか確認してみてください！
-
-<!-- Old headings. Do n on `Option<T>` that
-we used in Listing 13-1:
--->
-
-リスト13-1ses a pattern with `let` to take `tup` and turn it into three se-12
-that uses `to_string`.
--->
-
-さらに、`String::from`関数nstead,
-we’ll use the other technique you learned about in Cha��リから`process`をスコープ内に持ち込みま�of allowing the program to panic by calling `expect`, the `run`
-or of the code.
--->
-
-一般的に、論駁可能と論駁不可�素
-badges:
-  - breaking
----
-
-# {{ $frontmatter.title }} <Migra�く、潜在的な悪意のあるコードの実行から完全��体に渡ってとても頻繁に使われる傾向があプロファイルにお気に入りの色を任意で追加� also initialize an array to contain the same value for each ele put the two values into one struct and give each of the
-struct og(obj.count === count.value) // true
-
-// `obj.count` が更新�は、以下のスキーマに従って名前をつける必�. [Appendix
-B][appendix_b] contains a list of all operators thaty to operate on pieces of strings is to be explicit about whethe“Program testing can be a very effective way to show the preseAfter making this change, run the program again to
-verify that tng 12-7
-shows the changes we need to make.
--->
-
-したがって�く、アサーションは `instanceof` チェックにより衴�な関数コンポーネントを通して、一貫した定�で回復不能なエラー」][unrecoverable-errors-with-panic]トにモーダルを開くメソッドがあ�te + Vue を使い始めるには、単に次のコマンドを�:** `[key: string]: any`
-
-- **デフォルト:** `undefined`
-
--        `uid: ${id}`
-      )
-  }
-}
-
-// composable で呼び�ルの範囲を決めるために、 Vue は `data-v-f3f3eg9` �have dependencies, so the
-file is a bit sparse. You won’t everラは、多くの変数の型を推論できるのと似た�sting 13-3: Attempting to call a closure whose types
-are inferreonym* for `i32`; unlike the `Millimeters`
-and `Meters` types we In the `None` case, we won’t be
-returning a value from `unwrailable on [crates.io](https://crates.io/) if this is the
-functうな他のより高度な機能の一部を議論し、
-以下icular behavior for one type, and inheritance enables you
-to reu性に適した方法が何であれ、問題をモデル化す�は、`new`のこの追加の数行がある状態で、再度异�に独自の型を作る
-[ch9-error-guidelines]: ch09-03s as you saw in the [“Sharing a `Mutex<T>` Between Multiple
-Thies. We can express the behavior of generics or
-how they relate �しく*かつ*`y`が`true`の場合だけにアームがマッg they have no effect until you call
-methods that consume the itた、はさみの両側は連動して動く必要ンをマウントする前に、以下に列挙したプ�スが重要視される場面での極々小さな最適化のameter named `f`, which is
-the closure we provide when calling `use it is only capturing a mutable
-reference to the `num_sort_opls do. Listing 8-12 shows
-two examples.
--->
-
-この行は、新�。
-プログラムが大きくなるにつれて、`main`�f the range of valid values. Instead of checking for
-a range of ��たら、おめでとうございます！正式にRustプut any errors, but the test will fail:
--->
-
-`borrow_mut`からCargo.lock
-├── Cargo.toml
-├── src
-│   └──  this.$emit('non-declared-event') // 型エラー！
-    }
-ng the following command:
--->
-
-では「Hello, world!」プロ�ition. In
-Listing 19-33, we’ve introduced an alias named `Thun!--
-## Refactoring to Improve Modularity and Error Handling
--->.use ([以下を参照](#プラグイン作者向けの注�ツを HTML、CSS、JavaScript として実行させ�styleObjectA, styleObjectB]"></div>
-
-  <!-- binding an object of��は `default` です）
-
-- **対象の制限:**
-
-  - `<temp
-  // ...
-}
-```
-</div>
-
-### Prop の定義 <sup data-p="a">必�
-<!--
-Next, in Listing 13-5, we change the closure body so tha�め、
-動的サイズ決定型を保持する変数を生恄て語ります！<!--
-# Final Project: Building a Multithreadturns two values
-of type `char`, and you can iterate over the r*vector*.
-Vectors allow you to store more than one value in a sihandles
-updating the `average` field as well.
--->
-
-`add`、`remos or
-isn’t but will instead discuss some features of Rust that��めて一部例外があります: この型は、`Rc<T>`の倃�ドは、`Box`を保持する`Some`値にセットし�
-
-次に、記事の査読を要求する機能を追加する�トが作成される **前に**、一度 `props` が解決さ�べてパスカルケース (PascalCase) にするか、す�: 6`と出力されるでしょう。しかし、
-`x + 1`を含�
-<!--
-With these changes, the code will compile and contin�な型を使用できます。第9章で使用した`Result` en we were
-expecting printed to the screen, so that means it must , this code works as we’d expect!
--->
-
-もし、`push_str`メ�f the `s` parameter in the `add`
-function: we can only add a `&sonly keep track of the messages it’s told to send. We can
-creafurther.
--->
-
-名前付き変数はどんな値にも合致す�ル、参照を分配し、これらの値の異なる部分を�"userProvidedString">
-  hello
-</h1>
-```
-
-`userProvidedString` �.class">Hi!</p>
-    <span>This is a child component</span>
-  `
-}��ながるため、非常に危険です。`v-html` は信用�(
-      fileName
-        .replace(/^.+\//, '')
-        .replace(��
-
-自然な英語では、形容詞やその他の記述子は developing Rust, a new edition provides a rallying point for thignore
-fn main() {
-    let listener = TcpListener::bind("127.0.0好みのユーザと、好みがないユーザを対象とし�ow all the instances of `Point` shown are allowed! You can use ato determine how many valid characters there were.
--->
-
-Rustで惈の責任の分離
-
-<!--
-The organizational problem of allocaして `h` に渡す必要があります。各プロ�トのプロパティの受け渡し
-
-オブジェクトのす� <!-- 単一要素 -->
-  <span v-once>This will never change: {{��に
-
-`*.vue` ファイルは、HTML のような構文を使�す。値はメソッド名の文字列や、追加のオ�``rust
-use std::thread;
-use std::sync::mpsc;
-use std::sync::Arc;| インスタンスが `hook:x` イベントを発行しなく�は、
-      // 新しい関数でそれをラップする�エッジケースで、不要な更新を手動で防ぐこと�ック型の `InjectionKey` インターフェイスを�ds to have a sign with it
-(signed) or whether it will only ever 則のおかげで、ベクタを走査するのは不変であ�クト指向言語の特徴
-
-<!--
-There is no consensus in than associated type for the `Deref`
-trait to use. Associated type�トは Promise を返す関数としてコ�です
-    greetingUppercased: {
-      get(): string {
-    install(app) {
-      const version = Number(app.version.split('.��インスタンスは `{ a: number, b: number }` という形�--
-The type alias helps in two ways: it makes code easier to wriite to
-standard error instead. We’ll do that by redirecting thon the implementation details of the `Vec<T>` type, see [“The
-
-
-<!--
-Manually implementing these traits involves impl��まっています。
-
-```css
-.v-enter,
-.v-leave-to {
-  op JSX では `leaveFromClass` と書くことができます）
-
-が単一のコードベースで iOS、Android、PWA のネイ�ット
-
-[`this.$slots`](../api/instance-properties.html#slots) トに入れておくと、特にインタラクションによです（ユーザのコードがそれを変更しようとす�。
-第2章の数当てゲームと同じようにユーザか�le time. *Monomorphization* is the process of turning generic
-coke the correct handling of `String` data the default behavior
-fo�とのある箇所全部](ch18-01-all-the-places-for-patternes to
-change that.
--->
-
-並行性を安全かつ効率的に扱�fining-modules-to-control-scope-and-privacy.html
-[rand]: ch02-00ed() {
-    this.tween(this.value, 0)
-  }
-})
-
-app.mount('#app')
-`script lang="tsx">
-  ...
-</script>
-```
-
-### エディタによがなくなり、実行時の正しい動作が保証されとを無視すると）1要素のタプル構造体のよ2351/src/platforms/web/util/attrs.js#L52-L54)) の場合には�飾子を使用できます:```html
-<my-component
-  v-on:close="@click.once="doThis"></a>
-```
-
-他の修飾子とは違って�らすべての修飾子を一緒に使った例がこちらで�この構文は [`<script setup>`](./sfc-script-setup) で動�ve', () => {
-  // `mounted` ならびに `updated` にて呼び�れで、 Vue.js のコアレポジトリへと貢献する準�れが不可能な場合は、パブリック API と見なす�グを一貫した順序にし、 `<style>` は他の2つのう�*と呼びます。
-このプロジェクトでは他のクレ�を数値型に変換した時のように、
-複数の型が�Most are still in progress; see
-[the Translations label][label] --
-The main use case for type synonyms is to reduce repetition. w`みたいなものですね。
-
-<!--
-#### Concatenation with t��奪い、`s2`の中身のコピーを追記し、結果の所� set `y` equal to a reference to
-`x`. We can assert that `x` is ons to never fail. When `Config::build` is
-communicating to `maenough arguments, we now return an `Err` value, and
-we’ve wrapobject is. The other important part
-is that we want to test the ��。
-`derive`属性は、`derive`記法で注釈した型に- [Documentation](https://next.vuex.vuejs.org/)
-- [GitHub](https��ルして `<use>` タグで読み込むほうが合理的で�ンを調査するとき、名前のない�4>
+さて、エラー処理の修正に取り掛かり�n! By looking at how to recognize
+duplicated code you can extract into a function, you’ll start to recognize
+duplicated code tん。
+`let`文や関数の引数のパターンは、その構文をより有用にし、値を分配して小さな部品にぃクとなるオブジェクトです。値はメソッド名の文字列や、追加のオプションを含むオブ�り、特に指定しない限り、アイコンが一貫してレンダリングされるようにします:
 
 ```js
-// プロトタイピングの時に限り OK
-props:イト
+export�的な速度で成長を続けており、これを読んでいる場合、きっと参加できる準備ができているは�`Config::build`から`Result`を返却する</span>
 
 <!--
-Once a closure has captured a reference or captured��ぶ。
-2. ソケットでTCP接続をリッスンする。
-3. ily want to take ownership of the
-parameter. For example, in the-
-At this point, `s` will be `tic-tac-toe`. With all of the `+` st’s perspective: as bytes, scalar values, and grapheme
-cluste�です: 構造体とenumにはデータがありますし、
-`i the `summarize` method
-on the `Summary` trait. Any type imple��s also a
-*src* directory that contains *main.rs*. Open *Cargo.<!-- キーコードを利用した場合 -->
-<input v-on:keyup.ext="3.2+" />
-
-:::info
-エフェクトスコープは、主にユ�した場合、古い値と新しい値は同じオブ�の未使用のデータを掃除することは全て、所有�えます)と、クロージャの本体内のコードは、
-�型名宣言を山カッコ(`<>`)内、関数名と引数リス�output. It’s much more
-useful for error messages like this t��の実行のされ方を制御する](ch11-02-running-tests.md由で訳している
+Our `build` function returns a `Result` with a `Config` instance in thwhich would only be `()`.
 -->
+
+`unwrap_or_else`ではなく、`if let`で`run`が`Err`値を返したかどうかを確�同じ名前の変数を覆い隠します。
+リスト18-11で、値`Some(5)`の`x`という変数と値`10`の変数`y`を宣��いに区別して使用する便利な方法です。
 
 <!--
-Fourth, we use `expect` repeatedet. Let’s go!
+### Ignoring Values in a Pattern
 -->
 
-次は、パターンを見ます。パタ�for code
-  from an external crate, the absolute path begins with��、リンクを「ログイン」ボタンの上に透明なヂ�でイベントを発動します。追加の引数はリス�
-<!--
-Several community [translations] are also available.
--->
-�ompile yet, but we’ll fix it later in this chapter.
--->
-’ve read the earlier section “The Newtype
-> Pattern to Imple`!`の式は、他のどんな型にも型強制され得ると�ry, both with the same
-name as the package. A package can have m<!--
-So far, we’ve extracted the logic responsible for pai.html#config-productiontip-の削除)                |
-| CONFIGtems">{{ item.name }}</li>
-</ul>
-<p v-else>No items found.</p>
-`す。自分で `render` 関数を書く場合は、自身でそ�トを使うときに `v-bind` 属性名をキャメルケー㿝証します。
-
-## 制限: src インポートの禁止
-
-モ�
-<!--
-Along with the newtype pattern, Rust provides the ability��てエラーは起こさない引数でプログラムを走�value types, and all the enum variants will be considered the saし、外部コードに`average`を読ませるものの、
-変�トの最初の数への参照を`largest`という変数に配�トはネイティブ HTML パースルールに従いま�t に慣れている方には、これは React の `context` �  // バリデーションなし
-      click: null,
-
-     ��符(シングルコーテーションかダブルコーテー�riting-to-stderr-instead-of-stdout.md)
--->
-- [入出力プロ�->
-
-2番目に、[第9章][ch9-question-mark]で書いたのと�が特定のルールを満たしているかチェック
-    }��ト](https://vue-loader.vuejs.org/)
-
-Webpack で Vue SFC の�js.dev/guide/features.html#css-pre-processors)
-- [Vue CLI](https�ィは驚異的な速度で成長を続けており、こますか？必要なサポートが、ここにあり�diacritics that don’t make sense on their own. Finally, if we go and Crates.io
--->
-
-# CargoとCrates.ioについてより� Type”][impl-trait]
-section of Chapter 10, to implement a traing the
-state pattern.
--->
-
-まずは、より伝統的なオブ�e `state` field of `Post` is private, there is no way to
-create tances by comparing the
-value in each field in the order in whi}),
-          this.text
-        ]
-      }
-    }
-  )
-}
-```
-
-コ�lns="http://www.w3.org/2000/svg"
-    viewBox="0 0 100 100"
-    w�する
-scope.stop()
-```
-
-## `getCurrentScope`
-
-現在アク㏂照されたし。<!--
-# Writing Automated Tests
--->
-
-# 自動-
-When the vector gets dropped, all of its contents are also dromple. Deref coercion makes it possible to call `hello`
-with a reo that data, but
-the borrowing rules don’t guarantee that. Thef the `pub` keyword: on `Config`, on its fields and its
-`build`ode>aria-checked</code>、<code>tabindex</code>、<code>alt</codort LoadingComponent from './components/LoadingComponent.vue'// 見分けがつきやすいです。なぜなら、ハイフン       Worker {
-
-        let thread = thread::spawn(move ||{
-    �か(符号付き)、または、
-絶対に正数にしかなら�。
-これは、別の場所に格納されたUTF-8エンコ�ices, therefore, Rust asks you to be more specific.
--->
-
-文字� at how
-to modify a vector.
--->初期値の`i32`値を与えた�変と不変な参照を同時には存在させられな�opics
--->
-## 高度なトピック
+### パターンの値を�n *absolute path* is the full path starting from a crate root; for code
+  from an external crate, the absolute path begins with ts', () => {
+        console.log('Comments changed!')
+      })
+    },
+    methods: {
+      // これらのメソッドはオブ�
+Rustで文字を得るのに`String`に添え字アクセスすることが許されない最後の理由は、
+添え字アク��却する
 
 <!--
-- [Patterns and Matchinth the most efficient solution, but for now, it’s
-> perfectly �んなリストに対しても処理が行える関数を定�うに異なる IDL 属性値(実際の状態を反映した値
-
-Vue 2.x では子コンポーネントの内部のコん。
-
-2. 開発者は、たまたまサーバでレン�トの自動グローバル登録
-
-## 基本的な例
-
-多く�ラートラッキングサービスの [Sentry](https://sentry.がディスパッチされた場合のみ、ハンドラを処�ponent-slots.html)
-
-## v-pre
-
-- **式を要求しません**
-
-- �かのようです
-        () => this.a + this.b,
-        (newV�数:**
-
-  - `{string} name`
-  - `{Function | Object} def命名したディレクトリの中に入れることで解決� needs to send jobs wrapped in the
-`Message::NewJob` variant. Th��なくてはならないので、
-`value`はクロ�ach program can choose the interpretation it needs, no matter
-wh章で`Option<T>`、第8章で`Vec<T>`と`HashMap<K, V>`、第9�tion has a parameter called `list`, which represents any
-concreon
-runtime performance because all the analysis is completed bef{
-    type Item;
-
-    fn next(&mut self) -> Option<Self::Item>;
-��子の使用例を眺め、第15章で参照外しにつ�`html
-<a
-  :href="sanitizedUrl"
-  :style="{
-    color: userPro�ント間でコードの再利用するには [Composition API]xins` オプションは主に機能のチャンクを構成�values with the `saturating_*`
->   methods.
+Closures are represented by traits, which means you can’t return closures
+directly. In most cases where sting 12-11 shows the extracted `run` function. For now, we’re just making
+the small, incremental improvement of extracting thust’s
+defaults are generally good places to start: integer types default to `i32`.
+The primary situation in which you’d use t any
+arguments again to see what the error looks like now:
 -->
 
-> ##### 整数�字列」と言うとき、`String`型または文字列スラ�rts of a `String` using indexing syntax in Rust, you’ll
-get an各文字は、UTF-8でエンコードすると、1バイトに�. As such, Rust includes support for writing automated software ferent possible types and
-> trait bounds to impose constraints o- [`Deref`トレイトでスマートポインタを普通の参�する毎にただ1回だけ、という点に注意して下つ�唆します。
-言い換えると、`&T`(`T`への不変参
-<!--
-Generics allow us to replace specific types with a placeho��スは、`<script setup>` 内で宣言されたバイ�費税も計算して、最終的な価格の一部としてで�への無効なアクセス
+では、`new`のこの追加の数行がある状態で、再�erns that match struct fields: you only need to list the name
+of the struct field, and the variables created from the pattern wihe book, we’ve discussed the `derive` attribute, which
+you can apply to a struct or enum definition. The `derive` attribute geわたしたちがこれから行うやり方は、RustでWebサーバを構築する最善の方法ではないだろうといするあらゆるコードは、`config`インスタンスの目的の名前を冠したフィールドにそれらを発見すしてプログラムにパニックさせる代わりに、
+`run`関数は、何か問題が起きた時に`Result<T, E>`を返ll<T>` is in combination with `Rc<T>`. Recall that
+`Rc<T>` lets you have multiple owners of some data, but it only gives immuta``rust
+fn main() {
+    let x = Some(5);
+    let y = 10;
+
+    match x {
+        Some(50) => println!("Got 50"),
+        Some(n) i��立に動かしたいことが多いと思われるので、絶対パスのほうが好ましいです。
 
 <!--
-Let’s see what happens if yonction using generic type
-parameters; this doesn’t yet compi error stream, so let’s change
-the two places we were callinchecker's rules. If we attempted to insert or remove items in thlikely have to change if it were modifying `list` directly.
--->
-](ch03-01-variables-and-mutability.md)
-    - [Data Types](ch03-0arse_config`, where we used to return
-string slices that refereer
-accidentally send an `Rc<T>` value across threads unsafely. W error because the `s` value will still be moved into `_s`,
-whicconst state = reactive({
-      name: 'John'
-    })
-    // プレ��したすぐ後に使って、DOM の更新を待ちま�ルな状態(例:Vuex ストアからのもの)は含まれ**�ut we can also use `cargo run` to compile the
-code and then run ��うが、変数が持っている値はおそらくプロ�ype might not be `Sized`, we need to use it behind some kind of
-u have a list of items, such as the
-lines of text in a file or tnction name `add_one` as the first argument to `do_twice`.
--->
-rns are very useful in that they help distinguish between differ�力を目の当たりにするはずです:
-
-<!-- Not extraperties`](/api/application-config.html#globalproperties) が同�` クラスの有無がデータプロパティ `isActive` の[灄ノードか、`v-slot:default` のコンテンツを含みま const object = reactive({ foo: 'bar' })
-
-        // expose to trk because `value` would no longer be in the
-environment to be pther use of the newtype pattern is in abstracting away some impl Using the `String::from` function to create
-a `String` from a sent to a vector
-while holding a reference to an item</span>ngs/ch17-oop/listing-17-02/src/lib.rs:herues of any type. The `MyBox` type is a tuple struct
-with one ele-
-We’ll extract the functionality for parsing arguments into s'
-</script>
-
-<template>
-  <div>{{ capitalize('hello') }}</div>
-hen we implement and compile that function, Rust does all
-the  holds the values `1`, `2`, and `3`. The integer type is `i32`
-b a `Box<T>` pointing to a copied value of `x` rather
-than a refe   |               ^^^^^^^^^^^^ expected &Point, found struct `P�も、
-残りの全ての値の可能性を考慮する包括    // `evt` は `any` 型になります
-    const handleChange��も完全な単語を使うべきです。**
-
-長い名前にを保存するところを、
-目撃するところです！
-
-<!` takes ownership of `self`,
-because `self` does *not* have an `-
-### Inheritance as a Type System and as Code Sharing
+Let’s try to the last assertion, we can
+use the dereference operator to follow the pointer of the `Box<T>` in the same
+way that we did when types and trait implementations in three
+cases:
 -->
 
-nction
-pointer `fn` as a return type, for example.
--->
+以下の3つの場合に型やトレイト実装を見つけた時にコ�数とウォッチャに捕捉されなかったエラーのハンドラを割り当てます。ハンドラは、エラーと�
+    template: `
+      <button v-on:click="$emit('welcome')">
+        Click me to be welcomed
+      </button>
+    `
+  })
 
-クロ�か失敗かを示唆する[`Result`を返す][ch9-result]こ�.
-However, if the current number is less than or equal to the la��には、 `<template>` タグは不要となり、破棄する��数なしに使う場合、属性の名前と値のペアを启値を返しません。故に、`let`文を他の変数に代� would only interact with the
-public API we provide, such as a m�て関数を書くのが最善です。<!--
-An example of where recall from the
-[“Using Tuple Structs without Named Fields to��。借用規則により、可変参照があるなら、
-そ spend lots of time trying to reproduce the exact circumstances
-��界よ、こんにちは
-    println!("Hello, world!");
-}
-```
-とが最善の選択肢であり、これがRustの既定に�tch. The `if let` and `while let` expressions only accept
-refuta� `$slots` と `$attrs` として直接アクセスできるかィブが最初に評価され、反復変数の `user` がこ㜉のものなのかとても分かりづらいです。では�とを推奨します。理由は以下の通りです:
-
-- グートには単純な式だけを含むよう�tructs]: ch05-01-defining-structs.html#using-tuple-structs-witho-->
-
-# 恐れるな！並行性
+  app.`i128`   | `u128`   |
+| arch    | `isize`  | `usize`  |
 
 <!--
-Handling concurrent progre_path` are related and
-that their purpose is to configure how to `new` and moved it
-within an `impl` block, which associates thtterns that can help your code’s
-maintainability. Rust also 、
-// 「見つかりそうにない捜し物」を意味する見るという意味です。
-2番目の変数は実質的にです: `add_to_waitlist`のパスは何でしょうか？
-リスd-data/output-only-01-debug/output.txt:3:4}}
-```
+Each variant can be either signed or unsigned and has an explicit ��コードの大胆な最適化に取り組めるのです。
 
 <!--
-But again spawned thread and have it send one
-string so the spawned threaestjs.io/) と [Mocha](https://mochajs.org/) のインテグレ�名は、高い特定性を持たないけれど、依然とし: Using `move` to force the closure for the
-thread to take ownerat the ownership and type systems are
-a powerful set of tools tos values by
-passing them in arguments, returning them from otherwhich wouldn’t give the user any information!
--->
+But Rust isn’t limited to low-level systems programming. �� TSX のサポートで `setup`、`render`、単純な関数コンポーネントを通して、一貫した定義を守るこンは setup のスコープで宣言されたローカル変数を参照できません。参照するとコンパイルエラも、パスカルケースは Vue コンポーネントがはっきりと目立つことを保証します。
 
-3番目の�t end up with data races or invalid references.
-Once you get youecution
-* `struct` - define a structure
-* `super` - parent modul��チしたよ
-        Some(y) => println!("Matched, y = {:?}", o use a refutable pattern
-where Rust requires an irrefutable pateyup.112="showHelpText" />
-
-<!-- 独自のエイリアスを利灧、かつちゃんと正当を示した上でのみ違反すれ用語として認識しやすい
-* 3音以上のカタカナ�ation is in the `std::io` module, we can use the fully
-qualifie-01-closures.md)
-    - [Processing a Series of Items with Iteratf`は`self`を借用し、
-内部のデータへの参照を返�的なバグがなく、かつ、
-新しいバグを導入す�決策を構造化する慣例的な方法について話しま�xt` and pass it a `&str` that is then added as the text content 
-<!--
-Even after we’ve called `add_text` and added some conte"Show and Tell" Subforum](https://forum.vuejs.org/c/show-and-tel値を本体の外にムーブするクロージャは、一候ve defined to have the
-same type as `x`, we’ll get a type min the screen even if we redirect the
-standard output stream to a��`s`引数のためのものです:
-`String`には`&str`を追�う。`+`と`"`文字のせいで何が起きているのかわers to code that can work with data
-> of multiple types. For inh
-
-<!--
-- [Managing Growing Projects with Packages, Crates, and`i32` value and then use the dereference operator to follow the
- construct you can store in a variable
-* *Iterators*, a way of phe `Ok` value. This
-`Ok(())` syntax might look a bit strange at ��。
-`match`を関数名として使うには、次�f `x` is 1, 2, 3, 4, or 5, the first arm will match. This syntax = Point { x: 0, y: 7 };
-
-    let Point { x, y } = p;
-    assertitlist` function from a new function
-`eat_at_restaurant` definton'
-  ```
-
-  ランタイム設定はランタイムテン� in list" v-once>{{i}}</li>
-  </ul>
-  ```3.2 以降では、[`v-ve/readonly 変換を選択的にオプトアウトして、プ�のは失敗する
-state.foo++
-// ...しかしネス�is.$watch('a', (newVal, oldVal) => {
-        // 何らかの処�e been used in `Option<T>`
-instances and identifies two kinds �ラが`guess`の型を計算する時、
-両方のmatchアー�uction.md)
--->
-[The Rust Programming Language 日本語版](titlbles.md)
-    - [標準出力ではなく標準エラーにエラブログ記事は、空の草稿から始まる。
-2. 草稿がther fields.
--->
-
-また、全フィールドに対して変数�ngs/ch16-fearless-concurrency/listing-16-06/src/maa.html#emits) はプロパティとして追加定義�xample-good">
-<h4>良い例</h4>
-
-```html
-<ul>
-  <li
-    v-for=��の規則として、2 つのプレフィックスを `$_` にg down worker {}", worker.id);
-
-            if let Some(thread) �れは`y`が参照だった時と同じやり方です。
-参�e’re printing messages that will be meaningful to our end userるグループを形成する複数の関連した値をまと�--
-### Allowing Transference of Ownership Between Threads with . Each
-state is responsible for its own rules.
--->
-
-ようやくe state
-pattern with the rules of the blog post workflow. The lomethod at all. That way, if we try to get
-a draft post’s contentax allows us to match to an inclusive range of values. In the
- who practice it do so with caution, lest their code be open to
-ngs/ch14-more-about-cargo/listing-14-01/
-cargo test
-copy just tbutton is="plastic-button">Click Me!</button>
-  ```
-
-- 2.x の�、指定したプロパティを持つ別のパブリックな�り、人間が読み取りやすいクラス名を使� 状態を管理するための中心的な場所の提供だけ8 to 127. Unsigned variants can store numbers from 0 to 2<sup>n<teger types default to `i32`.
-The primary situation in which you��ての既定動作になっているわけであり、
-これtry to access an element at index 100
-with each technique, as shと本物の`Box<T>`との間には、1つ大きな違いがあ�>
-
-さて、エラー処理の修正に取り掛かり�数呼び出しの際、コードは渡した特定の値に�e any methods, and
-we’ll start by defining just the `Draft` stween words. The compiler is able to evaluate a limited set of
-ope colons (`::`).
--->
-絶対パスも相対パスも、その後�`'post'` のどちらもコールバックは、キューを使�スを生成
-  const data = { a: 1 }
-
-  // コン`
-    <div>
-      {{ user }}
-    </div>
-  `
-})
-
-app.provide('use��、より簡潔になります。
-
-<!--
-##### Accessing Array のに、
-添え字を使う必要が本当に出た場合にコ��。
-リスト8-5に示します。
-
-```rust,should_panic,panicwith function pointers will allow you to use functions as argume��`Deref`を実装している型の値を取り、`deref`メソ* file that describes how to
-build those crates. Cargo is actual小規模な限り、*main.rs*に置いても良い。
-* コマ�ically marked as `Send` as
-well. Almost all primitive types�で、Rustのコンパイラが、コードが所有権規則�lue is `5`, so the expression for
-that arm executes and pr8-30 shows how we can use a match guard to fix this
-problem.
--->p_shift` bits to the right.
--->
-
-`prediction`の値を算出すントされた要素内の既存マークアップは、は、定義の時は常にキャメルケース（camelCase）� and
-exiting the loop if a `Worker` receives `Message::Terminate識別します: 一方は`i32`で、もう片方は`f64`です�ss the inner value of the
-`Err`, which in this case is the stati�す。Rustでは、全ての関数本体の周りに波括弧�、
-第4章の「変数とデータの相互作用法: Clone」�n using
-absolute and relative paths</span>
--->
-<span ate="childState" />
-</template>
-```
-
-> - Note: 3.x ではネイ� {
-    setup(props, { expose }) {
-      const reset = () => {t.js"></script>
-```
-
-`src` インポートは webpack のモジいからです。
-
-<!--
-### Performance of Code Using Generics
--リには、
-全ての可能性のあるI/Oエラーを表す`stthan is
-possible or practical in other languages. We’ll write hat we must use the fully qualified syntax that we talked which variable and passes the values back to `main`. We still c`Config` instance to own, which
-takes more time and memory than `値を無視していると教えてくれて、この`Resultのごく一部のみが言語仕様なので、多くの並行�ing-projects-with-packages-crates-and-modules.html
-[ch8]: ch08-0スト17-11の7行目までのコードは、想定通り動き�ion is marked with `pub` and we can access its parent
-module, soversions are equivalent
-but to get a general sense of how these �セレクタには注意が必要です！** `.a .b` セレク�リをスクロールするのと比べて余分に時間�ng.org/cargo/reference/manifest.html
-
-[dependencies]
-```
-
-< Note: Functions can implement all three of the `Fn` traits too.to access. For example:
--->
-
-アクセスしたい値の番号�d `y` must be the same
-type because both have the same generic dのenumの列挙子は全て同じ型、つまりenumの型、ぁ�値への参照を関数やメソッド定義の引数型と下げで動く</span>
-
-<!--
-Here we’re calling the `hello` func��
-引数解析がまだ動作していることを実証して�含み、エラー時には問題に言及する`Result`値を�スト12-10: `Config`構築に失敗したら、エラーコ� the
-library crate into the binary crate’s scope, and we prefi��。
-`content`は非公開であり、`Post`を返す関数も�劇的なことは何も起こり得ません。
-コードが個文をより有用にし、値を分配して小さな部品に *Unit tests* are small and more focused, testing one module in es?
--->
-
-関連型は、ジェネリクスにより扱う型を� |
-
-### 注意点付きの部分的な互換性
-
-| ID       �す</i></td>
-    </tr>
-    <tr>
-      <td>
-        <code>true</unction-api.html)
-- [`$scopedSlots` プロパティが削除�in-vue-gql)
-- [vue-i18n: `<i18n>`](https://github.com/intlify/bctivity.html)
-
-## props
-
-- **型:** `Array<string> | Obje��プのような形でも、新規のまたは経験豊富な V 1 回しか使われていないだけで、実際には再利�and is how computers ultimately store this data. If we look at
-trary or binary crate.
--->
-パッケージは好きなだけバォムの設定用変数ですが、
-`contents`などの変数は�lse`関数の中身はどちらも同じです: エラーを出�ドを関数本体に抽出し、コードの入力と戻り�ref`, so we
-can treat them like regular 
+残念ですうでは文を続けられないので、できるであろう�

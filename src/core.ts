@@ -1,8 +1,8 @@
 // The codec over a compiled wasm module; the package entries only differ in how they obtain
 // the module (`index.ts` reads the file, `workers.ts` imports it as a module).
 
-/** The frame format version `compress` writes; `decompress` reads this version only. */
-export const FORMAT_VERSION = 1;
+/** The frame format version `compress` writes; `decompress` reads this version and version 1. */
+export const FORMAT_VERSION = 2;
 
 /**
  * Thrown when a frame is truncated, corrupt, from another format version, fails its CRC, or

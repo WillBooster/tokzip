@@ -1,11 +1,15 @@
-# tokzip frame format (version 1)
+# tokzip frame format (versions 1 and 2)
 
 The token grammar, range coder, language dictionaries, and model priors define a codec
-generation. Encoder search heuristics and equivalent implementation changes do not require a
-new generation. Changing decoding rules or retraining assets does: released generations will
-need distinct versions and retained decoders. During pre-release development, v1 assets are
-replaced in place, so frames from earlier development builds are not compatible. Decoders
-reject unknown versions.
+generation. Encoder search can improve without changing the generation. The encoder writes
+version 2; the decoder also reads version 1, emitted by the released v1.0.0 module. Both
+versions use the layout and token grammar below and select different dictionaries and priors.
+Unknown versions are rejected.
+
+Released generations must retain their decoding rules and assets. The frozen v1 snapshots
+live in `dict/v1/` and `priors/v1/`, with language/group metadata and checksums in
+`dict/v1/manifest.json`. The build rejects changes to the checksummed files. Retraining the
+current assets requires a new format version and retaining the released generation's decoder.
 
 The reference implementation is `rust/crates/tokzip`. All multi-byte integers are little-endian;
 varints are LEB128 (7 payload bits per byte, bit 7 = continue, canonical: a multi-byte varint
@@ -17,7 +21,7 @@ never ends in a zero byte).
 frame := header sizeVarint crc32 body
 ```
 
-- `header`: one byte — magic `1101` in the high nibble, then two version bits (1; the value 3
+- `header`: one byte — magic `1101` in the high nibble, then two version bits (1 or 2; the value 3
   is reserved for an extension byte that would follow), then two layout bits: 0 =
   single-segment, 1 = multi-segment, 2 = blocked, 3 = stored.
 - `sizeVarint`: decompressed length in bytes. For coded frames decoders reject a length above
@@ -152,8 +156,8 @@ class table (values < 32), then every 256-node tree from the literal trees on (t
 literal trees, then the two matched-literal trees) as a depth-first walk with one flag bit per
 visited node — 1: the node's value follows in the value stream and its children are walked; 0:
 the node and its subtree are flat and skipped — the flag bits of a tree packed LSB-first into
-bytes, followed by its values. All are trained offline (`bun run train`) and are format
-identity: a retrain changes the coded stream.
+bytes, followed by its values. The current generation is trained offline (`bun run train`). These assets are format
+identity: retraining requires a new generation.
 
 The class tables and the literal trees (everything from the literal context pairs on) are
 shared by the languages of a model group — prose (`text`, `en-US`), Japanese, Chinese, code —
@@ -169,3 +173,11 @@ use the wrapper and group dictionary as their prefix dictionary; a group's share
 no dictionary and the group's first language's models. They are decoded on first use. The
 detection table maps each 4-gram hash through a 16-bit index to a three-byte language set,
 which detection reads instead of decoding the dictionaries.
+
+The build packs v1 dictionaries as deltas against each current language's full dictionary,
+using that language's current model. It packs each v1 group's literal priors against the
+current packed literal priors of the group's first language, and embeds the v1 language nodes
+verbatim. `legacy.rs` restores those deltas with the current codec before constructing the
+immutable v1 models and dictionaries. The released language/group mapping comes from the
+frozen manifest, independently of the current model groups. V1 frame decoding uses those
+restored assets with the shared token grammar; v2 frame decoding uses the current assets.

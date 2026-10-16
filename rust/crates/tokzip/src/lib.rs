@@ -2,9 +2,9 @@
 //! encoder detects the language(s) of the input itself and picks the best of its embedded
 //! dictionaries per segment.
 //!
-//! Frame layout (format v1; released decoding rules, dictionaries, and priors must be
+//! Frame layout (formats v1 and v2; released decoding rules, dictionaries, and priors must be
 //! preserved for existing frames, while encoder search can improve independently):
-//!   [0]    header byte: high nibble 0b1101 (magic), bits 3–2 = version (1; 3 is reserved for
+//!   [0]    header byte: high nibble 0b1101 (magic), bits 3–2 = version (1 or 2; 3 is reserved for
 //!          an extension byte), bits 1–0 = layout (0 single-segment, 1 multi-segment,
 //!          2 blocked, 3 stored)
 //!   varint decompressed length
@@ -23,6 +23,7 @@ mod error;
 mod grams;
 mod lang;
 mod languages;
+mod legacy;
 mod lz;
 #[cfg(feature = "train")]
 #[allow(dead_code)]
@@ -33,12 +34,23 @@ pub mod train;
 mod varint;
 
 pub use error::DecodeError;
-use lz::Segment;
+use lz::{Primed, Segment};
 use varint::{push_varint, read_varint, varint_len};
 
 const MAGIC: u8 = 0xD0;
-const VERSION: u8 = 1;
-/// The header byte of a version-1 frame with `layout`.
+const VERSION: u8 = 2;
+
+#[derive(Clone, Copy)]
+struct Generation {
+    languages: usize,
+    primed: fn(u8) -> &'static Primed,
+}
+
+const CURRENT_GENERATION: Generation = Generation {
+    languages: lang::LANGUAGE_COUNT,
+    primed: lang::primed,
+};
+/// The header byte of a current-generation frame with `layout`.
 const fn header(layout: u8) -> u8 {
     MAGIC | (VERSION << 2) | layout
 }
@@ -148,7 +160,14 @@ fn coded_block(block: &[u8], probe: bool) -> Option<(u8, Vec<u8>)> {
     let mut decoded = Vec::new();
     let recoverable = payload.len() < block.len()
         && block.len() <= payload.len().saturating_mul(MAX_EXPANSION)
-        && decode_block(layout == LAYOUT_MULTI, &payload, block.len(), &mut decoded).is_ok()
+        && decode_block(
+            layout == LAYOUT_MULTI,
+            &payload,
+            block.len(),
+            &mut decoded,
+            CURRENT_GENERATION,
+        )
+        .is_ok()
         && decoded == block;
     recoverable.then_some((layout, payload))
 }
@@ -307,9 +326,14 @@ pub fn decompress(frame: &[u8], max_len: usize) -> Result<Vec<u8>, DecodeError> 
     if frame[0] & 0xF0 != MAGIC {
         return Err(DecodeError::BadMagic);
     }
-    if (frame[0] >> 2) & 3 != VERSION {
-        return Err(DecodeError::UnsupportedVersion);
-    }
+    let generation = match (frame[0] >> 2) & 3 {
+        1 => Generation {
+            languages: legacy::LANGUAGE_COUNT,
+            primed: legacy::primed,
+        },
+        VERSION => CURRENT_GENERATION,
+        _ => return Err(DecodeError::UnsupportedVersion),
+    };
     let layout = frame[0] & 3;
     let (out_len, rest) = read_varint(&frame[1..])?;
     if rest.len() < 4 {
@@ -344,11 +368,17 @@ pub fn decompress(frame: &[u8], max_len: usize) -> Result<Vec<u8>, DecodeError> 
     let out_len = out_len as usize;
     let mut content = Vec::new();
     if layout == LAYOUT_BLOCKED {
-        decode_blocks(body, out_len, &mut content)?;
+        decode_blocks(body, out_len, &mut content, generation)?;
     } else if out_len > BLOCK_LEN {
         return Err(DecodeError::Corrupt);
     } else {
-        decode_block(layout == LAYOUT_MULTI, body, out_len, &mut content)?;
+        decode_block(
+            layout == LAYOUT_MULTI,
+            body,
+            out_len,
+            &mut content,
+            generation,
+        )?;
     }
     if crc32fast::hash(&content) != expected_crc {
         return Err(DecodeError::ChecksumMismatch);
@@ -361,6 +391,7 @@ fn decode_blocks(
     mut body: &[u8],
     out_len: usize,
     content: &mut Vec<u8>,
+    generation: Generation,
 ) -> Result<(), DecodeError> {
     // Content that fits one block has the single-block layout; here it is a structural error.
     if out_len <= BLOCK_LEN {
@@ -390,7 +421,13 @@ fn decode_blocks(
             }
             content.extend_from_slice(payload);
         } else {
-            decode_block(layout == LAYOUT_MULTI, payload, block_len, content)?;
+            decode_block(
+                layout == LAYOUT_MULTI,
+                payload,
+                block_len,
+                content,
+                generation,
+            )?;
         }
         body = rest;
     }
@@ -407,6 +444,7 @@ fn decode_block(
     payload: &[u8],
     block_len: usize,
     out: &mut Vec<u8>,
+    generation: Generation,
 ) -> Result<(), DecodeError> {
     let (segment_count, mut rest) = if multi {
         read_varint(payload)?
@@ -420,7 +458,7 @@ fn decode_block(
     let mut end = 0usize;
     if !multi {
         let (&lang, after) = rest.split_first().ok_or(DecodeError::Truncated)?;
-        if usize::from(lang) >= lang::LANGUAGE_COUNT {
+        if usize::from(lang) >= generation.languages {
             return Err(DecodeError::Corrupt);
         }
         segments.push(Segment {
@@ -432,7 +470,7 @@ fn decode_block(
     }
     for _ in 0..if multi { segment_count } else { 0 } {
         let (&lang, after) = rest.split_first().ok_or(DecodeError::Truncated)?;
-        if usize::from(lang) >= lang::LANGUAGE_COUNT {
+        if usize::from(lang) >= generation.languages {
             return Err(DecodeError::Corrupt);
         }
         let (len, after) = read_varint(after)?;
@@ -446,7 +484,7 @@ fn decode_block(
     if end != block_len {
         return Err(DecodeError::Corrupt);
     }
-    lz::decode_doc(&lang::primed, rest, block_len, &segments, out)
+    lz::decode_doc(&generation.primed, rest, block_len, &segments, out)
 }
 
 #[cfg(test)]
@@ -588,7 +626,7 @@ mod tests {
         assert_eq!(decompress(&[], usize::MAX), Err(DecodeError::Truncated));
         assert!(decompress(&frame[..frame.len() / 2], usize::MAX).is_err());
         let mut bad = frame.clone();
-        for version in (0..4).filter(|&v| v != VERSION) {
+        for version in (0..4).filter(|&v| v != 1 && v != VERSION) {
             bad[0] = MAGIC | (version << 2);
             assert_eq!(
                 decompress(&bad, usize::MAX),

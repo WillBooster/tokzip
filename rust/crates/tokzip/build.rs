@@ -28,6 +28,9 @@ mod rc;
 #[path = "src/varint.rs"]
 mod varint;
 
+#[path = "build/v1.rs"]
+mod v1;
+
 pub use error::DecodeError;
 use languages::{Group, LANGUAGES};
 use std::path::{Path, PathBuf};
@@ -46,54 +49,9 @@ fn main() {
     ] {
         println!("cargo:rerun-if-changed={file}");
     }
-    let read = |path: &Path| {
-        println!("cargo:rerun-if-changed={}", path.display());
-        std::fs::read(path)
-    };
-    // Committed priors may be missing or stale after a model change (flat priors stand in,
-    // with a warning); every dictionary file is required, since a missing one would otherwise
-    // ship silently as an empty part.
-    let read_optional = |path: &Path| read(path).unwrap_or_default();
-    let read_required =
-        |path: &Path| read(path).unwrap_or_else(|e| panic!("{}: {e}", path.display()));
-    // A model layout change leaves the committed priors stale until the trainer (which needs
-    // this build) rewrites them: flat priors stand in meanwhile.
     let flat_raw = pack::flat_raw();
-    let flat_language = pack::language_part(&flat_raw);
-    let group_literals: Vec<Vec<u8>> = Group::ALL
-        .iter()
-        .map(|group| {
-            let path = root.join("priors").join(format!("{}.bin", group.name()));
-            let part = read_optional(&path);
-            if lz::LiteralModels::try_from_packed(&part).is_some() {
-                part
-            } else {
-                println!(
-                    "cargo:warning={} does not match the model layout; embedding flat priors until retrained",
-                    path.display()
-                );
-                pack::literal_part(&flat_raw)
-            }
-        })
-        .collect();
-    let language_parts: Vec<Vec<u8>> = LANGUAGES
-        .iter()
-        .map(|(name, _)| {
-            let path = root.join("priors").join(format!("{name}.bin"));
-            let part = read_optional(&path);
-            if part.len() == lz::LIT {
-                part
-            } else {
-                println!(
-                    "cargo:warning={} has {} bytes, expected {}; embedding flat priors until retrained",
-                    path.display(),
-                    part.len(),
-                    lz::LIT
-                );
-                flat_language.clone()
-            }
-        })
-        .collect();
+    let group_literals = load_group_literals(&root, &flat_raw);
+    let language_parts = load_language_parts(&root, &flat_raw);
     let models: Vec<lz::Models> = LANGUAGES
         .iter()
         .zip(&language_parts)
@@ -131,6 +89,7 @@ fn main() {
     group_priors.push(']');
     group_dicts.push(']');
     let mut trained_dictionaries: Vec<Vec<u8>> = Vec::new();
+    let mut full_dictionaries = Vec::new();
     let mut assets = String::from("[\n");
     for (i, (name, group)) in LANGUAGES.iter().enumerate() {
         let suffix = read_required(&root.join("dict").join(format!("{name}.bin")));
@@ -144,6 +103,9 @@ fn main() {
             pack::pack_dictionary(&suffix, &models[i], &prefix),
         )
         .expect("write packed dictionary");
+        let mut full = prefix;
+        full.extend_from_slice(&suffix);
+        full_dictionaries.push(full);
         let mut trained = shared_parts[*group as usize].clone();
         trained.extend_from_slice(&suffix);
         trained_dictionaries.push(trained);
@@ -152,8 +114,64 @@ fn main() {
         ));
     }
     assets.push(']');
+    let (grams_path, masks_path) = write_detection(&out, &trained_dictionaries);
+    std::fs::write(
+        out.join("assets.rs"),
+        format!(
+            "static ASSETS: [Assets; {}] = {assets};\nstatic GROUP_PRIORS: [&[u8]; {}] = {group_priors};\nstatic GROUP_DICTS: [&[u8]; {}] = {group_dicts};\nstatic GRAM_TABLE: &[u8] = include_bytes!({grams_path:?});\nstatic GRAM_MASKS: &[u8] = include_bytes!({masks_path:?});\n",
+            LANGUAGES.len(),
+            Group::ALL.len(),
+            Group::ALL.len()
+        ),
+    )
+    .expect("write assets.rs");
+    v1::emit(&root, &out, &models, &full_dictionaries, &group_literals);
+}
+
+fn load_group_literals(root: &Path, flat_raw: &[u8]) -> Vec<Vec<u8>> {
+    Group::ALL
+        .iter()
+        .map(|group| {
+            let path = root.join("priors").join(format!("{}.bin", group.name()));
+            let part = read_optional(&path);
+            if lz::LiteralModels::try_from_packed(&part).is_some() {
+                part
+            } else {
+                println!(
+                    "cargo:warning={} does not match the model layout; embedding flat priors until retrained",
+                    path.display()
+                );
+                pack::literal_part(flat_raw)
+            }
+        })
+        .collect()
+}
+
+fn load_language_parts(root: &Path, flat_raw: &[u8]) -> Vec<Vec<u8>> {
+    let flat_language = pack::language_part(flat_raw);
+    LANGUAGES
+        .iter()
+        .map(|(name, _)| {
+            let path = root.join("priors").join(format!("{name}.bin"));
+            let part = read_optional(&path);
+            if part.len() == lz::LIT {
+                part
+            } else {
+                println!(
+                    "cargo:warning={} has {} bytes, expected {}; embedding flat priors until retrained",
+                    path.display(),
+                    part.len(),
+                    lz::LIT
+                );
+                flat_language.clone()
+            }
+        })
+        .collect()
+}
+
+fn write_detection(out: &Path, trained_dictionaries: &[Vec<u8>]) -> (PathBuf, PathBuf) {
     let grams_path = out.join("grams");
-    let table = grams::gram_table(&trained_dictionaries);
+    let table = grams::gram_table(trained_dictionaries);
     let mut masks: Vec<u32> = (0..1 << grams::GRAM_BITS)
         .map(|h| grams::gram_mask(&table, h))
         .collect();
@@ -175,14 +193,18 @@ fn main() {
         })
         .collect();
     std::fs::write(&masks_path, masks).expect("write gram masks");
-    std::fs::write(
-        out.join("assets.rs"),
-        format!(
-            "static ASSETS: [Assets; {}] = {assets};\nstatic GROUP_PRIORS: [&[u8]; {}] = {group_priors};\nstatic GROUP_DICTS: [&[u8]; {}] = {group_dicts};\nstatic GRAM_TABLE: &[u8] = include_bytes!({grams_path:?});\nstatic GRAM_MASKS: &[u8] = include_bytes!({masks_path:?});\n",
-            LANGUAGES.len(),
-            Group::ALL.len(),
-            Group::ALL.len()
-        ),
-    )
-    .expect("write assets.rs");
+    (grams_path, masks_path)
+}
+
+fn read(path: &Path) -> std::io::Result<Vec<u8>> {
+    println!("cargo:rerun-if-changed={}", path.display());
+    std::fs::read(path)
+}
+
+fn read_optional(path: &Path) -> Vec<u8> {
+    read(path).unwrap_or_default()
+}
+
+fn read_required(path: &Path) -> Vec<u8> {
+    read(path).unwrap_or_else(|e| panic!("{}: {e}", path.display()))
 }
