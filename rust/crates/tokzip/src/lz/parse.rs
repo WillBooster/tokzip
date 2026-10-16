@@ -86,6 +86,8 @@ pub(super) fn run_encode_optimal(
     let mut pairs: Vec<(u32, u32)> = Vec::new();
     let mut steps: Vec<Step> = Vec::new();
     let mut nodes: Vec<Node> = Vec::new();
+    let mut adapted = None;
+    let mut refreshed_at = span.start;
     while pos < end {
         let max_len = MATCH_MAX.min(end - pos);
         let long_rep = (0..4)
@@ -120,14 +122,11 @@ pub(super) fn run_encode_optimal(
         nodes[0].state = cs.state as u8;
         nodes[0].reps = cs.reps;
 
-        let adapted;
-        // At document start the frozen prices depend only on the immutable priors.
-        let prices: &ParsePrices = if pos == 0 {
-            &mf.dict.index.prices
-        } else {
-            adapted = ParsePrices::new(&models.probs);
-            &adapted
-        };
+        if pos - refreshed_at >= CHUNK || (span.start != 0 && adapted.is_none()) {
+            adapted = Some(ParsePrices::new(&models.probs));
+            refreshed_at = pos;
+        }
+        let prices = adapted.as_ref().unwrap_or(&mf.dict.index.prices);
         let dlen = mf.dict.bytes.len();
 
         let mut search = Search {

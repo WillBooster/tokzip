@@ -7,7 +7,7 @@
 
 Lossless compressor for **prompts, LLM outputs, and source code** stored at rest — one
 function in, one function out, no compression options (only an optional decode length limit).
-The codec is Rust compiled to a single **wasm module (~1.83 MB, with 21 current dictionaries
+The codec is Rust compiled to a single **wasm module (~1.84 MB, with 21 current dictionaries
 and models plus retained v1 assets)** with a thin TypeScript wrapper; it runs on Node, Bun,
 and Cloudflare Workers.
 The module requires WebAssembly SIMD, which [Workers supports](https://developers.cloudflare.com/workers/runtime-apis/webassembly/#simd).
