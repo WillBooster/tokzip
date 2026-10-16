@@ -15,6 +15,10 @@ use crate::rc::{Decoder, Encoder, PROB_INIT};
 use crate::DecodeError;
 use std::sync::{Arc, OnceLock};
 
+#[path = "lz/parse.rs"]
+mod parse;
+use parse::{run_encode_optimal, ParsePrices};
+
 pub const MATCH_MAX: usize = 273;
 const NUM_STATES: usize = 12;
 const NUM_LEN_TO_POS: usize = 4;
@@ -96,6 +100,7 @@ pub type LitClasses = ([u8; 256], [u8; 256]);
 pub struct Models {
     own: Vec<u16>,
     literals: Arc<LiteralModels>,
+    prices: OnceLock<Box<ParsePrices>>,
 }
 
 pub struct LiteralModels {
@@ -119,6 +124,7 @@ impl Models {
         probs.shrink_to_fit();
         Self {
             own: probs,
+            prices: OnceLock::new(),
             literals: Arc::new(LiteralModels {
                 classes: lit_classes,
                 probs: literal_probs,
@@ -185,6 +191,7 @@ impl LiteralModels {
     pub fn with_language(self: &Arc<Self>, language: &[u8]) -> Models {
         assert_eq!(language.len(), LIT);
         Models {
+            prices: OnceLock::new(),
             own: language.iter().map(|&q| unquantize(q)).collect(),
             literals: Arc::clone(self),
         }
@@ -573,6 +580,7 @@ impl DocModels<'_> {
 
 /// Distance prices frozen for one parse chunk: full prices for values below `FULL_DIST`
 /// (slots with specialized trees) and slot + align prices beyond, per length state.
+#[derive(Clone)]
 struct DistPrices {
     full: [[u32; FULL_DIST]; NUM_LEN_TO_POS], // [len_state][value]
     slot: [[u32; 64]; NUM_LEN_TO_POS],
@@ -843,7 +851,7 @@ impl Chains {
             bits3,
             head4: vec![EMPTY; 1 << bits],
             head3: vec![EMPTY; 1 << bits3],
-            prev4: vec![EMPTY; len],
+            prev4: Vec::with_capacity(len.saturating_sub(3)),
         }
     }
 
@@ -854,7 +862,8 @@ impl Chains {
         }
         if pos + 4 <= bytes.len() {
             let h = hash4(bytes, pos, self.bits);
-            self.prev4[pos] = self.head4[h];
+            debug_assert_eq!(self.prev4.len(), pos);
+            self.prev4.push(self.head4[h]);
             self.head4[h] = pos as i32;
         }
     }
@@ -959,8 +968,7 @@ impl Primed {
             &mut models,
             &mut state,
             &mut mf,
-            0,
-            bytes.len(),
+            0..bytes.len(),
             &mut inserted,
         );
         let models = models.into_models();
@@ -995,80 +1003,78 @@ impl MatchFinder<'_> {
     /// the first distance found for that length: the nearest one among history matches, the
     /// lowest (cheapest, farthest) dictionary offset among dictionary matches.
     fn find_pairs(&self, pos: usize, max_len: usize, pairs: &mut Vec<(u32, u32)>) {
-        pairs.clear();
         let doc = self.win.doc;
         let dlen = self.dict.bytes.len();
         let mut best_len = 0usize;
-        if max_len >= 3 && pos + 3 <= doc.len() {
-            let cand = self.chains.head3[hash3(doc, pos, self.chains.bits3)];
-            let mut dist = 0usize;
-            if cand >= 0 && pos - cand as usize <= MAX_DIST_LEN3 {
-                dist = pos - cand as usize;
-            } else if dlen >= 3 {
-                let cand = self.dict.index.head3[hash3(doc, pos, HASH3_BITS)];
-                if cand >= 0 {
-                    dist = pos + dlen - cand as usize;
-                }
-            }
-            if dist > 0 {
-                let l = self.win.common_len(pos, dist, max_len);
-                if l >= 3 {
-                    best_len = l;
-                    pairs.push((l as u32, dist as u32));
-                }
-            }
+        if let Some(pair) = self.short_pair(pos, max_len) {
+            best_len = pair.0 as usize;
+            pairs.push(pair);
         }
-        if max_len < 4 || pos + 4 > doc.len() {
+        if max_len < 4 {
             return;
         }
-        let mut budget = SEARCH_DEPTH;
-        let mut cand = self.chains.head4[hash4(doc, pos, self.chains.bits)];
-        while cand >= 0 && budget > 0 {
-            budget -= 1;
-            let c = cand as usize;
-            let dist = pos - c;
-            if best_len == 0
-                || (pos + best_len < doc.len() && doc[c + best_len] == doc[pos + best_len])
+        let first = self.chains.head4[hash4(doc, pos, self.chains.bits)];
+        let history = std::iter::successors((first >= 0).then_some(first as usize), |&c| {
+            let previous = self.chains.prev4[c];
+            (previous >= 0).then_some(previous as usize)
+        })
+        .take(SEARCH_DEPTH)
+        .map(|c| pos - c);
+        let dictionary = self
+            .dict
+            .index
+            .bucket(doc, pos)
+            .iter()
+            .take(DICT_SEARCH_DEPTH)
+            .map(|&c| pos + dlen - c as usize);
+        for dist in history.chain(dictionary) {
+            if best_len > 0
+                && (pos + best_len >= doc.len()
+                    || self.win.byte_at(pos + best_len, dist) != doc[pos + best_len])
             {
-                let l = self.win.common_len(pos, dist, max_len);
-                if l > best_len && l >= 4 {
-                    best_len = l;
-                    pairs.push((l as u32, dist as u32));
-                    if l >= NICE_LEN || l == max_len {
-                        return;
-                    }
-                }
+                continue;
             }
-            cand = self.chains.prev4[c];
-        }
-        if dlen < 4 {
-            return;
-        }
-        let dict = &self.dict.bytes;
-        let bucket = self.dict.index.bucket(doc, pos);
-        for &c in &bucket[..bucket.len().min(DICT_SEARCH_DEPTH)] {
-            let c = c as usize;
-            let dist = pos + dlen - c;
-            let probe_ok = best_len == 0
-                || (pos + best_len < doc.len()
-                    && (c + best_len >= dlen || dict[c + best_len] == doc[pos + best_len]));
-            if probe_ok {
-                let l = self.win.common_len(pos, dist, max_len);
-                if l > best_len && l >= 4 {
-                    best_len = l;
-                    pairs.push((l as u32, dist as u32));
-                    if l >= NICE_LEN || l == max_len {
-                        return;
-                    }
+            let len = self.win.common_len(pos, dist, max_len);
+            if len > best_len && len >= 4 {
+                best_len = len;
+                pairs.push((len as u32, dist as u32));
+                if len >= NICE_LEN || len == max_len {
+                    return;
                 }
             }
         }
     }
 
+    fn short_pair(&self, pos: usize, max_len: usize) -> Option<(u32, u32)> {
+        if max_len < 3 {
+            return None;
+        }
+        let doc = self.win.doc;
+        let dlen = self.dict.bytes.len();
+        let cand = self.chains.head3[hash3(doc, pos, self.chains.bits3)];
+        let mut dist = 0usize;
+        if cand >= 0 && pos - cand as usize <= MAX_DIST_LEN3 {
+            dist = pos - cand as usize;
+        } else if dlen >= 3 {
+            let cand = self.dict.index.head3[hash3(doc, pos, HASH3_BITS)];
+            if cand >= 0 {
+                dist = pos + dlen - cand as usize;
+            }
+        }
+        if dist == 0 {
+            return None;
+        }
+        let len = self.win.common_len(pos, dist, max_len);
+        (len >= 3).then_some((len as u32, dist as u32))
+    }
+
     /// Match length at `pos` against the source `dist` back (0 when the distance underflows).
     #[inline]
     fn len_at(&self, pos: usize, dist: usize, max_len: usize) -> usize {
-        if dist == 0 || dist > pos + self.dict.bytes.len() {
+        if dist == 0
+            || dist > pos + self.dict.bytes.len()
+            || self.win.byte_at(pos, dist) != self.win.doc[pos]
+        {
             return 0;
         }
         self.win.common_len(pos, dist, max_len)
@@ -1175,8 +1181,7 @@ pub fn encode_doc_with_stats<'p>(
             &mut models,
             &mut cs,
             &mut mf,
-            start,
-            seg.end,
+            start..seg.end,
             &mut inserted,
         );
         // Positions skipped by the parse (inside matches) still join the chains.
@@ -1237,298 +1242,6 @@ fn clamp_reps(cs: &mut CoderState, pos: usize, dlen: usize) {
         if u64::from(*rep) >= (pos + dlen) as u64 {
             *rep = 0;
         }
-    }
-}
-
-#[derive(Clone, Copy)]
-enum Step {
-    Literal,
-    Match { len: u32, dist_m1: u32 },
-    Rep { idx: u8, len: u32 },
-}
-
-#[derive(Clone, Copy)]
-struct Node {
-    price: u32,
-    prev: u32,
-    step: Step,
-    state: u8,
-    reps: [u32; 4],
-}
-
-struct StatePrices {
-    literal: u32,
-    short_rep: u32,
-    reps: [u32; 4],
-    history: u32,
-    dictionary: u32,
-}
-
-impl StatePrices {
-    fn new(models: &DocModels, state: usize) -> Self {
-        let probs = &models.probs;
-        let mat = price_bit(probs[IS_MATCH + state], 1);
-        let rep = mat + price_bit(probs[IS_REP + state], 1);
-        let explicit = mat + price_bit(probs[IS_REP + state], 0);
-        Self {
-            literal: price_bit(probs[IS_MATCH + state], 0),
-            short_rep: rep
-                + price_bit(probs[IS_REP_G0 + state], 0)
-                + price_bit(probs[IS_REP0_LONG + state], 0),
-            reps: std::array::from_fn(|idx| rep + models.price_rep_choice(state, idx)),
-            history: explicit + price_bit(probs[IS_DICT + state], 0),
-            dictionary: explicit + price_bit(probs[IS_DICT + state], 1),
-        }
-    }
-}
-
-const INF: u32 = u32::MAX;
-
-// Freeze prices within a search chunk so speculative paths never adapt the shared models.
-fn run_encode_optimal(
-    rc: &mut Encoder,
-    models: &mut DocModels,
-    cs: &mut CoderState,
-    mf: &mut MatchFinder,
-    start: usize,
-    end: usize,
-    inserted: &mut usize,
-) {
-    const CHUNK: usize = 4096;
-    let mut pos = start;
-    let mut pairs: Vec<(u32, u32)> = Vec::new();
-    let mut steps: Vec<Step> = Vec::new();
-    let mut nodes: Vec<Node> = Vec::new();
-    while pos < end {
-        // A full-length rep at a committed position needs neither speculative states nor
-        // price tables. The next ordinary parse inserts the skipped history positions.
-        if end - pos >= MATCH_MAX {
-            let long_rep = (0..4)
-                .filter(|&idx| mf.len_at(pos, cs.reps[idx] as usize + 1, MATCH_MAX) == MATCH_MAX)
-                .min_by_key(|&idx| models.price_rep_choice(cs.state, idx));
-            if let Some(idx) = long_rep {
-                emit_rep(rc, models, cs, idx, MATCH_MAX);
-                pos += MATCH_MAX;
-                continue;
-            }
-        }
-        let end_target = (pos + CHUNK).min(end);
-        let max_reach = (end_target + MATCH_MAX).min(end);
-        let n = max_reach - pos;
-        nodes.clear();
-        nodes.resize(
-            n + 1,
-            Node {
-                price: INF,
-                prev: 0,
-                step: Step::Literal,
-                state: 0,
-                reps: [0; 4],
-            },
-        );
-        nodes[0].price = 0;
-        nodes[0].state = cs.state as u8;
-        nodes[0].reps = cs.reps;
-
-        let match_len_price = len_prices(&models.probs, LEN);
-        let rep_len_price = len_prices(&models.probs, REP_LEN);
-        let dict_len_price = len_prices(&models.probs, DICT_LEN);
-        let state_prices: [StatePrices; NUM_STATES] =
-            std::array::from_fn(|state| StatePrices::new(models, state));
-        let dlen = mf.dict.bytes.len();
-        let hist_prices = DistPrices::new(models, HIST_DIST);
-        let dict_prices = DistPrices::new(models, DICT_OFF);
-
-        // Inside a sufficiently long match, limit parse effort to literals and reps instead
-        // of searching for more explicit matches at every position.
-        let mut skip_until = 0usize;
-        for i in 0..(end_target - pos) {
-            if nodes[i].price == INF {
-                continue;
-            }
-            let gpos = pos + i;
-            while *inserted < gpos {
-                mf.insert(*inserted);
-                *inserted += 1;
-            }
-            let state = nodes[i].state as usize;
-            let reps = nodes[i].reps;
-            let base = nodes[i].price;
-            let max_len = MATCH_MAX.min(end - gpos);
-
-            let literal_base = base + state_prices[state].literal;
-            if literal_base < nodes[i + 1].price {
-                let lit_price = literal_base + models.price_literal(&mf.win, gpos, state, &reps);
-                relax(
-                    &mut nodes,
-                    i,
-                    1,
-                    lit_price,
-                    Step::Literal,
-                    state_after_literal(state) as u8,
-                    reps,
-                );
-            }
-
-            let mut long_rep = false;
-            for idx in 0..4usize {
-                let l = mf.len_at(gpos, reps[idx] as usize + 1, max_len);
-                if l >= NICE_LEN {
-                    long_rep = true;
-                    skip_until = skip_until.max(i + l);
-                }
-                if idx == 0 && l >= 1 {
-                    let price = base + state_prices[state].short_rep;
-                    let st = if state < 7 { 9 } else { 11 };
-                    relax(
-                        &mut nodes,
-                        i,
-                        1,
-                        price,
-                        Step::Rep { idx: 0, len: 1 },
-                        st,
-                        reps,
-                    );
-                }
-                if l < 2 {
-                    continue;
-                }
-                let choice = base + state_prices[state].reps[idx];
-                let mut new_reps = reps;
-                let rep = new_reps[idx];
-                new_reps.copy_within(0..idx, 1);
-                new_reps[0] = rep;
-                let st = state_after_rep(state) as u8;
-                // Keep every short-match length: ending earlier can enable a cheaper
-                // continuation. Long matches only contribute their full length to bound work.
-                let from = if l >= NICE_LEN { l } else { 2 };
-                for (len, &length_price) in rep_len_price.iter().enumerate().take(l + 1).skip(from)
-                {
-                    relax(
-                        &mut nodes,
-                        i,
-                        len,
-                        choice + length_price,
-                        Step::Rep {
-                            idx: idx as u8,
-                            len: len as u32,
-                        },
-                        st,
-                        new_reps,
-                    );
-                }
-            }
-
-            // A sufficiently long rep avoids an additional chain walk.
-            if long_rep || i < skip_until {
-                continue;
-            }
-            mf.find_pairs(gpos, max_len, &mut pairs);
-            if let Some(&(plen, _)) = pairs.last() {
-                if plen as usize >= NICE_LEN {
-                    skip_until = i + plen as usize;
-                }
-            }
-            let hist_bit = state_prices[state].history;
-            let dict_bit = state_prices[state].dictionary;
-            let st = state_after_match(state) as u8;
-            let mut len_from = 2usize;
-            for &(plen, pdist) in &pairs {
-                let plen = plen as usize;
-                let dist_m1 = pdist - 1;
-                let new_reps = [dist_m1, reps[0], reps[1], reps[2]];
-                let is_dict = pdist as usize > gpos;
-                let (prices, value, kind_bit, len_price): (
-                    &DistPrices,
-                    u32,
-                    u32,
-                    &[u32; MATCH_MAX + 1],
-                ) = if is_dict {
-                    (
-                        &dict_prices,
-                        (dlen - (pdist as usize - gpos)) as u32,
-                        dict_bit,
-                        &dict_len_price,
-                    )
-                } else {
-                    (&hist_prices, dist_m1, hist_bit, &match_len_price)
-                };
-                let mut dist_price = [0u32; NUM_LEN_TO_POS];
-                for (ls, p) in dist_price.iter_mut().enumerate() {
-                    *p = prices.price(ls, value);
-                }
-                let from = if plen >= NICE_LEN { plen } else { len_from };
-                for (len, &length_price) in len_price.iter().enumerate().take(plen + 1).skip(from) {
-                    let len_state = (len - 2).min(NUM_LEN_TO_POS - 1);
-                    relax(
-                        &mut nodes,
-                        i,
-                        len,
-                        base + kind_bit + length_price + dist_price[len_state],
-                        Step::Match {
-                            len: len as u32,
-                            dist_m1,
-                        },
-                        st,
-                        new_reps,
-                    );
-                }
-                len_from = plen + 1;
-            }
-        }
-
-        // Endpoints cover different byte counts. Comparing total prices alone favors
-        // stopping early even when a slightly dearer match covers more input cheaply.
-        let mut best = end_target - pos;
-        for j in (end_target - pos)..=n {
-            if (nodes[j].price as u64) * (best as u64) < (nodes[best].price as u64) * (j as u64) {
-                best = j;
-            }
-        }
-        steps.clear();
-        let mut cur = best;
-        while cur != 0 {
-            steps.push(nodes[cur].step);
-            cur = nodes[cur].prev as usize;
-        }
-        for step in steps.iter().rev() {
-            match *step {
-                Step::Literal => {
-                    emit_literal(rc, models, cs, &mf.win, pos);
-                    pos += 1;
-                }
-                Step::Match { len, dist_m1 } => {
-                    emit_match(rc, models, cs, pos, dlen, len as usize, dist_m1);
-                    pos += len as usize;
-                }
-                Step::Rep { idx, len } => {
-                    emit_rep(rc, models, cs, idx as usize, len as usize);
-                    pos += len as usize;
-                }
-            }
-        }
-    }
-}
-
-#[inline]
-fn relax(
-    nodes: &mut [Node],
-    from: usize,
-    adv: usize,
-    price: u32,
-    step: Step,
-    state: u8,
-    reps: [u32; 4],
-) {
-    let to = from + adv;
-    if to < nodes.len() && price < nodes[to].price {
-        nodes[to] = Node {
-            price,
-            prev: from as u32,
-            step,
-            state,
-            reps,
-        };
     }
 }
 

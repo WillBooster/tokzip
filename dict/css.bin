@@ -1,8 +1,30 @@
-r};
-  --#{$prefix}gutter-y: 0;
-  width: 100%;
-  padding-right: calc(var(--#{$prefix}gutter-x) * .5); // stylelint-disable-line function-disallowed-list
-  padding-left: calc(var(--#{$prefix}gutter-x) * .5); // stylelint-disable-line function-disallowed-listlma-text-strong);
+adding-right: calc(var(--#{$prefix}gutter-x) * .5); // stylelint-disable-line function-disallowed-list
+  padding-left: calc(var(--#{$prefix}gutter-x) * .5); // stylelint-disable-line function-disallowed-list
+  margin-right: auto;
+  margin-left: auto;
+}
+ horizontal.
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .list-group-horizontal#{$infix} {
+      flex-direction: row;
+
+      > .list-gr-bg);
+  border: var(--#{$prefix}list-group-border-width) solid var(--#{$prefix}list-group-border-color);
+
+  &:first-child {
+    @include border-top-radius(inherit);
+  }
+
+  &:last-child {
+    @include border-bottom-radius(inherit);
+  }
+
+  &.disabled,
+  &:dilma-text-strong);
     }
   }
 
@@ -19,36 +41,21 @@ $delay: 0.2s;
 .bd-home-intro {
   --scale: 1;
   align-items: stretch;
-  dist group items from vertical (default) to horizontal.
+  dis*/
+@charset "utf-8";
 
-@each $breakpoint in map-keys($grid-breakpoints) {
-  @include media-breakpoint-up($breakpoint) {
-    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-
-    .list-group-horizontal#{$infix} {
-    -bg);
-  border: var(--#{$prefix}list-group-border-width) solid var(--#{$prefix}list-group-border-color);
-
-  &:first-child {
-    @include border-top-radius(inherit);
-  }
-
-  &:last-child {
-    @include border-bottom-radius(inherit);
-  }
-
-  &.disabled,
-  &:di// scss-docs-end badge-css-vars
-
-  display: inline-block;
-  padding: var(--#{$prefix}badge-padding-y) var(--#{$prefix}badge-padding-x);
-  @include font-size(var(--#{$prefix}badge-font-size));
-  font-weight: var(--#{$prefix}badge-font-weight);
-  line-heightd-bg: #{$list-group-disabled-bg};
-  --#{$prefix}list-group-active-color: #{$list-group-active-color};
-  --#{$prefix}list-group-active-bg: #{$list-group-active-bg};
-  --#{$prefix}list-group-active-border-color: #{$list-group-active-border-color};
-  // scssault;
+@forward "aspect-ratio";
+@forward "border";
+@forward "color";
+@forward "flexbox";
+@forward "float";
+@forward "gap";
+@forward "overflow";
+@forward "position";
+@forward "spacing";
+@forward "typography";
+@forward "visibility";
+@forward "ault;
 
 @import "functions";
 @import "variables";
@@ -63,55 +70,84 @@ $delay: 0.2s;
 @import "vendor/rfs";
 
 @import "containers";
-@import "or: hsl(
-    cv.getVar("text-h"),
-    cv.getVar("text-s"),
-    cv.getVar("text-title-l")
-  );
-  font-size: calc(var(--scale) * 4rem);
-  font-weight: 800;
-  line-height: 1.125;
-  transform-origin: bottom center;
-}
-
-.bd-home-tagline {
-  @extend %anim-3d;
-  avbar-s": #{cv.getVar($name, "", "-s")},
+@import "avbar-s": #{cv.getVar($name, "", "-s")},
           "navbar-l": #{cv.getVar($name, "", "-l")},
           "burger-h": #{cv.getVar($name, "", "-h")},
           "burger-s": #{cv.getVar($name, "", "-s")},
-          "burger-l": #{cv.getVar($name, "", "-invert*/
-@charset "utf-8";
-
-@forward "aspect-ratio";
-@forward "border";
-@forward "color";
-@forward "flexbox";
-@forward "float";
-@forward "gap";
-@forward "overflow";
-@forward "position";
-@forward "spacing";
-@forward "typography";
-@forward "visibility";
-@forward "eme-h")},
+          "burger-l": #{cv.getVar($name, "", "-invert {
+  // scss-docs-start list-group-css-vars
+  --#{$prefix}list-group-color: #{$list-group-color};
+  --#{$prefix}list-group-bg: #{$list-group-bg};
+  --#{$prefix}list-group-border-color: #{$list-group-border-color};
+  --#{$prefix}list-group-border-width: #{$wn-boxed-radius: cv.getVar("radius-large") !default;
+$navbar-dropdown-boxed-shadow:
+  0 0.5em 0.5em
+    hsla(
+      #{cv.getVar("scheme-h")},
       #{cv.getVar("scheme-s")},
       #{cv.getVar("scheme-invert-l")},
       0.1
     ),
   0 0 0 1px
     hsla(
-      #{cv.getVar("scheme-h")},
-      #{cv.getVar("scheme-s")},
-      #{cv.getVar("scheme-invert-l")},
-      0.1
-    ) !default;
+    as mx;
 
-$naing-y, $padding-x, $font-size, $border-radius) {
-  --#{$prefix}pagination-padding-x: #{$padding-x};
-  --#{$prefix}pagination-padding-y: #{$padding-y};
-  @include rfs($font-size, --#{$prefix}pagination-font-size);
-  --#{$prefix}pagination-border-radius: #{$uto;
+$navbar-h: cv.getVar("scheme-h");
+$navbar-s: cv.getVar("scheme-s");
+$navbar-l: cv.getVar("scheme-main-l");
+$navbar--item-background-l-delta: 0%;
+$navbar-item-hover-background-l-delta: cv.getVar("hover-background-l-delta");
+$navbar-item-active-background-l-delta: cv.getVar("active-background-l-delta");
+$navbar-item-color-l: cv.getVar("text-l");
+$navbar-item-selected-h: -group-active-color: #{$list-group-active-color};
+  --#{$prefix}list-group-active-bg: #{$list-group-active-bg};
+  --#{$prefix}list-group-active-border-color: #{$list-group-active-border-color};
+  // scss-docs-end list-group-css-vars
+
+  disp $btn-hover-bg-tint-amount)),
+  $hover-border: if($color == $color-contrast-light, shade-color($border, $btn-hover-border-shade-amount), tint-color($border, $btn-hover-border-tint-amount)),
+  $hover-color: color-contrast($hover-background),
+  $active-backg"] {
+    @extend .bs-tooltip-top;
+  }
+  &[data-popper-placement^="right"] {
+    @extend .bs-tooltip-end;
+  }
+  &[data-popper-placement^="bottom"] {
+    @extend .bs-tooltip-bottom;
+  }
+  &[data-popper-placement^="left"] {
+    @extend .bs-tooltip-start;
+  }
+etVar("border");
+  // box-shadow:
+  //   0 0 4em hsla(var(--h), var(--s), var(--l), var(--a)),
+  //   inset 0 0 4em hsla(var(--h), var(--s), var(--l), var(--a));
+  border-radius: 9999px;
+  left: calc(calc(100% - var(--d)) / 2);
+  height: var(--d);
+  posie mx.widescreen-only {
+    @include cell-properties("-widescreen-only");
+  }
+
+  @include mx.fullhd {
+    @include cell-properties("-fullhd");
+  }
+}
+@use "sass:math";
+@use "../utilities/css-variables" as cv;
+@use "../utilities/derived-variables" as dv;
+@use;
+
+@each $display in $displays {
+  .#{iv.$helpers-prefix}display-#{$display},
+  .#{iv.$helpers-prefix}#{$display} {
+    display: $display !important;
+  }
+
+  @include mx.mobile {
+    .#{iv.$helpers-prefix}display-#{$display}-mobile,
+    .#{iv.$helpers-prefiuto;
   flex-direction: column;
   align-self: stretch;
 }
@@ -145,11 +181,15 @@ $naing-y, $padding-x, $font-size, $border-radius) {
 
 
 .lead {
-  @i-item-background-l-delta: 0%;
-$navbar-item-hover-background-l-delta: cv.getVar("hover-background-l-delta");
-$navbar-item-active-background-l-delta: cv.getVar("active-background-l-delta");
-$navbar-item-color-l: cv.getVar("text-l");
-$navbar-item-selected-h: width: 0 0 var(--#{$prefix}list-group-border-width);
+  @iion-mixin
+@mixin pagination-size($padding-y, $padding-x, $font-size, $border-radius) {
+  --#{$prefix}pagination-padding-x: #{$padding-x};
+  --#{$prefix}pagination-padding-y: #{$padding-y};
+  @include rfs($font-size, --#{$prefix}pagination-font-size);
+  --#radius(0);
+
+  > .list-group-item {
+    border-width: 0 0 var(--#{$prefix}list-group-border-width);
 
     &:last-child {
       border-bottom-width: 0;
@@ -161,11 +201,63 @@ $navbar-item-selected-h: width: 0 0 var(--#{$prefix}list-group-border-width);
 // scss-docs-start list-group-modifiers
 // List group contextual variants
 //
-// Add modifier classes to change text and background color onover-border: if($color == $color-contrast-light, shade-color($border, $btn-hover-border-shade-amount), tint-color($border, $btn-hover-border-tint-amount)),
-  $hover-color: color-contrast($hover-background),
-  $active-background: if($color == $color-contras}
+// Add modifier {
+    ol,
+    ul {
+      justify-content: flex-end;
+    }
+  }
 
-  &:hover {
+  // Sizes
+  &.#{iv.$class-prefix}is-small {
+    font-size: cv.getVar("size-small");
+  }
+
+  &.#{iv.$class-prefix}is-medium {
+    {
+  gap: calc(var(--scale) * 1.5rem);
+
+  .button {
+    @extend %anim-3d;
+    animation-delay: $delay * 4;
+    animation-name: anim-slow-intro;
+    font-size: 1.25em;
+
+    strong {
+      font-weight: cv.getVar("weight-medium");
+    }
+
+    &.is-primary {
+  ::file-selector-button {
+    padding: $input-padding-y $input-padding-x;
+    margin: (-$input-padding-y) (-$input-padding-x);
+    margin-inline-end: $input-padding-x;
+    color: $form-file-button-color;
+    @include gradient-bg($form-file-button-bg);
+    polor": #{$navbar-background-color},
+      "navbar-box-shadow-size": #{$navbar-box-shadow-size},
+      "navbar-box-shadow-color": #{$navbar-box-shadow-color},
+      "navbar-padding-vertical": #{$navbar-padding-vertical},
+      "navbar-padding-horizontal": #: false) {
+  @if $enable-rounded {
+    border-radius: valid-radius($radius);
+  }
+  @else if $fallback-border-radius != false {
+    border-radius: $fallback-border-radius;
+  }
+}
+
+@mixin border-top-radius($radius: $border-radius) {
+  @if $enable-rounded {
+  : 3rem 1.5rem !default;
+$section-padding-desktop: 3rem 3rem !default;
+$section-padding-medium: 9rem 4.5rem !default;
+$section-padding-large: 18rem 6rem !default;
+
+.#{iv.$class-prefix}section {
+  @include cv.register-vars(
+    (
+      "section-padding": #{$ {
     z-index: 2;
   }
 
@@ -181,334 +273,72 @@ $navbar-item-selected-h: width: 0 0 var(--#{$prefix}list-group-border-width);
 }
 
 .accordion-item {
-  color: var(--#{$prefix}accordion-color)xtend %bd-animated;
-  animation-name: anim-grow;
-  animation-duration: 1s;
-  border: 1px dashed cv.getVar("border");
-  // box-shadow:
-  //   0 0 4em hsla(var(--h), var(--s), var(--l), var(--a)),
-  //   inset 0 0 4em hsla(var(--h), var(--s), var(--l), var(olor": #{$navbar-background-color},
-      "navbar-box-shadow-size": #{$navbar-box-shadow-size},
-      "navbar-box-shadow-color": #{$navbar-box-shadow-color},
-      "navbar-padding-vertical": #{$navbar-padding-vertical},
-      "navbar-padding-horizontal": #{
-    @extend .bs-tooltip-top;
+  color: var(--#{$prefix}accordion-color);
+  bacprefix}#{$state}-text-emphasis);
+    --#{$prefix}list-group-active-border-color: var(--#{$prefix}#{$state}-text-emphasis);
   }
-  &[data-popper-placement^="right"] {
-    @extend .bs-tooltip-end;
-  }
-  &[data-popper-placement^="bottom"] {
-    @extend .bs-tooltip-bottom;
-  }
-  &[data-popper-placement^="left"] {
-    @extend .bs-tooltip-start;
-  }
-}y $input-padding-x;
-    margin: (-$input-padding-y) (-$input-padding-x);
-    margin-inline-end: $input-padding-x;
-    color: $form-file-button-color;
-    @include gradient-bg($form-file-button-bg);
-    pointer-events: none;
-    border-color: inherit;
-    bude mx.mobile {
-    @include cell-properties("-mobile");
-  }
-
-  @include mx.tablet {
-    @include cell-properties("-tablet");
-  }
-
-  @include mx.tablet-only {
-    @include cell-properties("-tablet-only");
-  }
-
-  @include mx.desktop {
-    @include cell-prop.
-  flex: 1 1 auto;
-  padding: var(--#{$prefix}modal-padding);
-}
-
-// Footer (for actions)
-.modal-footer {
-  display: flex;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  align-items: center; // vertically center
-  justify-content: flex-end; // Right align buttons 
 }
 // scss-docs-end list-group-modifiers
 // Utilities
 
 $utilities: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
-$utilities: map-merge(
-  (
-    // scss-docs-start utils-vertical-align
-    "align": (
-      property: vertical-align{
-    ol,
-    ul {
-      justify-content: flex-end;
-    }
-  }
+// stylelint-disable-next-line scss/dollar-variab$input-line-height;
+  color: $input-color;
+  appearance: none; // Fix appearance for date inputs in Safari
+  background-color: $input-bg;
+  background-clip: padding-box;
+  border: $input-border-width solid $input-border-color;
 
-  // Sizes
-  &.#{iv.$class-prefix}is-small {
-    font-size: cv.getVar("size-small");
-  }
+  // Note: This has no effecmport "../../mixins";
+// Row
+//
+// Rows contain your columns.
 
-  &.#{iv.$class-prefix}is-medium {
-    foh 0
-@function valid-radius($radius) {
-  $return: ();
-  @each $value in $radius {
-    @if type-of($value) == number {
-      $return: append($return, max($value, 0));
-    } @else {
-      $return: append($return, $value);
-    }
+:root {
+  @each $name, $value in $grid-breakpoints {
+    --#{$prefix}breakpoint-#{$name}: #{$value};
   }
-  @return $return;
 }
 
-// sc;
+@if $enable-grid-classes {
+  .row {
+    @include make-row();
 
-.#{iv.$helpers-prefix}display-none,
-.#{iv.$helpers-prefix}hidden {
-  display: none !important;
-}
+    > * {
+    me: bulma-fixed-grid;
 
-$displays: block flex inline inline-block inline-flex grid;
-
-@each $display in $displays {
-  .#{iv.$helpers-prefix}display-#{$display},
-  .#{iv.$helpers-prow-span": 1,
-    )
-  );
-
+.#{iv.$class-prefix}fixed-grid {
   @extend %block;
-  display: grid;
-  gap: cv.getVar("grid-gap");
-  column-gap: #{cv.getVarWithBackup("grid-column-gap", "grid-gap")};
-  row-gap: #{cv.getVarWithBackup("grid-row-gap", "grid-gap")};
-  grid-template-columns: repeat(
-   @if $enable-rounded {
-    border-top-left-radius: valid-radius($radius);
-    border-bottom-left-radius: valid-radius($radius);
-  }
-}
+  container-name: $grid-container-name;
+  container-type: inline-size;
 
-@mixin border-top-start-radius($radius: $border-radius) {
-  @if $enable-rounded {
-    border-top-left-radius: valid-jgthms/bulma */
+  > .#{iv.$class-prefix}grid {
+    @include cv.register-vars(
+      (
+        "grid-gap-count": calc(#{cv.getV
+$purple: #8A4D76;
+$pink: #FA7C91;
+$brown: #757763;
+$beige-light: #D0D1CD;
+$beige-lighter: #EFF0EB;
+
+$grey-dark: $brown;
+$grey-light: $beige-light;
+$primary: $purple;
+$link: $pink;
+
+$orange: #f60;
+$orange-invert: findColorInvert($orange);
+$orange-light: hsf-8";
+
+/*! bulma.io v1.0.1 | MIT License | github.com/jgthms/bulma */
 @forward "../sass/utilities";
 @forward "../sass/base";
 @forward "../sass/elements";
 @forward "../sass/form";
 @forward "../sass/components";
 @forward "../sass/grid";
-@forward "../sass/layout";
-@forward "../sass/base/skeleton";
-@lities/derived-variables" as dv;
-@use "../utilities/extends";
-@use "../utilities/mixins" as mx;
-
-$navbar-h: cv.getVar("scheme-h");
-$navbar-s: cv.getVar("scheme-s");
-$navbar-l: cv.getVar("scheme-main-l");
-$navbar- }
-  50% {
-    opacity: 1;
-    transform: none;
-  }
-}
-// scss-docs-end spinner-grow-keyframes
-
-.spinner-grow {
-  // scss-docs-start spinner-grow-css-vars
-  --#{$prefix}spinner-width: #{$spinner-width};
-  --#{$prefix}spinner-height: #{$spinner-height};
-  --t: $input-font-weight;
-  line-height: $input-line-height;
-  color: $input-color;
-  appearance: none; // Fix appearance for date inputs in Safari
-  background-color: $input-bg;
-  background-clip: padding-box;
-  border: $input-border-width solid $input-borde      lighter: $font-weight-lighter,
-        light: $font-weight-light,
-        normal: $font-weight-normal,
-        medium: $font-weight-medium,
-        semibold: $font-weight-semibold,
-        bold: $font-weight-bold,
-        bolder: $font-weight-bolder
-mn;
-  min-width: 0; // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
-  height: var(--#{$prefix}card-height);
-  color: var(--#{$prefix}body-color);
-  word-wrap: break-word;
-  background-color: var(--#{$prefix}card-bg);
-  bac      "section-padding": #{$section-padding},
-      "section-padding-desktop": #{$section-padding-desktop},
-      "section-padding-medium": #{$section-padding-medium},
-      "section-padding-large": #{$section-padding-large},
-    )
-  );
-  padding: cv.gehrough 12 {
-    .#{iv.$class-prefix}columns.#{iv.$class-prefix}is-mobile
-      > &.#{iv.$class-prefix}is-#{$i} {
-      flex: none;
-      width: calc(
-        math.percentage(math.div($i, 12)) - calc(#{cv.getVar("column-gap")} / 2)
-      );
-    }
-
-    .#{ivflow-anchor: none;
-  @include transition(var(--#{$prefix}accordion-transition));
-
-  &:not(.collapsed) {
-    color: var(--#{$prefix}accordion-active-color);
-    background-color: var(--#{$prefix}accordion-active-bg);
-    box-shadow: inset 0 calc(-1 * var(--}
-
-  &.is-modern {
-    --h: 220;
-    --bg: var(--grad-blue);
-    --icon: #{cv.getVar("info-50")};
-  }
-
-  &.is-easy {
-    --h: 160;
-    --bg: var(--grad-green);
-    --icon: #{cv.getVar("success")};
-  }
-
-  &.is-free {
-    --h: 348;
-    --s: 6%;
-    --bg: varn-active-shadow: #{$btn-active-box-shadow};
-  --#{$prefix}btn-disabled-color: #{$disabled-color};
-  --#{$prefix}btn-disabled-bg: #{$disabled-background};
-  --#{$prefix}btn-disabled-border-color: #{$disabled-border};
-}
-// scss-docs-end btn-variant-mixin
-
-//height-sm};
-}
-
-@if $enable-reduced-motion {
-  @media (prefers-reduced-motion: reduce) {
-    .spinner-border,
-    .spinner-grow {
-      --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed * 2};
-    }
-  }
-}
-//
-// Base styles
-//
-
-.accordion {
-  //s-one-quarter {
-    flex: none;
-    width: 25%;
-  }
-
-  .#{iv.$class-prefix}columns.#{iv.$class-prefix}is-mobile
-    > &.#{iv.$class-prefix}is-one-fifth {
-    flex: none;
-    width: 20%;
-  }
-
-  .#{iv.$class-prefix}columns.#{iv.$class-prefix}is-mobile
-    >    @if $enable-rounded {
-        &:not(:last-child) {
-          @include border-end-radius(0);
-
-          .card-img-top,
-          .card-header {
-            // stylelint-disable-next-line property-disallowed-list
-            border-top-right-radius: 0;
-  .bd-tw-action {
-  margin-right: 1.25em;
-}
-
-.bd-tw-action-link {
-  align-items: center;
-  color: var(--bulma-text);
-  display: flex;
-  height: 1.25em;
-  min-width: 1.25em;
-}
-
-.bd-tw-icon {
-  background-size: contain;
-  height: 1.25em;
-  width: 1.25em;
-}
-
-.bl-width);
-    margin-right: auto;
-    margin-left: auto;
-  }
-
-  .modal-sm {
-    --#{$prefix}modal-width: #{$modal-sm};
-  }
-}
-
-@include media-breakpoint-up(lg) {
-  .modal-lg,
-  .modal-xl {
-    --#{$prefix}modal-width: #{$modal-lg};
-  }
-}
-
-@includ("size-medium");
-  }
-
-  &.#{iv.$class-prefix}is-large {
-    font-size: cv.getVar("size-large");
-  }
-
-  // Colors
-  @each $name, $components in $message-colors {
-    &.#{iv.$class-prefix}is-#{$namrs: dv.$colors !default;
-
-.#{iv.$class-prefix}message {
-  @include cv.register-vars(
-    (
-      "message-border-l-delta": #{$message-border-l-delta},
-      "message-radius": #{$message-radius},
-      "message-header-weight": #{$message-header-weight},
-   as mx;
-
-$max-column-count: 12;
-$grip-gap: 0.75rem;
-$column-min-base: 1.5rem;
-
-@mixin fixed-grid-properties($suffix: "") {
-  @for $i from 1 through $max-column-count {
-    &.#{iv.$class-prefix}has-#{$i}-cols#{$suffix} {
-      > .#{iv.$class-prefix}grid {
-  -radius};
-}
-// scss-docs-end btn-size-mixin
-// scss-docs-start clearfix
-@mixin clearfix() {
-  &::after {
-    display: block;
-    clear: both;
-    content: "";
-  }
-}
-// scss-docs-end clearfix
-//
-// Rotating border
-//
-
-.spinner-grow,
-.spinner-border {
-  dispolor);
+@forward "../sass/layolor);
 }
 
 .card-text:last-child {
@@ -526,92 +356,35 @@ $column-min-base: 1.5rem;
 }
 
 //
-// Optional textuallass: padding-x,
-            property: padding-inline-start padding-inline-end,
-            values: 1rem
-          )
-        ) {
-          .padding-x-1rem {
-            padding-inline-start: 1rem;
-            padding-inline-end: 1rem;
-     mport "../../mixins";
-// Row
-//
-// Rows contain your columns.
+// Optional textualvalues);
 
-:root {
-  @each $name, $value in $grid-breakpoints {
-    --#{$prefix}breakpoint-#{$name}: #{$value};
-  }
-}
-
-@if $enable-grid-classes {
-  .row {
-    @include make-row();
-
-    > * {
-    dal-scale-transform;
-  }
-}
-
-.modal-dialog-scrollable {
-  height: calc(100% - var(--#{$prefix}modal-margin) * 2);
-
-  .modal-content {
-    max-height: 100%;
-    overflow: hidden;
+  // If the values are a list or string, convert it into a map
+  @if type-of($values) == "string" or type-of(nth($values, 1)) != "list" {
+    $values: zip($values, $values);
   }
 
-  .modal-body {
-    overflow-y: auto;
-  }
-}
-
-.modal-dialog-centered {
-  diidth": #{$navbar-dropdown-border-width},
-      "navbar-dropdown-offset": #{$navbar-dropdown-offset},
-      "navbar-dropdown-arrow": #{$navbar-dropdown-arrow},
-      "navbar-dropdown-radius": #{$navbar-dropdown-radius},
-      "navbar-dropdown-z": #{$nderline,
-        (
-          null: rgba(var(--#{$prefix}link-color-rgb), var(--#{$prefix}link-underline-opacity, 1)),
-        )
+  @each $key, $value in $values {
+    $properties: map-get($utilityrefix}border-style) var(--#{$prefix}border-color),
+        0: 0,
       )
     ),
-    "link-underline-opacity": (
-      css-var: true,
-      class: link-underline-opacity,
-      state: hover,
-   -image;
-}
-
-$d: 2.5rem;
-
-.bd-header-control {
-  align-items: center;
-  display: flex;
-  gap: 0.75rem;
-}
-
-.bd-cycle {
-  --h: #{cv.getVar("sun-h")};
-  --s: #{cv.getVar("sun-s")};
-  --l: #{cv.getVar("sun-l")};
-
-  border-radius: 0.5em;
-  color: hsl(var(--llapsed {
-        @include border-bottom-radius(var(--#{$prefix}accordion-inner-border-radius));
-      }
-    }
-
-    > .accordion-collapse {
-      @include border-bottom-radius(var(--#{$prefix}accordion-border-radius));
+    "border-end": (
+      property: border-right,
+      class: border-end,
+      values: (
+        null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--radius(var(--#{$prefix}accordion-border-radius));
     }
   }
 }
 
 .accordion-body {
-  padddient(
+  padding: var(--#{$prefix}accordion-body-padding-y) var(--#{$prefix}accordion-body-padding-x);
+}
+
+
+// Flush accordion items
+//
+// Remove borders and border-radius to keep accadient(
     0deg,
     hsla(
         var(--bulma-scheme-h),
@@ -623,90 +396,83 @@ $d: 2.5rem;
     hsla(
         var(--bulma-scheme-h),
         var(--bulma-scheme-s),
-        var(--bulma-schemev.system-theme($name: "light") {
-  @include light.light-theme;
+        var(--bulma-scheme
+    clear: both;
+    content: "";
+  }
+}
+// scss-docs-end clearfix
+//
+// Rotating border
+//
+
+.spinner-grow,
+.spinner-border {
+  display: inline-block;
+  width: var(--#{$prefix}spinner-width);
+  height: var(--#{$prefix}spinner-height);
+  vertical-align: var.
+  flex: 1 1 auto;
+  padding: var(--#{$prefix}modal-padding);
 }
 
-// prefers-color-scheme: dark
-@include cv.system-theme($name: "dark") {
-  @include dark.dark-theme;
+// Footer (for actions)
+.modal-footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center; // vertically center
+  justify-content: flex-end; // Right align buttons erflow-anchor: none;
+  @include transition(var(--#{$prefix}accordion-transition));
+
+  &:not(.collapsed) {
+    color: var(--#{$prefix}accordion-active-color);
+    background-color: var(--#{$prefix}accordion-active-bg);
+    box-shadow: inset 0 calc(-1 * var(o;
+  }
+
+  .modal-sm {
+    --#{$prefix}modal-width: #{$modal-sm};
+  }
 }
 
-// :root, [data-theme=light], .theme-light
-@include cv.bulma-theme($name: "light") {
-  round-l: cv.getVar("dark-l");
-$message-header-color-l: cv.getVar("text-dark-invert-l");
-$message-radius: cv.getVar("radius") !default;
-
-$message-header-weight: cv.getVar("weight-semibold") !default;
-$message-header-padding: 1em 1.25em !default;
-$message-heor: #{$table-active-color};
-  --#{$prefix}table-active-bg: #{$table-active-bg};
-  --#{$prefix}table-hover-color: #{$table-hover-color};
-  --#{$prefix}table-hover-bg: #{$table-hover-bg};
-
-  width: 100%;
-  margin-bottom: $spacer;
-  vertical-align: $table-cground-size: 100% 100%;
+@include media-breakpoint-up(lg) {
+  .modal-lg,
+  .modal-xl {
+    --#{$prefix}modal-width: #{$modal-lg};
+  }
 }
 
-.carousel-control-prev-icon {
-  background-image: escape-svg($carousel-control-prev-icon-bg) #{"/*rtl:" + escape-svg($carousel-control-next-icon-bg) + "*/"};
-}
-.carousel-control-next-icon {
-  background-image: escape-svg($carouslities-colors,
-  (
-    "black": to-rgb($black),
-    "white": to-rgb($white),
-    "body": to-rgb($body-color)
-  )
-) !default;
-$utilities-text-colors: map-loop($utilities-text, rgba-css-var, "$key", "text") !default;
-
-$utilities-text-emphasis-colors: (
-  "ute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: var(--#{$prefix}card-img-overlay-padding);
-  @include border-radius(var(--#{$prefix}card-inner-border-radius));
+@include media-breakpoint-up(xl) {
+  .modal-xl {
+    --height-sm};
 }
 
-.card-img,
-.card-img-top,
-.card-img-bottom {
-  width: 100%; // Required becausmport "helpers/focus-ring";
-@import "helpers/icon-link";
-@import "helpers/ratio";
-@import "helpers/position";
-@import "helpers/stacks";
-@import "helpers/visually-hidden";
-@import "helpers/stretched-link";
-@import "helpers/text-truncation";
-@import "helpersal-header-padding-x) * .5);
+@if $enable-reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    .spinner-border,
+    .spinner-grow {
+      --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed * 2};
+    }
+  }
+}
+//
+// Base styles
+//
+
+.accordion {
+  //al-header-padding-x) * .5);
     margin: calc(-.5 * var(--#{$prefix}modal-header-padding-y)) calc(-.5 * var(--#{$prefix}modal-header-padding-x)) calc(-.5 * var(--#{$prefix}modal-header-padding-y)) auto;
   }
 }
 
 // Title text within header
 .modal-title {
-  mant-size-large {
-          font-size: 1.25rem !important;
-        }
-
-        @media (min-width: 333px) {
-          .padding-sm-1rem {
-            padding: 1rem !important;
-          }
-        }
-
-        @media (min-width: 666px) {
-          .padding-md-1remprefix}card-spacer-y: #{$card-spacer-y};
-  --#{$prefix}card-spacer-x: #{$card-spacer-x};
-  --#{$prefix}card-title-spacer-y: #{$card-title-spacer-y};
-  --#{$prefix}card-title-color: #{$card-title-color};
-  --#{$prefix}card-subtitle-color: #{$card-subtitle-ccolor-l")}
+  mafix}navbar-link {
+  color: hsl(
+    #{cv.getVar("navbar-h")},
+    #{cv.getVar("navbar-s")},
+    #{cv.getVar("navbar-item-color-l")}
   );
   display: block;
   line-height: 1.5;
@@ -714,337 +480,62 @@ $utilities-text-emphasis-colors: (
   position: relative;
 
   .#{iv.$class-prefix}icon {
-    &:only-child {
-      margin-left: -0.25rem;
-      margin-right: -0.25rem;
-    }
+    // Handle rounded corners
+      @if $enable-rounded {
+        &:not(:last-child) {
+          @include border-end-radius(0);
+
+          .card-img-top,
+          .card-header {
+            // stylelint-disable-next-line property-disallowed-list
+    btn-active-shadow: #{$btn-active-box-shadow};
+  --#{$prefix}btn-disabled-color: #{$disabled-color};
+  --#{$prefix}btn-disabled-bg: #{$disabled-background};
+  --#{$prefix}btn-disabled-border-color: #{$disabled-border};
+}
+// scss-docs-end btn-variant-mixin
+
+("size-medium");
+  }
+
+  &.#{iv.$class-prefix}is-large {
+    font-size: cv.getVar("size-large");
+  }
+
+  // Colors
+  @each $name, $components in $message-colors {
+    &.#{iv.$class-prefix}is-#{$nam) {
+  .bd-features {
+    padding: calc(2 * var(--gap));
   }
 }
 
-a.#{iv.$class-prefix}navbar-class: px,
-      values: $spacers
-    ),
-    "padding-y": (
-      responsive: true,
-      property: padding-top padding-bottom,
-      class: py,
-      values: $spacers
-    ),
-    "padding-top": (
-      responsive: true,
-      property: padding-top,
- 1.5 !default;
-
-$code-family: cv.getVar("family-code") !default;
-$code-padding: 0.25em 0.5em 0.25em !default;
-$code-weight: normal !default;
-$code-size: 0.875em !default;
-
-$small-font-size: 0.875em !default;
-
-$hr-background-color: cv.getVar("background") !dc(100% + (#{cv.getVar("navbar-dropdown-offset")}));
-      transform: translateY(-5px);
-      transition-duration: cv.getVar("duration");
-      transition-property: opacity, transform;
-    }
-
-    &.#{iv.$class-prefix}is-right {
-      left: auto;
-      rigs mx;
-
-.bd-tws {
-  --tws-spacing: #{var(--bulma-block-spacing)};
-  --column-min-width: 100%;
-  padding: 0 var(--tws-spacing) var(--tws-spacing);
-}
-
-@include mx.tablet {
-  .bd-tws {
-    --column-min-width: 24rem;
-  }
-}
-
-@include mx.widescreen {
-  .bd-tws {
-,
-    "text-decoration": (
-      property: text-decoration,
-      values: none underline line-through
-    ),
-    "text-transform": (
-      property: text-transform,
-      class: text,
-      values: lowercase uppercase capitalize
-    ),
-    "white-space": (%;
-    height: 100%;
-  }
-}
-
-@each $key, $ratio in $aspect-ratios {
-  .ratio-#{$key} {
-    --#{$prefix}aspect-ratio: #{$ratio};
-  }
-}
-.form-floating {
-  position: relative;
-
-  > .form-control,
-  > .form-control-plaintext,
-  > .form-select {
-    heiissues/18842
-
-::-webkit-datetime-edit-fields-wrapper,
-::-webkit-datetime-edit-text,
-::-webkit-datetime-edit-minute,
-::-webkit-datetime-edit-hour-field,
-::-webkit-datetime-edit-day-field,
-::-webkit-datetime-edit-month-field,
-::-webkit-datetime-edit-year-fieround-l")} + #{cv.getVar(
-          "navbar-item-background-l-delta"
-        )}
-    ),
-    #{cv.getVar("navbar-item-background-a")}
-  );
-  cursor: pointer;
-
-  &:focus,
-  &:focus-within,
-  &:hoer-wave {
-  mask-image: linear-gradient(130deg, $black 55%, rgba(0, 0, 0, (1 - $placeholder-opacity-min)) 75%, $black 95%);
-  mask-size: 200% 100%;
-  animation: placeholder-wave 2s linear infinite;
-}
-
-@keyframes placeholder-wave {
-  100% {
-    mask-positiogrounds, border colors
-// and the colors of the striped, hovered & active tables
-
-@each $color, $value in $table-variants {
-  @include table-variant($color, $value);
-}
-
-// Responsive tables
-//
-// Generate series of `.table-responsive-*` classes for confi   // `$columns - 1` because offsetting by the width of an entire row isn't possible
-        @for $i from 0 through ($columns - 1) {
-          @if not ($infix == "" and $i == 0) { // Avoid emitting useless .offset-0
-            .offset#{$infix}-#{$i} {
-   //
-// Forms
-//
-
-$form-select-indicator-color-dark:  $body-color-dark !default;
-$form-select-indicator-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color-bles
-$primary-text-emphasis-dark:        tint-color($primary, 40%) !default;
-$secondary-text-emphasis-dark:      tint-color($secondary, 40%) !default;
-$success-text-emphasis-dark:        tint-color($success, 40%) !default;
-$info-text-emphasis-dark:      order,
-      local-vars: (
-        "border-opacity": 1
-      ),
-      values: $utilities-border-colors
-    ),
-    "subtle-border-color": (
-      property: border-color,
-      class: border,
-      values: $utilities-border-subtle
-    ),
-    "border-width": ars
-
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: var(--#{$prefix}modal-zindex);
-  display: none;
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  // Prevent Chrome on Windows from adding a focus outline. For details, see
-  {$name} {
-      @include cv.register-var("grid-cell-column-start", #{$i});
-    }
-
-    &.#{iv.$class-prefix}is-col-end-#{$name} {
-      @include cv.register-var("grid-cell-column-end", #{$i});
-    }
-
-    &.#{iv.$class-prefix}is-col-from-end-#{$name} {
-  : -0.375em;
-    inset-inline-end: 1.125em;
-  }
-}
-
-.#{iv.$class-prefix}navbar-dropdown {
-  font-size: 0.875rem;
-  padding-bottom: 0.75rem;
-  padding-top: 0.5rem;
-
-  .#{iv.$class-prefix}navbar-item {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-
-    ult;
-$breadcrumb-item-hover-color: cv.getVar("link-text-hover") !default;
-$breadcrumb-item-active-color: cv.getVar("link-text-active") !default;
-
-$breadcrumb-item-padding-vertical: 0 !default;
-$breadcrumb-item-padding-horizontal: 0.75em !default;
-
-$breadcrprefix}modal-zindex: #{$zindex-modal};
-  --#{$prefix}modal-width: #{$modal-md};
-  --#{$prefix}modal-padding: #{$modal-inner-padding};
-  --#{$prefix}modal-margin: #{$modal-dialog-margin};
-  --#{$prefix}modal-color: #{$modal-content-color};
-  --#{$prefix}modf this Sass bug: https://github.com/sass/node-sass/issues/2251
-@each $color, $value in $theme-colors {
-  .link-#{$color} {
-    color: RGBA(var(--#{$prefix}#{$color}-rgb), var(--#{$prefix}link-opacity, 1)) if($enable-important-utilities, !important, null)le-bg-type, var(--#{$prefix}table-accent-bg)));
-  }
-
-  > tbody {
-    vertical-align: inherit;
-  }
-
-  > thead {
-    vertical-align: bottom;
-  }
-}
-
-.table-group-divider {
-  border-top: calc(#{$table-border-width} * 2) solid $table-group-separator-color; // smixin make-col-auto() {
-  flex: 0 0 auto;
-  width: auto;
-}
-
-@mixin make-col-offset($size, $columns: $grid-columns) {
-  $num: divide($size, $columns);
-  margin-left: if($num == 0, 0, percentage($num));
-}
-
-// Row columns
-//
-// Specify on a parent element(e.gubtle-background-color": (
-      property: background-color,
-      class: bg,
-      values: $utilities-bg-subtle
-    ),
-    // scss-docs-end utils-bg-color
-    "gradient": (
-      property: background-image,
-      class: bg,
-      values: (gradient: var(close-white-filter);
-}
-
-.btn-close-white {
-  @include btn-close-white();
-}
-
-@if $enable-dark-mode {
-  @include color-mode(dark) {
-    .btn-close {
-      @include btn-close-white();
-    }
-  }
-}
-// Notes on the classes:
-//
-// 1. .carousel.pointer-event shoule-main-bis") !default;
-$modal-card-foot-radius: cv.getVar("radius-large") !default;
-
-$modal-card-body-background-color: cv.getVar("scheme-main") !default;
-$modal-card-body-padding: 2rem !default;
-
-$modal-breakpoint: iv.$tablet !defau-subtle: (
-  "primary": $primary-bg-subtle,
-  "secondary": $secondary-bg-subtle,
-  "success": $success-bg-subtle,
-  "info": $info-bg-subtle,
-  "warning": $warning-bg-subtle,
-  "danger": $danger-bg-subtle,
-  "light": $light-bg-subtle,
-  "dark": $dark-bg-subem;
-  --px: 1rem;
-  background-color: var(--hl-gray-09);
-  border-radius: var(--hl-radius);
-  color: var(--hl-gray-01);
-  padding-bottom: calc(2 * var(--py));
-
-  table {
-    width: 100%;
-
-    td,
-    th {
-      padding: var(--py) var(--px);
-    }
-
-    th {height and font-size of form controls.
-//
-// Repeated in `_input_group.scss` to avoid Sass extend issues.
-
-.form-control-sm {
-  min-height: $input-height-sm;
-  padding: $input-padding-y-sm $input-padding-x-sm;
-  @include font-size($input-font-size-sm);
-  @kpoint and narrower.
-@mixin media-breakpoint-down($name, $breakpoints: $grid-breakpoints) {
-  $max: breakpoint-max($name, $breakpoints);
-  @if $max {
-    @media (max-width: $max) {
-      @content;
-    }
-  } @else {
-    @content;
-  }
-}
-
-// Media that spans ity, rtl);
-
-    @if $value != null {
-      @if $is-rtl == false {
-        /* rtl:begin:remove */
-      }
-
-      @if $is-css-var {
-        .#{$property-class + $infix + $property-class-modifier} {
-          --#{$prefix}#{$css-variable-name}: #{$value};
-    l-card-head-background-color");
-  border-start-start-radius: cv.getVar("modal-card-head-radius");
-  border-start-end-radius: cv.getVar("modal-card-head-radius");
-  box-shadow: cv.getVar("shadow");
-}
-
-.#{iv.$class-prefix}modal-card-title {
-  co}
-
-  > :not(:first-child) {
-    border-top-width: 0;
-  }
-}
-
-// Zebra-striping
-//
-// Default zebra-stripe styles (alternating gray and transparent backgrounds)
-
-// For rows
-.table-striped {
-  > tbody > tr:nth-of-type(#{$table-striped-order}) > * {
-lelint-enable selector-no-qualifying-type
-
-.form-control-color {
-  width: $form-color-width;
-  height: $input-height;
-  padding: $input-padding-y;
-
-  &:not(:disabled):not([readonly]) {
-    cursor: pointer;
-  }
-
-  &::-moz-color-swatch {
-    border: 0 !impore-link-active-color);
-    border-bottom-color: currentcolor;
+.bd-feature {
+  --h: 348;
+  --s: 86%;
+  --l: 61%;
+  --a: 0.1;
+  --bg: var(--grad-red);
+  --bd-width: 0.125em;
+  --radius: 0.75em;
+  --p: 1em;
+  --icon: #{cv.getVar("danger")};
+  background: var    lighter: $font-weight-lighter,
+        light: $font-weight-light,
+        normal: $font-weight-normal,
+        medium: $font-weight-medium,
+        semibold: $font-weight-semibold,
+        bold: $font-weight-bold,
+        bolder: $font-weight-bolder
+  lass: padding-x,
+            property: padding-inline-start padding-inline-end,
+            values: 1rem
+          )
+        ) {
+          .padding-x-1rem {
+            padding-inline-start: 1rem;
+            padding-inline-end: 1rem;
+  bottom-color: currentcolor;
   }
 }
 
@@ -1065,125 +556,494 @@ lelint-enable selector-no-qualifying-type
   > .nav-link,
   .nav-item {
     flex-basis: 0;
- ($values) == "string" or type-of(nth($values, 1)) != "list" {
-    $values: zip($values, $values);
-  }
+    flehrough 12 {
+    .#{iv.$class-prefix}columns.#{iv.$class-prefix}is-mobile
+      > &.#{iv.$class-prefix}is-#{$i} {
+      flex: none;
+      width: calc(
+        math.percentage(math.div($i, 12)) - calc(#{cv.getVar("column-gap")} / 2)
+      );
+    }
 
-  @each $key, $value in $values {
-    $properties: map-get($utility, property);
-
-    // Multiple properties are possible, for example with vertical or hoprefix}heading-color);
+    .#{ivdth: 0; // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
+  height: var(--#{$prefix}card-height);
+  color: var(--#{$prefix}body-color);
+  word-wrap: break-word;
+  background-color: var(--#{$prefix}card-bg);
+  background-clip: bordecv.system-theme($name: "light") {
+  @include light.light-theme;
 }
 
-h1 {
-  @extend %heading;
-  @include font-size($h1-font-size);
+// prefers-color-scheme: dark
+@include cv.system-theme($name: "dark") {
+  @include dark.dark-theme;
 }
 
-h2 {
-  @extend %heading;
-  @include font-size($h2-font-size);
+// :root, [data-theme=light], .theme-light
+@include cv.bulma-theme($name: "light") {
+ rs: dv.$colors !default;
+
+.#{iv.$class-prefix}message {
+  @include cv.register-vars(
+    (
+      "message-border-l-delta": #{$message-border-l-delta},
+      "message-radius": #{$message-radius},
+      "message-header-weight": #{$message-header-weight},
+   class: px,
+      values: $spacers
+    ),
+    "padding-y": (
+      responsive: true,
+      property: padding-top padding-bottom,
+      class: py,
+      values: $spacers
+    ),
+    "padding-top": (
+      responsive: true,
+      property: padding-top,
+    -bulma-text);
+  display: flex;
+  height: 1.25em;
+  min-width: 1.25em;
 }
 
-h3 {
-  @extend %heading;
-  @include font-size($h3-font-size);
+.bd-tw-icon {
+  background-size: contain;
+  height: 1.25em;
+  width: 1.25em;
 }
 
-h4 {
-  @extend %heading;
-  @inhadow") !default;
-$card-radius: 0.75rem !default;
-
-$card-header-background-color: transparent !default;
-$card-header-color: cv.getVar("text-strong") !default;
-$card-header-padding: 0.75rem 1rem !default;
-$card-header-shadow: 0 0.125em 0.25em
-  hsla(
-    #
-$purple: #8A4D76;
-$pink: #FA7C91;
-$brown: #757763;
-$beige-light: #D0D1CD;
-$beige-lighter: #EFF0EB;
-
-$grey-dark: $brown;
-$grey-light: $beige-light;
-$primary: $purple;
-$link: $pink;
-
-$orange: #f60;
-$orange-invert: findColorInvert($orange);
-$orange-light: hsght: $dt-font-weight;
+.bd-tw-action-stat {
+  color: currentColor;
+  font-size: 0.875em;
+  margin-left: 0.5em;
+  marground-size: 100% 100%;
 }
 
-// 1. Undo browser default
+.carousel-control-prev-icon {
+  background-image: escape-svg($carousel-control-prev-icon-bg) #{"/*rtl:" + escape-svg($carousel-control-next-icon-bg) + "*/"};
+}
+.carousel-control-next-icon {
+  background-image: escape-svg($carousent-size-large {
+          font-size: 1.25rem !important;
+        }
 
-dd {
-  margin-bottom: .5rem;
-  margin-left: 0; // 1
+        @media (min-width: 333px) {
+          .padding-sm-1rem {
+            padding: 1rem !important;
+          }
+        }
+
+        @media (min-width: 666px) {
+          .padding-md-1remies-colors,
+  (
+    "black": to-rgb($black),
+    "white": to-rgb($white),
+    "body": to-rgb($body-color)
+  )
+) !default;
+$utilities-text-colors: map-loop($utilities-text, rgba-css-var, "$key", "text") !default;
+
+$utilities-text-emphasis-colors: (
+  "prima;
+$card-content-padding: 1.5rem !default;
+
+$card-footer-background-color: transparent !default;
+$card-footer-border-top: 1px solid cv.getVar("border-weak") !default;
+$card-footer-padding: 0.75rem !default;
+
+$card-media-margin: cv.getVar("block-spacing") !d: #{cv.getVarWithBackup("grid-column-gap", "grid-gap")};
+  row-gap: #{cv.getVarWithBackup("grid-row-gap", "grid-gap")};
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(#{cv.getVar("grid-column-min")}, 1fr)
+  );
+  grid-template-rows: auto;
+
+  &.isrefix}table-striped-bg: #{$table-striped-bg};
+  --#{$prefix}table-active-color: #{$table-active-color};
+  --#{$prefix}table-active-bg: #{$table-active-bg};
+  --#{$prefix}table-hover-color: #{$table-hover-color};
+  --#{$prefix}table-hover-bg: #{$table-hoverll backgrounds, border colors
+// and the colors of the striped, hovered & active tables
+
+@each $color, $value in $table-variants {
+  @include table-variant($color, $value);
 }
 
-
-// Blockquote
-
-blockquote {
-  margin: 0 0 1rem;
-}
-
-
-// Strong
+// Responsive tables
 //
-// Add the correct font weight in Chrome, Edge, and Safari
-
-b,
-strong {
-  font calc(1.5rem - #{$column-gap});
-  }
-
-  // Modifiers
-  &.#{iv.$class-prefix}is-centered {
-    justify-content: center;
-  }
-
-  &.#{iv.$class-prefix}is-gapless {
-    margin-inline-start: 0;
-    margin-inline-end: 0;
-
-    margin-top: 0;
-
-    & > .#{il put a leading zero so we want to keep that one
-            // stylelint-disable-next-line @stylistic/number-leading-zero
-            --bs-color-saturation: 0.25;
-            color: hsla(192deg, var(--bs-color-saturation), 0, var(--bs-color-opacity));
-   ed-link-z-index + 1;
-    padding: $alert-padding-y * 1.25 $alert-padding-x;
+// Generate series of `.table-responsive-*` classes for op: -0.375em;
+    inset-inline-end: 1.125em;
   }
 }
 
+.#{iv.$class-prefix}navbar-dropdown {
+  font-size: 0.875rem;
+  padding-bottom: 0.75rem;
+  padding-top: 0.5rem;
 
-// scss-docs-start alert-modifiers
-// Generate contextual modifier classes for colorizing the alert
-@each $state in map-keys($theme-colors) {
-  .alert-#{$state} {
-   sions": #{$icon-dimensions},
-      "icon-dimensions-small": #{$icon-dimensions-small},
-      "icon-dimensions-medium": #{$icon-dimensions-medium},
-      "icon-dimensions-large": #{$icon-dimensions-large},
-      "icon-text-spacing": #{$icon-text-spacing},
- -grow: 0;
+  .#{iv.$class-prefix}navbar-item {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+
+  -normal") !default;
+$body-line-height: 1.5 !default;
+
+$code-family: cv.getVar("family-code") !default;
+$code-padding: 0.25em 0.5em 0.25em !default;
+$code-weight: normal !default;
+$code-size: 0.875em !default;
+
+$small-font-size: 0.875em !default;
+
+$hr-backgr-style: solid;
+    }
+  }
+}
+
+.bs-tooltip-top .tooltip-arrow {
+  bottom: calc(-1 * var(--#{$prefix}tooltip-arrow-height)); // stylelint-disable-line function-disallowed-list
+
+  &::before {
+    top: -1px;
+    border-width: var(--#{$prefix}tooltip-arrow-heighlex;
+  gap: 0.75rem;
+}
+
+.bd-cycle {
+  --h: #{cv.getVar("sun-h")};
+  --s: #{cv.getVar("sun-s")};
+  --l: #{cv.getVar("sun-l")};
+
+  border-radius: 0.5em;
+  color: hsl(var(--h), var(--s), var(--l));
+  display: flex;
+  flex-shrink: 0;
+  height: $d;
+  overound-l: cv.getVar("background-l");
+$message-border-l: cv.getVar("border-l");
+$message-border-l-delta: -20% !default;
+$message-border-style: solid;
+$message-border-width: 0.25em;
+$message-color-l: cv.getVar("text-l");
+$message-header-background-l: cv. }
+  50% {
+    opacity: 1;
+    transform: none;
+  }
+}
+// scss-docs-end spinner-grow-keyframes
+
+.spinner-grow {
+  // scss-docs-start spinner-grow-css-vars
+  --#{$prefix}spinner-width: #{$spinner-width};
+  --#{$prefix}spinner-height: #{$spinner-height};
+  --idth": #{$navbar-dropdown-border-width},
+      "navbar-dropdown-offset": #{$navbar-dropdown-offset},
+      "navbar-dropdown-arrow": #{$navbar-dropdown-arrow},
+      "navbar-dropdown-radius": #{$navbar-dropdown-radius},
+      "navbar-dropdown-z": #{$n842
+
+::-webkit-datetime-edit-fields-wrapper,
+::-webkit-datetime-edit-text,
+::-webkit-datetime-edit-minute,
+::-webkit-datetime-edit-hour-field,
+::-webkit-datetime-edit-day-field,
+::-webkit-datetime-edit-month-field,
+::-webkit-datetime-edit-year-field {
+  pamport "helpers/ratio";
+@import "helpers/position";
+@import "helpers/stacks";
+@import "helpers/visually-hidden";
+@import "helpers/stretched-link";
+@import "helpers/text-truncation";
+@import "helpers/vr";
+@import "mixins/banner";
+@include bsBanner("");
+
+
+// acity: $placeholder-opacity-min;
+  }
+}
+
+.placeholder-wave {
+  mask-image: linear-gradient(130deg, $black 55%, rgba(0, 0, 0, (1 - $placeholder-opacity-min)) 75%, $black 95%);
+  mask-size: 200% 100%;
+  animation: placeholder-wave 2s linear infinite;
+}
+
+@keble-bg-type, var(--#{$prefix}table-accent-bg)));
+  }
+
+  > tbody {
+    vertical-align: inherit;
+  }
+
+  > thead {
+    vertical-align: bottom;
+  }
+}
+
+.table-group-divider {
+  border-top: calc(#{$table-border-width} * 2) solid $table-group-separator-color; // ilities, !important, null);
+  text-decoration-color: RGBA(var(--#{$prefix}emphasis-color-rgb), var(--#{$prefix}link-underline-opacity, 1)) if($enable-important-utilities, !important, null);
+
+  @if $link-shade-percentage != 0 {
+    &:hover,
+    &:focround-l")} + #{cv.getVar(
+          "navbar-item-background-l-delta"
+        )}
+    ),
+    #{cv.getVar("navbar-item-background-a")}
+  );
+  cursor: pointer;
+
+  &:focus,
+  &:focus-within,
+  &:ho- calc(
+              #{cv.getVar("column-gap")} / 2
+            )
+        );
+      }
+
+      &.#{iv.$class-prefix}is-offset-#{$i}-mobile {
+        margin-inline-start: math.percentage(math.div($i, 12));
+      }
+    }
+  }
+
+  @include mx.tablet {
+    &.{$name} {
+      @include cv.register-var("grid-cell-column-start", #{$i});
+    }
+
+    &.#{iv.$class-prefix}is-col-end-#{$name} {
+      @include cv.register-var("grid-cell-column-end", #{$i});
+    }
+
+    &.#{iv.$class-prefix}is-col-from-end-#{$name} {
+  derline,
+        (
+          null: rgba(var(--#{$prefix}link-color-rgb), var(--#{$prefix}link-underline-opacity, 1)),
+        )
+      )
+    ),
+    "link-underline-opacity": (
+      css-var: true,
+      class: link-underline-opacity,
+      state: hover,
+   ubtle-background-color": (
+      property: background-color,
+      class: bg,
+      values: $utilities-bg-subtle
+    ),
+    // scss-docs-end utils-bg-color
+    "gradient": (
+      property: background-image,
+      class: bg,
+      values: (gradient: var(ars
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--#{$prefix}modal-zindex);
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  // Prevent Chrome on Windows from adding a focus outline. For details, see
+  -start theme-text-dark-variables
+$primary-text-emphasis-dark:        tint-color($primary, 40%) !default;
+$secondary-text-emphasis-dark:      tint-color($secondary, 40%) !default;
+$success-text-emphasis-dark:        tint-color($success, 40%) !default;
+$infoblock;
+}
+
+%control {
+  @include controls.control;
+}
+
+%delete {
+  @include mixins.delete;
+}
+
+%loader {
+  @include mixins.loader;
+}
+
+%overlay {
+  @include mixins.overlay;
+}
+
+%reset {
+  @include mixins.reset;
+}
+
+%unselectable {
+  @include mixins.unselectable;//
+// Forms
+//
+
+$form-select-indicator-color-dark:  $body-color-dark !default;
+$form-select-indicator-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color-s: flex,
+      values: (
+        grow-0: 0,
+        grow-1: 1,
+      )
+    ),
+    "flex-shrink": (
+      responsive: true,
+      property: flex-shrink,
+      class: flex,
+      values: (
+        shrink-0: 0,
+        shrink-1: 1,
+      )
+    ),
+    "flex-wr   @for $i from 1 through $columns {
+          .col#{$infix}-#{$i} {
+            @include make-col($i, $columns);
+          }
+        }
+
+        // `$columns - 1` because offsetting by the width of an entire row isn't possible
+        @for $i from 0 througariable-name}: #{$value};
+          }
+        }
+      } @else {
+        .#{$property-class + $infix + $property-class-modifier} {
+          @each $property in $properties {
+            @if $is-local-vars {
+              @each $local-var, $variable in $is-l-grow: 0;
           padding: 0;
           overflow-y: visible;
           // Reset `background-color` in case `.bg-*` classes are used in offcanvas
           background-color: transparent !important; // stylelint-disable-line declaration-no-important
-    $value)), "", "-s");
-  @include register-var($name, round(lightness($value)), "", "-l");
+    st-line-height: 1.25 !default;
+$menu-list-link-padding: 0.5em 0.75em !default;
+$menu-nested-list-margin: 0.75em !default;
+$menu-nested-list-padding-left: 0.75em !default;
+
+$menu-label-color: cv.getVar("text-weak") !default;
+$menu-label-font-size: 0.75em !dlelint-enable selector-no-qualifying-type
+
+.form-control-color {
+  width: $form-color-width;
+  height: $input-height;
+  padding: $input-padding-y;
+
+  &:not(:disabled):not([readonly]) {
+    cursor: pointer;
+  }
+
+  &::-moz-color-swatch {
+    border: 0 !imporprefix}modal-zindex: #{$zindex-modal};
+  --#{$prefix}modal-width: #{$modal-md};
+  --#{$prefix}modal-padding: #{$modal-inner-padding};
+  --#{$prefix}modal-margin: #{$modal-dialog-margin};
+  --#{$prefix}modal-color: #{$modal-content-color};
+  --#{$prefix}modl(
+    cv.getVar("notification-h"),
+    cv.getVar("notification-s"),
+    cv.getVar("notification-color-l")
+  );
+  font-weight: cv.getVar("weight-semibold");
+  padding: 1.25rem 0;
+  position: relative;
+  text-align: center;
+
+  .title,
+  .subtitle,
+  .contenarent;
+$input-shadow: none;
+
+// Import only what you need from Bulma
+@import "../../../sass/utilities/_all.sass";
+@import "../../../sass/base/_all.sass";
+@import "../../../sass/elements/button.sass";
+@import "../../../sass/elements/container.sass";
+@imcs-end border-radius-mixins
+//
+// Text truncation
+//
+
+.text-truncate {
+  @include text-truncate();
+}
+// stylelint-disable property-disallowed-list
+@mixin transition($transition...) {
+  @if length($transition) == 0 {
+enable-dark-mode {
+  @include color-mode(dark) {
+    .btn-close {
+      @include btn-close-white();
+    }
+  }
+}
+// Notes on the classes:
+//
+// 1. .carousel.pointer-event should ideally be pan-y (to allow for users to scroll vertically)
+//    even when theiradius");
+    border-top-color: cv.getVar("navbar-dropdown-border-color");
+    border-top-style: cv.getVar("navbar-dropdown-border-style");
+    border-top-width: cv.getVar("navbar-dropdown-border-width");
+    box-shadow: 0 0.5em 0.5em
+      hslding-small {
+        padding: .5rem;
+      }
+
+      .padding-large {
+        padding: 2rem;
+      }
+    }
+  }
+
+  @include describe("global $enable-important-utilities: true") {
+    @include it("sets !important") {
+      $enable-important-utilities: true !gx}card-spacer-y: #{$card-spacer-y};
+  --#{$prefix}card-spacer-x: #{$card-spacer-x};
+  --#{$prefix}card-title-spacer-y: #{$card-title-spacer-y};
+  --#{$prefix}card-title-color: #{$card-title-color};
+  --#{$prefix}card-subtitle-color: #{$card-subtitle-colorottom-right-radius border-bottom-left-radius,
+      class: rounded-bottom,
+      values: (
+        null: var(--#{$prefix}border-radius),
+        0: 0,
+        1: var(--#{$prefix}border-radius-sm),
+        2: var(--#{$prefix}border-radius),
+        3: var(-: 0;
+  }
+
+  &.form-control-sm,
+  &.form-control-lg {
+    padding-right: 0;
+    padding-left: 0;
+  }
 }
 
-@mixin generate-on-scheme-colors($name, $base, $scheme-main) {
-  // Accessibility Contrast System
-  $scheme-main-brightness: fn.bulmaColorBrightness($scheme-main);
-ll {
+// Form control sizing
+//
+// Build on `.form-control` with modifier classes to decrease or increase the
+// height and font-size of form controls.
+//
+// 00%;
+  }
+}
+
+@each $key, $ratio in $aspect-ratios {
+  .ratio-#{$key} {
+    --#{$prefix}aspect-ratio: #{$ratio};
+  }
+}
+.form-floating {
+  position: relative;
+
+  > .form-control,
+  > .form-control-plaintext,
+  > .form-select {
+    height: $form-floating-heighll {
   @extend small;
 }
 
@@ -1206,58 +1066,74 @@ ll {
 .list-inline-item {
   display: inline-block;
 
-  &:-radius-xl),
-        5: var(--#{$prefix}border-radius-xxl),
-        circle: 50%,
-        pill: var(--#{$prefix}border-radius-pill)
-      )
-    ),
-    "rounded-bottom": (
-      property: border-bottom-right-radius border-bottom-left-radius,
-      class: rousvg {
-  vertical-align: middle;
+  &:{$value2}), $value1 + unquote(" + ") + $value2);
 }
 
+@function subtract($value1, $value2, $return-calc: true) {
+  @if $value1 == null and $value2 == null {
+    @return null;
+  }
 
-// Tables
-//
-// Prevent double borders
+  @if $value1 == null {
+    @return -$value2;
+  }
 
-table {
-  caption-side: bottom;
-  border-collapse: collapse;
-}
+  @if $value2 == null {
+   "primary": $primary-bg-subtle,
+  "secondary": $secondary-bg-subtle,
+  "success": $success-bg-subtle,
+  "info": $info-bg-subtle,
+  "warning": $warning-bg-subtle,
+  "danger": $danger-bg-subtle,
+  "light": $light-bg-subtle,
+  "dark": $dark-bg-subtle,
+) !defade-transform;
+  }
+  .modal.show & {
+    transform: $modal-show-transform;
+  }
 
-caption {
-  padding-top: $table-cell-padding-y;
-  padding-bottom: $table-cell-padding-y;
-  color: $table-caption-colwidth: 85px; // Seems to be a good minimum safe width
-
-    // Add some height to date inputs on iOS
-    // https://github.com/twbs/bootstrap/issues/23307
-    // TODO: we can remove this workaround once https://bugs.webkit.org/show_bug.cgi?id=198959 is resoip-arrow {
-  bottom: calc(-1 * var(--#{$prefix}tooltip-arrow-height)); // stylelint-disable-line function-disallowed-list
-
-  &::before {
-    top: -1px;
-    border-width: var(--#{$prefix}tooltip-arrow-height) calc(var(--#{$prefix}tooltip-arrow-width) * .5) ensions");
-  vertical-align: top;
-
-  .#{iv.$class-prefix}icon {
-    flex-grow: 0;
-    flex-shrink: 0;
+  // When trying to close, animate focus to scale
+  .modal.modal-static & {
+    transform: $modal-scale-transform;
   }
 }
 
-div.#{iv.$class-prefix}icon-text {
-  display: flex;
+.modal-dialog-scrollable {
+  height: calc(100% - var(--     @content;
+    }
+  } @else {
+    @content;
+  }
 }
-@use "sass:color";
-@use "sass:list";
-@use "sass:map";
-@use "sass:math";
 
-@use "initialen {
+// Media of at most the maximum breakpoint width. No query for the largest breakpoint.
+// Makes the @content apply to the given breakpoint and narrower.
+@mixin media-breakpoint-down($name, $breakpoints:weight");
+  justify-content: space-between;
+  line-height: 1.25;
+  padding: cv.getVar("message-header-padding");
+  position: relative;
+
+  .#{iv.$class-prefix}delete {
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-inline-start: 0.75em;
+  }
+
+  & + .#{iv.ute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: var(--#{$prefix}card-img-overlay-padding);
+  @include border-radius(var(--#{$prefix}card-inner-border-radius));
+}
+
+.card-img,
+.card-img-top,
+.card-img-bottom {
+  width: 100%; // Required becaus
   @if iv.$widescreen-enabled {
     @media screen and (min-width: iv.$widescreen) {
       @content;
@@ -1267,37 +1143,111 @@ div.#{iv.$class-prefix}icon-text {
 
 @mixin widescreen-only {
   @if iv.$widescreen-enabled and iv.$fullhd-enabled {
-    @media screen and (min-width: iv.$widescreen) and (max-wlight, $color-contrast-dark, $white, $black;
+    @media screen and (min-width: iv.$widescreen) and (max-wid  $first-value: nth($values, 1);
+    @if $first-value != 0 {
+      @warn "First breakpoint in #{$map-name} must start at 0, but starts at #{$first-value}.";
+    }
+  }
+}
+
+// Colors
+@function to-rgb($value) {
+  @return red($value), green($value), blue($valueprefix}heading-color);
+}
+
+h1 {
+  @extend %heading;
+  @include font-size($h1-font-size);
+}
+
+h2 {
+  @extend %heading;
+  @include font-size($h2-font-size);
+}
+
+h3 {
+  @extend %heading;
+  @include font-size($h3-font-size);
+}
+
+h4 {
+  @extend %heading;
+  @inorder,
+      local-vars: (
+        "border-opacity": 1
+      ),
+      values: $utilities-border-colors
+    ),
+    "subtle-border-color": (
+      property: border-color,
+      class: border,
+      values: $utilities-border-subtle
+    ),
+    "border-width": sions-small": #{$icon-dimensions-small},
+      "icon-dimensions-medium": #{$icon-dimensions-medium},
+      "icon-dimensions-large": #{$icon-dimensions-large},
+      "icon-text-spacing": #{$icon-text-spacing},
+    )
+  );
+}
+
+.#{iv.$class-prefix}icon {
+  alig      "table-head-cell-border-width": #{$table-head-cell-border-width},
+      "table-head-cell-color": #{$table-head-cell-color},
+      "table-foot-cell-border-width": #{$table-foot-cell-border-width},
+      "table-foot-cell-color": #{$table-foot-cell-colo-height-lg; }
+}
+//
+// Form text
+//
+
+.form-text {
+  margin-top: $form-text-margin-top;
+  @include font-size($form-text-font-size);
+  font-style: $form-text-font-style;
+  font-weight: $form-text-font-weight;
+  color: $form-text-color;
+}
+//
+// Stretched link
+ $min-contrast-ratio: $min-contrast-ratio) {
+  $foregrounds: $color-contrast-light, $color-contrast-dark, $white, $black;
   $max-ratio: 0;
   $max-ratio-color: null;
 
   @each $color in $foregrounds {
-    $contrast-ratio: contrast-ratio($background, $color);
-    @if $contrast-ratio > $min-contrast-ratio {
-      @return $color;
-alues: inline inline-block block grid inline-grid table table-row table-cell flex inline-flex none
+    $contrast-ratio: contrast-ratio($background, $color);minance($color) {
+  $rgb: (
+    "r": red($color),
+    "g": green($color),
+    "b": blue($color)
+  );
+
+  @each $name, $value in $rgb {
+    $value: if(divide($value, 255) < .04045, divide(divide($value, 255), 12.92), nth($_luminance-list, $value + 1));
+    $  class: d,
+      values: inline inline-block block grid inline-grid table table-row table-cell flex inline-flex none
     ),
     // scss-docs-end utils-display
     // scss-docs-start utils-shadow
     "shadow": (
       property: box-shadow,
-      class: shadow,
-     n");
-  transition-property: background-color, border-color, color;
-
-  strong {
-    color: currentColor;
-  }
+      class: sha;
 }
 
-button {
-  @include mx.reset;
-  transition-duration: cv.getVar("duration");
-  transition-property: background-color, border-color, color;
+.progress-stacked > .progress {
+  overflow: visible;
 }
 
-code: top;
-  width: calc(var(--f) * #{$w});
+.progress-stacked > .progress > .progress-bar {
+  width: 100%;
+}
+
+@if $enable-transitions {
+  .progress-bar-animated {
+    animation: $progress-bar-animation-timing progress-bar-stripes;
+
+    @if(var(--f) * #{$w});
 }
 /*! minireset.css v0.0.6 | MIT License | github.com/jgthms/minireset.css */
 // Blocks
@@ -1323,19 +1273,89 @@ h2,
 h3,
 h4,
 h5,
-h6 {-color),
-        0: 0,
-      )
+h6 {
+  margin: 0;
+  class: ms,
+      values: map-merge($spacers, (auto: auto))
     ),
-    "border-top": (
-      property: border-top,
-      values: (
-        null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--#{$prefix}border-color),
-        0: 0,
-      )
+    // Negative margin utilities
+    "negative-margin": (
+      responsive: true,
+      property: margin,
+      class: m,
+      values: $negative-spacers
     ),
-    "border-end": (
- $search, $replace: "") {
+    "negative-margin-x": (
+  , "-s");
+  @include register-var($name, round(lightness($value)), "", "-l");
+}
+
+@mixin generate-on-scheme-colors($name, $base, $scheme-main) {
+  // Accessibility Contrast System
+  $scheme-main-brightness: fn.bulmaColorBrightness($scheme-main);
+  $on-schopacity;
+    transform: none;
+  }
+
+  .carousel-item.active,
+  .carousel-item-next.carousel-item-start,
+  .carousel-item-prev.carousel-item-end {
+    z-index: 1;
+    opacity: 1;
+  }
+
+  .active.carousel-item-start,
+  .active.carousel-item-end {
+   prefix}secondary-color), // deprecated
+          "black-50": rgba($black, .5), // deprecated
+          "white-50": rgba($white, .5), // deprecated
+          "body-secondary": var(--#{$prefix}secondary-color),
+          "body-tertiary": var(--#{$prefix}tertspace: pre;
+  word-wrap: normal;
+
+  code {
+    background-color: transparent;
+    color: currentColor;
+    font-size: cv.getVar("pre-code-font-size");
+    padding: 0;
+  }
+}
+
+table {
+  td,
+  th {
+    vertical-align: top;
+
+    &:not([align]) {
+      texmixin make-col-auto() {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+@mixin make-col-offset($size, $columns: $grid-columns) {
+  $num: divide($size, $columns);
+  margin-left: if($num == 0, 0, percentage($num));
+}
+
+// Row columns
+//
+// Specify on a parent element(e.g;
+  --px: 1rem;
+  background-color: var(--hl-gray-09);
+  border-radius: var(--hl-radius);
+  color: var(--hl-gray-01);
+  padding-bottom: calc(2 * var(--py));
+
+  table {
+    width: 100%;
+
+    td,
+    th {
+      padding: var(--py) var(--px);
+    }
+
+    th {
+: "") {
   $index: str-index($string, $search);
 
   @if $index {
@@ -1345,198 +1365,129 @@ h6 {-color),
   @return $string;
 }
 
-// See weight");
-  justify-content: space-between;
-  line-height: 1.25;
-  padding: cv.getVar("message-header-padding");
-  position: relative;
-
-  .#{iv.$class-prefix}delete {
-    flex-grow: 0;
-    flex-shrink: 0;
-    margin-inline-start: 0.75em;
-  }
-
-  & + .#{iv.as iv;
-
-.#{iv.$class-prefix}loader {
-  animation: spinAround 500ms infinite linear;
-  border: 2px solid cv.getVar("border");
-  border-radius: cv.getVar("radius-rounded");
-  border-right-color: transparent;
-  border-top-color: transparent;
-  cont }
-
-  & > .#{iv.$class-prefix}container {
-    align-items: stretch;
-    display: flex;
-    min-height: cv.getVar("navbar-height");
-    width: 100%;
-  }
-
-  &.#{iv.$class-prefix}has-shadow {
-    box-shadow: cv.getVar("navbar-box-shadow-size")
-      cv.ult;
-$file-name-border-style: solid !default;
-$file-name-border-width: 1px 1px 1px 0 !default;
-$file-name-max-width: 16em !default;
-
-$file-colors: shared.$form-colors !default;
-
-.#{iv.$class-prefix}file {
-  @extend %block;
-  @extend %unselectable;
-
-  @inor: #{$nav-tabs-link-active-color};
-  --#{$prefix}nav-tabs-link-active-bg: #{$nav-tabs-link-active-bg};
-  --#{$prefix}nav-tabs-link-active-border-color: #{$nav-tabs-link-active-border-color};
-  // scss-docs-end nav-tabs-css-vars
-
-  border-bottom: var(-       25: 25%,
-        50: 50%,
-        75: 75%,
-        100: 100%,
-        auto: auto
-      )
-    ),
-    "max-height": (
-      property: max-height,
-      class: mh,
-      values: (100: 100%)
-    ),
-    "viewport-height": (
-      property: height,
-    $prefix: bs-;
-$enable-important-utilities: false;
-
-// Important: Do not import rfs to check that the mixin just calls the appropriate functions from it
-@import "../../mixins/utilities";
-
-@mixin test-generate-utility($params...) {
-  @include assert() {
-t(
+// See https://codepen.ioheight": #{$hr-height},
+      "hr-margin": #{$hr-margin},
+      "strong-color": #{$strong-color},
+      "strong-weight": #{$strong-weight},
+      "pre-font-size": #{$pre-font-size},
+      "pre-padding": #{$pre-padding},
+      "pre-code-font-size": #{$pre-c-strong-l");
+$pagination-item-font-size: 1em !default;
+$pagination-item-margin: 0.25rem !default;
+$pagination-item-padding-left: 0.5em !default;
+$pagination-item-padding-right: 0.5em !default;
+$pagination-item-outer-shadow-h: 0;
+$pagination-item-outer-shadll put a leading zero so we want to keep that one
+            // stylelint-disable-next-line @stylistic/number-leading-zero
+            --bs-color-saturation: 0.25;
+            color: hsla(192deg, var(--bs-color-saturation), 0, var(--bs-color-opacity));
+  t(
     180deg,
     hsla(var(--theme-h), var(--theme-s), var(--theme-l), 0.1),
     transparent calc(var(--spacing) * 3)
   );
   background-repeat: repeat-x;
   padding: calc(3 * var(--spacing)) var(--spacing) calc(3 * var(--spacing));
-  poanslateX(100%);
+  po}
+
+
+// Images and content
+
+img,
+svg {
+  vertical-align: middle;
 }
 
-.carousel-item-prev:not(.carousel-item-end),
-.active.carousel-item-start {
-  transform: translateX(-100%);
+
+// Tables
+//
+// Prevent double borders
+
+table {
+  caption-side: bottom;
+  border-collapse: collapse;
 }
 
+caption {
+  padding-top: $table-cell-padding-y;
+  padding-bottom: $table-cell-padditablet,
+    "until": $desktop,
+  ),
+  "touch": (
+    "from": $desktop,
+  ),
+  "desktop": (
+    "from": $desktop,
+  ),
+  "desktop-only": (
+    "from": $desktop,
+    "until": $widescreen,
+  ),
+  "until-widescreen": (
+    "until": $widescreen,
+  ),
+  "widescreudo element button overlap
 
-//
-// Alternate transitions
-//
-
-.carousel-fade {
-  .carousel-item {
-    opacity: 0;
-    transition-property: opacity;
-    t  end: flex-end,
-        center: center,
-        between: space-between,
-        around: space-around,
-        stretch: stretch,
-      )
-    ),
-    "align-self": (
-      responsive: true,
-      property: align-self,
-      values: (
-        auto: auto,
-    de": "link",
-  "css": "css",
-  "customize": "info",
-  "docs": "success",
-  "expo": "warning",
-  "features": "danger",
-  "helpers": "link",
-  "html": "html",
-  "library": "primary",
-  "love": "danger",
-  "primary": "primary",
-  "sass": "sass",
-  "sponsor": ths
-  .container,
-  // 100% wide container at all breakpoints
-  .container-fluid {
-    @include make-container();
+    &:not(:disabled):not([readonly]) {
+      cursor: pointer;
+    }
   }
 
-  // Responsive containers that are 100% wide until a breakpoint
-  @each $breakpoint, $container-max-width in $container-max-widths {
-   t-light) {
-  $l1: luminance($background);
-  $l2: luminance(opaque($background, $foreground));
-
-  @return if($l1 > $l2, divide($l1 + .05, $l2 + .05), divide($l2 + .05, $l1 + .05));
+  // Customize the `:focus` state to imitate native WebKit styles.
+  &:focus {
+    color: $input-focus-color;
+    background-color: $input-focus-bg;
+    bz-index + 1;
+    padding: $alert-padding-y * 1.25 $alert-padding-x;
+  }
 }
 
-// Return WCAG2.1 relative luminance
-// See https://www.w3.org/TR/WCAG/#ddex: $zindex;
-  width: 100vw;
-  height: 100vh;
-  background-color: $backdrop-bg;
 
-  // Fade for backdrop
-  &.fade { opacity: 0; }
-  &.show { opacity: $backdrop-opacity; }
-}
-@mixin box-shadow($shadow...) {
-  @if $enable-shadows {
-    $result: ();
+// scss-docs-start alert-modifiers
+// Generate contextual modifier classes for colorizing the alert
+@each $state in map-keys($theme-colors) {
+  .alert-#{$state} {
+   : 1;
+  flex-shrink: 1;
+  padding: $column-gap;
 
-    @eachu-list-line-height: 1.25 !default;
-$menu-list-link-padding: 0.5em 0.75em !default;
-$menu-nested-list-margin: 0.75em !default;
-$menu-nested-list-padding-left: 0.75em !default;
-
-$menu-label-color: cv.getVar("text-weak") !default;
-$menu-label-font-size: 0.75e      "table-head-cell-border-width": #{$table-head-cell-border-width},
-      "table-head-cell-color": #{$table-head-cell-color},
-      "table-foot-cell-border-width": #{$table-foot-cell-border-width},
-      "table-foot-cell-color": #{$table-foot-cell-colottps://stackoverflow.com/questions/36247140/why-dont-flex-items-shrink-past-content-size
+  .#{iv.$class-prefix}columns.#{iv.$class-prefix}is-mobile
+    > &.#{iv.$class-prefix}is-narrow {
+    flex: none;
+    width: unset;
   }
 
-  // Bring the "active" form control to the top of surrounding elements
-  > .form-control:focus,
-  > .form-select:focus,
-  > .form-floating:focus-within {
-   or($danger, 40%) !default;
-$light-border-subtle-dark:          $gray-700 !default;
-$dark-border-subtle-dark:           $gray-800 !default;
-// scss-docs-end theme-border-subtle-dark-variables
+  .#{iv.$class-prefix}columns.#{iv.$class-prefix}is-mobile
+    > &.#{ivutline-color: hsl(
+      cv.getVar("focus-h"),
+      cv.getVar("focus-s"),
+      cv.getVar("focus-l")
+    );
+    outline-offset: cv.getVar("focus-offset");
+    outline-style: cv.getVar("focus-style");
+    outline-width: cv.getVar("focus-width");
 
-$body-color-dark:                   $gray-300 !default;
-$body-bgrtant;
+    &:actt-size(var(--#{$prefix}nav-link-font-size));
+  font-weight: var(--#{$prefix}nav-link-font-weight);
+  color: var(--#{$prefix}nav-link-color);
+  text-decoration: if($link-decoration == none, null, none);
+  background: none;
+  border: 0;
+  @intically, but seems to currently be
+// confused and applies its very visible two-tone outline anyway.
+
+button:focus:not(:focus-visible) {
+  outline: 0;
 }
 
-// 1. Prevent a WebKit bug where (2) destroys native `audio` and `video`
-//    controls in Android 4.
-// 2. Correct the inability to style clickable types in iOS and Safari.
-// 3. Opinionated: add "hand" cursor to non-disabled button elements.
+// 1. Remove the margin in Firefox and Safari
 
-b none;
-}
-
-// 1. Textareas should really only resize vertically so they don't break their (horizontal) containers.
-
+input,
+button,
+select,
+optgroup,
 textarea {
-  resize: vertical; // 1
-}
-
-// 1. Browsers set a default `min-width: min-content;` on fieldsets,
-//    unlike e.g. `<div>`s, whic 16 16' fill='#{$accordion-icon-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
-$accordion-button-active-icon-dark:  url("prefix}dropdown-divider-bg: #{$dropdown-divider-bg};
-  --#{$prefix}dropdown-divider-margin-y: #{$dropdown-divider-margin-y};
-  --#{$prefix}dropdown-box-shadow: #{$dropdown-box-shadow};
-  --#{$prefix}dropdown-link-color: #{$dropdown-link-color}
+  ma
   .bd-nav-item.is-love {
     display: none;
   }
@@ -1554,18 +1505,198 @@ $accordion-button-active-icon-dark:  url("prefix}dropdown-divider-bg: #{$dropdow
 
 @include mx.from(utils.$header-bp + 300px) {
   .bd-header {
-    gap: 1.25points") {
-  @if length($map) > 0 {
-    $values: map-values($map);
-    $first-value: nth($values, 1);
-    @if $first-value != 0 {
-      @warn "First breakpoint in #{$map-name} must start at 0, but starts at #{$first-value}.";
+    gap: 1.25    end: flex-end,
+        center: center,
+        between: space-between,
+        around: space-around,
+        stretch: stretch,
+      )
+    ),
+    "align-self": (
+      responsive: true,
+      property: align-self,
+      values: (
+        auto: auto,
+  kpoints
+  .container-fluid {
+    @include make-container();
+  }
+
+  // Responsive containers that are 100% wide until a breakpoint
+  @each $breakpoint, $container-max-width in $container-max-widths {
+    .container-#{$breakpoint} {
+      @extend .container-"modal-card-head-background-color");
+  border-start-start-radius: cv.getVar("modal-card-head-radius");
+  border-start-end-radius: cv.getVar("modal-card-head-radius");
+  box-shadow: cv.getVar("shadow");
+}
+
+.#{iv.$class-prefix}modal-card-title {
+  co.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
+// scss-docs-end sass-dark-mode-vars
+.focus-ring:focus {
+  outline: 0;
+  // By default, there is no `--bs-focus-ring-x`, `--bs-focus-ring-y`, or `--bs-focus-ring-blur`, but we provide CSS variablcolor: inherit;
+  --#{$prefix}alert-border-color: transparent;
+  --#{$prefix}alert-border: #{$alert-border-width} solid var(--#{$prefix}alert-border-color);
+  --#{$prefix}alert-border-radius: #{$alert-border-radius};
+  --#{$prefix}alert-link-color: inher
+// `min-` and `max-` prefixes and viewports with fractional widths.
+// See https://www.w3.org/TR/mediaqueries-4/#mq-min-max
+// Uses 0.02px rather than 0.01px to work around a current rounding bug in Safari.
+// See https://bugs.webkit.org/show_bug.cgi?id=1    )}, #{cv.getVar("scheme-invert-l")}, 0.1);
+        top: auto;
+      }
     }
+
+    &.#{iv.$class-prefix}is-active,
+    &.#{iv.$class-prefix}is-hoverable:focus,
+    &.#{iv.$class-prefix}is-hoverable:focus-within,
+    &.#{iv.$class-prefix}is-hoverable:hove: "warning",
+  "features": "danger",
+  "helpers": "link",
+  "html": "html",
+  "library": "primary",
+  "love": "danger",
+  "primary": "primary",
+  "sass": "sass",
+  "sponsor": "patreon",
+  "start": "start",
+  "twitter": "twitter",
+  "moon": "moon",
+);
+
+@eacult;
+
+$modal-card-title-color: cv.getVar("text-strong") !default;
+$modal-card-title-line-height: 1 !default;
+$modal-card-title-size: cv.getVar("size-4") !default;
+
+$modal-card-foot-background-color: cv.getVar("scheme-main-bis") !default;
+$modal-card-foot-rprefix}dropdown-divider-bg: #{$dropdown-divider-bg};
+  --#{$prefix}dropdown-divider-margin-y: #{$dropdown-divider-margin-y};
+  --#{$prefix}dropdown-box-shadow: #{$dropdown-box-shadow};
+  --#{$prefix}dropdown-link-color: #{$dropdown-link-color}ttom: 1rem;
+  font-style: normal;
+  line-height: inherit;
+}
+
+
+// Lists
+
+ol,
+ul {
+  padding-left: 2rem;
+}
+
+ol,
+ul,
+dl {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+ol ol,
+ul ul,
+ol ul,
+ul ol {
+  margin-bottom: 0;
+}
+
+dt {
+  font-weight: $dt-font-weight;
+}
+
+// calc(1.5rem - #{$column-gap});
+  }
+
+  // Modifiers
+  &.#{iv.$class-prefix}is-centered {
+    justify-content: center;
+  }
+
+  &.#{iv.$class-prefix}is-gapless {
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+
+    margin-top: 0;
+
+    & > .#{iescreen {
+    &.#{iv.$class-prefix}is-narrow-widescreen {
+      flex: none;
+      width: unset;
+    }
+
+    &.#{iv.$class-prefix}is-full-widescreen {
+      flex: none;
+      width: 100%;
+    }
+
+    &.#{iv.$class-prefix}is-three-quarters-widescreen {
+   -serif !default;
+$family-monospace: "Inconsolata", "Hack", "SF Mono", "Roboto Mono",
+  "Source Code Pro", "Ubuntu Mono", monospace !default;
+$render-mode: optimizeLegibility !default;
+
+$size-1: 3rem !default;
+$size-2: 2.5rem !default;
+$size-3: 2rem !deas iv;
+
+.#{iv.$class-prefix}loader {
+  animation: spinAround 500ms infinite linear;
+  border: 2px solid cv.getVar("border");
+  border-radius: cv.getVar("radius-rounded");
+  border-right-color: transparent;
+  border-top-color: transparent;
+  conottom: $carousel-caption-spacer;
+  left: (100% - $carousel-caption-width) * .5;
+  padding-top: $carousel-caption-padding-y;
+  padding-bottom: $carousel-caption-padding-y;
+  color: $carousel-caption-color;
+  text-align: center;
+}
+
+// Dark mode carousel
+
+@mitstrap/issues/12359
+//    and https://html.spec.whatwg.org/multipage/#the-fieldset-and-legend-elements
+// 2. Reset the default outline behavior of fieldsets so they don't affect page layout.
+
+fieldset {
+  min-width: 0; // 1
+  padding: 0; // 2
+  margcontrol:focus,
+  > .form-select:focus,
+  > .form-floating:focus-within {
+    z-index: 5;
+  }
+
+  // Ensure buttons are always above inputs for more visually pleasing borders.
+  // This isn't needed for `.input-group-text` since it shares the same borde 2
+  overflow: auto; // 3
+  @include font-size($code-font-size);
+  color: $pre-color;
+
+  // Account for some code outputs that place code tags in pre tags
+  code {
+    @include font-size(inherit);
+    color: inherit;
+    word-break: normal;
   }
 }
 
-// Colors
-@functdown($next, $breakpoints) {
+code {
+ math";
+
+@use "initial-variables" as iv;
+@use "functions" as fn;
+
+@function buildVarName($name, $prefix: "", $suffix: "") {
+  @return "--#{iv.$cssvars-prefix}#{$prefix}#{$name}#{$suffix}";
+}
+
+@function buildHslaString($name, $l, $a: 1) {
+  $lightness: getVadown($next, $breakpoints) {
       @content;
     }
   }
@@ -1577,239 +1708,38 @@ $accordion-button-active-icon-dark:  url("prefix}dropdown-divider-bg: #{$dropdow
   }
 }
 // scss-docs-end mixin-color-scheme
-// All-caps `RGBA()` function usrners
-//
-// These rulesets must come after the sizing ones to properly override sm and lg
-// border-radius values when extending. They're more specific than we'd like
-// with the `.input-group >` part, but without it, we cannot override the sizing.
+// All-caps `RGBA()` functi}
 
-// stygin: 0; // Override default margin of ul
-  @include font-size(var(--#{$prefix}dropdown-font-size));
-  color: var(--#{$prefix}dropdown-color);
-  text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
-  list-style: none1 + unquote(" - ") + $value2);
-}
-
-@function divide($dividend, $divisor, $precision: 10) {
-  $sign: if($dividend > 0 and $divisor > 0 or $dividend < 0 and $divisor < 0, 1, -1);
-  $dividend: abs($dividend);
-  $divisor: abs($divisor);
-  @if $dividend == 0 {
-  true) {
-  $normal: if($right, "right", "left");
-  $opposite: if($right, "left", "right");
-
-  @if iv.$rtl {
-    #{$property}-#{$opposite}: $spacing;
-  } @else {
-    #{$property}-#{$normal}: $spacing;
+  > :not(:first-child) {
+    border-top-width: 0;
   }
 }
 
-@mixin ltr-position($spacing, $right: true) {
-  $ation;
-  }
-}
-
-// And undo these styles for placeholder links/named anchors (without href).
-// It would be more straightforward to just use a[href] in previous block, but that
-// causes specificity issues in many other styles that are too complex to fix.
-//of the previous key '#{$prev-key}' !";
-    } @else if $prev-num >= $num {
-      @warn "Invalid value for #{$map-name}: This map must be in ascending order, but key '#{$key}' has value #{$num} which isn't greater than #{$prev-num}, the value of the previotVar("hr-margin");
-}
-
-img {
-  height: auto;
-  max-width: 100%;
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-  vertical-align: baseline;
-}
-
-small {
-  font-size: cv.getVar("small-font-size");
-}
-
-span {
-  font-style: inherit;
-  font-weight: inherit;
-}
-
-stlled-left {
-  float: left !important;
-}
-
-.#{iv.$helpers-prefix}float-right,
-.#{iv.$helpers-prefix}pulled-right {
-  float: right !important;
-}
-
-.#{iv.$helpers-prefix}float-none {
-  float: none !important;
-}
-
-$clears: both left none right;
-
-@each $clear in $r-top: 1px solid var(--#{$prefix}dropdown-divider-bg);
-  opacity: 1; // Revisit in v6 to de-dupe styles that conflict with <hr> element
-}
-
-// Links, buttons, and more within the dropdown menu
+// Zebra-striping
 //
-// `<button>`-specific styles are denoted with `// For <buttonclude describe(generate-utility) {
-  @include it("generates a utility class for each value") {
-    @include test-generate-utility(
-      (
-        property: "padding",
-        values: (small: .5rem, large: 2rem)
-      )
-    ) {
-      .padding-small {
- -tablet: 3rem 3rem !default;
-$hero-body-padding-small: 1.5rem !default;
-$hero-body-padding-medium: 9rem 4.5rem !default;
-$hero-body-padding-large: 18rem 6rem !default;
+// Default zebra-stripe styles (alternating gray and transparent backgrounds)
 
-$hero-gradient-h-offset: 5deg;
-$hero-gradient-s-offset: 10%;
-$hero-gradient-l-offset: 5olor: $color;
+// For rows
+.table-striped {
+  > tbody > tr:nth-of-type(#{$table-striped-order}) > * {
+th: 100vw;
+  height: 100vh;
+  background-color: $backdrop-bg;
 
-  @if $enable-gradients {
-    background-image: var(--#{$prefix}gradient);
-  }
+  // Fade for backdrop
+  &.fade { opacity: 0; }
+  &.show { opacity: $backdrop-opacity; }
 }
-// scss-docs-end gradient-bg-mixin
+@mixin box-shadow($shadow...) {
+  @if $enable-shadows {
+    $result: ();
 
-// scss-docs-start gradient-mixins
-// Horizontal gradient, from left to right
-//
-// Creates two color stops, start and end, -close-opacity: #{$btn-close-opacity};
-  --#{$prefix}btn-close-hover-opacity: #{$btn-close-hover-opacity};
-  --#{$prefix}btn-close-focus-shadow: #{$btn-close-focus-shadow};
-  --#{$prefix}btn-close-focus-opacity: #{$btn-close-focus-opacity};
-  -prefix}nav-link-font-weight);
-  color: var(--#{$prefix}nav-link-color);
-  text-decoration: if($link-decoration == none, null, none);
-  background: none;
-  border: 0;
-  @include transition($nav-link-transition);
+    @each $value in $shadow v-tabs-link-active-color};
+  --#{$prefix}nav-tabs-link-active-bg: #{$nav-tabs-link-active-bg};
+  --#{$prefix}nav-tabs-link-active-border-color: #{$nav-tabs-link-active-border-color};
+  // scss-docs-end nav-tabs-css-vars
 
-  &:hover,
-  &:fo");
-$menu-item-radius: cv.getVar("radius-small") !default;
-$menu-item-selected-h: cv.getVar("link-h");
-$menu-item-selected-s: cv.getVar("link-s");
-$menu-item-selected-l: cv.getVar("link-l");
-$menu-item-selected-background-l: cv.getVar("link-l");
-$men-item-border-style": #{$pagination-item-border-style},
-      "pagination-item-border-width": #{$pagination-item-border-width},
-      "pagination-item-border-l": #{$pagination-item-border-l},
-      "pagination-item-border-l-delta": #{$pagination-item-borderansform-origin: 0 0;
-    @include transition($form-floating-transition);
-  }
-
-  > .form-control,
-  > .form-control-plaintext {
-    padding: $form-floating-padding-y $form-floating-padding-x;
-
-    &::placeholder {
-      color: transparent;
-    }
-
-    &:focrrect element displays
-
-output {
-  display: inline-block;
-}
-
-// Remove border from iframe
-
-iframe {
-  border: 0;
-}
-
-// Summary
-//
-// 1. Add the correct display in all browsers
-
-summary {
-  display: list-item; // 1
-  cursor: pointer;
-}
-
-
-// Progress
-//
-//ink: #ff5cd3;
-  // --hl-rose: #ff6b9d;
-  // --hl-orange: #ff9970;
-  // --hl-yellow: #fed604;
-  // --hl-gray-01: #d9e0e8;
-  // --hl-gray-02: #808182;
-  // --hl-gray-09: #1f2330;
-
-  --hl-green: #85e89d;
-  --hl-cyan: #47ffe7;
-  --hl-blue: #79b8ff;
-  --hl-purp232 .0242 .0252 .0262 .0273 .0284 .0296 .0307 .0319 .0331 .0343 .0356 .0369 .0382 .0395 .0409 .0423 .0437 .0452 .0467 .0482 .0497 .0513 .0529 .0545 .0561 .0578 .0595 .0612 .063 .0648 .0666 .0685 .0704 .0723 .0742 .0762 .0782 .0802 .0823 .0844 .0865 .0887 .input-disabled-bg;
-    }
-  }
-}
-// Breakpoint viewport sizes and media queries.
-//
-// Breakpoints are defined as a map of (name: minimum width), order from small to large:
-//
-//    (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px, xxl: 1400px)
-//
-// The  $min: map-get($breakpoints, $name);
-  @return if($min != 0, $min, null);
-}
-
-// Maximum breakpoint width.
-// The maximum value is reduced by 0.02px to work around the limitations of
-// `min-` and `max-` prefixes and viewports with fractional widths.
-// Seenclude expect() {
-        [data-bs-theme=dark] .element {
-          color: var(--bs-primary-text-emphasis);
-          background-color: var(--bs-primary-bg-subtle);
-        }
-        [data-bs-theme=dark] {
-          --custom-color: #3a3ff8;
-     sition-timing-function: cv.getVar("easing");
-    width: cv.getVar("burger-item-width");
-
-    &:nth-child(1),
-    &:nth-child(2) {
-      top: calc(50% - calc(#{cv.getVar("burger-item-height")}) / 2);
-    }
-
-    &:nth-child(3) {
-      bottom: calc(50% + #{cva: 0s;
-  --circle-delay-b: 0.5s;
-  --circle-delay-c: 1s;
-  --background-offset: -1%;
-  --border-offset: -6%;
-
-  --grad-angle: 96deg;
-  --grad-red: linear-gradient(
-    var(--grad-angle),
-    #f14668 4.28%,
-    #ff5a5c 51.66%,
-    #f1a246 100%
-  );
-  --gradward "sass/layout/footer";
-
-// Import the themes so that all CSS variables have a value
-@forward "sass/themes";
-
-// Import the Google Font
-@import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
-@use "sass/utilities/extends";
-
-.bd-pills  "sass/themes/light";
+  border-bottom: var(- "sass/themes/light";
 
 $mauve: #8a4d76;
 $pink: #fa7c91;
@@ -1825,143 +1755,244 @@ $sass: #bf4080;
   color: var(--bulma-border-hover);
 }
 
-.bd-index-custom-exampladient($deg, $start-color, $end-color);
+.bd-index-custom-examplezed {
+  text-transform: capitalize !important;
 }
 
-@mixin gradient-x-three-colors($start-color: $blue, $mid-color: $purple, $color-stop: 50%, $end-color: $red) {
-  background-image: linear-gradient(to right, $start-color, $mid-color $color-stop, $end-color);
+.#{iv.$helpers-prefix}lowercase {
+  text-transform: lowercase !important;
 }
 
-@mvariant
+.#{iv.$helpers-prefix}uppercase {
+  text-transform: uppercase !important;
+}
+
+.#{iv.$helpers-prefix}italic {
+  font-style: italic  solid transparent; // Required for aligning label's text with the input as it affects inner box model
+    transform-origin: 0 0;
+    @include transition($form-floating-transition);
+  }
+
+  > .form-control,
+  > .form-control-plaintext {
+    padding: $formrward "nav";
+
+.bd-hr {
+  height: 0.25rem;
+  margin: 1em auto;
+  border-radius: 9999px;
+  background-color: var(--theme-color, #{cv.getVar("primary")});
+  width: 4em;
+}
+@use "sass/utilities/mixins" as mx;
+
+.bd-brand {
+  padding: 3rem;
+}
+
+.bd-logos {
+  --sizcanvas-bg);
+      background-clip: padding-box;
+      outline: 0;
+      @include box-shadow(var(--#{$prefix}offcanvas-box-shadow));
+      @include transition(var(--#{$prefix}offcanvas-transition));
+
+      &.offcanvas-start {
+        top: 0;
+        lefr-top: 0;
+  content: " ";
+  display: block;
+  height: 0.625em;
+  margin-top: -0.4375em;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: rotate(-45deg);
+  transform-origin: center;
+  transition-duration: cv.getVar("duration");
+  traight, $start-color, $mid-color $color-stop, $end-color);
+}
+
+@mixin gradient-y-three-colors($start-color: $blue, $mid-color: $purple, $color-stop: 50%, $end-color: $red) {
+  background-image: linear-gradient($start-color, $mid-color $color-stop, $end-color)ground);
+    $bg-is-light: $bg-lum > 0.55;
+    $candidates: ();
+    $found: false;
+
+    // If the background color is the base color
+    @if $bg-l == $l {
+      $base-digits: $digits-bg;
+
+      // Even if the base color as a background
+      // doesn't hav-style": #{$file-name-border-style},
+      "file-name-border-width": #{$file-name-border-width},
+      "file-name-max-width": #{$file-name-max-width},
+      "file-h": #{$file-h},
+      "file-s": #{$file-s},
+      "file-background-l": #{$file-background-l},3.405-6.772%204.643V16.67c0-.414-.334-.75-.75-.75h-.395c-3.66%200-6.318-2.476-6.318-5.886%200-3.534%202.768-6.302%206.3-6.302l4.147.01h.002c3.532%200%206.3%202.766%206.302%206.296-.003%201.91-.942%203.844-2.514%205.176z%22%2F%3E%3C%2Fsvg%3E);
+  }
+
+  .bd-twd-color;
+
+  --sun: #{$sun};
+  --moon: #{$moon};
+  --animation-duration: 1s;
+  --circle-delay-a: 0s;
+  --circle-delay-b: 0.5s;
+  --circle-delay-c: 1s;
+  --background-offset: -1%;
+  --border-offset: -6%;
+
+  --grad-angle: 96deg;
+  --grad-red: linearder-start-radius(0);
+  }
+
+  > .form-floating:not(:first-child) > .form-control,
+  > .form-floating:not(:first-child) > .form-select {
+    @include border-start-radius(0);
+  }
+}
+// Grid system
+//
+// Generate semantic grid columns with these mixins.
+
+@mixior($danger, 40%) !default;
+$light-border-subtle-dark:          $gray-700 !default;
+$dark-border-subtle-dark:           $gray-800 !default;
+// scss-docs-end theme-border-subtle-dark-variables
+
+$body-color-dark:                   $gray-300 !default;
+$body-bgttom: 1.5rem;
+}
+
+$container-offset: 2 * iv.$gap;
+$container-max-width: iv.$fullhd;
+
+:root {
+  --container-width: calc(100vw - 3rem);
+  --container-width-desktop: #{iv.$desktop - $container-offset};
+  --container-width-widescreen: #{min(iv.$widescreen, $congin: 0; // Override default margin of ul
+  @include font-size(var(--#{$prefix}dropdown-font-size));
+  color: var(--#{$prefix}dropdown-color);
+  text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
+  list-style: nonen-item-s": #{cv.getVar($name, "", "-s")},
+        )
+      );
+    }
+  }
+
+  & > .#{iv.$class-prefix}container {
+    align-items: stretch;
+    display: flex;
+    min-height: cv.getVar("navbar-height");
+    width: 100%;
+  }
+
+  &.#{iv.$class-prefix}has-shadow {r-top: 1px solid var(--#{$prefix}dropdown-divider-bg);
+  opacity: 1; // Revisit in v6 to de-dupe styles that conflict with <hr> element
+}
+
+// Links, buttons, and more within the dropdown menu
+//
+// `<button>`-specific styles are denoted with `// For <buttoty($property, $spacing, $right: true) {
+  $normal: if($right, "right", "left");
+  $opposite: if($right, "left", "right");
+
+  @if iv.$rtl {
+    #{$property}-#{$opposite}: $spacing;
+  } @else {
+    #{$property}-#{$normal}: $spacing;
+  }
+}
+
+@mixin ltr-positio-close-bg) center / $btn-close-width auto no-repeat; // include transparent for button elements
+  border: 0; // for button elements
+  @include border-radius();
+  opacity: var(--#{$prefix}btn-close-opacity);
+
+  // Override <a>'s hover style
+  &:hoding: 0 !important;
+}
+
+$spacing-shortcuts: (
+  "margin": "m",
+  "padding": "p",
+) !default;
+$spacing-directions: (
+  "top": "t",
+  "right": "r",
+  "bottom": "b",
+  "left": "l",
+) !default;
+$spacing-horizontal: "x" !default;
+$spacing-vertical: "y" !defaurefix}pulled-left {
+  float: left !important;
+}
+
+.#{iv.$helpers-prefix}float-right,
+.#{iv.$helpers-prefix}pulled-right {
+  float: right !important;
+}
+
+.#{iv.$helpers-prefix}float-none {
+  float: none !important;
+}
+
+$clears: both left none right;
+
+@each $clward "sass/layout/footer";
+
+// Import the themes so that all CSS variables have a value
+@forward "sass/themes";
+
+// Import the Google Font
+@import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
+@use "sass/utilities/extends";
+
+.bd-pills variant
 @mixin table-variant($state, $background) {
   .table-#{$state} {
     $color: color-contrast(opaque($body-bg, $background));
     $hover-bg: mix($color, $background, percentage($table-hover-bg-factor));
-    $striped-bg: mix($color, $background, percelex;
-  }
+    $striped-bg: mix($color, $background, percelor: $color;
 
-  &.#{iv.$class-prefix}is-multiline {
-    flex-wrap: wrap;
-  }
-
-  &.#{iv.$class-prefix}is-vcentered {
-    align-items: center;
-  }
-
-  // Responsiveness
-  @include mx.tablet {
-    &:not(.#{iv.$class-prefix}is-desktop) {
-      display: flex;
-    }($l-base < 3%) {
-    $l-0: $l-base;
-    $l-5: $l-base + 5%;
-  } @else if ($l-base < 8%) {
-    // $l-0: math.max($l-base - 5%, 0%);
-    $l-0: $l-base - 5%;
-    $l-5: $l-base;
-  } @else {
-    // $l-0: math.max($l-base - 10%, 0%);
-    $l-0: $l-base - 10%;
-   escreen,
-  ),
-  "until-widescreen": (
-    "until": $widescreen,
-  ),
-  "widescreen": (
-    "from": $widescreen,
-  ),
-  "widescreen-only": (
-    "from": $widescreen,
-    "until": $fullhd,
-  ),
-  "until-fullhd": (
-    "until": $fullhd,
-  ),
-  "fullhd": (
-  lass: ms,
-      values: map-merge($spacers, (auto: auto))
-    ),
-    // Negative margin utilities
-    "negative-margin": (
-      responsive: true,
-      property: margin,
-      class: m,
-      values: $negative-spacers
-    ),
-    "negative-margin-x": (
-  -bg(var(--#{$prefix}dropdown-link-hover-bg));
-  }
-
-  &.active,
-  &:active {
-    color: var(--#{$prefix}dropdown-link-active-color);
-    text-decoration: none;
-    @include gradient-bg(var(--#{$prefix}dropdown-link-active-bg));
-  }
-
-  &.disabled,
-  &:disabll");
-
-  // === STEP 3 ===
-  // Find accessible color combinations
-
-  $combos: ();
-
-  @each $digits-bg, $bg-l in $shades {
-    $background: hsl($h, $s, $bg-l);
-    $bg-lum: fn.bulmaColorLuminance($background);
-    $bg-is-light: $bg-lum > 0.55;
-    $candidatrefix}alert-color: inherit;
-  --#{$prefix}alert-border-color: transparent;
-  --#{$prefix}alert-border: #{$alert-border-width} solid var(--#{$prefix}alert-border-color);
-  --#{$prefix}alert-border-radius: #{$alert-border-radius};
-  --#{$prefix}alert-link-co
-//
-// Form text
-//
-
-.form-text {
-  margin-top: $form-text-margin-top;
-  @include font-size($form-text-font-size);
-  font-style: $form-text-font-style;
-  font-weight: $form-text-font-weight;
-  color: $form-text-color;
-}
-//
-// Stretched link
-//
-
-.stretchsubtle-map
-
-$theme-colors-text-dark: null !default;
-$theme-colors-bg-subtle-dark: null !default;
-$theme-colors-border-subtle-dark: null !default;
-
-@if $enable-dark-mode {
-  // scss-docs-start theme-text-dark-map
-  $theme-colors-text-dark: (
-    "primtargeting irrelevant browsers while applying new styles.
-//
-// Normalize is licensed MIT. https://github.com/necolas/normalize.css
-
-
-// Document
-//
-// Change from `box-sizing: content-box` so that `width` is not affected by `padding` or `border`.
-
-*,
-*::be2c-1.134.96-4.862%203.405-6.772%204.643V16.67c0-.414-.334-.75-.75-.75h-.395c-3.66%200-6.318-2.476-6.318-5.886%200-3.534%202.768-6.302%206.3-6.302l4.147.01h.002c3.532%200%206.3%202.766%206.302%206.296-.003%201.91-.942%203.844-2.514%205.176z%22%2F%3E%3C%2Fsv200-.75.336-.75.75s.336.75.75.75h5.85c1.24%200%202.25%201.01%202.25%202.25v10.24l-2.22-2.22c-.293-.293-.768-.293-1.06%200s-.294.768%200%201.06l3.5%203.5c.145.147.337.22.53.22s.383-.072.53-.22l3.5-3.5c.294-.292.294-.767%200-1.06zm-10.66%203.28H7.26c-1.24%20  // Remove the top rounded corners here since there is a hard edge above the menu
-    @include border-top-radius(0);
+  @if $enable-gradients {
+    background-image: var(--#{$prefix}gradient);
   }
 }
+// scss-docs-end gradient-bg-mixin
 
-
+// scss-docs-start gradient-mixins
+// Horizontal gradient, from left to right
 //
-// Pills
-//
-
-.nav-pills {
-  // scss-docs-start nav-pills-css-vars
-  --#{$prefix}nav-pills-border-radius: #{$nav-pills-borden": #{$pagination-margin},
+// Creates two color stops, start and end, b-main-l: 100%,
+  $invert: null,
+  $light: null,
+  $dark: null
+) {
+  $h: round(hue($base)); // Hue
+  $s: round(saturation($base)); // Saturation
+  $l: round(lightness($base)); // Lightness
+  $base-lum: fn.bulmaColorLuminance($base);
+  $l-base: round($l % 10   "pagination-margin": #{$pagination-margin},
       "pagination-min-width": #{$pagination-min-width},
-      "pagination-item-h": #
+      "pagination-item-h": #{$pagination-item-h},
+      "pagination-item-s": #{$pagination-item-s},
+      "pagination-item-l": #{$pagination-item-l},
+    // --hl-cyan: #51fbde;
+  // --hl-blue: #00b2ff;
+  // --hl-purple: #9a89b4;
+  // --hl-lavender: #9b6dff;
+  // --hl-pink: #ff5cd3;
+  // --hl-rose: #ff6b9d;
+  // --hl-orange: #ff9970;
+  // --hl-yellow: #fed604;
+  // --hl-gray-01: #d9e0e8;
+  // --hl-gray-02: ");
+$menu-item-radius: cv.getVar("radius-small") !default;
+$menu-item-selected-h: cv.getVar("link-h");
+$menu-item-selected-s: cv.getVar("link-s");
+$menu-item-selected-l: cv.getVar("link-l");
+$menu-item-selected-background-l: cv.getVar("link-l");
+$mench {
+  -webkit-overfl

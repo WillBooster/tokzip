@@ -1,355 +1,311 @@
-final dio = Dio();
-  dio.options.baseUrl = 'https://httpbin.org/';
-  dio.options.connectTimeout = const Duration(seconds: 5);
- ements Client {
-  StreamedResponse? response;
-  BaseRequest? request;
+ge:http/http.dart';
+
+class CloseClientMock implements Client {
+  bool closeWasCalled = false;
 
   @override
-  Future<StreamedResponse> send(BaseReques   httpServerChannel = await startServer();
-      httpServerQueue = StreamQueue(httpServerChannel.stream);
-      uri = server should exit.
-  unawaited(server.close());
-}
-// Copyright (c) 2022, the D Channel protocol:
+  void close() {
+ () {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  group('backgroundSession', () {
+    final config =
+    final dio = Dio();
+  dio.options.baseUrl = 'https://httpbin.org/';
+  dio.options.connectTimeout = const Duration(seconds: 5);
+  / Channel protocol:
 ///    On Startup:
 ///     - send port
 ///    On Request Received:
-///     - send the received headers and ret('application/json', () {
-    expect(Transformer.isJsonMimeType('application/json'), isTrue);
-  });
-
-  test('text/json', () {
- {
-    late StreamController<Uint8List> source;
-
-    setUp(() {
-      source = StreamController<Uint8List>();
-    });
-
-    test(ioForBrowser;
-export '../html/multipart_file.dart';
-
-// import 'package:http_parser/http_parser.dart';
-//
-// final _err = UnsuppInOrder([
+///     - send the received headers and r expectLater(
+        stream,
+        emitsInOrder([
           Uint8List.fromList([0]),
           Uint8List.fromList([1, 2]),
-          Uint8List.fromList([3, 4, 5]),
-    ) => super.noSuchMethod(i);
-}
-@TestOn('vm')
-import 'dart:io';
-
-import 'package:dio/dio.dart';
-import 'package:dio/io.dartnal completer = Completer<void>();
+       ..httpClientAdapter = MockAdapter()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, hmpleter = Completer<void>();
   stream.listen(
     sink.add,
     onError: sink.addError,
-    onDone: () => completer.comple.interceptors.add(
-        InterceptorsWrapper(
-          onRequest: (options, handler) {
-            handler.next(options);
-   ers.set('Content-Type', 'text/plain');
-          request.response.write('Hello World');
-          await request.response.close(mport 'headers.dart';
+    onDone: () => completer.complete(),
+}
+library native_dio_adapter;
+
+export 'package:cronet_http/cronet_http.dart';
+export 'package:cupertino_http/cupertino_http.daexit.
+  unawaited(server.close());
+}
+// Copyright (c) 2022, the Dtring, dynamic>? queryParameters,
+    super.extra,
+    super.headers,
+    super.preserveHeaderCase = false,
+    super.responseTy:http_profile/http_profile.dart';
+import 'package:integration_test/integration_test.dart';
+import 'package:ok_http/ok_http.d   httpServerChannel = await startServer();
+      httpServerQueue = StreamQueue(httpServerChannel.stream);
+      uri = () {
+  test('application/json', () {
+    expect(Transformer.isJsonMimeType('application/json'), isTrue);
+  });
+
+  test('text/jsoStream<Uint8List>? requestStream,
+    Future<dynamic>? cancelFuture,
+  ) =>
+      _conversionLayer.fetch(options, requestStream,ocket server that closes the HTTP connection before WebSocket
+/// upgrade.
+void hybridMain(StreamChannel<Object?> channel) asyncmport '../adapter.dart';
+import '../compute/compute.dart';
+import '../headers.dart';
+import '../options.dart';
+import '../transf final stream = handleResponseStream(
+        RequestOptions(
+          cancelToken: cancelToken,
+        ),
+        ResponseBodltipart_file.dart';
+export 'src/options.dart';
+export 'src/parameter.dart';
+export 'src/redirect_record.dart';
+export 'src/respomport 'adapter.dart';
+import 'cancel_token.dart';
+import 'headers.dart';
 import 'transformer.dart';
 import 'utils.dart';
 
-/// {@template dio.options.ProgressCallback}
-/// The typSocket server that closes the HTTP connection before WebSocket
-/// upgrade.
-void hybridMain(StreamChannel<Object?> channel) asynFuture<ResponseBody> fetch(
-    RequestOptions options,
-    Stream<Uint8List>? requestStream,
-    Future<dynamic>? cancelFuture,:http_profile/http_profile.dart';
-import 'package:integration_test/integration_test.dart';
-import 'package:ok_http/ok_http.dString baseUrl = '',
-    Map<String, dynamic>? queryParameters,
-    super.extra,
-    super.headers,
-    super.preserveHeaderCaseurce on cancel', () async {
-      final cancelToken = CancelToken();
-      final stream = handleResponseStream(
-        RequestOge:http/http.dart';
-import 'package:test/test.dart';
+/// {@eturn Transformer.defaultTransformRequest(options, jsonEncode);
+  }
 
-import 'client_mock.dart';
+  @override
+  Future<dynamic> transformResponse(
+    Re
+  /// the [Response.data] will be [ResponseBody].
+  ///
+  /// ```dart
+  /// Response<ResponseBody> rs = await Dio().get<Responsd stream', () async {
+    final mock = ClientMock()
+      ..response = StreamedResponse(
+        Stream.fromIterable(<Uint8List>hesDioException(
+              DioExceptionType.receiveTimeout,
+              stackTraceContains: 'test/response/response_streamnal profilingEnabled = HttpClientRequestProfile.profilingEnabled;
 
-void main() {
-  test('close', () {
-    final m createState() => _MyHomePageState();
+    setUpAll(() {
+      HttpClientRequestProfile.profilingEnaquestedUri.pathSegments.last);
+            final nextPath = n - 1 == 0 ? '' : '${n - 1}';
+            unawaited(reques,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+    StackTrace? createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
-  Widget build(BuildContprofilingEnabled = HttpClientRequestProfile.profilingEnabled;
+  Widget build(BuildContese.bodyBytes)) as Map;
+///
+///   final itemCount = decodedResponse['totalItems'];
+///   print('Number of books about http: $item_web.dart`](https://github.com/flutter/flutter/blob/stable/packages/flutter/lib/src/foundation/_isolates_web.dart).
+//
+// Change (value.isNotEmpty && !kIsWeb && Uri.parse(value).host.isEmpty) {
+      throw ArgumentError.value(
+        value,
+        'baseU// The HTTP request method.
+  String? method;
 
-    setUpAll(() {
-      HttpClientRequestProfile.profilingEnabledawait expectLater(
-      duplicateRequestCallsDio.get('/test'),
-      throwsA(
-        allOf([
-          isA<DioException>(),
-  ps://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#simple_requests
-//     // Upload progress events only get triggered if the rgiven bytes
-  /// in a single chunk.
-  factory ByteStream.fromBytes(List<int> bytes) =>
-      ByteStream(Stream.fromIterable([byfinal itemCount = decodedResponse['totalItems'];
-///   print('Number of books about http: $itemCount.');
-///   for (var i = 0;parse('ws://localhost:${await httpServerQueue.next}');
+  /// HTTP request headers.
+  ///
+  /// The keys of the header are case-insensituture<MultipartFile> multipartFileFromPath(
+  String filePath, {
+  String? filename,
+  DioMediaType? contentType,
+  final Map<Sttask = session.dataTaskWithRequest(
+          URLRequest.fromUrl(Uri.https('does-not-exist', '')))
+        ..resumensitiveKeyMap(headers);
+      assert(
+        !(contentType != null &&
+            headers.containsKey(Headers.contentTypeHeaderparse('ws://localhost:${await httpServerQueue.next}');
     });
     tearDown(() => httpServerChannel.sink.add(null));
 
-  Channel;
-    late final StreamQueue<Object?> httpServerQueue;
+  ers: {'content-type': 'application/json'});
+///     });
+library;
 
-   const Stream.empty(), 200);
-    final cla = ConversionLayerAdapter(mock);
+import 'src/mock_client.dart';
 
-    await cla.fetch(
-      RequestOptions(path: '', hfile.
+export 'src/mock_client.dart'more about status codes at https://developer.mozilla.org/en-US/docs/Web/HTTP/Status',
+    );
+    buffer.writeln(
+      'In order     'HTTP/1.1 200 OK',
+          'Access-Control-Allow-Origin: *',
+          'Content-Length: 0',
+          '\r\n', // Add \r\nio_cookie_manager/dio_cookie_manager.dart';
 
-export 'src/io_web_socket.dart' show IOWebSocket;
-// Copyright (c) 2023, the Dtask = session.dataTaskWithRequest(
-          URLRequest.fromUrl(Uri.parse('http://localhost:${server.port}')))
-        ..resumeect(response.data, 'xxx');
+void main() async {
+  final dio = Dio();
+  final cookieJar = CookieJar();
+  dio.i native platform by making use of
+/// [cronet_http](https://pub.dev/packages/cronet_http).
+class CronetAdapter implements HttpClequest_body_server_vm.dart'
+    if (dart.library.js_interop) 'request_body_server_web.dart';
 
-      response = await dio.get('/reject-next-response');
-      expect(response.data, 100);
+Future<void> _testPost(Client Funcackage:async/async.dart';
+import 'package:http/http.dart';
+import 'package:http_profile/http_profile.dart';
 
-   ptions.dart' as _i6;
-import 'package:dio/src/transformer.dart' as _i5;
-import 'package:mockito/mockito.dart' as _i1;
+import 'cupertino_a await response.close();
+        return;
+      }
 
-// ignore_lEncodedTests(
+      final requestBodyBytes = await ByteStream(request).toBytes();
+ rt '../web_socket.dart';
+
+Future<WebSocket> connect(Uri url, {Iterable<String>? protocols}) {
+  tpleter.future;
+
+  bool get isCompleted => _completer.isCompleted;
+
+  void _throwIfCompleted() {
+    if (_completer.isCompleted) ('https://baidu.com/')));
+  // second request with the cookie
+  await dio.get('https://baidu.com/');
+}
+// export '../js_interop/nseBody.headers[Headers.contentLengthHeader];
+
+    final hasContentLengthHeader =
+        contentLengthHeader != null && conten);
+
+  static List<Book> listFromJson(Map<dynamic, dynamic> json) {
+    final books = <Book>[];
+
+    if (json['items'] case final    equals: (key1, key2) => key1.toLowerCase() == key2.toLowerCase(),
+    hashCode: (key) => key.toLowerCase().hashCode,
+  );
+  Client = IOClient(HttpClient()..userAgent = 'Book Agent');
+  }
+
+  runApp(Provider<Client>(
+      create: (_) => httpClient,
+  pter = IOHttpClientAdapter(
+        createHttpClient: () {
+          return HttpClient()
+            ..badCertificateCallback = 
+void corsTests(
   Dio Function(String baseUrl) create,
 ) {
   late Dio dio;
 
   setUp(() {
     dio = create(httpbunBaseUrl);
-  })e.add(Uint8List.fromList([0]));
-      await Future.delayed(const Duration(milliseconds: 100), () {
-        expect(count, 1);
-   ub.com/flutter/flutter/blob/stable/packages/flutter/lib/src/foundation/_isolates_web.dart).
-//
-// Changes are only synced withs,
-    CancelToken? cancelToken,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress,
-    StackTrace?     profile.requestData.headers, containsPair('Content-Length', ['2']));
-        expect(profile.requestData.header{
-    final contentLengthHeader =
-        responseBody.headers[Headers.contentLengthHeader];
-
-    final hasContentLengthHeader      receiveTimeout: const Duration(milliseconds: 100),
-        ),
-        ResponseBody(
-          source.stream,
-          200,main() async {
-  final dio = Dio();
-  final cookieJar = CookieJar();
-  dio.interceptors.add(CookieManager(cookieJar));
-  awaih == '/loop') {
+  })h == '/loop') {
         final n = int.parse(request.uri.query);
         response
           ..statusCode = 302
-          ..header native platform by making use of
-/// [cronet_http](https://pub.dev/packages/cronet_http).
-class CronetAdapter implements HttpClnsitiveKeyMap(headers);
-      assert(
-        !(contentType != null &&
-            headers.containsKey(Headers.contentTypeHeader= Dio()
-    ..options.baseUrl = 'https://pub.dev'
-    ..interceptors.add(LogInterceptor())
-    ..httpClientAdapter = Http2Adapteride
-  HttpClient createHttpClient(SecurityContext? context) {
-    return httpClientMock;
-  }
-}
-import 'dart:async';
-impo 'HTTP/1.1 200 OK',
-          'Access-Control-Allow-Origin: *',
-          'Content-Length: 0',
-          '\r\n', // Add \r\n at ers: {'content-type': 'application/json'});
-///     });
-library;
+          ..headeressionState, isNull);
+        expect(profile.responseData.contentLength, 11);
+        expect(profile.responseData.endTime, isNotect(response.data, 'xxx');
 
-import 'src/mock_client.dart';
+      response = await dio.get('/reject-next-response');
+      expect(response.data, 100);
 
-export 'src/mock_client.dart'kies
-  print(cookieJar.loadForRequest(Uri.parse('https://baidu.com/')));
-  // second request with the cookie
-  awai/ Get the response stream directly,
-  /// the [Response.data] will be [ResponseBody].
-  ///
-  /// ```dart
-  /// Response<Responsreturn handler.next(
-                    error.copyWith(
-                      error: 'custom error info [${response.statusCode}esponseDecoder,
+  esponseDecoder,
     ListFormat? listFormat,
   }) {
     return BaseOptions(
       method: method ?? this.method,
-      baseUrl: b
-}
+      baseUrl: bFuture<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancissing_whitespace_between_adjacent_strings
+          'id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Path=/,,HE,=L=LO,'
+     e.error as StateError).message == message,
+        ]),
+      ),
+    );
+  });
 
-/// The internal request option class that is the eventual result after
-/// [BaseOptions] and [Options] are composed.
-class s
-    final int contentLength;
+  group('InterceptorState', () {
+    test('toStrinride
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ListParam &&
+          runtimeType == otponse.detachSocket();
+            await socket.close();
+          });
+        successServerUri = Uri.http('localhost:${success   host = 'localhost:${await httpServerQueue.nextAsInt}';
+    });
+    tearDownAll(() => final int contentLength;
 
     // Successful HEAD requests don't have a response body, even if the content-length header
-  rt '../web_socket.dart';
-
-Future<WebSocket> connect(Uri url, {Iterable<String>? protocols}) {
-  t);
-
-  static List<Book> listFromJson(Map<dynamic, dynamic> json) {
-    final books = <Book>[];
-
-    if (json['items'] case finalpleter.future;
-
-  bool get isCompleted => _completer.isCompleted;
-
-  void _throwIfCompleted() {
-    if (_completer.isCompleted) ltipartFileFromPath(
-  String filePath, {
-  String? filename,
-  MediaType? contentType,
-  final Map<String, List<String>>? headeient = IOClient(HttpClient()..userAgent = 'Book Agent');
-  }
-
-  runApp(Provider<Client>(
-      create: (_) => httpClient,
-  esponseType: responseType ?? baseOpt.responseType,
-      validateStatus: validateStatus ?? baseOpt.validateStatus,
-    e({bool force = false}) {
-    _adapter.close(force: force);
-  }
-}
-
-class _SaveCall {
-  _SaveCall(this.uri, this.cookies);
-
-  fi
-//
-// The file is intentionally not refactored so that it is easier to keep the
-// compute package up to date with Flutter's imackage:async/async.dart';
-import 'package:http/http.dart';
-import 'package:http_profile/http_profile.dart';
-
-import 'cupertino_alated files) have changed
-// on the `stable` branch and you would like to see those changes in the `compute` package
-// please ots.last);
-            final nextPath = n - 1 == 0 ? '' : '${n - 1}';
-            unawaited(request.response.redirect(Uri.parse(
-eturn headers;
-//     }
-//     final headersList = headersString.split('\r\n');
-//     for (final header in headersList) {
-//  }
-
-  /// The HTTP request method.
-  String? method;
-
-  /// HTTP request headers.
-  ///
-  /// The keys of the header are case-ine the data if status code indicates a failed request.
-  ///
-  /// Defaults to true.
-  bool? receiveDataWhenStatusError;
-
-  /// Age:dio/src/dio_mixin.dart';
-import 'package:dio/src/interceptors/imply_content_type.dart';
-import 'package:te
-/// "token" as defined in RFC 2616, 2.2
-/// See https://datatracker.ietf.org/doc/html/rfc2616#section-2.2
-const _tokenChars = rJsonDecode(options, responseBody);
-    }
-    final responseBytes = await consolidateBytes(responseBody.stream);
-
-    // A customgle.com/books/docs/overview
-  var url =
-      Uri.https('www.googleapis.com', '/books/v1/volumes', {'q': '{http}'});
-
-  // Await    'id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Path=/,,HE,=L=LO,'
-              'sessionId=e8bb43229de9; Domain=foo.examge:dio_http2_adapter/dio_http2_adapter.dart';
-import 'package:dio_test/tests.dart';
-
-void main() {
-  dioAdapterTestSuite(
-    (bdirects,
-      maxRedirects: maxRedirects ?? this.maxRedirects,
-      persistentConnection: persistentConnection ?? this.persistfinal webSocket = await WebSocketTransformer.upgrade(
-            request,
-            protocolSelector: (l) => 'myprotocol',
-  ackage:web_socket_conformance_tests/web_socket_conformance_tests.dart';
+    /age:web_socket_conformance_tests/web_socket_conformance_tests.dart';
 
 void main() {
   testAll(CupertinoWebSocket.connect);
 
-ptions.method, '${options.uri}')
-//       ..responseType = 'arraybuffer';
-//
-//     final withCredentialsOption = options.extra[d isolate if possible.
-class BackgroundTransformer extends SyncTransformer {
-  BackgroundTransformer() : super(jsonDecodeCallbacponse: (response, ResponseInterceptorHandler handler) {
-              final options = response.requestOptions;
-              swi (value.isNotEmpty && !kIsWeb && Uri.parse(value).host.isEmpty) {
-      throw ArgumentError.value(
-        value,
-        'baseU    .having((e) => e.message, 'message', null)
-              .having((e) => e.type, 'error type', DioExceptionType.unknown),
-   Future<void>? cancelFuture,
-  ) =>
-      _fetch(options, requestStream, cancelFuture);
-
-  @o;
-///   }
-///   for (int i = 2; i < value; ++i) {
-///     if (value % i == 0) {
-///       return false;
-///     }
-///   }
-///   lRequest.bodyBytes = bytes;
-    } else if (requestStream != null) {
-      final streamedRequest = request = http.StreamedRequest
-      Future.delayed(const Duration(seconds: 1)).then((_) {
-        cancelToken.cancel('test');
-      });
-      await dio
-     // ```
-/// void main() {
-///   var clientFactory = Client.new; // Constructs the default client.
-///   if (Platform.isAndroid) {wait _findMatchingBooks(query);
-    // Avoid the situation where a slow-running query finishes late and
-    // replaces newer se/// isolate.
-///
-/// If [canWorkInIsolates] is `false` then the tests will be skipped.
-void testIsolate(Client Function() clientport 'src/test/cancellation_tests.dart';
-export 'src/test/cors_tests.dart';
-export 'src/test/download_tests.dart';
-export 'srcponse.detachSocket();
-            await socket.close();
-          });
-        successServerUri = Uri.http('localhost:${successSe throw UnsupportedError(errorMsg);
-          },
-        ),
+  g4, 5]),
+          emitsDone,
+        ]),
       );
-      expect(
-        dio.get('https://www.cloudflare.com')ait client.get(Uri.parse('https://flutter.dev/'));
-    await showDialog<void>(
-      context: context,
-      builder: (contextements _i2.HttpHeaders {}
 
-class _FakeHttpClientResponse_4 extends _i1.Fake
-    implements _i2.HttpClientResponse {}
+      source.add(Uint8List.fromList([0]));
+      await Future.delayed(const Dresults found', style: TextStyle(fontSize: 24));
 
-class _Fakeaders.forEach((name, values) {
-        // These headers are automatically generated by dart:io, so we don't
-        // want tfile.
+    return Scaffold(
+      appBar: AppBar(title: const Text('Book Search')),
+ tps://datatracker.ietf.org/doc/html/rfc2616#section-2.2
+const _tokenChars = r"!#$%&'*+\-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ^_`ts BaseResponseWithUrl {
+  @override
+  final Uri url;
+
+  _StreamedResponseWithUrl(super.stream, super.statusCode,
+      {requireckage:meta/meta.dart';
+// import 'package:web/web.dart' as web;
+//
+// BrowserHttpClientAdapter createAdapter() => BrowserHttpCli     receiveTimeout: receiveTimeout ?? this.receiveTimeout,
+      sendTimeout: sendTimeout ?? this.sendTimeout,
+      extra: extderCase,
+    this.responseType,
+    this.contentType,
+    this.validateStatus,
+    this.receiveDataWhenStatusError,
+    this.folif the body is empty and return null in that case
+        responseBytes ??= await consolidateBytes(responseBody.stream);
+    return handler.next(
+                    error.copyWith(
+                      error: 'custom error info [${response.statusCode}ckTrace.current;
+
+  factory DioException.badResponse({
+    required int statusCode,
+    required RequestOptions reque changed
+// on the `stable` branch and you would like to see those changes in the `compute` package
+// please open an [issue](httus;
+
+  /// Whether to retrieve the data if status code indicates a failed request.
+  ///
+  /// Defaults to true.
+  bool? receivge:dio_http2_adapter/dio_http2_adapter.dart';
+import 'package:dio_test/tests.dart';
+
+void main() {
+  dioAdapterTestSuite(
+    (body] is `false` then tests that assume that the
+/// [Client] supports receiving HTTP responses with unbounded body sizes will
+//t:io';
+
+import 'package:dio/dio.dart';
+import 'package:mockito/annotations.dart';
+
+import 'http_mock.mocks.dart';
+
+final httpCli,
+// and I'll try my best to "merge".
+//
+// The file is intentionally not refactored so that it is easier to keep the
+// computeoverview
+  var url =
+      Uri.https('www.googleapis.com', '/books/v1/volumes', {'q': '{http}'});
+
+  // Await the http get respoile.
 
 class Book {
   String title;
@@ -357,1031 +313,1088 @@ class Book {
   Uri imageUrl;
 
   Book(this.title, this.description, this.imageUrl);
-When Receive Anything:
+
+Jar.saveFromResponse()', () {
+    test(
+      'is called with a full Uri for requests that had relative redirects',
+      () asy> toBytes() {
+    final completer = Completer<Uint8List>();
+    final sink = ByteConversionSink.withCallback(
+      (bytes) => c situation where a slow-running query finishes late and
+    // replaces newer search results.
+    if (query != _lastQuery) retur= Dio()
+    ..options.baseUrl = 'https://pub.dev'
+    ..interceptors.add(LogInterceptor())
+    ..httpClientAdapter = Http2Adride
+  List<String>? operator [](String? name) =>
+      (super.noSuchMethod(Invocation.method(#[], [name])) as List<String>?);
+      isA<DioException>()
+              .having((e) => e.message, 'message', null)
+              .having((e) => e.type, 'error ty's headers.
+///
+/// Channel protocol:
+///    On Startup:
+///     - send port
+///    When Receive Anything:
 ///     - exit
-void hybridMain(StreamChannel<Object?> channel) async {
-  late HttpServer server;
+void ht the [Client] correctly implements HTTP redirect logic.
+///
+/// If [redirectAlwaysAllowed] is `true` then tests that require theUrl = EchoAdapter.mockBase;
+      dio.httpClientAdapter = EchoAdapter();
+      dio.interceptors
+        ..add(
+  streamedRequest.sink.add,
+        onError: streamedRequest.sink.addError,
+        onDone: streamedRequest.sink.close,
+        onError: (error, handler) {
+              if (error.requestOptions.path == '/reject-next-response') {
+   t 'src/html/progress_stream.dart';
 
-  serve  void close({bool? force = false}) =>
-      super.noSuchMethod(Invocation.method(#close, [], {#force: force}),
-   ts BaseResponseWithUrl {
-  @override
-  final Uri url;
-
-  _StreamedResponseWithUrl(super.stream, super.statusCode,
-      {requireinal session = URLSession.sessionWithConfiguration(config,
-          onComplete: (session, task, error) => c.complete(),
-   tions(headers: {'Content-Type': 'text/plain'}),
-        );
-        expect(response.requestOptions.contentType, 'text/plain');
-  next(response); //continue
-              }
-            },
-            onError: (error, handler) {
-              if (error.requesnPhrase, 'OK');
-        expect(profile.responseData.redirects, isEmpty);
-        expect(profile.responseData.startTime, isNotreturn Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Container(
-        padding: constp.dart' as http;
-
-const _kIsWeb = bool.hasEnvironment('dart.library.js_util')
-    ? bool.fromEnvironment('dart.library.js_util') assert(sendTimeout == null || !sendTimeout.isNegative),
-        _sendTimeout = sendTimeout;
-
-  /// Create a Option from currenrovided, the [protocols] argument indicates that subprotocols that
+// export 'src/js_interop/progress_stream.dart';
+@TestOn('vm')
+imporaders: xhr.getResponseHeaders(),
+//           statusMessage: xhr.statusText,
+//           isRedirect: xhr.status == 302 ||
+//   ided, the [protocols] argument indicates that subprotocols that
   /// the peer is able to select. See
-  /// [RFC-6455 1.9](htText('Please enter a query', style: TextStyle(fontSize: 24))
-        : _books!.isNotEmpty
-            ? BookList(_books!)
-        // Unfortunately, the underlying XMLHttpRequest API doesn't expose any
-//       // specific information about the error itselt.send(Request('GET', successServerUri.replace(path: '/3'))
-          ..followRedirects = true
-          ..maxRedirects = 4);
-  ckTrace.current;
-
-  factory DioException.badResponse({
-    required int statusCode,
-    required RequestOptions requesquest.followRedirects = options.followRedirects;
-    request.maxRedirects = options.maxRedirects;
-    request.persis    children: [
-          ElevatedButton(
-            onPressed: _doGetRequest,
-            child: const Text('make get request'nt.fromCronetEngineFuture(engine);
-  ///   }
-  ///
-  ///   runWithClient(() => runApp(const BookSearchApp()), clientFactory);
- final sink = ByteConversionSink.withCallback(
-//         (bytes) => completer.complete(
-//           bytes is Uint8List ? bytes      ..contentType = Headers.jsonContentType;
-  }
-
-  Future<String> echo(String data) {
-    return post('/post', data: data).thmport 'mock/adapters.dart';
-import 'mock/http_mock.dart';
-import 'mock/http_mock.mocks.dart';
-
-void main() async {
-  group('$Didata';
-
-import '../options.dart';
-
-Stream<Uint8List> addProgress(
-  Stream<List<int>> stream,
-  int? length,
-  Reque;
-
-Encoding requiredEncodingForCharset(String charset) =>
-    Encoding.getByName(charset) ??
-    (throw FormatException('Unsuppoackage:flutter/material.dart';
-
-import '../http.dart';
-
-class RequestRoute extends StatefulWidget {
-  @override
-  State<RequestRemCount: widget.books.length,
-        itemBuilder: (context, index) => Card(
-          key: ValueKey(widget.books[index].title)
+  /// [RFC-6455 1.9](https
   late String method;
 
   Map<String, dynamic> get headers => _headers;
   late Map<String, dynamic> _headers;
 
-  set headers(Mapride
-  List<String>? operator [](String? name) =>
-      (super.noSuchMethod(Invocation.method(#[], [name])) as List<String>?);
- ng.decode(requestBodyBytes);
-      }
+  set headers(Mapp.dart' as http;
 
-      final content = <String, dynamic>{
-        'method': request.method,
-        'path':ders: xhr.getResponseHeaders(),
-//           statusMessage: xhr.statusText,
-//           isRedirect: xhr.status == 302 ||
-//    ePolicy, URLRequestCachePolicy.useProtocolCachePolicy);
+const _kIsWeb = bool.hasEnvironment('dart.library.js_util')
+    ? bool.fromEnvironment('dart.library.js_util')l List<Book> books;
+  const BookList(this.books, {super.key});
+
+  @override
+  State<BookList> createState() => _BookListState()nt.fromCronetEngineFuture(engine);
+  ///   }
+  ///
+  ///   runWithClient(() => runApp(const BookSearchApp()), clientFactory);
+expect(headers['set-cookie']?.length, 2);
+      headers.removeAll('set-cookie');
+      expect(headers['set-cookie'], isNull);
+ualTask, task);
+      expect(actualData.bytes, 'Hello World'.codeUnits);
+    });
+  });
+}
+
+void testOnFinishedDownloading(URLSess    children: [
+          ElevatedButton(
+            onPressed: _doGetRequest,
+            child: const Text('make get request'ePolicy, URLRequestCachePolicy.useProtocolCachePolicy);
 
       request.toString(); // Just verify that there is no crash.
-    })}
+    })ons.contentType, 'application/json');
+      });
 
-  // Get the list of books matching `query`.
-  // The `get` call will automatically use the `client` configured in `main`.
-       'x-multi-value-request-header-echo',
-          request.headers.value('x-multi-value-request-header').toString(),
-   text) => const MaterialApp(
+      test('sets multipart/form-data for FormData instances', () ah to the
+  /// HTTP server, for example, occurring a DNS error, network is not available.
+  final Response? response;
+
+  final Dwait requestStreamFuture;
+    }
+    await stream.outgoingMessages.close();
+
+    final responseSink = StreamController<Uint     home: MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({
+      late URLSessionTask actualTask;
+
+      final session =
+          URLSession.sessionWithConfiguration(config, onResponse: (stext) => const MaterialApp(
         // Remove the debug banner.
         debugShowCheckedModeBanner: false,
-        title: 'Book ng get reasonPhrase =>
-      (super.noSuchMethod(Invocation.getter(#reasonPhrase), returnValue: '')
-          as String);
-  @oyBytes)) as Map;
-    return Book.listFromJson(json);
-  }
+        title: 'Book rently manually synced. If you noticed that the Flutter's
+// original `compute` function (and any of the related files) have chaquest.contentLength != null) {
+      profile?.requestData.headersListValues = {
+        'Content-Length': ['${request.conteny`.
+  // The `get` call will automatically use the `client` configured in `main`.
+  Future<List<Book>> _findMatchingBooks(Stringt8List> stream) async {
+  final builder = BytesBuilder(copy: false);
 
-  void _runSearch(String query) async {
-    _lastQuery = query;
-    iificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-      return client;
-    },
-  );
-
-  Respf the receiving.
+  await for (final chunk in stream) {
+    builder.add(chun   var uri = Uri.http('example.com', '/foo');
+    var request = http.Request('POST', uri)..body = 'hello, world';
+    var streatring>>? headers,
+  })  : stream = Stream.value(
+          bytes is Uint8List ? bytes : Uint8List.fromList(bytes),
+   (_calculate, value);
+/// }
+///
+/// bool _calculate(int value) {
+///   if (value == 1) {
+///     return false;
+///   }
+///   for her to send credentials such as cookies or authorization headers for
+  /// cross-site requests.
   ///
-  /// Throws the [DioException] with
-  /// [DioExceptionType.receiveTimeout] type when timed out.
-  ///');
+  /// Defaults to `false`.eaders.jsonContentType,
+//     ),
+//   );
+//   print(response);
+// }
+//
+// void main() async {
+//   getHttp();
+// }
+
+void ;
+
+Encoding requiredEncodingForCharset(String charset) =>
+    Encoding.getByName(charset) ??
+    (throw FormatException('Unsupposerver out-of-processValue: 0)
+          as int);
+  @override
+  String get reasonPhrase =>
+      (super.noSuchMethod(Invocation.getter(#reasonPhrase)al item in items) {
+        if (item case {'volumeInfo': final Map<dynamic, dynamic> volumeInfo}) {
+          if (volumeInfo
+      .catchError((e) => throw e.error as num),
+        throwsA(2),
+      );
+    });
+
+    test('unexpected error', () aon of Dart.
+          // ignore: void_checks
+          onRequest: (response, handler) {
+            throw UnsupportedError(errorType: Headers.formUrlEncodedContentType,
+          listFormat: ListFormat.multiCompatible,
+        ),
+      );
+
+      final expe<Client>())),
+            title: Text(widget.books[index].title),
+            subtitle: Text(widget.books[index].description),t;
+
+  /// The response stream.
+  Stream<Uint8List> stream;
+
+  /// HTTP status code.
+  int statusCode;
+
+  /// Content length of tat the [WebSocket] can correctly close the connection to the peer.
+void testCloseLocal(
+    Future<WebSocket> Function(Uri uri.get('/?xx=6');
   for (final e in response.redirects) {
     print('redirect: ${e.statusCode} ${e.location}');
   }
-  print(response.data);
-}
-t the [WebSocket] can correctly close the connection to the peer.
-void testCloseLocal(
-    Future<WebSocket> Function(Uri urio();
-      dio.options.baseUrl = EchoAdapter.mockBase;
-      dio.httpClientAdapter = EchoAdapter();
-      dio.interceptors
-    // The changes are currently manually synced. If you noticed that the Flutter's
-// original `compute` function (and any of th status) {
+  printeaders.userAgentHeader: 'dio',
+///       'common-header': 'xx',
+///     },
+///   )
+/// );
+/// ```
+///
+/// The [Dio.options] can   socket.events.listen((e) {
+    switch (e) {
+      case TextDataReceived(text: final text):
+        final json = jsonDecode(texts:
+  ///  - a timeout before the connection is established
+  ///    and the first received response bytes.
+  ///  - the duratiot = OkHttpClientWithProfile();
+        await client.send(Request('GET', successServerUri.replace(path: '/3'))
+          ..follow status) {
   return status != null && status >= 200 && status < 300;
 }
 
 class _RequestConfig {
   _RequestConfig({
-    Duration? List> stream) async {
-  final builder = BytesBuilder(copy: false);
+    Duration?      RedirectRecord(
+                  HttpStatus.found,
+                  'GET',
+                  Uri(path: 'redirect'),
+   eturn client;
+    },
+  );
 
-  await for (final chunk in stream) {
-    builder.add(chunk)   host = 'localhost:${await httpServerQueue.nextAsInt}';
-    });
-    tearDownAll(() => /json');
+  Response<String> response;
+  response = await dio.get('https://www.baidu.com');
+  prin
+      Future.delayed(const Duration(seconds: 1)).then((_) {
+        cancelToken.cancel('test');
       });
+      await dio
+     ened during requests.
+enum DioExceptionType {
+  /// Caused by a connection timeout.
+  connectionTimeout,
 
-      test('sets multipart/form-data for FormData instances', () async {
-        final dio = createDio();
-fecycle of a request
-/// before it reaches users.
-///
-/// Interceptors are called once per request and response,
-/// that means n ClientException {
-          // Expected exception.
-        }
-        profile = client.profile!;
-      });
-      tearDownAll(()ders: {
-                HttpHeaders.setCookieHeader: ['Cookie1=value1; Path=/'],
-    is not valid.
-void checkCloseCode(int? code) {
-  if (code != null && code != 1000 && !(code >= 3000 && code <= 4999)) {
-    thrions: options,
-        queryParameters: queryParameters,
-        cancelToken: cancelToken,
-      );
-    } on DioException catch ride
-  String toString() {
-    String msg = 'DioException [${type.toPrettyDescription()}]: $message';
-    if (error != nul> close([int? code, String? reason]) => throw UnimplementedError();
+  /// It occurs when us _FakeHttpHeaders_3 extends _i1.Fake implements _i2.HttpHeaders {}
+
+class _FakeHttpClientResponse_4 extends _i1.Fake
+    implemfile.requestData.error, startsWith('ClientException:'));
+        expect(
+            profile.requestData.headers, conta<void> close([int? code, String? reason]) => throw UnimplementedError();
 
   @override
-  Stream<WebSocketEvent> get events => thrsformer] allows changes to the request/response data before it is
-  /// sent/received to/from the server.
-  /// This is only apperable(data.map((e) => e.codeUnits));
-    final expanded = data.expand((element) => element.codeUnits);
-    bool fullFilled = fa'src/js_interop/multipart_file.dart';
+  Stream<WebSocketEvent> get events => thrsformer extends Transformer {
+  FusedTransformer({
+    this.contentLengthIsolateThreshold = -1,
+  });
 
-export 'src/html/progress_stream.dart';
+  /// Always decode the r
+  /// {@macro dio.Dio.download}
+  @override
+  Future<Response> download(
+    String urlPath,
+    dynamic savePath, {
+    Prb/HTTP/CORS#simple_requests
+//     // Upload progress events only get triggered if the request body exists,
+//     // so we caneader in message.headers) {
+            final name = utf8.decode(header.name);
+            final value = utf8.decode(header.valu  late HttpClientAdapter httpClientAdapter;
 
-// export 'src/js_interop/progress_stream.dart';ption error, ErrorInterceptorHandler handler) {
-            final response = error.response;
-            if (response != null)nal name = utf8.decode(header.name);
-            final value = utf8.decode(header.value);
-            responseHeaders.add(name, separate steps, since
-/// Dart uses a special fast decoder for this case.
-/// See https://github.com/dart-lang/sdk/blob/5b2ea0c7Error('Isolate exited without result or error.', '');
-  }
+  /// [Transformer] allows changes to the request/response data before it is
+  /// 
 
-  assert(response is List<dynamic>);
-  response as List<dynamic>;
-
-  s'));
-
-  socket.events.listen((e) {
-    switch (e) {
-      case TextDataReceived(text: final text):
-        final json = jsonDecs that assume that the
-/// [Client] supports receiving HTTP responses with unbounded body sizes will
-/// be skipped
-///
-//port 'base_client.dart';
+/// Tests that no [http.Client] is provided by default when run with
+/// `--define=no_default_http_client=true`.
+void mequest.drain<void>();
+          request.response.headers.set('Content-Type', 'text/plain');
+          request.response.write('He   location: successServerUri.replace(path: '/1').toString()),
+          HttpProfileRedirectData(
+            statusCode: 302,
+ port 'base_client.dart';
 import 'base_response.dart';
 import 'byte_stream.dart';
 import 'client.dart';
-import 'streamed_responl List<Book> books;
-  const BookList(this.books, {super.key});
+import 'streamed_respath,
+        'query': request.uri.query,
+        'headers': {},
+      };
+      if (requestBody != null) {
+        content['body'er {
+  BackgroundTransformer() : super(jsonDecodeCallback: _decodeJson);
+}
+
+FutureOr<dynamic> _decodeJson(String text) {
+  // Ta      URLSessionConfiguration.ephemeralSessionConfiguration()
+            ..allowsCellularAccess = false
+            ..allowsCon;
+}
+
+/// The internal request option class that is the eventual result after
+/// [BaseOptions] and [Options] are composed.
+class BaseRequest? request;
 
   @override
-  State<BookList> createState() => _BookListState()mport 'byte_stream.dart';
-import 'multipart_file_stub.dart' if (dart.library.io) 'multipart_file_io.dart';
-import 'multipart_reqeadAsBytes(), throwsA(const TypeMatcher<StateError>()));
+  Future<StreamedResponse> send(BaseRequest request) async {
+    this.request = request;
+   tream is Stream<Uint8List>
+      ? _transform<Uint8List>(stream, length, options)
+      : _transform<List<int>>(stream, length, ream = Stream.fromIterable(data.map((e) => e.codeUnits));
+    final expanded = data.expand((element) => element.codeUnits);
+  eadAsBytes(), throwsA(const TypeMatcher<StateError>()));
 
         final fm1 = FormData();
-        fm1.fields.add(const MapEntry( throw ClientException(
-          'HTTP request failed. Client is already closed.', request.url);
-    }
-    final urlSession = _     decoration: const InputDecoration(
-                labelText: 'Search',
-                suffixIcon: Icon(Icons.search),
-     location: successServerUri.replace(path: '/1').toString()),
-          HttpProfileRedirectData(
-            statusCode: 302,
- 
-/// Controls cancellation of [Dio]'s requests.
-///
-/// The same token can be shared between different requests.
-/// When [cance item in items) {
-        if (item case {'volumeInfo': final Map<dynamic, dynamic> volumeInfo}) {
-          if (volumeInfo
-     ]) => DioForNative(baseOptions);
+        fm1.fields.add(const MapEntry( final webSocket = await WebSocketTransformer.upgrade(
+            request,
+            protocolSelector: (l) => 'myprotocol',
+ istView.builder(
+        itemCount: widget.books.length,
+        itemBuilder: (context, index) => Card(
+          key: ValueKey(e:http_image_provider/http_image_provider.dart';
+import 'package:provider/provider.dart';
 
-/// Implements features for [Dio] on native platforms.
-class DioForNative with DioMixin implemnts.toString());
-  });
+import 'book.dart'0; i < min(itemCount, 10); ++i) {
+///     print(decodedResponse['items'][i]['volumeInfo']['title']);
+///   }
+/// }
+/// ``e [HttpClient] when it is needed. If [onHttpClientCreate]
+  /// has provided, [Dio] will call it when a [HttpClient] created.
+  loseCode(int? code) {
+  if (code != null && code != 1000 && !(code >= 3000 && code <= 4999)) {
+    throw ArgumentError('Invalid     'imageLinks': {'smallThumbnail': final String thumbnail}
+              }) {
+            books.add(Book(title, description, Us Map;
+    return Book.listFromJson(json);
+  }
 
-  test('stream', () async {
-    const str = 'hello 😌';
-    final bytes = utf8.encode(str).toList();
- pClientProfilingData();
+  void _runSearch(String query) async {
+    _lastQuery = query;
+    if (query.isio.get(
+          '/echo',
+          data: 'hello',
+          options: Options(headers: {'Content-Type': 'text/plain'}),
+   
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.badResponse) {
+        final response = e.response!;
+   client.
+//   ///
+//   /// This terminates all active requests.
+//   @override
+//   void close({bool force = false}) {
+//     ifpClientProfilingData();
     expect(profileBackingMaps.length, isPositive);
     backingMap = profileBackingMaps.lastOrNull!;
-  })once [stream] (a single-subscription [Stream]) is finished.
+  })ion(
+  Dio Function(String baseUrl) create,
+);
+
+const _tests = [
+  basicTests,
+  cancellationTests,
+  corsTests,
+  downloadTests//     print('percentage: ${(received / total * 100).toStringAsFixed(0)}%');
+  ///   },
+  /// );
+  /// ```
+  /// {@endtemplate}
+    ..cache = URLCache.withCapacity(memoryCapacity: 2 * 1024 * 1024)
+      ..httpAdditionalHeaders = {'User-Agent': 'Bookception] during the lifecycle of a request
+/// before it reaches users.
 ///
-/// The return value, also a single-subscription [Stream] shouldPath);
-  final file = File(filePath);
-  final length = await file.length();
-  return MultipartFile.fromStream(
-    () => _getStrring? _lastQuery;
+/// Interceptors are called once per request and res   decoration: const InputDecoration(
+                labelText: 'Search',
+                suffixIcon: Icon(Icons.search),
+    ds: 10), () {
+        token.cancel('cancelled');
+        dio.httpClientAdapter.close(force: true);
+      });
+
+      await expectannel.sendBytes(Uint8List(10)),
+          throwsA(isA<WebSocketConnectionClosed>()));
+    });
+
+    test('sendText after close',stQuery;
   late Client _client;
 
   @override
   void initState() {
     super.initState();
-    _client = context.read<Clie:http_image_provider/http_image_provider.dart';
-import 'package:provider/provider.dart';
-
-import 'book.dart';
-import 'http_ders = [
-      Header.ascii(':method', options.method),
-      Header.ascii(':path', path),
-      Header.ascii(':scheme', uri.sc     .catchError((e) => throw e.error as num),
-        throwsA(2),
-      );
-    });
-
-    test('unexpected error', () an.org';
-//   dio.options.headers = {'Authorization': 'Bearer '};
-//   //dio.options.baseUrl = "http://localhost:3000";
-//   finaror` or SocketExceptions.
-  connectionError,
-
-  /// Default error type, Some other [Error]. In this case, you can use the
-  /// Future<dynamic>.value()) as _i4.Future<dynamic>);
+    _client = context.read<Client>();
+  final headers = caseInsensitiveKeyMap(baseOpt.headers);
+    if (this.headers != null) {
+      headers.addAll(this.headers!);
+  th = file.lengthSync();
+  return MultipartFile.fromStream(
+    () => _getStreamFromFilepath(file),
+    length,
+    filename: filormData.fromMap({
+          'name': 'wendux',
+          'age': 25,
+          'path': '/图片空间/地址',
+          'file': Mes are ambiguous e.g.
+/// "Set-Cookie: lang=en; Path=/foo/"
+/// "Set-Cookie: SID=x23"
+/// and:
+/// "Set-Cookie: lang=en; Path=/fedirect,
+      statusMessage: reasonPhrase,
+    );
+  }
 }
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart'mport 'byte_stream.dart';
+import 'multipart_file_stub.dart' if (dart.library.io) 'multipart_file_io.dart';
+import 'multipart_reqn.cancel();
+      await Future.microtask(() {});
+      expect(timerCancelled, isTrue);
+    });
+  });
+}
+import 'dart:async';
 
-/// A class which mocks [HttpClientResponse].
-///
-/// See the doserver out-of-procesaders['set-cookie']?.length, 2);
-      headers.removeAll('set-cookie');
-      expect(headers['set-cookie'], isNull);
-that make them bad.
+imp   containsPair('content-type', ['text/plain']));
+        expect(profile.responseData.headers,
+            containsPair('conten close({bool? force = false}) =>
+      super.noSuchMethod(Invocation.method(#close, [], {#force: force}),
+   uri', options.uri);
+    //options.headers;
+
+    if (request) {
+      _printKV('method', options.method);
+      _printKV('respons      'www.googleapis.com',
+        '/books/v1/volumes',
+        {'q': query, 'maxResults': '20', 'printType': 'books'},
+    Timeout;
+  }
+
+  /// Create a [RequestOptions] from current instance with merged attributes.
+  RequestOptions copyWith({
+    Sthat make them bad.
     final lines = File('test/_pinning_http2.txt').readAsLinesSync();
-    return lines.first.split('=').last.nal result = Http2Adapter.resolveRedirectUri(
-        Uri.parse('https://example.com/foo'),
-        Uri.parse('../bar'),
-   od to make an HTTP GET request with [Uri].
-  Future<Response<T>> getUri<T>(
-    Uri uri, {
-    Object? data,
-    Options? optionllback = void Function(
+    return lines.first.split('=').last.rror.', '');
+  }
+
+  assert(response is List<dynamic>);
+  response as List<dynamic>;
+
+  final int type = response.length;
+  asserString>>{};
+    responseStream.headers.forEach((key, values) {
+      headers[key] = values;
+    });
+    return Respon     while (task.state != URLSessionTaskState.urlSessionTaskStateCompleted) {
+        // Let the event loop run.
+ Bytes = utf8.encode(content);
+        response
+          ..bufferOutput = gap <= 0
+          ..contentLength = contentBytes.lengnction(
   Response<dynamic> response,
   ResponseInterceptorHandler handler,
 );
 
-/// The signature of [Inter  error = e;
-      }
-      expect(error, isNotNull);
+/// The signature of [Interceptor.onError].
+typeception),
+        throwsA(isA<DioException>()),
+      );
     });
-
-    test('trusted certificate tested and allowed', ()] : The real size of original file (not compressed).
-  /// When file is compressed:
-  /// 1. If this value is 'content-length', f ComputeImpl = Future<R> Function<Q, R>(
-  ComputeCallback<Q, R> callback,
-  Q message, {
-  String? debugLabel,
-});
-
-/// A funcon) async {
-  late final List<dynamic> computationResult;
-
-  try {
-    computationResult =
-        _buildSuccessResponse(await c     while (task.state != URLSessionTaskState.urlSessionTaskStateCompleted) {
-        // Let the event loop run.
-    ..cache = URLCache.withCapacity(memoryCapacity: 2 * 1024 * 1024)
-      ..httpAdditionalHeaders = {'User-Agent': 'Book Agent'}ckage:meta/meta.dart';
-
-part 'client_setting.dart';
-
-part 'connection_manager.dart';
-
-part 'connection_manager_imp.dart'alue('location');
-      // An empty `location` header is considered a self redirect.
-      final uri = Uri.parse(url ?? '');
-   //     print('percentage: ${(received / total * 100).toStringAsFixed(0)}%');
-  ///   },
-  /// );
-  /// ```
-  /// {@endtemplate}
-code, request method, and the location.
-class RedirectRecord {
-  const RedirectRecord(this.statusCode, this.method, this.locatioTimeout);
-    final reqFuture = httpClient.openUrl(options.method, options.uri);
-    late HttpClientRequest request;
-   resp.data['extra_2'], 'extra');
-    });
+    test('multi response interceptor', () async {
+      dio = n using the JavaScript WebSocket API.
+  ///
+  /// The URL supplied in [url] must use the scheme ws or wss.
+  ///
+  /// If provideError(e, s),
+//         onDone: sink.close,
+//         cancelOnError: true,
+//       );
+//       final bytes = await comple// TODO(https://github.com/dart-lang/ffigen/issues/386): Check that the
+      // error is set.
+    }, skip: 'Error not set for r'));
   });
 
-  group('Error Interceptor', () {
-    test('handled when request cancelled', () aample, occurring a DNS error, network is not available.
-  final Response? response;
-
-  final DioExceptionType type;
-
-  //  if (options.onSendProgress != null) {
-//         debugLog(
-//           'onSendProgress cannot be used without a request body ler,
-  ) {
-    _handleQueue(_requestQueue, options, handler, onRequest);
-  }
-
-  void _handleResponse(
-    Res.add(
-///   LogInterceptor(
-///    logPrint: (o) => debugPrint(o.toString()),
-///   ),
-/// );
-/// ```
-class LogInterceptor extenes are ambiguous e.g.
-/// "Set-Cookie: lang=en; Path=/foo/"
-/// "Set-Cookie: SID=x23"
-/// and:
-/// "Set-Cookie: lang=en; Path=/fer?.cancel();
-//           connectTimeoutTimer = null;
-//         });
-//       }
-//
-//       if (sendTimeout > Duration.zero) {
- }) async {
-//   // To avoid blocking the UI immediately for an expensive function call, we
-//   // pump a single frame to allow
-  set receiveTimeout(Duration? value) {
-    if (value != null && value.isNegative) {
-      throw StateError('receiveTimeout sho }
-    return encodeComponent(value);
-  }
-
-  void urlEncode(Object? sub, String path) {
-    // Detect if the list format for tCronetClient] that will be initialized with a new [CronetEngine].
-  factory CronetClient.defaultCronetEngine() => CronetClient._    'imageLinks': {'smallThumbnail': final String thumbnail}
-              }) {
-            books.add(Book(title, description, UnDecoder.bind(responseBody.stream) would throw if the body is empty.
-        // So we need to check if the body is empty and reason: 'The XMLHttpRequest onError callback was called. '
-              'This typically indicates an error on the network layer.'eptors.clear();
-      expect(dio.interceptors.isEmpty, true);
-    });
-
-    test('error', () async {
-      String? csrfToken;
-   Error((_) {})
-              .whenComplete(() => responseSink.close().catchError((_) {}));
-          throw DioException.receivStream.value(Uint8List(0));
-      final bytes = await consolidateBytes(stream);
-      expect(bytes, Uint8List(0));
-   ;
-
-    var response = await client.post(Uri.http('example.com', '/foo'),
-        body: {'field1': 'value1', 'field2': 'value2'})lease open an [issue](https://github.com/dartsidedev/compute/issues),
-// and I'll try my best to "mrofile? _createProfile(BaseRequest request) =>
-      profile = super._createProfile(request);
-
-  CupertinoClientWithProfile._(suments HTTP redirect logic.
-///
-/// If [redirectAlwaysAllowed] is `true` then tests that require the [Client]
-/// to limit redire     CupertinoClient.fromSessionConfiguration(configuration),
-        );
-
-  final ConversionLayerAdapter _conversionLayer;
-
-  @o// The default [ImplyContentTypeInterceptor] will be removed only if
-  /// [keepImplyContentTypeInterceptor] is false.
-  @overation.ephemeralSessionConfiguration()
-            ..allowsCellularAccess = false
-            ..allowsConstrainedNetworkAccess =print log to console.
-  /// In flutter, you'd better use debugPrint.
-  /// you can also write log in a file, for example:
-  /// lumes',
-        {'q': query, 'maxResults': '20', 'printType': 'books'},
-      ),
-    );
-
-    final json = jsonDecode(utf8.deok longer than $timeout '
-            'and it was aborted. '
-            'To get rid of this exception, try raising the '
-     tring> transformRequest(RequestOptions options) async {
-    requestTransformed = true;
-    return super.transformRequestuest = Request('GET', Uri.https('example.com'));
-    final response = MockClient.pngResponse(request: reque, it's used as a list of bytes for the body of the
-/// request.
-///
-/// If [body] is a Map, it's encoded as form fields using [eadcastStream(
-          {void Function(_i4.StreamSubscription<List<int>>)? onListen,
-          void Function(_i4.StreamSubscript as ResponseType.plain
-  response = await dio.get(
-    '/get',
-    options: Options(responseType: ResponseType.plain),
-  );
-  prst in preparation for it being sent.
-  ///
-  /// Freezes all mutable fields and returns a single-subscription [ByteStream]
-  //t 'src/request_body_streamed_tests.dart';
-import 'src/request_body_tests.dart';
-import 'src/request_cookies_test.replaceAll('//', '/')}';
-      }
-    }
-    final query = Transformer.urlEncodeQueryMap(queryParameters, listFormat);
-    if (que     onDone: sink.close,
-        cancelOnError: true,
-      );
-      final bytes = await completer.future;
-      xhr.send(bytes)   dispose: (_, client) => client.close()));
+  test('handles a request with no body', () async {
+    var client = MockClient((_) async => http.Response('you did    dispose: (_, client) => client.close()));
 }
 
 class BookSearchApp extends StatelessWidget {
-  const BookSearchApp({super.n is missing, then the certificate is allowed.
-  /// This method is called only if both the [SecurityContext] and
-  /// [badCertidu.com');
-
-  // This is the recommended way.
-  final r = await dio.get<String>('https://baidu.com');
-  print(r.data?.length);
-}use [Request] instead.
-Future<Response> head(Uri url, {Map<String, String>? headers}) =>
-    _withClient((client) => client.head2NotSupportedException(
+  const BookSearchApp({super.n(
     this.uri,
     this.selectedProtocol,
   ) : super('h2 protocol not supported');
 
   final Uri uri;
-  fground sessions.
-  });
+  final String? selectAll(
+  Client Function() clientFactory, {
+  bool canStreamRequestBody = true,
+  bool canStreamResponseBody = true,
+  bool rediremethod casing will be skipped.
+void testRequestMethods(Client client,
+    {bool preservesMethodCase = true}) async {
+  grdapter({this.withCredentials = false});
 
-  group('defaultSessionConfiguration', () {
-    final config = URLSessionConfiguration.defaultSession  void forEach(void Function(String, List<String>)? action) =>
-      super.noSuchMethod(Invocation.method(#forEach, [action]),
- T guarantee only one result event is sent through the
-/// [SendPort.send] be it directly or indirectly i.e. [Isolate.exit].
+  /// These are aborted if the client is closed.
+  @visibleForTesting
+  final xhrs = <Hwhen !_digitRegex.hasMatch(contentLengthHeader)) {
+      throw ClientException(
+        'Invalid content-length header [$contentr,
+    bool? followRedirects,
+    int? maxRedirects,
+    bool? persistentConnection,
+    RequestEncoder? requestEncoder,
+    Ressposition.urlSessionResponseAllow;
+  }
+
+  /// A [Client] with the default configuration.
+  factory CupertinoClient.defaultSessio/// If [closeEngine] is `true`, then [engine] will be closed when [close] is
+  /// called on this [CronetClient]. This can simplonce [stream] (a single-subscription [Stream]) is finished.
 ///
-ectory.systemTemp.createTempSync('dio_test_');
-      addTearDown(() => tmp.deleteSync(recursive: true));
+/// The return value, also a single-subscription [Stream] should}
 
-      final f = File(pfinal uploadStopwatch = Stopwatch();
-        xhr.upload.onProgress.listen((event) {
-          if (!uploadStopwatch.isRunning) {
-questStartTime: DateTime.now(),
-          requestMethod: request.method,
-          requestUri: request.url.toString());
+    request.followRedirects = options.followRedirects;
+    request.maxRedirects = options.maxRedirects;
+    request.persis    '/put',
+      data: bytes,
+    );
+    expect(transformer.requestTransformed, isFalse);
+    expect(r.statusCode, 200);
+  })l be this header value.
+  ///
+  /// You can also disable the compression by specifying the 'accept-encoding'
+  /// header value 0]', dummyUrl), throwsArgumentError);
+    });
+  });
+}
+export 'src/fake_web_socket.dart' show fakes;
+// Copyright (c) 2023, the Dption error, ErrorInterceptorHandler handler) {
+            final response = error.response;
+            if (response != null)onType.unknown].
+  final Object? error;
 
-  @ride
+  /// The stacktrace of the original error/exception object;
+  /// It's usually not nulalue('location');
+      // An empty `location` header is considered a self redirect.
+      final uri = Uri.parse(url ?? '');
+   , it's used as a list of bytes for the body of the
+/// request.
+///
+/// If [body] is a Map, it's encoded as form fields using [eeing sent.
+  ///
+  /// Freezes all mutable fields and returns a single-subscription [ByteStream]
+  /// that emits the body of thll);
+  @override
   set userAgent(String? _userAgent) =>
       super.noSuchMethod(Invocation.setter(#userAgent, _userAgent),
-  ction using the JavaScript WebSocket API.
-  ///
-  /// The URL supplied in [url] must use the scheme ws or wss.
-  ///
-  /// If prMessages.add(DataStreamMessage(data));
-      }).asFuture();
-      final sendTimeout = options.sendTimeout ?? Duration.zero;
-     await webSocket.close(serverCode, serverReason);
-        });
-    });
-    tearDown(() {
- 
-  /// If request have been canceled, save the cancel error.
-  DioException? get cancelError => _cancelError;
-  DioException? _d for request data( mostly need Map ). So we provide a custom
-/// [Transformer] that will throw error when request data is a `Lian [IOClient].
-///
-/// Used from conditional imports, matches the definition in `client_stub.dart`.
-BaseClient createClient() {
-arse('2024-03-21');
+   arse('2024-03-21');
     expect(
       responseData['startTime'],
       DateTime.parse('2024-03-21').microsecondsSinceEpoch,
-    tps://flutter.dev';
+    wait Directory('lib/src').list().toList();
+  final formatter = DartFormatter();
+
+  files.where((file) => file.path.endsWith('_sequestStartTime: DateTime.now(),
+          requestMethod: request.method,
+          requestUri: request.url.toString());
+
+  @o    rethrow;
+    }
+    final File file;
+    if (savePath is FutureOr<String> Function(Headers)) {
+      // Add real Uri and redihasRequestData = requestStream != null;
+    if (hasRequestData && cancelFuture != null) {
+      cancelFuture.whenComplete(() {
+ // Request data in dynamic types.
+  dynamic data;
+
+  /// Defines the path of the request. If it starts with "http(s)",
+  /// [ba   });
+//       }
+//
+//       if (sendTimeout > Duration.zero) {
+//         final uploadStopwatch = Stopwatch();
+//         xhrUltipleClients(clientFactory);
+  testMultipartRequests(clientFactory(),
+      supportsMultipartRequest: supportsMultipartRequest)artFile file) {
+    var header = 'content-type: ${file.contentType}\r\n'
+        'content-disposition: form-data; name="${_browsfile.events, isEmpty);
+        expect(profile.requestMethod, 'POST');
+        expect(profile.requestUri, successServerUri.toStri_socket/web_socket.dart';
+
+import 'close_local_server_vm.dart'
+    if (dart.library.html) 'close_local_serve final options = response.requestOptions;
+              switch (options.path) {
+                case '/resolve':
+    
+  set contentType(String? contentType) {
+    final newContentType = contentType?.trim();
+    _defaultContentType = newContentTdcastStream(
+          {void Function(_i4.StreamSubscription<List<int>>)? onListen,
+          void Function(_i4.StreamSubscriptivalue('Sec-WebSocket-Key');
+      var digest = sha1.convert('$key$_webSocketGuid'.codeUnits);
+      var accept = base64.encode(den] handling.
+  /// When the request is canceled, [cancelFuture] will be resolved.
+  /// To await if a request has been canceledvely `dart:developer`'s `log` function can also be used.
+///
+/// ```dart
+/// dio.interceptors.add(
+///   LogInterceptor(
+///    e,
+  ) async {
+    if (_closed) {
+      throw StateError(
+        "Can't establish connection after the adapter was closed.",
+  e finalized after being read.
+        try {
+          multipartFile1.finalize();
+          fail('Should not be able to finalize       webSocket.listen((event) {
+        channel.sink.add(event);
+        webSocket.close(4123, 'server closed the connection');seBody.fromString(
+          '',
+          statusCode,
+          headers: {
+            HttpHeaders.locationHeader: ['www.googleerror, [
+    bool callFollowingErrorInterceptor = false,
+  ]) {
+    _throwIfCompleted();
+    _completer.completeError(
+      IT guarantee only one result event is sent through the
+/// [SendPort.send] be it directly or indirectly i.e. [Isolate.exit].
+///
+ion<Q, R>(
+  ComputeCallback<Q, R> callback,
+  Q message, {
+  String? debugLabel,
+});
+
+/// A function that spawns an isolate and
+  IOClient([HttpClient? inner]) : _inner = inner ?? HttpClient();
+
+  /// Sends an HTTP request and asynchronously returns the r case CloseReceived():
+        stderr.writeln('Connection to server closed');
+    }
+  });
+  socket.sendText(jsonEncode({
+    'idnType.connectionError,
+                (e) => e.error is SocketException,
+                (e) => (e.error as SocketException)
+ ttps://flutter.dev';
 
   await Future.wait([
     dio
         .get(url1, cancelToken: token)
-        .then((response) => print('${rlientRequest_1()))
-          as _i4.Future<_i2.HttpClientRequest>);
-  @override
-  _i4.Future<_i2.HttpClientRequest> openUrl(Striconds: 3);
-    // ignore: deprecated_member_use, deprecated_member_use_from_same_package
-    return onHttpClientCreate?.call(cliptions options,
-            RequestInterceptorHandler handler,
-          ) {
-            switch (options.path) {
-   equest,
-  /// unless [callFollowingErrorInterceptor] is true
-  /// which delivers [InterceptorResultType.rejectCallFollowing]
-  void>? asyncWrite;
-    bool closed = false;
-    Future<void> closeAndDelete() async {
-      if (!closed) {
-        closed = trerver successServer;
-      late Uri successServerUri;
-      late HttpClientRequestProfile profile;
+        .then((response) => print('${sCode', response.statusCode);
+      if (response.isRedirect == true) {
+        _printKV('redirect', response.realUri);
+       ncb.NSString.castFrom(array.objectAtIndex_(1)).toString(), 'banana');
+    });
+  });
+}
+// Copyright (c) 2012, the Splitter = RegExp(r'[ \t]*,[ \t]*');
 
-      setUpAll(() asyequest.drain<void>();
-          request.response.statusCode = 500;
-    oes.not.exist'
-              ..httpClientAdapter = IOHttpClientAdapter(
-                validateCertificate: (_, __, ___) => fal
+/// Splits comma-separated "Set-Cookie" header values.
+///
+/// Set-Cookie strings can contcode, request method, and the location.
+class RedirectRecord {
+  const RedirectRecord(this.statusCode, this.method, this.locatio branch.
+//
+// Last synced commit:
+// [978a2e7](https://github.com/flutter/flutter/commit/978a2e7bf6a2ed287130af8dbd94cef019fb7bter<ResponseBody>();
+
+    xhr.onLoad.first.then((_) {
+      final Uint8List body = (xhr.response as ByteBuffer).asUint8List();
+ mport 'exception.dart';
+import 'streamed_response.dart';
+
+final _digitRegex = RegExp(r'^\d+$');
+
+/// Create a [BrowserClient]eptors.clear();
+      expect(dio.interceptors.isEmpty, true);
+    });
+
+    test('error', () async {
+      String? csrfToken;
+        client.findProxy = (uri) {
+        // Proxy all request to localhost:8888
+        return 'PROXY localhost:8888';
+    eaders.value(
+      Headers.contentEncodingHeader,
+    );
+    if (contentEncoding != null) {
+      compressed = ['gzip', 'deflat error.stackTrace,
+    );
+    _processNextInQueue?.call();
+  }
+}
+
+/// The handler for interceptors to handle error occurred duri
+
+/// An HTTP request where the entire request body is known in advance.
+class Request extends BaseRequest {
+  /// The size ders: {
+            Headers.contentLengthHeader: contentLength,
+          },
+        ),
+      );
+      expect(r.data['headers'][ent requests will be added to the queue for interceptors.
+class QueuedInterceptor extends Interceptor {
+  final _requestQueue = ackage:native_dio_adapter/src/conversion_layer_adapter.dart';
+
+import 'client_mock.dart';
+
+void main() {
+  test('close', () am = toByteStream(stream),
+        contentType = contentType ?? MediaType('application', 'octet-stream');
+
+  /// Creates a new [sponse.
+        taskTracker.profile?.responseData.closeWithError(exception.toString());
+      }
+      if (taskTracker.respi.http(host, '/'));
+      }
+    });
+
+    test('disallow redirect', () async {
+      final request = Request('GET', Uri.http(host     'The request was successfully received, understood, and accepted';
+    } else if (statusCode >= 300 && statusCode < 400) {
+  startsWith(Headers.multipartFormDataContentType),
+      );
+
+      // Regression: https://github.com/cfug/dio/issues/1834
+     / The idea behind this regex is that ",<valid token>=" is more likely to
+/// start a new <cookie-pair> then be part of <path-valfile.
+
+// This file corresponds to Flutter's
+// [`foundation/_isolates_io.dart`]  /// Convenience method to make an HTTP GET request with [Uri].
+  Future<Response<T>> getUri<T>(
+    Uri uri, {
+    Object? dat/ This code is structured to call `xhr.upload.onProgress.listen` only when
+    // absolutely necessary, because registering an x
+/// Usable when targeting native platforms.
+class IOWebSocket implements WebSocket {
+  final io.WebSocket _webSocket;
+  fin      (e) => e.type == DioExceptionType.cancel,
+            (e) =>
+                e.stackTrace.toString().contains('test/stackt 'dart:js_interop';
+// import 'dart:typed_data';
+//
+// import 'package:dio/dio.dart';
+// import 'package:dio/src/utils.dart';
+//former.urlEncodeMap, () {
+    final data = {
+      'a': '你好',
+      'b': [5, '6'],
+      'c': {
+        'd': 8,
+        'e':  //        URI |  Redirects TO
+      // ===========|==============
+      //   ".../10" |       ".../9"
+      //    ".../inal client = MockHttpClient();
+                when(client.openUrl(any, any)).thenAnswer((_) async => requeselToken == null || !cancelToken.isCancelled) {
+            subscription.resume();
+          }
+        }).catchError((Object e) aesponse], **may** return a [BaseResponseWithUrl].
+///
+/// For example:
+///
+/// ```dart
+/// final client = Client();
+/// final
     (baseUrl) => Dio(BaseOptions(baseUrl: baseUrl)),
   );
 }
 library dio_web_adapter;
 
-// We separate implementations as `html` sCode, 200);
-      expect(response.isRedirect, isFalse);
-      expect(
-        response.data['headers']['X-Multi-Value-Request-HormData.fromMap({
-          'name': 'wendux',
-          'age': 25,
-          'path': '/图片空间/地址',
-          'file': Muest = await _fromOptionsAndStream(options, requestStream);
-    final response = await client.send(requesresented as an unmodifiable list of bytes.
-  List<int> get bodyBytes =>
-      UnmodifiableListView(_data['requestBodyBytes'] as sCode);
-      if (response.isRedirect == true) {
-        _printKV('redirect', response.realUri);
-      }
-
-      logPrint('headerSocket-Key');
-      var digest = sha1.convert('$key$_webSocketGuid'.codeUnits);
-      var accept = base64.encode(digest.bytes) super.requestEncoder,
-    super.responseDecoder,
-    super.listFormat,
-    bool? setRequestContentTypeWhenNoPayload,
-    SrequestUri, 'http://thisisnotahost');
-        expect(
-            profile.connectionInfo, containsPair('package', 'packanc {
-///   final socket = await CupertinoWebSocket.connect(
-///       Uri.parse('wss://ws.postman-echo.com/raw'));
-///
-///   socethods = [
-      'CONNECT',
-      'HEAD',
-      'GET',
-      'POST',
-      'PUT',
-      'PATCH',
-      'DELETE',
-      'OPTIONS' case CloseReceived():
-        stderr.writeln('Connection to server closed');
-    }
-  });
-  socket.sendText(jsonEncode({
-    'ids when
-  /// creating a [DioException.badResponse].
-  static String _badResponseExceptionMessage(int statusCode) {
-sed to provide a custom [HttpClient] for Dio.
-typedef CreateHttpClient = HttpClient Function();
-
-/// The signature of [IOHttpCerror, [
-    bool callFollowingErrorInterceptor = false,
-  ]) {
-    _throwIfCompleted();
-    _completer.completeError(
-      Ifile.
-
-// This file corresponds to Flutter's
-// [`foundation/_isolates_io.dart`](httpswhen !_digitRegex.hasMatch(contentLengthHeader)) {
-      throw ClientException(
-        'Invalid content-length header [$content] are usually not constructed manually; instead,
-/// they're returned by [BaseClient.send] or other HTTP client methods.
-abstrac0; i < min(itemCount, 10); ++i) {
-///     print(decodedResponse['items'][i]['volumeInfo']['title']);
-///   }
-/// }
-ter();
-
-  /// {@macro dio_http2_adapter.ConnectionManager}
-  ConnectionManager connectionManager;
-
-  /// {@macro dio.HttpClquest was fully sent.
-  DateTime? get endTime => _data['requestEndTimestamp'] == null
-      ? null
-      : DateTime.fromMicrosecher to send credentials such as cookies or authorization headers for
-  /// cross-site requests.
-  ///
-  /// Defaults to `false` && contentTypeInHeader),
-      'You cannot set both contentType param and a content-type header',
+// We separate implementations as `html` al resp = await cla.fetch(
+      RequestOptions(path: ''),
+      null,
+      null,
     );
 
-    final ro = Requesheader'],
-          equals('test-value'),
-        );
-      },
-      testOn: 'vm',
-    );
-
-    test('default content-type', () aError('no_default_http_client was defined but runWithClient '
-        'was not used to configure a Client implementation.');
-  }od.
-/// 2. Server generates CSRF token and sends it to the client.
-/// 3. Client make a request to the Server by using `POST` me //        URI |  Redirects TO
-      // ===========|==============
-      //   ".../10" |       ".../9"
-      //    ".../ 'RequestOptions.receiveTimeout above the duration of $timeout or '
-            'improve the response time of the server.',
-    tring>>{};
-    responseStream.headers.forEach((key, values) {
-      headers[key] = values;
-    });
-    return Responstream, this.length,
-      {this.filename, MediaType? contentType})
-      : _stream = toByteStream(stream),
-         ncb.NSString.castFrom(array.objectAtIndex_(1)).toString(), 'banana');
-    });
-  });
-}
-// Copyright (c) 2012, the 'src/response_headers_tests.dart' show testResponseHeaders;
-export 'src/response_status_line_tests.dart' show testResponseStatusrset(contentType.parameters['charset'], utf8);
-    contentType = contentType.change(parameters: {'charset': encoding.name});
-
-  of the `package:http` [Client],
-/// which means that it can easily used conditionally based on the current
-/// platform.
-///
-/ptors to handle error occurred during the request.
-class ErrorInterceptorHandler extends _BaseHandler {
-  /// Deliver the [error title: Text('Response ${response.statusCode}'),
-          content: SingleChildScrollView(
-            child: Text(response.body   savePath.runtimeType,
-        'savePath',
-        'The type must be `String` or `FutureOr<String> Function(Headers)`.',
-    close() {
-    if (!_isClosed) {
-      _engine
-        ..shutdown()
-        ..release();
-    }
-    _isClosed = true;
-  }
-}
-
-Map<section 4.1.1:
-/// - <sane-cookie-date> e.g. "Expires=Sun, 06 Nov 1994 08:49:37 GMT"
-/// - <path-value> e.g. "Path=somepath,"
-//      (e) => e.type == DioExceptionType.cancel,
-            (e) =>
-                e.stackTrace.toString().contains('test/stackt    cla.close(force: true);
-
-    expect(mock.closeWasCalled, true);
-  });
-
-  test('headers', () async {
-    final mock = ClientMsponse.
-        taskTracker.profile?.responseData.closeWithError(exception.toString());
-      }
-      if (taskTracker.respt make sense to
-  /// change after the request headers are sent.
-  @mustCallSuper
-  ByteStream finalize() {
-    // TODO(nweiz): ntError('Invalid argument: $code, close code must be 1000 or '
-          'in the range 3000-4999');
-    }
-    if (reason != nData.compressionState, isNull);
-
-    profile.responseData.compressionState =
-        HttpClientResponseCompressionState.decompreken == null || !cancelToken.isCancelled) {
-            subscription.resume();
-          }
-        }).catchError((Object e) async final actualData = MutableData.empty();
-      late URLSession actualSession;
-      late URLSessionTask actualTask;
-
-   _isDirect,
-        if (_port != null) 'port': _port,
-      };
-}
-
-/// Describes details about an HTTP request.
-final class HttpPr Fingerprint=EE:5C:E1:DF:A7:A4...
-    // All badssl.com hosts have the same cert, they just have TLS
-    // setting or other difn').then((d) {
-                options.headers['csrfToken'] =
-                    csrfToken = d.data['data']['token'] as String;/ The idea behind this regex is that ",<valid token>=" is more likely to
-/// start a new <cookie-pair> then be part of <path-p(
-    'CORS preflight',
-    () {
-      test('empty GET is not preflighted', () async {
-        // If there is no preflight (OPTns the [Encoding] that corresponds to [charset].
-///
-/// Returns [fallback] if [charset] is null or if no [Encoding] was found tp['responseData'] as Map<String, dynamic>;
-    final redirectsFromBackingMap =
-        responseData['redirects'] as List<Map<Strannel.sendBytes(Uint8List(10)),
-          throwsA(isA<WebSocketConnectionClosed>()));
-    });
-
-    test('sendText after close',inal client = MockHttpClient();
-                when(client.openUrl(any, any)).thenAnswer((_) async => requese.wait(
-        ['/redirection', '/redirection1', '/redirection2', '/redirection3'].map(
-          (url) asyncck passed to [compute].
-///
-/// For more information, visit Flutter documentation for the equivalent
-/// [`ComputeCallback<Q, R>ders = false,
-  bool supportsMultipartRequest = true,
-}) {
-  testRequestBody(clientFactory());
-  testRequestBodyStreamed(clientFnts => _events.stream;
-
-  @override
-  String get protocol => _webSocket.protocol;
-}
-
-const connect = BrowserWebSocket.connect;
-/      #onError: onError,
-                #onDone: onDone,
-                #cancelOnError: cancelOnError
-              }),
-   l;
-  });
-
-  group('Timeout exception of', () {
-    group('connectTimeout', () {
-      test(
-        'update between calls',
-    io_cookie_manager/dio_cookie_manager.dart';
-import 'package:test/test.dart';
-
-class MockRequestInterceptorHandler extends Reques  startsWith(Headers.multipartFormDataContentType),
-      );
-
-      // Regression: https://github.com/cfug/dio/issues/1834
-     tType: DioMediaType.parse('text/plain'),
-            ),
-          ),
-        );
-        expect(fmStr.length, fm1.length);
-  child: ListTile(
-            leading: Image(
-                image: HttpImageProvider(
-                    widgetrs.addAll(
-      [
-        /// Handles CSRF token
-        QueuedInterceptorsWrapper(
-          /// Adds CSRF token to headers, igrade')
-        ..headers.add(HttpHeaders.upgradeHeader, 'websocket')
-        ..headers.add('Sec-WebSocket-Accept', accept);
-   () {
-  group(Transformer.urlEncodeMap, () {
-    final data = {
-      'a': '你好',
-      'b': [5, '6'],
-      'c': {
-        'dthe finalized bytes if the response type is bytes.
-    if (responseType == ResponseType.bytes) {
-      return responseBytes;
-   nseData
-        ?..contentLength = contentLength
-        ..headersCommaValues = responseHeaders
-        ..isRedirect = fal= http.Request('POST', dummyUrl)
-        ..encoding = latin1
-        ..headers['Content-Type'] = 'text/plain; charset=utf-8';
-   case '/reject-next-response':
-                  handler.reject(
-                    DioException(requestOptions: reqOpt, error:codeMap(data, ListFormat.pipes), result);
-    });
-
-    test('multi', () {
-      //a=你好&b[]=5&b[]=6&c[d]=8&c[e][a]=5&c[e][b][dapter {
-  ConversionLayerAdapter(this.client);
-
-  /// The client instance from the `http` package.
-  final http.Client group('testOnWebSocketTaskClosed', () {
-    late HttpServer server;
-    late int? serverCode;
-    late String? serverReason;
-
-     channel.sink.add(event);
-        webSocket.close(4123, 'server closed the connection');
-      });
-    });
-
-  chan used as the encoding. Otherwise, if
-  /// [encoding] has been set manually, that encoding is used. If that hasn't
-  /// been seHeaders['accept-encoding'] as List).join(', '),
-          contains('gzip'));
-      expect(await response.stream.bytesToString   // RFC-2616 4.2 says:
-      // "The field value MAY be preceded by any amount of LWS, though a single
-      // SP is preferre// See also:
-///  - [QueuedInterceptorsWrapper], creates [QueuedInterceptor]s in ease.
-class InterceptorsWrapper extends Intercd use
-/// either [IOHttpClientAdapter] on `dart:io` platforms
-/// or [BrowserHttpClientAdapter] on `dart:html` platforms.
-/// {@to the status code.
-  /// The message can be [HttpRequest.statusText]
-  /// or [HttpClientResponse.reasonPhrase].
-  String? stat[body] sets the body of the request. It can be a [String], a [List<int>] or
-/// a [Map<String, String>]. If it's a String, it's artFile file) {
-    var header = 'content-type: ${file.contentType}\r\n'
-        'content-disposition: form-data; name="${_browner clients or requests.
-  void close({bool force = false});
-}
-
-/// The response wrapper class for adapters.
-///
-/// This class  }
-
-  static FutureOr<String> defaultTransformRequest(
-    RequestOptions options,
-    JsonEncodeCallback jsonEncodeCalirect, true);
-      if (response case BaseResponseWithUrl(url: final url)) {
-        expect(url, Uri.http(host, '/1'));
- al files = await Directory('lib/src').list().toList();
-  final formatter = DartFormatter();
-
-  files.where((file) => file.path.eeme('ws') && !url.isScheme('wss')) {
-      throw ArgumentError.value(
-          url, 'url', 'only ws: and wss: schemes are suppoEncode(data, '');
-  return urlData.toString();
-}
-
-String _getSeparatorChar(ListFormat collectionFormat, bool isQuery) {
-  swit const urlNotFound1 = '${urlNotFound}1';
-  const urlNotFound2 = '${urlNotFound}2';
-  const urlNotFound3 = '${urlNotFound}3';
-  feaders).thenAnswer((_) => mockRequestHeaders);
-      when(request.close()).thenAnswer((_) => Future.value(response));
-      wpleter<ResponseBody>();
-
-    xhr.onLoad.first.then((_) {
-      final Uint8List body = (xhr.response as ByteBuffer).asUint8List()/// A matcher for functions that throw [DioException] of a specified type,
-/// with an optional matcher for the stackTrace conta /// [bodyBytes].
-  ///
-  /// The content length cannot be set for [Request], since it's automatically
-  /// calculated from [bovert';
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:dio/dio.dart';
-import 'package:path/path.dart' as p;
-impoct(data.length, 0));
+    expect(await resp.stream.lengthxpect(data.length, 0));
     test('bytes', () => expect(data.bytes, Uint8List(0)));
-    test('toString', data.toString); // Jl be closed and the fields of [HttpProfileRequestData] will
-  /// no longer be changeable.
-  ///
-  /// [value] is a textual desc     reason: 'Stacktrace should be available in onError',
-      );
-    });
-
-    test('QueuedInterceptor gets stacktrace in onErrseData.bodySink.add(data.bytes);
+    test('toString', data.toString); // J   var key = header.substring(0, splitIdx).toLowerCase();
+      var value = header.substring(splitIdx + 2);
+      if (headerV('extra', options.extra);
+    }
+    if (requestHeader) {
+      logPrint('headers:');
+      options.headers.forEach((key, v) => entType.change(parameters: {'charset': value.name});
   }
 
-  static URLRequest? _onRedirect(URLSession session, URLSessionTask task,
-   ile?.requestData.close());
+  // TODO(nweiz): make this return a read-only view
+  /// The bytes con').then((d) {
+                options.headers['csrfToken'] =
+                    csrfToken = d.data['data']['token'] as String;     'sessionId=e8bb43229de9; Domain=foo.example.com'
+    };
+    expect(
+      responseData['headers'],
+      {
+        'set-coog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Response ${respo skipped to handle the request,
+  /// unless [callFollowingErrorInterceptor] is true
+  /// which delivers [InterceptorResultTypeking the UI immediately for an expensive function call, we
+//   // pump a single frame to allow the framework to complete the cuonse.stream, client.close);
 
-    return URLSessionResponseDisposition.urlSessionResponseAllow;
-  }
+      if (response case BaseResponseWithUrl(:final url)) {
+        return StreamedResponseV2(ByteStuest represented as an unmodifiable list of bytes.
+  List<int> get bodyBytes =>
+      UnmodifiableListView(_data['requeshen sending a large
+/// [StreamedRequest].
+final class RetryClient extends BaseClient {
+  /// The wrapped client.
+  final Clientallback] accept the certificate chain. Those
+  /// methods evaluate the root or intermediate certificate, while
+  /// [validatt(
+    '/get',
+    options: Options(responseType: ResponseType.plain),
+  );
+  print(response.data is String);
 
-  /// A [Client] with the de
+  // the co    onWebSocketTaskOpened: (session, task, protocol) {},
+          onWebSocketTaskClosed: (session, task, closeCode, reason) {
       JArray(jbyte.type, length)..setRange(0, length, this);
 }
 
 extension on JArray<jbyte> {
-  Uint8List toUint8List({int? len be sent and received to and
-/// from isolates. These limitations constrain the values of `Q` and `R` that
-/// are possible. Sez123',
-      'https://',
-      'pub.dev',
-    ];
-    final validUrls = <String>[
-      '',
-      'https://pub.dev',
-      'https.name).join(',');
-  File('$root/.melos_packages')
-      .writeAsStringSync('MELOS_PACKAGES=$validPackagesString');
-}
+  Uint8List toUint8List({int? lengthchild: ListTile(
+            leading: Image(
+                image: HttpImageProvider(
+                    widgetkage:crypto/crypto.dart';
+import 'package:stream_channel/stream_channel.dart';
 
-extension ofile?.connectionInfo = {
-      'package': 'package:cronet_http',
-      'client': 'CronetHttp',
-    };
-    profile?.requestData
-eData.headersCommaValues = {
-      'set-cookie':
-          // ignore: missing_whitespace_between_adjacent_strings
-     ));
+const _webSocketGuid = '258EAFA5-E914-47DA-95CA-uest: (
+            RequestOptions options,
+            RequestInterceptorHandler handler,
+    error that the request failed with.
+  String? get error =>
+      _requestData['error'] == null ? null : _requestData['error'] aof the `package:http` [Client],
+/// which means that it can easily used conditionally based on the current
+/// platform.
+///
+/namic> addStream(_i4.Stream<List<int>>? stream) =>
+      (super.noSuchMethod(Invocation.method(#addStream, [stream]),
+   nseType = options.responseType;
+    // Do not handled the body for streams.
+    if (responseType == ResponseType.strea//
+/// Used from conditional imports, matches the definition in `client_stub.dart`.
+BaseClient createClient() {
+  if (const bool $timeout '
+            'and it was aborted. '
+            'To get rid of this exception, try raising the '
+            'Requestisten((event) {
+          if (event.loaded != null && event.total != null) {
+            onSendProgress(event.loaded!, event.totedError] if `dart:io` isn't supported in this
+  /// environment.
+  static Future<MultipartFile> fromPath(String field, Strinon) async {
+  late final List<dynamic> computationResult;
 
-  /// Collects the data of this stream in a [Uint8List].
-  Future<Uint8List> toBytes() {
-    var completer = Completer<Uintnt.path;
-  final config = MelosWorkspaceConfig.fromYaml(
-    loadYamlNode(
-      File('$root/melos.yaml').readAsStringSync(),
-  r value. The header named [name] will have the value
-  /// [value] added to its list of values.
-  void add(String name, Strinesponse!.statusCode, 302);
-      expect(response!.allHeaderFields['Location'],
-          'http://localhost:${redirectServer.p3, 4, 5, 6, 7, 8, 9, 10];
-      expect(request.contentLength, equals(10));
-    });
+  try {
+    computationResult =
+        _buildSuccessResponse(await c await _fromOptionsAndStream(options, requestStream);
+    final response = await client.send(request);
+    return response.toDioow HttpException('bad response: ${response.statusCode}');
+///   }
+///
+///   final decodedResponse =
+///       jsonDecode(utf8.dereturn encodeComponent(value);
+  }
 
-    test('is computed from body', () {     .sendMessage(URLSessionWebSocketMessage.fromString('Hello World!'));
-      await task.receiveMessage();
-      task.cancelWillbacks generated by Cronet is documented here:
-  // https://developer.android.com/guide/topics/connectivity/cronet/lifecycle
-  t/HttpURLConnection.dart';
-import 'third_party/java/net/URL.dart';
+  void urlEncode(Object? sub, String path) {
+    // Detect if the list format for this paramponse> patch(Uri url,
+        {Map<String, String>? headers, Object? body, Encoding? encoding}) =>
+    _withClient((client) =>coding.decodeStream(this);
 
-final _digitRegex = RegExp(r'^\d+$');
+  Stream<String> toStringStream([Encoding encoding = utf8]) =>
+      encoding.decoder.bind(this);// The default [ImplyContentTypeInterceptor] will be removed only if
+  /// [keepImplyContentTypeInterceptor] is false.
+  @oveformer = SyncTransformer;
 
-// TODO: Add a descri       MockHttpOverrides(),
-        );
-      },
-      testOn: '!browser',
-    );
-
-    test(
-      Dibrary.html) 'adapters/browser_adapter.dart' as adapter;
-import 'headers.dart';
-import 'options.dart';
-import 'redirect_record.d     onWebSocketTaskOpened: (session, task, protocol) {},
-          onWebSocketTaskClosed: (session, task, closeCode, reason) {
-e.mimeType, 'text/fancy');
-    });
-
-    test('expectedContentLength ', () {
-      expect(response.expectedContentLength, 11);
-  g close reason', () async {
-      final channel = await channelFactory(uri);
-      await expectLater(() => channel.close(3000, 'index].imageUrl.replace(scheme: 'https'),
-                    client: context.read<Client>())),
-   (task);
-    if (!taskQueue.processing) {
-      taskQueue.processing = true;
-      final task = taskQueue.queue.removeFirst();
-  inal request = MockHttpClientRequest();
-                when(request.addStream(any)).thenAnswer(
-                  (_) asyncment, you must return the [responseBody]
-  /// when the Options.responseType is [ResponseType.stream].
-  // TODO(AlexV525): Add ] or [CacheMode.diskNoHttp]
-  /// then [storagePath] must be set.
-  ///
-  /// [cacheMaxSize] is the maximum amount of data that ream);
+/// If you want to custom the transformation of request/response data,
+/// you can provide a [TransnseData
+        ?..contentLength = contentLength
+        ..headersCommaValues = responseHeaders
+        ..isRedirect = falream);
 }
 
 /// This class is private to `package:http` and will be removed when
 /// `package:http` v2 is released.
-class Streas,
-  ) async {
-    late final ClientTransportConnection transport;
-    try {
-      transport = await connectionManager.getConneckage:crypto/crypto.dart';
-import 'package:stream_channel/stream_channel.dart';
+class Strea then [storagePath] must be set.
+  ///
+  /// [cacheMaxSize] is the maximum amount of data that should be cached, in
+  /// bytes.dd \r\n at the end of this header section.
+        ], '\r\n')
+        ..write(headers)
+        ..write('Connection: Closed\r\n\rerver successServer;
+      late Uri successServerUri;
+      late HttpClientRequestProfile profile;
 
-const _webSocketGuid = '258EAFA5-E914-47DA-95CA-      {'name': 'foo', 'value': 1},
+      setUpAll(() asynHeader, 'Upgrade')
+        ..headers.add(HttpHeaders.upgradeHeader, 'websocket')
+        ..headers.add('Sec-WebSocket-Accept',       #onError: onError,
+                #onDone: onDone,
+                #cancelOnError: cancelOnError
+              }),
+   > '${Uri.encodeQueryComponent(e.key, encoding: encoding)}'
+            '=${Uri.encodeQueryComponent(e.value, encoding: encoding)ytes = [104, 101, 108, 108, 111];
+      expect(request.body, equals('hello'));
+    });
+
+    test('is encoded according to the giuest. It can be a [String], a [List<int>] or
+/// a [Map<String, String>]. If it's a String, it's encoded using [encoding] and
+//f (contentType != null) {
+      ro.headers.remove(Headers.contentTypeHeader);
+      ro.contentType = contentType;
+    onse = MockHttpClientResponse();
+                when(request.close()).thenAnswer(
+                  (_) => Future.delayed(
+      fail('did not throw');
+      } on DioException catch (e) {
+        error = e;
+      }
+      expect(error, isNotNull);
+dding: const EdgeInsets.all(16),
+        child: Column(
+    sing.
+      urlRequest.httpBody = Data.fromList(request.bodyBytes);
+      profile?.requestData.bodySink.add(request.bodyBytes);
+     anyOf([
+            1002, // protocol error
+            1005, // closed no status
+            1006, // closed abnormal
+     test('cookies replacement', () async {
+    final cookies = [
+      Cookie('foo', 'bar')..path = '/',
+      Cookie('a', 'c')..patps://wrong.host.badssl.com/';
+
+  /// NOTE: Run scripts/prepare_pinning_certs.sh
+  /// to download the current certs to the fierprint=EE:5C:E1:DF:A7:A4...
+    // All badssl.com hosts have the same cert, they just have TLS
+    // setting or other differ//
+/// void main() {
+///  var clientFactory = Client.new; // Constructs the default client.
+///  if (Platform.isAndroid) {
+///nse.
+  ///
+  /// Errors added to [bodySink] (for example with [StreamSink.addError]) are
+  /// ignored.
+  StreamSink<List<iride
+  HttpClientRequestProfile? _createProfile(BaseRequest request) =>
+      profile = super._createProfile(request);
+
+  Cuperclient.post(
+      Uri.parse('https://httpbin.org/post'),
+      body: jsonEncode(<String, dynamic>{'foo': 'bar'}),
+  l file = File(savePath + 'temp$i');
+      await ioSink.addStream(file.openRead());
+      await file.delete();
+    }
+    await ioaders['Content-Type'] = 'text/plain; charset=iso-8859-1';
+      expect(request.encoding.name, equals(latin1.name));
+  .then(onResult),
+        dio.get('/test-auth?tag=2').then(onResult),
+        dio.get('/test-auth?tag=3').then(onResult),
+      ]   // RFC-2616 4.2 says:
+      // "The field value MAY be preceded by any amount of LWS, though a single
+      // SP is preferrese}) {
+    _closed = true;
+    _cachedHttpClient?.close(force: force);
+  }
+
+  HttpClient _createHttpClient() {
+    if (createH      {'name': 'foo', 'value': 1},
             {'name': 'bar', 'value': 2},
           ],
           'api': {
-            'dest':    httpClient.connectionTimeout! > Duration.zero) {
-          effectiveTimeout = httpClient.connectionTimeout!;
-     _socket/web_socket.dart';
+            'dest': e equivalent
+/// [`ComputeCallback<Q, R>` type definition](https://api.flutter.dev/flutter/foundation/ComputeCallback.html)
+/// group('testOnWebSocketTaskClosed', () {
+    late HttpServer server;
+    late int? serverCode;
+    late String? serverReason;
 
-import 'close_local_server_vm.dart'
-    if (dart.library.html) 'close_local_serve.
+ onse_status_line_tests.dart' show testResponseStatusLine;
+export 'src/server_errors_test.dart' show testServerErrors;
 
-/// An Android Flutter plugin that provides access to the
-/// [OkHttp](https://squfinal engine = CronetEngine.build(
-          cacheMode: CacheMode.memory, cacheMaxSize: 1024 * 1024);
-      final client = Croneersion layer which translates Dio HTTP requests to
-/// [http](https://pub.dev/packages/http) compatible requests.
-/// This way t IOStreamedResponse extends StreamedResponse {
+/// Runs 6 14.44 states that header field names are case-insensitive.
+      // http.Client canonicalizes field names into lower case.
+   Value: Future<List<int>>.value(<int>[])) as _i4.Future<List<int>>);
+  @override
+  _i4.Future<List<int>> get last => (suc Map correctly', () async {
+      final dynamicData = <dynamic, dynamic>{
+        'a': 1,
+        'b': 2,
+        'c': 3,
+     
+  /// not known in advance. May not be assigned a negative value.
+  int? get contentLength => _contentLength;
+  int? _conten  void sendText(String s) {
+    if (_events.isClosed) {
+      throw WebSocketConnectionClosed();
+    }
+    _task
+     eceived.
+class IOStreamedResponse extends StreamedResponse {
   final HttpClientResponse? _inner;
 
-  /// Creates a new streaming response.
-  //  /// Terminates all active connections. If a client remains unclosed, the Dart
-  ///
+  /// Creates a new streaming seData.bodySink.add(data.bytes);
+  }
+
+  static URLRequest? _onRedirect(URLSession session, URLSessionTask task,
+    onst LineSplitter()
+          .bind(const Utf8Decoder().bind(response.stream))
+          .forEach((s) {
+        lastReceived = iThe reason phrase associated with the status code.
+  final String? reasonPhrase;
+
+  /// The size of the response body, in bytes.// the same server, you should use a single [Client] for all of those requests.
+///
+/// For more fine-grained control over the r test('GET with custom headers is preflighted', () async {
+        // If there is a preflight (OPTIONS) request, the server faildapter {
+  Http2Adapter(
+    ConnectionManager? connectionManager, {
+    HttpClientAdapter? fallbackAdapter,
+    this.onNotSuppo fm1.files.add(
+          MapEntry(
+            'files',
+            MultipartFile.fromBytes(
+              utf8.encode('hello wptions.receiveTimeout above the duration of $timeout or '
+            'improve the response time of the server.',
+      );
+
+  fa     onClientCreate: (url, config) {
+            config.validateCertificate = (certificate, host, port) {
+              approved// See also:
+///  - [QueuedInterceptorsWrapper], creates [QueuedInterceptor]s in ease.
+class InterceptorsWrapper extends Interc
+/// {@template dio.HttpClientAdapter}
+/// [HttpAdapter] is a bridge between [Dio] and [HttpClient].
+///
+/// [Dio] implements st final jsonHeaders = {'content-type': contentTypeJson};
+
+    try {
+      BaseOptions(contentType: contentType, headers: header'src/request_headers_tests.dart';
+import 'src/request_methods_tests.dart';
+import 'src/response_body_streamed_test.d    setState(() {
+                      print(r.data);
+                      _text = r.data!.replaceAll(RegExp(r'\s'), '');
+onst urlNotFound1 = '${urlNotFound}1';
+  const urlNotFound2 = '${urlNotFound}2';
+  const urlNotFound3 = '${urlNotFound}3';
+  fint'
+    show MelosLogger, MelosWorkspace, MelosWorkspaceConfig;
+import 'package:path/path.dart' as p;
+import 'package:pub_semver/ed by Cronet is documented here:
+  // https://developer.android.com/guide/topics/connectivity/cronet/lifecycle
+  return jb.UrlReSocket(writeHeaders: false);
+
+      final statusLine = (await clientQueue.next) as String;
+      socket.writeAll(
+  }
+//       if (options.onSendProgress != null) {
+//         debugLog(
+//           'onSendProgress cannot be used without a requ   httpClient.connectionTimeout! > Duration.zero) {
+          effectiveTimeout = httpClient.connectionTimeout!;
+     ring>> cronetHeaders) =>
+    cronetHeaders.map((key, value) => MapEntry(
+        key.toDartString(releaseOriginal: true).toLowelength);
+
+        // The cloned multipart files should be able to be read again.
+        expect(fm.files[0].value.isFinalized, tly initializes a new [Client] and closes that client once
+/// the request is complete. If you're planning on making multiple reqfinal engine = CronetEngine.build(
+          cacheMode: CacheMode.memory, cacheMaxSize: 1024 * 1024);
+      final client = Crone     .sendMessage(URLSessionWebSocketMessage.fromString('Hello World!'));
+      await task.receiveMessage();
+      task.cancelWi= value;
+      });
+      channel.sink.add(headers);
+
+      request.response.headers.set('Access-Control-Allow-Origin', '*');
+   nc {
+///   final socket = await CupertinoWebSocket.connect(
+///       Uri.parse('wss://ws.postman-echo.com/raw'));
+///
+///   socr.send();
+    }
+    return completer.future.whenComplete(() {
+      xhrs.remove(xhr);
+    });
+  }
+
+  /// Closes the client.
+  //channelFactory(uri);
+      await expectLater(() => channel.close(3000, 'a'.padLeft(124)),
+          throwsA(isA<ArgumentError>(_port != null) 'port': _port,
+      };
+}
+
+/// Describes details about an HTTP request.
+final class HttpProfileRequestData {
+  fiason: 'The XMLHttpRequest onError callback was called. '
+//               'This typically indicates an error on the network layeders: Headers.fromMap(
+        {HttpHeaders.setCookieHeader: mockFirstRequestCookies},
+      ),
+    );
+    cookieManager.onRespoaddAll(
+      [
+        /// Handles CSRF token
+        QueuedInterceptorsWrapper(
+          /// Adds CSRF token to headers, if ilued header. If
+  /// there is no header with the provided name, [:null:] will be
+  /// returned. If the header has more than onuest = MutableURLRequest.fromUrl(
+          Uri.parse('http://localhost:${server.port}'))
+        ..setValueForHttpHeaderField('le.
+
+/// An Android Flutter plugin that provides access to the
+/// [OkHttp](https://squnvalid argument: $code, clos

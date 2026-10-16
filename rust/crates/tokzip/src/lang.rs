@@ -247,16 +247,18 @@ fn add_gram_hits(doc: &[u8], rows: &mut [[i32; LANGUAGE_COUNT]], row_of: impl Fn
     if doc.len() < 4 {
         return;
     }
-    for pos in 0..doc.len() - 3 {
+    // Scale sampled hits so fence hints and switching retain their relative weights.
+    let stride = if doc.len() < WINDOW * 2 { 1 } else { 2 };
+    for pos in (0..doc.len() - 3).step_by(stride) {
         let mut mask = detection_mask(gram_hash(doc, pos));
         let row = &mut rows[row_of(pos)];
         // Subtracting misses differs from adding hits by a constant shared by every
         // language in the window, so both the Viterbi path and global argmax are unchanged.
         let delta = if mask.count_ones() as usize > LANGUAGE_COUNT / 2 {
             mask ^= (1 << LANGUAGE_COUNT) - 1;
-            -1
+            -(stride as i32)
         } else {
-            1
+            stride as i32
         };
         while mask != 0 {
             row[mask.trailing_zeros() as usize] += delta;

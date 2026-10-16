@@ -79,7 +79,7 @@ const MAX_VALIDATION_BYTES: usize = 1024 * 1024;
 /// Dmer length: the shortest fragment worth a dictionary reference (the coder's minimum match
 /// is 2, but references that short rarely beat literals).
 const DMER: usize = 8;
-const FREQ_BITS: u32 = 20;
+const FREQ_BITS: u32 = 24;
 /// Candidate segment sizes; the one whose dictionary codes the held-out documents smallest wins.
 const SEGMENT_SIZES: [usize; 5] = [64, 128, 256, 512, 1024];
 

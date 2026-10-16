@@ -7,7 +7,7 @@
 
 Lossless compressor for **prompts, LLM outputs, and source code** stored at rest — one
 function in, one function out, no compression options (only an optional decode length limit).
-The codec is Rust compiled to a single **wasm module (~1.15 MB, all 21 dictionaries and models
+The codec is Rust compiled to a single **wasm module (~1.14 MB, all 21 dictionaries and models
 included)** with a thin TypeScript wrapper; it runs on Node, Bun, and Cloudflare Workers.
 The module requires WebAssembly SIMD, which [Workers supports](https://developers.cloudflare.com/workers/runtime-apis/webassembly/#simd).
 
@@ -45,8 +45,8 @@ the closest one.
   most documents — counted over the public corpus and, for the languages it holds at least
   1 MiB of, the private production corpus, so every dictionary byte is a substring of a public document
   while the selection follows production usage; segment size picked by coding held-out
-  documents), price-based parse (a bounded
-  shortest-path over 4 KB chunks, not a global optimum), adaptive binary range coder
+  documents), price-based parse (a bounded shortest-path over 1 KB chunks, committing early
+  on long matches), adaptive binary range coder
   (LZMA-style symbol layout, terminated on the shortest representation of its final interval)
   whose literals are modeled by an order-2 context (128 trained classes of the previous byte
   × 32 of the one before) and whose models start from trained priors — short documents get
@@ -57,8 +57,9 @@ the closest one.
   dictionary are coded as absolute dictionary offsets, so the same fragment costs the same
   wherever it is referenced.
 - **Detection without a parser**: one table maps every 4-gram hash to the languages whose
-  dictionary contains it; the input is scored per 64-byte window (labeled code fences add a
-  hint), and a Viterbi pass with a switch penalty turns the scores into segments, whose
+  dictionary contains it; the input is scored per 64-byte window, sampling alternate positions
+  on documents of at least 128 bytes. Labeled code fences add a hint. A Viterbi pass with a
+  switch penalty turns the scores into segments, whose
   boundaries snap to the nearest line start. The table stores 16-bit indices into a palette
   of language sets; dense sets are scored by subtracting misses instead of adding hits. On mixed
   prose + code documents this codes ~4 pp smaller than the best single language. When the
@@ -92,16 +93,16 @@ compressed size as a percentage of the input:
 
 | documents  | tokzip    | brotli -11 | zstd -19 | gzip -9 |
 | ---------- | --------- | ---------- | -------- | ------- |
-| all        | **20.8%** | 26.3%      | 31.1%    | 31.9%   |
-| ≤ 1 KB     | **28.7%** | 47.6%      | 60.2%    | 61.1%   |
-| 1–4 KB     | **23.1%** | 33.9%      | 42.1%    | 42.2%   |
-| 4–16 KB    | **20.8%** | 25.8%      | 30.4%    | 31.2%   |
-| > 16 KB    | **19.1%** | 21.6%      | 24.5%    | 25.6%   |
-| ja-JP      | **24.9%** | 35.6%      | 42.8%    | 43.3%   |
-| zh-CN      | **26.5%** | 36.8%      | 45.3%    | 46.1%   |
-| typescript | **14.9%** | 17.7%      | 19.8%    | 20.6%   |
+| all        | **20.7%** | 26.3%      | 31.1%    | 31.9%   |
+| ≤ 1 KB     | **28.4%** | 47.6%      | 60.2%    | 61.1%   |
+| 1–4 KB     | **22.9%** | 33.9%      | 42.1%    | 42.2%   |
+| 4–16 KB    | **20.7%** | 25.8%      | 30.4%    | 31.2%   |
+| > 16 KB    | **19.0%** | 21.6%      | 24.5%    | 25.6%   |
+| ja-JP      | **24.8%** | 35.6%      | 42.8%    | 43.3%   |
+| zh-CN      | **26.4%** | 36.8%      | 45.3%    | 46.1%   |
+| typescript | **14.8%** | 17.7%      | 19.8%    | 20.6%   |
 | java       | **13.8%** | 23.3%      | 28.2%    | 28.6%   |
-| html       | **17.9%** | 21.3%      | 25.4%    | 26.1%   |
+| html       | **17.6%** | 21.3%      | 25.4%    | 26.1%   |
 
 Cloudflare Workers allow [128 MB per isolate and 10 ms of CPU per request on the free plan](https://developers.cloudflare.com/workers/platform/limits/).
 Dictionary initialization and larger documents can exceed the free CPU budget; local throughput
@@ -124,8 +125,8 @@ bun run train         # retrain dict/*.bin and priors/*.bin from ../tokzip-corpu
                       # a sibling ../tokzip-corpus-private checkout scores the training
 ```
 
-Layout: `rust/crates/tokzip` (codec: `lz.rs` parse + coder, `lang.rs` dictionaries +
-detection, `languages.rs` the language table, `train.rs` dictionary + priors trainer,
+Layout: `rust/crates/tokzip` (codec: `lz.rs` token coding + `lz/parse.rs` price-based search,
+`lang.rs` dictionaries + detection, `languages.rs` the language table, `train.rs` dictionary + priors trainer,
 `pack.rs` + `build.rs` asset packing), `rust/crates/tokzip-wasm` (C-ABI exports), `src/`
 (wrapper: `core.ts` over a compiled module, `index.ts` for Node and Bun, `workers.ts` for
 Cloudflare Workers), `dict/` (the wrapper, the code group's shared part, and each language's
