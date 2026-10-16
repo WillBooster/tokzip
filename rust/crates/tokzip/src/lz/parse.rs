@@ -16,7 +16,6 @@ struct Node {
     reps: [u32; 4],
 }
 
-#[derive(Clone)]
 struct StatePrices {
     literal: u32,
     short_rep: u32,
@@ -26,8 +25,7 @@ struct StatePrices {
 }
 
 impl StatePrices {
-    fn new(models: &DocModels, state: usize) -> Self {
-        let probs = &models.probs;
+    fn new(probs: &[u16], state: usize) -> Self {
         let mat = price_bit(probs[IS_MATCH + state], 1);
         let rep = mat + price_bit(probs[IS_REP + state], 1);
         let explicit = mat + price_bit(probs[IS_REP + state], 0);
@@ -36,14 +34,13 @@ impl StatePrices {
             short_rep: rep
                 + price_bit(probs[IS_REP_G0 + state], 0)
                 + price_bit(probs[IS_REP0_LONG + state], 0),
-            reps: std::array::from_fn(|idx| rep + models.price_rep_choice(state, idx)),
+            reps: std::array::from_fn(|idx| rep + price_rep_choice(probs, state, idx)),
             history: explicit + price_bit(probs[IS_DICT + state], 0),
             dictionary: explicit + price_bit(probs[IS_DICT + state], 1),
         }
     }
 }
 
-#[derive(Clone)]
 pub(super) struct ParsePrices {
     match_len: [u32; MATCH_MAX + 1],
     rep_len: [u32; MATCH_MAX + 1],
@@ -54,14 +51,14 @@ pub(super) struct ParsePrices {
 }
 
 impl ParsePrices {
-    fn new(models: &DocModels) -> Self {
+    pub(super) fn new(probs: &[u16]) -> Self {
         Self {
-            match_len: len_prices(&models.probs, LEN),
-            rep_len: len_prices(&models.probs, REP_LEN),
-            dict_len: len_prices(&models.probs, DICT_LEN),
-            states: std::array::from_fn(|state| StatePrices::new(models, state)),
-            history: DistPrices::new(models, HIST_DIST),
-            dictionary: DistPrices::new(models, DICT_OFF),
+            match_len: len_prices(probs, LEN),
+            rep_len: len_prices(probs, REP_LEN),
+            dict_len: len_prices(probs, DICT_LEN),
+            states: std::array::from_fn(|state| StatePrices::new(probs, state)),
+            history: DistPrices::new(probs, HIST_DIST),
+            dictionary: DistPrices::new(probs, DICT_OFF),
         }
     }
 }
@@ -97,7 +94,7 @@ pub(super) fn run_encode_optimal(
             .max_by_key(|&(idx, len)| {
                 (
                     len,
-                    std::cmp::Reverse(models.price_rep_choice(cs.state, idx)),
+                    std::cmp::Reverse(price_rep_choice(&models.probs, cs.state, idx)),
                 )
             });
         if let Some((idx, len)) = long_rep {
@@ -123,14 +120,12 @@ pub(super) fn run_encode_optimal(
         nodes[0].state = cs.state as u8;
         nodes[0].reps = cs.reps;
 
-        let base = models.base;
         let adapted;
         // At document start the frozen prices depend only on the immutable priors.
         let prices: &ParsePrices = if pos == 0 {
-            base.prices
-                .get_or_init(|| Box::new(ParsePrices::new(models)))
+            &mf.dict.index.prices
         } else {
-            adapted = ParsePrices::new(models);
+            adapted = ParsePrices::new(&models.probs);
             &adapted
         };
         let dlen = mf.dict.bytes.len();

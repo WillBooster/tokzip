@@ -100,7 +100,6 @@ pub type LitClasses = ([u8; 256], [u8; 256]);
 pub struct Models {
     own: Vec<u16>,
     literals: Arc<LiteralModels>,
-    prices: OnceLock<Box<ParsePrices>>,
 }
 
 pub struct LiteralModels {
@@ -124,7 +123,6 @@ impl Models {
         probs.shrink_to_fit();
         Self {
             own: probs,
-            prices: OnceLock::new(),
             literals: Arc::new(LiteralModels {
                 classes: lit_classes,
                 probs: literal_probs,
@@ -191,7 +189,6 @@ impl LiteralModels {
     pub fn with_language(self: &Arc<Self>, language: &[u8]) -> Models {
         assert_eq!(language.len(), LIT);
         Models {
-            prices: OnceLock::new(),
             own: language.iter().map(|&q| unquantize(q)).collect(),
             literals: Arc::clone(self),
         }
@@ -560,27 +557,25 @@ impl DocModels<'_> {
         }
         price
     }
+}
 
-    fn price_rep_choice(&self, state: usize, idx: usize) -> u32 {
-        let p = &self.probs;
-        if idx == 0 {
-            price_bit(p[IS_REP_G0 + state], 0) + price_bit(p[IS_REP0_LONG + state], 1)
+fn price_rep_choice(p: &[u16], state: usize, idx: usize) -> u32 {
+    if idx == 0 {
+        price_bit(p[IS_REP_G0 + state], 0) + price_bit(p[IS_REP0_LONG + state], 1)
+    } else {
+        let mut price = price_bit(p[IS_REP_G0 + state], 1);
+        if idx == 1 {
+            price += price_bit(p[IS_REP_G1 + state], 0);
         } else {
-            let mut price = price_bit(p[IS_REP_G0 + state], 1);
-            if idx == 1 {
-                price += price_bit(p[IS_REP_G1 + state], 0);
-            } else {
-                price += price_bit(p[IS_REP_G1 + state], 1)
-                    + price_bit(p[IS_REP_G2 + state], (idx == 3) as u32);
-            }
-            price
+            price += price_bit(p[IS_REP_G1 + state], 1)
+                + price_bit(p[IS_REP_G2 + state], (idx == 3) as u32);
         }
+        price
     }
 }
 
 /// Distance prices frozen for one parse chunk: full prices for values below `FULL_DIST`
 /// (slots with specialized trees) and slot + align prices beyond, per length state.
-#[derive(Clone)]
 struct DistPrices {
     full: [[u32; FULL_DIST]; NUM_LEN_TO_POS], // [len_state][value]
     slot: [[u32; 64]; NUM_LEN_TO_POS],
@@ -590,11 +585,11 @@ struct DistPrices {
 const FULL_DIST: usize = 1 << (END_POS_MODEL as usize >> 1);
 
 impl DistPrices {
-    fn new(models: &DocModels, group: usize) -> Self {
+    fn new(probs: &[u16], group: usize) -> Self {
         let (slot_base, spec_base, align_base) = dist_group(group);
         let mut slot = [[0u32; 64]; NUM_LEN_TO_POS];
         for (ls, row) in slot.iter_mut().enumerate() {
-            tree_prices(&models.probs, slot_base + ls * 64, 0, row);
+            tree_prices(probs, slot_base + ls * 64, 0, row);
         }
         // The footer bits of a value below `FULL_DIST` are priced independently of the length
         // state, so each value's footer price is computed once and added to every slot row.
@@ -606,7 +601,7 @@ impl DistPrices {
                 let footer = (sl >> 1) - 1;
                 let base = (2 | (sl & 1)) << footer;
                 footer_price = price_tree_reverse(
-                    &models.probs,
+                    probs,
                     spec_base + (base - sl) as usize,
                     footer,
                     value - base,
@@ -618,7 +613,7 @@ impl DistPrices {
         }
         let mut align = [0u32; 1 << ALIGN_BITS];
         for (v, price) in align.iter_mut().enumerate() {
-            *price = price_tree_reverse(&models.probs, align_base, ALIGN_BITS, v as u32);
+            *price = price_tree_reverse(probs, align_base, ALIGN_BITS, v as u32);
         }
         Self { full, slot, align }
     }
@@ -869,8 +864,8 @@ impl Chains {
     }
 }
 
-/// Match candidates of a static dictionary: the positions of every 4-byte hash bucket, in
-/// ascending order, laid out back to back (`positions[offsets[h]..offsets[h + 1]]`), so a walk
+/// Initial token prices and match candidates for a static dictionary: every 4-byte hash
+/// bucket's positions in ascending order, laid out back to back (`positions[offsets[h]..offsets[h + 1]]`), so a walk
 /// reads them sequentially — cheapest offsets first, which is also where the trainer puts the
 /// most valuable fragments — instead of chasing a chain through memory; plus the lowest
 /// position of every 3-byte hash.
@@ -879,10 +874,11 @@ pub struct DictIndex {
     offsets: Vec<u32>,
     positions: Vec<u32>,
     head3: Vec<i32>,
+    prices: Box<ParsePrices>,
 }
 
 impl DictIndex {
-    fn new(bytes: &[u8]) -> Self {
+    fn new(bytes: &[u8], models: &Models) -> Self {
         let bits = hash4_bits(bytes.len());
         let count4 = bytes.len().saturating_sub(3);
         // Counting sort by bucket: counts land two slots up so that, after the prefix sum,
@@ -911,6 +907,7 @@ impl DictIndex {
             offsets,
             positions,
             head3,
+            prices: Box::new(ParsePrices::new(&models.own)),
         }
     }
 
@@ -948,7 +945,7 @@ impl Primed {
         let base = Models::new(lit_classes);
         let mut models = DocModels::new(&base);
         let mut state = CoderState::new();
-        let empty = Primed::new(Vec::new(), Models::new(lit_classes));
+        let empty = Primed::new(Vec::new(), base.clone());
         let mut mf = MatchFinder {
             win: Window {
                 doc: &bytes,
@@ -976,7 +973,8 @@ impl Primed {
     }
 
     fn index(&self) -> &DictIndex {
-        self.index.get_or_init(|| DictIndex::new(&self.bytes))
+        self.index
+            .get_or_init(|| DictIndex::new(&self.bytes, &self.models))
     }
 }
 
