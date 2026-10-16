@@ -10,6 +10,7 @@ test('names a failed round-trip row and stops without reporting it as a measurem
   expect(result.stderr).toContain('/decompress/ts-source-4k');
   expect(result.stderr).toContain('failed round trip');
   expect(result.stdout).not.toContain('"path":"/decompress/ts-source-4k');
+  expect(result.stdout.trim().split('\n')).toHaveLength(5);
 }, 15_000);
 
 test('reports fresh-instance CPU only after isolate startup has been excluded', async () => {
