@@ -34,7 +34,7 @@ const HASH3_BITS: u32 = 15;
 const MAX_DIST_LEN3: usize = 1 << 14;
 const SEARCH_DEPTH: usize = 32;
 const DICT_SEARCH_DEPTH: usize = 64;
-const NICE_LEN: usize = 48;
+const NICE_LEN: usize = 32;
 const EMPTY: i32 = -1;
 
 // ---------------------------------------------------------------------------
