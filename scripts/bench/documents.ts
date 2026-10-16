@@ -7,6 +7,7 @@ export interface Doc {
   language: string;
   bucket: string;
   content: string;
+  location: string;
   bytes: number;
 }
 
@@ -18,16 +19,23 @@ const BUCKETS: [number, string][] = [
 ];
 
 export function loadBenchDocs(inputPath?: string): Doc[] {
-  if (inputPath) {
-    return readFileSync(inputPath, 'utf8')
-      .split(/\r?\n/)
-      .filter((line) => line.trim())
-      .map((content) => {
-        JSON.parse(content);
-        return document(content, 'input', 'json');
-      });
-  }
+  if (inputPath) return inputDocs(inputPath);
   return corpusDirs().flatMap((root) => readdirLanguages(root).flatMap((language) => languageDocs(root, language)));
+}
+
+function inputDocs(file: string): Doc[] {
+  const docs: Doc[] = [];
+  for (const [index, content] of readFileSync(file, 'utf8').split(/\r?\n/).entries()) {
+    if (!content.trim()) continue;
+    const location = `${file}:${index + 1}`;
+    try {
+      JSON.parse(content);
+    } catch {
+      throw new Error(`${location}: expected one complete JSON value`);
+    }
+    docs.push(document(content, 'input', 'json', location));
+  }
+  return docs;
 }
 
 function languageDocs(root: string, language: string): Doc[] {
@@ -39,15 +47,16 @@ function languageDocs(root: string, language: string): Doc[] {
     if (!line.trim()) continue;
     const entry = manifestEntrySchema.parse(JSON.parse(line));
     if (entry.split === 'bench') {
-      docs.push(document(readFileSync(join(dir, entry.file), 'utf8'), basename(dirname(root)), language));
+      const file = join(dir, entry.file);
+      docs.push(document(readFileSync(file, 'utf8'), basename(dirname(root)), language, file));
     }
   }
   return docs;
 }
 
-function document(content: string, corpus: string, language: string): Doc {
+function document(content: string, corpus: string, language: string, location: string): Doc {
   const bytes = Buffer.byteLength(content);
-  return { content, corpus, language, bytes, bucket: BUCKETS.find(([limit]) => bytes <= limit)![1] };
+  return { content, corpus, language, location, bytes, bucket: BUCKETS.find(([limit]) => bytes <= limit)![1] };
 }
 
 function readdirLanguages(corpusDir: string): string[] {

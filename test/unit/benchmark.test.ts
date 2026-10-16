@@ -22,7 +22,7 @@ const groupSchema = z.object({
   }),
 });
 
-test('benchmarks complete JSON records and reports grouped latency without copying their content', () => {
+test('benchmarks JSONL records and identifies invalid input without copying content', () => {
   mkdirSync('.tmp', { recursive: true });
   const directory = mkdtempSync('.tmp/benchmark-');
   try {
@@ -64,6 +64,14 @@ test('benchmarks complete JSON records and reports grouped latency without copyi
     const serialized = readFileSync(output, 'utf8');
     expect(serialized).not.toContain('read_file');
     expect(report.corpusFingerprint).toMatch(/^[a-f\d]{64}$/);
+    writeFileSync(input, `${documents[0]}\r\n\r\n{"text":"DO_NOT_INCLUDE_RECORD"\r\n`);
+    const failure = spawnSync(process.execPath, ['scripts/bench/bench.ts', '--codec-only', '--input', input], {
+      encoding: 'utf8',
+    });
+    expect(failure.status).not.toBe(0);
+    expect(failure.stderr).toContain(`${input}:3`);
+    expect(failure.stderr).not.toContain('DO_NOT_INCLUDE_RECORD');
+    expect(failure.stdout).not.toContain('round-trip:');
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

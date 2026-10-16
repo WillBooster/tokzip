@@ -94,7 +94,7 @@ function measureDocuments(docs: Doc[], methods: Method[], repeat: number): Map<s
       const restored = decompress(frame);
       timings.decompress.push(performance.now() - compressed);
       timings.compress.push(compressed - started);
-      if (restored !== doc.content) throw new Error(`tokzip round-trip mismatch on a ${doc.language} document`);
+      if (restored !== doc.content) throw new Error(`tokzip round-trip mismatch at ${doc.location}`);
     }
     const sizes: Record<string, number> = { tokzip: frame.length };
     for (const method of methods) sizes[method.name] = method.compress(doc.content).length;
