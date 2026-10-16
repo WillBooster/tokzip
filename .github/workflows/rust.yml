@@ -52,21 +52,3 @@ jobs:
           path: rust/target/wasm32-unknown-unknown/release/tokzip_wasm.wasm
           retention-days: 1
           if-no-files-found: ignore
-      - name: Build alternative profiles for reproducibility diagnosis
-        if: failure()
-        run: |
-          mkdir -p ../.tmp/profile-wasm
-          for opt in 2 3; do
-            for lto in fat thin false; do
-              CARGO_PROFILE_RELEASE_OPT_LEVEL="$opt" CARGO_PROFILE_RELEASE_LTO="$lto" CARGO_TARGET_DIR=../.tmp/profile-target cargo build --locked --release --target wasm32-unknown-unknown -p tokzip-wasm
-              cp ../.tmp/profile-target/wasm32-unknown-unknown/release/tokzip_wasm.wasm "../.tmp/profile-wasm/opt-$opt-lto-$lto.wasm"
-            done
-          done
-      - name: Upload alternative profile modules
-        if: failure()
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: profile-wasm
-          path: .tmp/profile-wasm/*.wasm
-          retention-days: 1
-          if-no-files-found: ignore
