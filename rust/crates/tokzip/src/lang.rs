@@ -82,11 +82,7 @@ pub fn primed(lang: u8) -> &'static Primed {
     })
 }
 
-pub fn packed_literal_priors(language: u8) -> &'static [u8] {
-    GROUP_PRIORS[LANGUAGES[usize::from(language)].1 as usize]
-}
-
-pub(super) fn language_models(lang: u8) -> Models {
+fn language_models(lang: u8) -> Models {
     static LITERALS: [OnceLock<Arc<LiteralModels>>; Group::ALL.len()] =
         [const { OnceLock::new() }; Group::ALL.len()];
     let (_, group) = LANGUAGES[lang as usize];
