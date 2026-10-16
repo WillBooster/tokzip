@@ -51,7 +51,7 @@ async function runDriver(mode: 'mismatch' | 'cold'): Promise<{ code: number; std
       });
     },
   });
-  const child = Bun.spawn(['node', 'bench/cloudflare/measure.ts', server.url.href, 'test/fixtures/benchmarkTail.mjs'], {
+  const child = Bun.spawn(['node', 'bench/cloudflare/measure.ts', server.url.href, 'test/helpers/benchmarkTail.mjs'], {
     env: { ...process.env, TOKZIP_BENCHMARK_EVENTS: eventFile },
     stdout: 'pipe',
     stderr: 'pipe',

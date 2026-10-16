@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, watch } from 'node:fs';
 
 const file = process.env.TOKZIP_BENCHMARK_EVENTS;
-assert(file);
+assert.ok(file);
 let offset = 0;
 const watcher = watch(file, flush);
 flush();
