@@ -40,6 +40,19 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --locked --all-targets --all-features -- -D warnings
       - run: cargo test --locked --release --all-features
+      - name: Diagnose cross-host code generation
+        run: |
+          mkdir -p ../.tmp/profile-wasm
+          for profile in 3-false-1 3-thin-1 3-fat-1 2-false-1 2-thin-1 2-fat-1 3-false-16 3-thin-16; do
+            IFS=- read -r opt lto units <<< "$profile"
+            CARGO_PROFILE_RELEASE_OPT_LEVEL="$opt" CARGO_PROFILE_RELEASE_LTO="$lto" CARGO_PROFILE_RELEASE_CODEGEN_UNITS="$units" cargo build --locked --release --target wasm32-unknown-unknown -p tokzip-wasm
+            cp target/wasm32-unknown-unknown/release/tokzip_wasm.wasm "../.tmp/profile-wasm/$profile.wasm"
+          done
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: profile-wasm
+          path: .tmp/profile-wasm
+          retention-days: 1
       - name: Verify the committed wasm module matches the sources
         run: |
           cargo build --locked --release --target wasm32-unknown-unknown -p tokzip-wasm
