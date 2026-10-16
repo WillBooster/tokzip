@@ -27,18 +27,18 @@ describe('malformed frames', () => {
   });
 
   test('a forged coded body is rejected, not a trap', () => {
-    // A valid header (version 1, single segment, 2 bytes, zero CRC, language 0) over a body
+    // A valid header (version 2, single segment, 2 bytes, zero CRC, language 0) over a body
     // crafted to code a match whose distance overflows 32-bit arithmetic: on the wasm32 build
     // `distance as usize + 1` used to wrap to 0 and trap the module.
     const forged = Uint8Array.from(
-      'd4020000000000b8a0572bfffc54be70'.match(/../g)!.map((byte) => Number.parseInt(byte, 16))
+      'd8020000000000c483b4ebffffed'.match(/../g)!.map((byte) => Number.parseInt(byte, 16))
     );
     expect(() => decompress(forged)).toThrow(TokzipDecodeError);
   });
 
   test('other format versions are rejected, never misdecoded', () => {
     const frame = compress(SAMPLE);
-    for (const version of [0, 3]) {
+    for (const version of [0, 1, 3]) {
       const other = Uint8Array.from(frame);
       other[0] = (other[0]! & ~(3 << 2)) | (version << 2);
       expect(() => decompress(other)).toThrow(/unsupported format version/);
