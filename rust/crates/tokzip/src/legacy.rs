@@ -25,10 +25,10 @@ pub fn primed(language: u8) -> &'static Primed {
         let group = usize::from(GROUP_IDS[usize::from(language)]);
         let literals = LITERALS[group].get_or_init(|| {
             let base = GROUP_BASES[group] as u8;
-            let current = lang::primed(base);
+            let models = lang::language_models(base);
             let raw = restore(
                 &GROUP_PRIORS[group],
-                &current.models,
+                &models,
                 lang::packed_literal_priors(base),
             );
             LiteralModels::from_packed(&raw)
