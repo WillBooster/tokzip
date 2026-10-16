@@ -38,7 +38,7 @@ describe('malformed frames', () => {
 
   test('other format versions are rejected, never misdecoded', () => {
     const frame = compress(SAMPLE);
-    for (const version of [0, 2, 3]) {
+    for (const version of [0, 3]) {
       const other = Uint8Array.from(frame);
       other[0] = (other[0]! & ~(3 << 2)) | (version << 2);
       expect(() => decompress(other)).toThrow(/unsupported format version/);

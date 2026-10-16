@@ -7,8 +7,9 @@
 
 Lossless compressor for **prompts, LLM outputs, and source code** stored at rest — one
 function in, one function out, no compression options (only an optional decode length limit).
-The codec is Rust compiled to a single **wasm module (~1.14 MB, all 21 dictionaries and models
-included)** with a thin TypeScript wrapper; it runs on Node, Bun, and Cloudflare Workers.
+The codec is Rust compiled to a single **wasm module (~1.82 MB, with 21 current dictionaries
+and models plus retained v1 assets)** with a thin TypeScript wrapper; it runs on Node, Bun,
+and Cloudflare Workers.
 The module requires WebAssembly SIMD, which [Workers supports](https://developers.cloudflare.com/workers/runtime-apis/webassembly/#simd).
 
 ```ts
@@ -27,9 +28,9 @@ decompress(untrustedFrame, { maxLength: 8 * 1024 * 1024 }); // throws instead of
   `nodejs_compat` compatibility flag. The first call in an isolate decodes the dictionary of
   each language it uses and initializes shared model priors lazily; later calls reuse them.
   First-use CPU depends on the languages and the runtime, so measure it separately from warm calls.
-- `FORMAT_VERSION` is the version `compress` writes. During pre-release development, this
-  number does not distinguish dictionary/prior revisions; see [FORMAT.md](FORMAT.md).
-  `TokzipDecodeError` carries a numeric `code`.
+- `FORMAT_VERSION` is 2: `compress` writes v2 frames and `decompress` reads v1 and v2.
+  The v1.0.0 generation's dictionaries and priors are retained, so stored v1 frames remain
+  readable. `TokzipDecodeError` carries a numeric `code`. See [FORMAT.md](FORMAT.md).
 
 There is nothing to configure: the encoder **detects the language of the input itself,
 segment by segment** — a Japanese prompt, a Markdown answer with an HTML block whose
@@ -79,11 +80,10 @@ the closest one.
   bounds a frame's expansion only relative to its size (a small frame of repetitive content
   legitimately expands thousands of times), so pass `maxLength` when decompressing frames from
   an untrusted source.
-- **Format v1**: decoding rules, dictionaries, and priors define a codec generation. Encoder
-  search and implementation optimizations can evolve without changing those rules. This is
-  still a pre-release format: retraining currently replaces v1 assets and invalidates frames
-  from earlier development builds. Released generations will need distinct versions and
-  retained decoders before assets can change. See [FORMAT.md](FORMAT.md).
+- **Versioned storage**: decoding rules, dictionaries, and priors define a codec generation.
+  Encoder search can improve within a generation. Retraining requires a new version and a
+  retained decoder for every released generation. Both generations share the token grammar;
+  the module restores v1 assets lazily from deltas against the current assets. See [FORMAT.md](FORMAT.md).
 
 ## Results
 
@@ -127,7 +127,7 @@ bun run train         # retrain dict/*.bin and priors/*.bin from ../tokzip-corpu
 
 Layout: `rust/crates/tokzip` (codec: `lz.rs` token coding + `lz/parse.rs` price-based search,
 `lang.rs` dictionaries + detection, `languages.rs` the language table, `train.rs` dictionary + priors trainer,
-`pack.rs` + `build.rs` asset packing), `rust/crates/tokzip-wasm` (C-ABI exports), `src/`
+`pack.rs` + `build.rs` asset packing, `legacy.rs` v1 asset restoration), `rust/crates/tokzip-wasm` (C-ABI exports), `src/`
 (wrapper: `core.ts` over a compiled module, `index.ts` for Node and Bun, `workers.ts` for
 Cloudflare Workers), `dict/` (the wrapper, the code group's shared part, and each language's
 suffix) and `priors/` (each group's packed literal priors and each language's own model
