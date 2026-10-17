@@ -208,23 +208,10 @@ pub fn segments(content: &[u8]) -> Vec<(usize, u8)> {
         .collect()
 }
 
-/// Codes `content` with the detected per-segment languages and returns the smallest whole
-/// frame. A confident single-language detection (its one segment is the strongest gram-match
-/// language) is coded as detected. Otherwise — a multi-segment split, or a single language that
-/// is not the strongest dictionary match (the fence-hint-overwhelm case) — the input is also
-/// coded as a single segment of the strongest gram-match language and the smaller payload
-/// (body plus segment table) wins: multi-segment documents of 5-30 KB coded 1-4% larger as
-/// detected than as their best single language, and the winner was always the top gram
-/// candidate (further candidates changed nothing measurable).
-///
-/// The alternative costs a full second parse, so above twice `TRIAL_LEN` (where two prefix
-/// parses plus one full parse are cheaper than two full parses) both candidates are only
-/// compared on the document's first `TRIAL_LEN` bytes and the winner codes the whole document:
-/// the comparison then costs a bounded ~2 ms instead of a full second parse (the winner's full
-/// parse is the one the document needs anyway), and the prefix's choice codes the corpus
-/// within 0.03 pp of the full comparison.
+// Two prefix trials plus the chosen full encode process fewer input bytes than two
+// full encodes only when the document exceeds twice the trial length.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
-    const TRIAL_LEN: usize = 8 * 1024;
+    const TRIAL_LEN: usize = 2 * 1024;
     let (detected, gram_scores) = lang::analyze(content);
     let top = lang::top_language(&gram_scores);
     if detected.len() == 1 && detected[0].lang == top {
