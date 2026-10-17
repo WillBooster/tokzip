@@ -208,8 +208,8 @@ pub fn segments(content: &[u8]) -> Vec<(usize, u8)> {
         .collect()
 }
 
-// A split can cost more than it saves on mixed documents. Compare it against the strongest
-// dictionary match, using a bounded prefix for larger inputs to limit duplicate parsing.
+// Two prefix trials plus the chosen full encode process fewer input bytes than two
+// full encodes only when the document exceeds twice the trial length.
 fn best_segmentation(content: &[u8]) -> (Vec<Segment>, Vec<u8>) {
     const TRIAL_LEN: usize = 2 * 1024;
     let (detected, gram_scores) = lang::analyze(content);
