@@ -65,7 +65,7 @@ the closest one.
   prose + code documents this codes ~4 pp smaller than the best single language. When the
   split is uncertain (several segments, or a single language that is not the strongest
   dictionary match) the encoder also codes the document as one segment of the strongest
-  match and keeps the smaller — comparing the two on the first 8 KB only above 16 KB, so
+  match and keeps the smaller — comparing the two on the first 2 KB only above 4 KB, so
   the amount of trial input stays bounded. Identical trial segmentations are encoded only once
   as the selected full document.
 - **Storage-grade**: every frame carries a CRC-32 of its content, `compress` decodes
