@@ -17,7 +17,8 @@ in the current asset directories. When introducing new assets, preserve the froz
 set separately and keep its hash checks; do not replace the recorded hashes with new values.
 `test/fixtures/format2Languages.json` contains independent single-segment reference frames
 for every language ID, encoded with that language's dictionary and priors at the same revision.
-`test/fixtures/format2.json` also covers stored, multi-segment, and blocked frames.
+`test/fixtures/format2.json` also covers empty and nonempty stored frames, multi-segment frames,
+and blocked frames with coded and stored blocks.
 Keep these fixtures unchanged and run them against the public decoder in every release.
 
 The reference implementation is `rust/crates/tokzip`. All multi-byte integers are little-endian;

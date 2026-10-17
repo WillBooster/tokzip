@@ -124,8 +124,7 @@ bun install
 bun run build         # rust → wasm/tokzip.wasm (committed; rebuild after codec changes), then builds dist/
 bun test              # round-trip and resilience tests through the wasm build
 cargo test --release --manifest-path rust/Cargo.toml
-bun run train         # retrain dict/*.bin and priors/*.bin from ../tokzip-corpus (then build);
-                      # a sibling ../tokzip-corpus-private checkout scores the training
+bun run train         # new-format development only: read FORMAT.md before overwriting frozen assets
 ```
 
 Layout: `rust/crates/tokzip` (codec: `lz.rs` token coding + `lz/parse.rs` price-based search,

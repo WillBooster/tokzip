@@ -11,11 +11,13 @@ test('preserves every format-2 dictionary and trained prior', () => {
       .filter((name) => name.endsWith('.bin'))
       .map((name) => `${directory}/${name}`)
   );
-  expect(paths.toSorted()).toEqual(Object.keys(assets.sha256).toSorted());
+  expect(paths.toSorted(), 'Format-2 asset set changed; preserve frozen assets. See FORMAT.md.').toEqual(
+    Object.keys(assets.sha256).toSorted()
+  );
   for (const [path, expected] of Object.entries(assets.sha256)) {
     const actual = createHash('sha256')
       .update(readFileSync(new URL(path, root)))
       .digest('hex');
-    expect(actual, path).toBe(expected);
+    expect(actual, `${path}: format-2 asset changed; preserve frozen assets. See FORMAT.md.`).toBe(expected);
   }
 });

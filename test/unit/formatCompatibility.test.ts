@@ -9,6 +9,7 @@ interface ReferenceFrame {
   repeat: number;
   frame: string;
   id?: number;
+  suffix?: string;
 }
 
 const referenceFrames: ReferenceFrame[] = [...fixtures, ...languages];
@@ -19,7 +20,7 @@ test('keeps one reference frame for every format-2 language ID', () => {
 
 for (const fixture of referenceFrames) {
   test(`reads a frozen format-2 frame: ${fixture.name}`, () => {
-    const expected = fixture.text.repeat(fixture.repeat);
+    const expected = fixture.text.repeat(fixture.repeat) + (fixture.suffix ?? '');
     const frame = Buffer.from(fixture.frame, 'base64');
     if (fixture.id !== undefined) {
       expect(frame[0]).toBe(0xD8);
