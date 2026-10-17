@@ -28,8 +28,11 @@ decompress(untrustedFrame, { maxLength: 8 * 1024 * 1024 }); // throws instead of
   `nodejs_compat` compatibility flag. The first call in an isolate decodes the dictionary of
   each language it uses and initializes shared model priors lazily; later calls reuse them.
   First-use CPU depends on the languages and the runtime, so measure it separately from warm calls.
-- `FORMAT_VERSION` is 2: `compress` and `decompress` use the current format only.
-  Earlier builds are not supported. `TokzipDecodeError` carries a numeric `code`. See [FORMAT.md](FORMAT.md).
+- `FORMAT_VERSION` is 2. Future package releases will retain decoding support for format 2,
+  including its dictionaries and trained model priors. A future format can improve compression
+  for new writes without requiring existing records to be recompressed. Earlier experimental
+  formats are not supported. `TokzipDecodeError` carries a numeric `code`. See [FORMAT.md](FORMAT.md)
+  for the wire specification and compatibility rules.
 
 There is nothing to configure: the encoder **detects the language of the input itself,
 segment by segment** — a Japanese prompt, a Markdown answer with an HTML block whose

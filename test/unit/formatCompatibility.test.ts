@@ -1,8 +1,9 @@
 import { expect, test } from 'bun:test';
 import { decompress } from '../../src/index.ts';
 import fixtures from '../fixtures/format2.json';
+import languages from '../fixtures/format2Languages.json';
 
-for (const fixture of fixtures) {
+for (const fixture of [...fixtures, ...languages]) {
   test(`reads a frozen format-2 frame: ${fixture.name}`, () => {
     const expected = fixture.text.repeat(fixture.repeat);
     const frame = Buffer.from(fixture.frame, 'base64');
