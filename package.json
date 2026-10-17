@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/WillBooster/tokzip.git"
   },
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "author": "WillBooster Inc.",
   "type": "module",
   "exports": {
@@ -31,9 +31,20 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist/",
-    "src/",
-    "wasm/"
+    "dist/core.d.ts",
+    "dist/core.js",
+    "dist/core.js.map",
+    "dist/index.d.ts",
+    "dist/index.js",
+    "dist/index.js.map",
+    "src/core.ts",
+    "src/index.ts",
+    "src/wasm.d.ts",
+    "src/workers.ts",
+    "wasm/tokzip.wasm",
+    "FORMAT.md",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES/"
   ],
   "scripts": {
     "bench": "bun scripts/bench/bench.ts",
@@ -73,5 +84,8 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
+  },
+  "patchedDependencies": {
+    "braces@3.0.3": "patches/braces@3.0.3.patch"
   }
 }

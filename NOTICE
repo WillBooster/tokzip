@@ -1,0 +1,20 @@
+tokzip
+Copyright 2026 WillBooster Inc.
+
+Original tokzip code is licensed under the Apache License, Version 2.0.
+
+The dictionaries embedded in wasm/tokzip.wasm and stored in dict/ contain
+selected, concatenated and truncated fragments of third-party public training
+documents. These fragments remain subject to their upstream licenses. The
+source repository pins and upstream license, copyright and NOTICE files are
+provided in THIRD_PARTY_NOTICES/index.json and the directories it identifies.
+The handcrafted wrapper dictionary is original tokzip content.
+
+The Wasm module also incorporates crc32fast, cfg-if, and the Rust standard
+library, including compiler-builtins and libm. Their license and copyright
+material is provided under THIRD_PARTY_NOTICES/. The Rust notice catalog is
+rendered as plain text from the pinned toolchain and includes components for
+other targets that may not be linked into this module. Upstream Markdown
+notice files have a .txt suffix to preserve them without project formatting.
+
+The Apache-2.0 license for tokzip does not replace any third-party terms.
