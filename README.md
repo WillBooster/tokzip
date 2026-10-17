@@ -116,7 +116,16 @@ line is one complete JSON value, compressed as written, without the line separat
 only the supplied file. Reports contain aggregate measurements and fingerprints, not the input
 records.
 
+## License
+
+Original tokzip code is licensed under [Apache-2.0](LICENSE). Embedded dictionary fragments
+and compiled dependencies retain their upstream terms. Redistributors must retain the
+accompanying [NOTICE](NOTICE) and [third-party license material](THIRD_PARTY_NOTICES/index.json).
+
 ## Development
+
+Read the [dependency patch notes](https://github.com/WillBooster/tokzip/blob/main/patches/README.md)
+before updating the patched development dependencies.
 
 ```bash
 mise install          # bun, node, rust (+ wasm32-unknown-unknown)
