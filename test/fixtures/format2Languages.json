@@ -1,0 +1,149 @@
+[
+  {
+    "name": "text",
+    "id": 0,
+    "text": ":: || ## @@ ** -- ++ == %% ~~ ;; [[ ]] (( )) {{ }} 0123456789\n",
+    "repeat": 3,
+    "frame": "2LoBVKoPagBDWFOYEYL90ZsyQuZ3N7yTLEI5yIK388D7lhZbeARmQxsmTOAPFgZ4ifW+TOZG1HOSmVzv+976"
+  },
+  {
+    "name": "en-US",
+    "id": 1,
+    "text": "The archive stores each document independently. Restore the original text before updating the record. Compression preserves every character and line break.\n",
+    "repeat": 3,
+    "frame": "2NQDT2JV1gFr6oGPBJvhXxroMMz8yzP3CrWB+SHxR+q7baJdf8kJfnepQXkD6YLscwYBBSUa4H6TgrktdCiH/XnNnsE="
+  },
+  {
+    "name": "ja-JP",
+    "id": 2,
+    "text": "この文書は圧縮して保存されます。読み取り時には元の内容を完全に復元します。言語を自動判定し、改行と文字を保持します。\n",
+    "repeat": 3,
+    "frame": "2I0EjZ1KwALLXxsdMF415fj0R7ig/hxUGKp2mRv6MS6+mjnPPDX0WJL3jI0zWSPZNgRZkyBcr2ZCy/m8IejiIT4e76t/A1CKPWvWNHE="
+  },
+  {
+    "name": "html",
+    "id": 3,
+    "text": "<!doctype html>\n<html lang=\"en\"><head><title>Archive</title></head><body><main><h1>Documents</h1><p>Restore the original content.</p></main></body></html>\n",
+    "repeat": 3,
+    "frame": "2NEDGpXMvgP8e4FDQlrMPTnjg6CqYIvVfIDFZaCXksYl7/t2bIoo9cbP8R5CT43TreH2QUuNj5Qje9LnQwK3Wqsqng=="
+  },
+  {
+    "name": "css",
+    "id": 4,
+    "text": ".archive { display: flex; flex-direction: column; padding: 16px; background-color: #ffffff; }\n.archive:hover { color: #333333; border-radius: 8px; }\n",
+    "repeat": 3,
+    "frame": "2L8D/v4CmwQC0cH8BWRneSnv5dBypY4Tuz0awQ4FNKFRNiAFd1zSVcUzZCglO+fJBnujE4/UM9k="
+  },
+  {
+    "name": "javascript",
+    "id": 5,
+    "text": "export async function loadArchive(path) { const response = await fetch(path); if (!response.ok) throw new Error(\"Archive unavailable\"); return await response.json(); }\n",
+    "repeat": 3,
+    "frame": "2PgDEkrEeQXe9H8bOW4fy/eQs5n1rFhod0pUrP8GM7eS4kJEvM7zRc4RAxrZldVuY3n63iABERICr/ia4VGwebGr7A=="
+  },
+  {
+    "name": "typescript",
+    "id": 6,
+    "text": "export interface ArchiveEntry { id: string; content: string; }\nexport function restoreArchive(entries: ReadonlyArray<ArchiveEntry>): Map<string, string> { return new Map(entries.map((entry) => [entry.id, entry.content])); }\n",
+    "repeat": 3,
+    "frame": "2KAF2g8Q9gb2pzA2iTUHSCgLh4F4kU6GgKb+cH+5yg0LHwxsNyJnULmnJj4pgtafhlYrUZ1Zz9UaSHC4CSixtpVisEWbhmreArX13HRTHDOF/w=="
+  },
+  {
+    "name": "c",
+    "id": 7,
+    "text": "#include <stdio.h>\n#include <stdlib.h>\nint main(void) { const char *message = \"archive\"; printf(\"%s\\n\", message); return EXIT_SUCCESS; }\n",
+    "repeat": 3,
+    "frame": "2JsD6ysdBAf5UTuvWO9A8uKZg6AbyEWjeSE3Iv7SVnZl5A8C9sA0EINy55voxv3YI47NCA=="
+  },
+  {
+    "name": "cpp",
+    "id": 8,
+    "text": "#include <iostream>\n#include <vector>\n#include <string>\nint main() { std::vector<std::string> entries{\"archive\", \"document\"}; for (const auto& entry : entries) { std::cout << entry << std::endl; } return 0; }\n",
+    "repeat": 3,
+    "frame": "2PMEAPtGYgjzP69/pAsByfl6Ot/X9hmZ9aZQkHw76f4cSzhx3hxXXw2tbjICSKXN6+ZwE5XIuTdKYmHQlzJMKTCqo7MtG1AS"
+  },
+  {
+    "name": "csharp",
+    "id": 9,
+    "text": "using System;\nusing System.Collections.Generic;\npublic class Archive { public static void Main(string[] args) { var entries = new List<string> { \"archive\", \"document\" }; foreach (var entry in entries) { Console.WriteLine(entry); } } }\n",
+    "repeat": 3,
+    "frame": "2MEFofZzZgn5vzdA3Cv5R/Ox330fEc/ncRTrZbhXHfeVI9S+yftTW012lPv6MUYyTjykxWCkjKsz92hBSARNEeuleWlDca5r05kbko+K"
+  },
+  {
+    "name": "dart",
+    "id": 10,
+    "text": "import \"dart:convert\";\nFuture<void> main() async { final entries = <String>[\"archive\", \"document\"]; for (final entry in entries) { print(jsonEncode({\"content\": entry})); } }\n",
+    "repeat": 3,
+    "frame": "2IoE/q1HXQrau0pXGf4fjm0GiWUfkidJsnqaTmRtiKGgh5o1gokVsf8XtegHBlvnno4ZYFhQx9p3CFavFNYcl00AnfUCjZO2YaY="
+  },
+  {
+    "name": "haskell",
+    "id": 11,
+    "text": "module Main where\nimport Data.List (intercalate)\nrestore :: [String] -> String\nrestore entries = intercalate \"\\n\" entries\nmain :: IO ()\nmain = putStrLn $ restore [\"archive\", \"document\"]\n",
+    "repeat": 3,
+    "frame": "2K4EYZdMQAv3oHChVpb/fiKIJ44aXwmG804pARpXogiyluOp18SU/bs6fXvaJd5sIJXTV6YFhFMUVp6YGbU="
+  },
+  {
+    "name": "java",
+    "id": 12,
+    "text": "import java.util.List;\npublic class Archive { public static void main(String[] args) { List<String> entries = List.of(\"archive\", \"document\"); for (String entry : entries) { System.out.println(entry); } } }\n",
+    "repeat": 3,
+    "frame": "2OoEdv3wggz3dXkKrpThRYhSpAKc0CTYbit7htmTWrsa++gZbAZcVzCk6HA/4kvE3Z5i7s4tJtJSUl5ySYl38MgtWEE8RBHgJw=="
+  },
+  {
+    "name": "jsp",
+    "id": 13,
+    "text": "<%@ page language=\"java\" contentType=\"text/html; charset=UTF-8\" pageEncoding=\"UTF-8\" %>\n<%@ page import=\"java.util.List\" %>\n<html><body><% for (String entry : List.of(\"archive\", \"document\")) { %><p><%= entry %></p><% } %></body></html>\n",
+    "repeat": 3,
+    "frame": "2MQFJeOwmA2EdZFx9BUNuNINBbJX32q7axshICK490jcMQD5zTYC31HRpouaMJdaAKntg+YgPriz/wARvb8ZjHmvN6Iu/xZ1JRbzHmU="
+  },
+  {
+    "name": "php",
+    "id": 14,
+    "text": "<?php\ndeclare(strict_types=1);\nfunction restoreArchive(array $entries): string { return implode(\"\\n\", $entries); }\nforeach ([\"archive\", \"document\"] as $entry) { echo htmlspecialchars($entry, ENT_QUOTES, \"UTF-8\"); }\n?>\n",
+    "repeat": 3,
+    "frame": "2I4FZi+aSg7h+yay4kUaHfd0sU4THAunceXUwnAFK/ehLPvXG68AezgtwXXAAIPoB2BPvf7TU98zUAm/yHkk2b2CLm/BGcrPtuuWZWhN+MllhiOM6VLOKoKg+cS589Sd"
+  },
+  {
+    "name": "python",
+    "id": 15,
+    "text": "from pathlib import Path\nfrom typing import Iterable\ndef restore_archive(entries: Iterable[str]) -> str:\n    return \"\\n\".join(entries)\nif __name__ == \"__main__\":\n    for entry in [\"archive\", \"document\"]:\n        print(restore_archive([entry]))\n",
+    "repeat": 3,
+    "frame": "2NwFdYNhDg8Ye+ff0NhMdRT5buErxeD4y3NSYefEAFw/pohsui2AV5oOG8E/lZNq2oKPoIwtP9TuMaIYbnJRVz7dXhwn7XkLpDa7WcgSfg8YS5o34hO8rqG7YiJRP/wzuCc="
+  },
+  {
+    "name": "ruby",
+    "id": 16,
+    "text": "class Archive\n  attr_reader :entries\n  def initialize(entries)\n    @entries = entries\n  end\n  def restore\n    @entries.map { |entry| entry.to_s }.join(\"\\n\")\n  end\nend\nputs Archive.new([\"archive\", \"document\"]).restore\n",
+    "repeat": 3,
+    "frame": "2IsFBncNDxDm4Rwp7EC5d9rnuOORTrNmsTVzMWzi8iogyuz1ljFIgJkVJ4pSVTDGfeOTnhSlY+yrgWlVxAVlvQDey6VqWbdGPPSFT1yUcYZKqLk3aQ=="
+  },
+  {
+    "name": "rust",
+    "id": 17,
+    "text": "use std::collections::HashMap;\npub fn restore_archive(entries: &[(&str, &str)]) -> HashMap<String, String> { entries.iter().map(|(id, content)| (id.to_string(), content.to_string())).collect() }\nfn main() { println!(\"{:?}\", restore_archive(&[(\"archive\", \"document\")])); }\n",
+    "repeat": 3,
+    "frame": "2LAGyycXrxHmSWPAZVNe3qtlBpg+IHfr1FktKqPu1zH15PNq4PRaH3Pd+VVj27qoh1R7sOqi00OLjvHfAvMwF8c96cHqFFmFrymGrJNBTKaEGmRLSr+pXeHHE5vCcf+ciFA/xkPfy56TyCI="
+  },
+  {
+    "name": "zig",
+    "id": 18,
+    "text": "const std = @import(\"std\");\npub fn main() !void { var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator); defer arena.deinit(); const allocator = arena.allocator(); const content = try allocator.dupe(u8, \"archive\"); std.debug.print(\"{s}\\n\", .{content}); }\n",
+    "repeat": 3,
+    "frame": "2KEGrBz88xL6zo+9/obL2PqdFeZCt6Jmy3IdipV+dTQWTss+jkhe6BlW9rm7YtxXIlqLtY4n+4dL0+qSjyY2ad9d0+EV"
+  },
+  {
+    "name": "zh-CN",
+    "id": 19,
+    "text": "这个文档经过压缩后保存。读取时恢复原始内容，保留所有字符和换行。语言会自动识别，数据不会丢失。\n",
+    "repeat": 3,
+    "frame": "2KoDtPCiBRPSaySLcD8tRQK0EKpojZZmA1k6l19N/Sdq505bKTzC5jg5FUopLOFRrYBtXEybVUUQYpyyZmnHrSCFLBpOuGI="
+  },
+  {
+    "name": "zh-TW",
+    "id": 20,
+    "text": "這個文件經過壓縮後儲存。讀取時還原原始內容，保留所有字元與換行。語言會自動識別，資料不會遺失。\n",
+    "repeat": 3,
+    "frame": "2KoDGS4+sxTr5WZorIgvTQcb2sTPbWNdlLvhm0zSbB2KwuOxCSI35UXHMVe8V2nuZEoeQStoC6tZvyE74mKpl+yFeffkKiG2Qg=="
+  }
+]

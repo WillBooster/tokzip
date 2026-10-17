@@ -1,7 +1,25 @@
 # tokzip frame format (version 2)
 
-The decoder accepts only the current format version. Dictionaries and model priors are part
-of the format identity; encoder search can improve without changing it.
+Format 2 is a permanent read contract: future package releases must continue to decode valid
+format-2 frames. The current writer emits format 2. Earlier experimental formats are unsupported.
+Package versions and frame-format versions are independent.
+
+Dictionaries, trained model priors, language IDs, token grammar, and decoding rules are format
+identity. Changing them for new writes requires a new format identifier and retaining the
+format-2 decoder with its original assets. The frame header identifies which decoder to use;
+introducing a new writer must not require rewriting existing stored records. Encoder search
+and language detection may improve within format 2 when the existing decoder can still read
+the resulting frames.
+
+`test/fixtures/format2Assets.json` freezes the SHA-256 of every format-2 dictionary and prior
+from its recorded source revision. The asset check also rejects added or removed `.bin` files
+in the current asset directories. When introducing new assets, preserve the frozen format-2
+set separately and keep its hash checks; do not replace the recorded hashes with new values.
+`test/fixtures/format2Languages.json` contains independent single-segment reference frames
+for every language ID, encoded with that language's dictionary and priors at the same revision.
+`test/fixtures/format2.json` also covers empty and nonempty stored frames, multi-segment frames,
+and blocked frames with coded and stored blocks.
+Keep these fixtures unchanged and run them against the public decoder in every release.
 
 The reference implementation is `rust/crates/tokzip`. All multi-byte integers are little-endian;
 varints are LEB128 (7 payload bits per byte, bit 7 = continue, canonical: a multi-byte varint
