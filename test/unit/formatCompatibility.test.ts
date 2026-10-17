@@ -13,6 +13,10 @@ interface ReferenceFrame {
 
 const referenceFrames: ReferenceFrame[] = [...fixtures, ...languages];
 
+test('keeps one reference frame for every format-2 language ID', () => {
+  expect(languages.map(({ id }) => id).toSorted((a, b) => a - b)).toEqual(Array.from({ length: 21 }, (_, id) => id));
+});
+
 for (const fixture of referenceFrames) {
   test(`reads a frozen format-2 frame: ${fixture.name}`, () => {
     const expected = fixture.text.repeat(fixture.repeat);
