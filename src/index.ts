@@ -4,6 +4,7 @@
 // module the way Workers require.
 /// <reference lib="es2024.string" />
 import { readFileSync } from 'node:fs';
+
 import { createCodec, type DecompressOptions } from './core.ts';
 
 export { type Codec, type DecompressOptions, FORMAT_VERSION, TokzipDecodeError } from './core.ts';

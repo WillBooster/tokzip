@@ -11,6 +11,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { brotliCompressSync, constants as zlibConstants, gzipSync } from 'node:zlib';
+
 import { compress, decompress } from '../../src/index.ts';
 import { type Doc, loadBenchDocs } from './documents.ts';
 import { summarizeTimings, type Timings } from './timings.ts';

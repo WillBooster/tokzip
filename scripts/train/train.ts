@@ -11,6 +11,7 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+
 import { CORPUS_DIR, corpusDirs } from '../corpus.ts';
 import { buildWrapperDictionary } from './wrapperContent.ts';
 

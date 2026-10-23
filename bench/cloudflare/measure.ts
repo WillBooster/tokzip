@@ -1,7 +1,9 @@
 import { type ChildProcess, spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
 import { setTimeout } from 'node:timers/promises';
+
 import { z } from 'zod';
+
 import { compress } from '../../src/index.ts';
 import { SAMPLES } from './samples.ts';
 

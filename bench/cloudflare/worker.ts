@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer';
-import { createCodec, type Codec } from '../../src/core.ts';
+
+import { type Codec, createCodec } from '../../src/core.ts';
 import wasmModule from '../../wasm/tokzip.wasm';
 import { SAMPLES } from './samples.ts';
 

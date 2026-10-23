@@ -3,33 +3,18 @@
   "version": "0.0.0-semantically-released",
   "description": "Lossless compressor for prompts, LLM outputs, and source code stored at rest: one wasm module, automatic language detection, no options",
   "keywords": [
+    "cloudflare-workers",
     "compression",
     "llm",
     "prompt",
-    "wasm",
-    "cloudflare-workers"
+    "wasm"
   ],
+  "license": "Apache-2.0",
+  "author": "WillBooster Inc.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/WillBooster/tokzip.git"
   },
-  "license": "Apache-2.0",
-  "author": "WillBooster Inc.",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "workerd": "./src/workers.ts",
-      "default": "./dist/index.js"
-    },
-    "./src": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts",
-      "require": "./src/index.ts"
-    }
-  },
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
   "files": [
     "dist/core.d.ts",
     "dist/core.js",
@@ -46,6 +31,25 @@
     "NOTICE",
     "THIRD_PARTY_NOTICES/"
   ],
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "workerd": "./src/workers.ts",
+      "default": "./dist/index.js"
+    },
+    "./src": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "bench": "bun scripts/bench/bench.ts",
     "build": "bun run build/wasm && build-ts lib --input src/index.ts --module-type esm",
@@ -66,23 +70,16 @@
   "devDependencies": {
     "@tsconfig/bun": "1.0.11",
     "@types/bun": "1.4.3",
-    "@willbooster/oxfmt-config": "1.2.2",
-    "@willbooster/oxlint-config": "1.4.8",
-    "@willbooster/wb": "22.27.0",
+    "@willbooster/oxlint-config": "1.4.9",
+    "@willbooster/wb": "22.29.1",
     "build-ts": "21.0.27",
     "conventional-changelog-conventionalcommits": "10.4.1",
     "lefthook": "2.2.2",
-    "oxfmt": "0.73.0",
     "oxlint": "1.88.0",
     "oxlint-tsgolint": "7.0.2004",
     "semantic-release": "25.0.9",
-    "sort-package-json": "4.1.0",
     "wrangler": "4.149.0",
     "zod": "4.6.7"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   },
   "patchedDependencies": {
     "braces@3.0.3": "patches/braces@3.0.3.patch"

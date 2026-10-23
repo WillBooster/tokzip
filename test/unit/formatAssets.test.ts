@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
+
 import assets from '../fixtures/format2Assets.json';
 
 const root = new URL('../../', import.meta.url);
