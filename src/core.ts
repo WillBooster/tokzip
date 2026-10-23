@@ -128,7 +128,7 @@ export function createCodec(loadModule: () => WebAssembly.Module): Codec {
       // A negative limit would wrap to a huge unsigned length at the wasm boundary (NaN fails too).
       if (!(maxLength >= 0)) throw new RangeError(`tokzip: maxLength must be a non-negative number, got ${maxLength}`);
       // wasm32 lengths are 32-bit; anything above cannot be a frame's length anyway.
-      const maxLen = Math.min(maxLength, 0xFF_FF_FF_FF);
+      const maxLen = Math.min(maxLength, 0xff_ff_ff_ff);
       return withInput(frame, (exports, ptr, len) => {
         const code = exports.tokzip_decompress(ptr, len, maxLen);
         if (code !== 0) throw new TokzipDecodeError(code);

@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+
 import { compress, decompress, TokzipDecodeError } from '../../src/index.ts';
 
 const SAMPLE = 'const answer = 42; // the answer\n'.repeat(20) + 'ゲームの仕様を以下に示します。'.repeat(10);
@@ -49,7 +50,7 @@ describe('malformed frames', () => {
     const frame = compress(SAMPLE);
     for (let i = 0; i < frame.length; i++) {
       const mutated = Uint8Array.from(frame);
-      mutated[i] = mutated[i]! ^ 0x5A;
+      mutated[i] = mutated[i]! ^ 0x5a;
       let decoded: string | undefined;
       try {
         decoded = decompress(mutated);

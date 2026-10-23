@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+
 import { compress, decompress, FORMAT_VERSION, TokzipDecodeError } from '../../src/index.ts';
 
 const JAPANESE_PROMPT = `以下の要件を満たすブロック崩しゲームを作成してください。
@@ -77,7 +78,7 @@ describe('compress/decompress', () => {
   });
 
   test('never expands incompressible input beyond the stored frame', () => {
-    let x = 0x25_45_F4_91;
+    let x = 0x25_45_f4_91;
     const randomText = (length: number): string => {
       let text = '';
       for (let i = 0; i < length; i++) {
